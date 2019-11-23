@@ -76,8 +76,8 @@ def checkPathsExists(*args):
 			printBoldRed("Path not found: "+path)
 			failFlag=True
 	if failFlag==True:
-		return 1
-	return 0
+		return False
+	return True
 
 
 def checkFilesExists(*args):
@@ -88,12 +88,31 @@ def checkFilesExists(*args):
 			failFlag=True
 	
 	if failFlag:
-		return 1
-	return 0
+		return False
+	return True
 
 def checkHisatIndex(index):
 	return checkFilesExists(index+".1.ht2")
 	
+
+def bytetoReadable(sizeInBytes):
+    """
+    function to convert bytes to human readable format (MB,GB ...)
+    """
+    for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
+        if sizeInBytes < 1024.0:
+            return "%3.1f %s" % (sizeInBytes, x)
+        sizeInBytes /= 1024.0
+
+
+def getFileSize(file_path):
+    """
+    Return File size in human readable format
+    """
+    
+    if (checkFilesExists(file_path)):
+        file_info = os.stat(file_path)
+        return bytetoReadable(file_info.st_size)
     
 
 if __name__ == "__main__":
