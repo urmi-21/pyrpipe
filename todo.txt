@@ -1,0 +1,3 @@
+handle paired and single files differently
+generate reports for each analysis
+
