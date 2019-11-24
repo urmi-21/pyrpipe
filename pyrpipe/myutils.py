@@ -22,20 +22,20 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def printBoldRed(text):
-	print (bcolors.FAIL + bcolors.BOLD+ text + bcolors.ENDC)
+    print (bcolors.FAIL + bcolors.BOLD+ text + bcolors.ENDC)
 
 def printGreen(text):
-	print (bcolors.OKGREEN + text + bcolors.ENDC)
+    print (bcolors.OKGREEN + text + bcolors.ENDC)
 
 def printBlue(text):
-	print (bcolors.OKBLUE + text + bcolors.ENDC) 
+    print (bcolors.OKBLUE + text + bcolors.ENDC) 
 
 ######End color functions###################
 
 def getCommandReturnValue(cmd):
-	result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-	stdout,stderr = result.communicate()
-	return result.returncode
+    result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+    stdout,stderr = result.communicate()
+    return result.returncode
 
 def executeCommand(cmd):
       
@@ -70,30 +70,30 @@ def findFiles(path,name,recursive):
     return results
 
 def checkPathsExists(*args):
-	failFlag=False
-	for path in args:
-		if not os.path.exists(path):
-			printBoldRed("Path not found: "+path)
-			failFlag=True
-	if failFlag==True:
-		return False
-	return True
+    failFlag=False
+    for path in args:
+        if not os.path.exists(path):
+            printBoldRed("Path not found: "+path)
+            failFlag=True
+    if failFlag==True:
+        return False
+    return True
 
 
 def checkFilesExists(*args):
-	failFlag=False
-	for path in args:
-		if not os.path.isfile(path):
-			printBoldRed("File not found: "+path)
-			failFlag=True
-	
-	if failFlag:
-		return False
-	return True
+    failFlag=False
+    for path in args:
+        if not os.path.isfile(path):
+            printBoldRed("File not found: "+path)
+            failFlag=True
+    
+    if failFlag:
+        return False
+    return True
 
 def checkHisatIndex(index):
-	return checkFilesExists(index+".1.ht2")
-	
+    return checkFilesExists(index+".1.ht2")
+    
 
 def bytetoReadable(sizeInBytes):
     """
@@ -113,6 +113,38 @@ def getFileSize(file_path):
     if (checkFilesExists(file_path)):
         file_info = os.stat(file_path)
         return bytetoReadable(file_info.st_size)
+    
+def parseUnixStyleArgs(validArgsList,passedArgs):
+    """
+    Function creates arguments to pass to unix systems through popen
+    Parameters
+    ----------
+    arg1 : list
+        list of valid arguments. Invalid arguments will be ignored
+    arg2: keyword value argument list to be parsed
+        
+    Returns
+    -------
+        list
+            a list with command line arguments to be used with popen
+
+        Examples
+        --------
+        >>> parseUnixStyleArgs(['-O','-t','-q'], **{"-O": "./test", "Attr2": "XX","-q":""})
+        ['-O','./test','-q']
+    """
+    popenArgs=[]
+    for key, value in passedArgs.items():
+        #check if key is a valid argument
+        if key in validArgsList:
+            popenArgs.append(key)
+            #do not add emty parameters e.g. -q or -v
+            if len(value)>0:
+                    popenArgs.append(value)
+        else:
+            print("Unknown argument {0} = {1}. ignoring...".format(key, value))
+    return popenArgs
+    
     
 
 if __name__ == "__main__":

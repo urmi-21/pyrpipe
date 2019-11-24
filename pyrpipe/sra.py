@@ -51,24 +51,19 @@ class SRA:
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
         pathFound=False
         sraLocation=""
-        prefetchArgs=[]
-        for key, value in kwargs.items():
-            #check if key is a valid argument
-            if key in prefetchArgsList:
-                prefetchArgs.append(key)
-                if key == "-O":
-                    #create a directory <srrAccession>
-                    value=os.path.join(value,self.srrAccession)
-                    sraLocation=value
-                    pathFound=True
-                #do not add emty parameters e.g. -q or -v
-                if len(value)>0:
-                    prefetchArgs.append(value)
-            else:
-                print("Unknown argument {0} = {1}. ignoring...".format(key, value))
+        
+        #append srrid at the end of path
+        if '-O' in kwargs:
+            pathFound=True
+            value=kwargs['-O']
+            value=os.path.join(value,self.srrAccession)
+            kwargs['-O']=value
+            sraLocation=value
+            
+        
         
         prefetch_Cmd=['prefetch']
-        prefetch_Cmd.extend(prefetchArgs)
+        prefetch_Cmd.extend(parseUnixStyleArgs(prefetchArgsList,kwargs))
         #if path is not specified, used current directory
         if not pathFound:
             prefetch_Cmd.extend(['-O',os.path.join(os.getcwd(),self.srrAccession)])
@@ -93,11 +88,17 @@ class SRA:
         self.localSRAPath=os.path.join(sraLocation,self.srrAccession+".sra")
         #validate path exists
         if not checkFilesExists(self.localSRAPath):
-            print ("Error downloading file. File "+self.localSRAPath+" does not exist!!!")
+            printBoldRed("Error downloading file. File "+self.localSRAPath+" does not exist!!!")
             return False
         
         print ("Downloaded file: "+self.localSRAPath+" {0} ".format(getFileSize(self.localSRAPath)))
         return True
+    
+    def sraFileExistsLocally(self):
+        if hasattr(self,'localSRAPath'):
+            return(os.path.isfile(self.localSRAPath))
+        else:
+            return False
         
         
 
@@ -105,9 +106,10 @@ if __name__ == "__main__":
     #test
     newOb=SRA('SRR10408795')
     print(newOb.getSrrAccession())
-    tel = {'jack': 4098, 'sape': 4139}
-    newOb.downloadSRAFile(**{"-O": "/home/usingh/work/urmi/hoap/test", "Attr2": "Val2","-q":""})
     
+    print(newOb.sraFileExistsLocally())
+    newOb.downloadSRAFile(**{"-O": "/home/usingh/work/urmi/hoap/test", "Attr2": "Val2","-q":""})
+    print(newOb.sraFileExistsLocally())
     
     
     
