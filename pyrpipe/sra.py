@@ -225,9 +225,10 @@ if __name__ == "__main__":
     print ("done")
     
     #create hisat index
-    import mapping
+    import mapping,assembly
     hs=mapping.Hisat2("/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex")
     samtOb=mapping.Samtools()
+    stieOb=assembly.Stringtie()
     
     temp=hs.runHisat2(sra3,**{"-p":"10","--dta-cufflinks":""})
     
@@ -246,6 +247,9 @@ if __name__ == "__main__":
         #run hisat
         hisatStatus=hs.runHisat2(thisOb,**{"-p":"10","--dta-cufflinks":""})
         if hisatStatus[0]: samtOb.samToSortedBam(hisatStatus[1],10)
+        
+        #run stie
+        
     
     
     
