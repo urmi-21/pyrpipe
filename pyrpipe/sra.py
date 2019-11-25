@@ -46,17 +46,17 @@ class SRA:
         prefetch will create a folder with name same as <srrAccession> under the location (path) specified.
         The path of downloaded file is saved in the object as localSRAPath. This localSRAPath is then used
         by other functions to access the downloaded data. 
-        The **kwargs is for passing arguments to the prefetch command
+        The **kwargs is for passing arguments to the prefetch command.
+        
         Parameters
         ----------
-        arg1 : string
-            location on disk to downloaded the file. prefetch will create a folder with name same as <srrAccession> under the path specified.
-            Default is the current directory
+        arg1:
+            dict containing prefetch arguments
         
         Returns
         -------
         bool
-            Return status of the prefetch command. 0 for successfull download and 1 for failiure
+            Return status of the prefetch command. True if successful download and False if failed.
 
         Examples
         --------
@@ -70,18 +70,16 @@ class SRA:
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
         pathFound=False
         
-        #append srrid at the end of path
+        #ignore location and file name arguments if given
         if '-O' in kwargs:
             print("Ignoring -O flag."+" location is: "+self.location)
             #delete -O parameter
             del kwargs['-O']
-            '''
-            pathFound=True
-            value=kwargs['-O']
-            value=os.path.join(value,self.srrAccession)
-            kwargs['-O']=value
-            sraLocation=value
-            '''
+        if '-o' in kwargs:
+            print("Ignoring -o flag."+" File name is: "+self.srrAccession)
+            #delete -o parameter
+            del kwargs['-o']
+            
 
         prefetch_Cmd=['prefetch']
         prefetch_Cmd.extend(parseUnixStyleArgs(prefetchArgsList,kwargs))
@@ -114,23 +112,74 @@ class SRA:
            
     
     def sraFileExistsLocally(self):
-        if hasattr(self,'localSRAPath'):
+        if hasattr(self,'localSRAFilePath'):
             return(os.path.isfile(self.localSRAFilePath))
         else:
             return False
     
+    def runFasterQDump(self,deleteSRA=False,**kwargs):
+        """Execute fasterq-dump to convert .sra file to fastq files.
+        The fastq files will be stored in the same directory as the sra file.
         
+        Parameters
+        ----------
+        arg1: bool
+            delete sra file after completion
+            
+        arg2: dict
+            A dict containing fasterq-dump arguments
+        
+        Returns
+        -------
+        bool
+            Return status of the fasterq-dump command. True if successful download and False if failed.
+
+        Examples
+        --------
+        >>> object.runFasterQDump()
+        True
+        """
+        
+        #first check is sra exists
+        if not self.sraFileExistsLocally():
+            print ("{0} does'n exist".format(self.localSRAFilePath))
+            return False
+        #else directly run fasterq-dump on accession
+        
+        fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V','-L','-v','-q','-b','-m','-e','-x','-S','-3','-P','-M','-B','--option-file','--strict','--table','--include-technical','--skip-technical','--concatenate-reads']
+        
+        
+        
+        #ignore location and file name arguments if given
+        if '-O' in kwargs:
+            print("Ignoring -O flag."+" location is: "+self.location)
+            #delete -O parameter
+            del kwargs['-O']
+        if '-o' in kwargs:
+            print("Ignoring -o flag."+" File name is: "+self.srrAccession)
+            #delete -o parameter
+            del kwargs['-o']
+        
+        
+        #execute command
+        
+        fstrqd_Cmd=['fasterq-dump']
+        fstrqd_Cmd.extend(parseUnixStyleArgs(fasterqdumpArgsList,kwargs))
+        fstrqd_Cmd.extend(['-O',self.location])
+        fstrqd_Cmd.append(self.localSRAFilePath)
+        print("Executing:"+" ".join(fstrqd_Cmd))
 
 if __name__ == "__main__":
     #test
     newOb=SRA('SRR10408795',"/home/usingh/work/urmi/hoap/test")
     print(newOb.getSrrAccession())
-    
     print(newOb.sraFileExistsLocally())
     newOb.downloadSRAFile(**{"-O": "/home/usingh/work/urmi/hoap", "Attr2": "Val2","-q":""})
     print(newOb.sraFileExistsLocally())
+    newOb.runFasterQDump(**{"-O": "/home/usingh/work/urmi/hoap", "Attr2": "Val2","-S":"","--skip-technical":""})
     
-    
+    sraOb2=SRA("ERR3520221","/home/usingh/work/urmi/hoap/test")
+    sraOb2.downloadSRAFile()
     
     
     
