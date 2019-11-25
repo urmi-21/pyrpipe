@@ -229,10 +229,10 @@ if __name__ == "__main__":
     #-e numthreads, -S split files, -t temp directory
     sraOb2.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
     
+    import mapping
+    hs=mapping.HISAT2("xyz","a")
     
-    
-    
-    
+    print ("done")
     
     
     

@@ -10,18 +10,25 @@ contains classes of RNA-Seq mapping programs
 from myutils import *
 
 class HISAT2:
-    def __init__(self,hisat2Index=""):
+    def __init__(self,hisat2Index="",*args):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
         
         """
+        
+        
         #check index exists
         if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
+            print("Found HISAT2 index files.")
             self.hisat2Index=hisat2Index
+        elif args :
+            print("Building HISAT2 index with "+ str(args))
+            indexPath,indexName=os.path.split(hisat2Index)
+            self.buildHisat2Index(indexPath,indexName,*args)
         else:
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
     def buildHisat2Index(self,indexPath,indexName,*args):
-        print("building hisat index...")
+        print("Building hisat index...")
         
         
     
@@ -47,3 +54,9 @@ class STAR:
     def __init__(self,starIndex):
         """STAR constructor. Initialize star's index and other parameters.
         """
+
+if __name__ == "__main__":
+    
+    hs=HISAT2("ssa","as","dsa","","dsadrr")
+    
+    print ("done")
