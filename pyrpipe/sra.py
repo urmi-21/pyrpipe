@@ -216,6 +216,7 @@ class SRA:
 if __name__ == "__main__":
     #test
     testDir="/home/usingh/work/urmi/hoap/test"
+    '''
     newOb=SRA('SRR10408795',testDir)
     print(newOb.sraFileExistsLocally())
     newOb.downloadSRAFile(**{})
@@ -228,14 +229,20 @@ if __name__ == "__main__":
     sraOb2.downloadSRAFile()
     #-e numthreads, -S split files, -t temp directory
     sraOb2.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
+    '''
     
-    import mapping
-    hs=mapping.HISAT2("xyz","a")
+    yeastList=['SRR1583780','SRR5507495','SRR5507442','SRR5507362','SRR5507343','SRR5507356','SRR5507413','SRR5507339','SRR5507399','SRR5507353','SRR5507415','SRR5507444','SRR5507419','SRR5507379','SRR5507434']
     
+    sra3=SRA("SRR5507434",testDir)
+    sra3.downloadSRAFile()
+    sra3.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir,"-f":""})
     print ("done")
     
+    #create hisat index
+    import mapping
+    hs=mapping.HISAT2("/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex")
     
-    
+    print(hs.runHisat2(sra3,"newHS",**{"-p":"10","--dta-cufflinks":""}))
     
     
     

@@ -15,7 +15,8 @@ class HISAT2:
         Parameters
         ----------
         
-        """
+        """        
+       
         
         
         #check index exists
@@ -34,7 +35,7 @@ class HISAT2:
         
         
     
-    def runHisat2(self,sraOb,**kwargs):
+    def runHisat2(self,sraOb,outSamSuffix="_hisat2",**kwargs):
         """Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
         All output will be written to SRA.location by default.
         
@@ -46,7 +47,64 @@ class HISAT2:
         arg2: dict
             arguments to be passed to hisat2
         """
+        
+        #check for a valid index
+        if not self.checkHisat2Index():
+            raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
+         #save information about the SRAobject
+         #self.SRAob=SRAob
+         
+        #scan for prefetch arguments
+        hisatArgsList=['-p','--dta-cufflinks']
+        
+        outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+        
+        
+        #check if file exists. return if yes
+        if checkFilesExists(outSamFile):
+            print("The file "+outSamFile+" already exists. Exiting..")
+            return False,outSamFile
+            
+        hisat2_Cmd=['hisat2']
+        hisat2_Cmd.extend(parseUnixStyleArgs(hisatArgsList,kwargs))
+        hisat2_Cmd.extend(['-x',self.hisat2Index])
+        if sraOb.layout == 'PAIRED':
+            hisat2_Cmd.extend(['-1',sraOb.localfastq1Path])
+            hisat2_Cmd.extend(['-2',sraOb.localfastq2Path])
+        else:
+            hisat2_Cmd.extend(['-U',sraOb.localfastqPath])
+        #save output to the sraob location folder 
+        hisat2_Cmd.extend(['-S',outSamFile])
+        print("Executing:"+" ".join(hisat2_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(hisat2_Cmd):
+                print (output)    
+                log=log+str(output)
+            #save to a log file
+
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False,"NA"
+        
+        #check if sam file is present in the location directory of sraOb
+        if not checkFilesExists(outSamFile):
+            return False,"NA"
+        
+        #return status and path to output sam
+        return True,outSamFile
+        
+        
+    
+    def checkHisat2Index(self):
+        if hasattr(self,'hisat2Index'):
+            return(checkHisatIndex(self.hisat2Index))
+        else:
+            return False
 
 
 
@@ -63,3 +121,14 @@ if __name__ == "__main__":
     hs=HISAT2("ssa","as","dsa","","dsadrr")
     
     print ("done")
+    
+    
+    
+    
+    
+class SAMTOOLS:
+    def __init__(self):
+        
+        
+    def runSAMtoBAM(self,samFile):
+        
