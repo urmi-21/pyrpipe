@@ -56,6 +56,7 @@ class STAR:
         """
 
 if __name__ == "__main__":
+    #test
     
     hs=HISAT2("ssa","as","dsa","","dsadrr")
     
