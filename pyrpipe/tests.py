@@ -24,7 +24,7 @@ stieOb=assembly.Stringtie()
 
     
     
-shortList=yeastList[0:3]
+shortList=yeastList[0:10]
 sraOBs=[]
 #download all sra
 for r in shortList:
@@ -37,5 +37,6 @@ for r in shortList:
         temp=samtOb.samToSortedBam(hisatStatus[1],10)
         stieOb.runStringtie(temp,8,outDir=testDir+"/gtfsDir")
         
-
+    else:
+        print("Failed Hisat for "+r)
     
