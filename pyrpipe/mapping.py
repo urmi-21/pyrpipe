@@ -9,14 +9,17 @@ contains classes of RNA-Seq mapping programs
 
 from myutils import *
 
-class HISAT2:
+class Hisat2:
     def __init__(self,hisat2Index="",*args):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
         Parameters
         ----------
         
-        """        
-       
+        """ 
+        self.programName="hisat2"
+        #check if hisat2 exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
         
         #check index exists
@@ -64,7 +67,7 @@ class HISAT2:
         #check if file exists. return if yes
         if checkFilesExists(outSamFile):
             print("The file "+outSamFile+" already exists. Exiting..")
-            return False,outSamFile
+            return True,outSamFile
             
         hisat2_Cmd=['hisat2']
         hisat2_Cmd.extend(parseUnixStyleArgs(hisatArgsList,kwargs))
@@ -110,11 +113,16 @@ class HISAT2:
 
 
 
-class STAR:
+class Star:
     def __init__(self,starIndex):
         """STAR constructor. Initialize star's index and other parameters.
         """
-
+        
+        self.programName="star"
+        #check if hisat2 exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+            
 if __name__ == "__main__":
     #test
     
@@ -126,9 +134,106 @@ if __name__ == "__main__":
     
     
     
-class SAMTOOLS:
+class Samtools:
     def __init__(self):
+        self.programName="samtools"
+        #check if hisat2 exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+    def samToBam(self,samFile,proc,deleteSam=True):
+        """Convert sam file to a bam file. Output bam file will have same name as input sam.
+        """
+        fname=samFile.split('.sam')[0]
+        outBamFile=fname+'.bam'
+        samToBamCmd=['samtools','view','-@',str(proc),'-b','-o',outBamFile,samFile]
+        print("Executing: "+" ".join(samToBamCmd))
+        try:
+            for output in executeCommand(samToBamCmd):
+                print(output)
+        except subprocess.CalledProcessError as e:
+            print ("Error in command")
+            return -1
+        print("sam2bam finished")
+    
+        #deletesamfile
+        if deleteSam:
+            delSamCmd=['rm',samFile]
+            print("Deleting sam file...")
+            try:
+                    for output in executeCommand(delSamCmd):
+                            print (output)
+            except subprocess.CalledProcessError as e:
+                print ("Error in command")
+                return -1
+        
+        #check if bam file exists
+        if not checkFilesExists(outBamFile):
+            return False,"NA"
+        #return status and file
+        return True,outBamFile
         
         
-    def runSAMtoBAM(self,samFile):
+        
+        
+    #sort bam file.output will be bamFile_sorted.bam
+    def sortBam(self,bamFile,proc,deleteOriginalBam=True):
+        fname=bamFile.split('.bam')[0]
+        outSortedBamFile=fname+"_sorted.bam"
+        bamSortCmd=['samtools','sort','-o',outSortedBamFile,'-@',str(proc),bamFile]
+        print("Executing: "+" ".join(bamSortCmd))
+        try:
+            for output in executeCommand(bamSortCmd):
+                print (output)
+        except subprocess.CalledProcessError as e:
+            print ("Error in command")
+            return False
+        print("SamSort finished")
+    
+        if deleteOriginalBam:
+            delBamCmd=['rm',bamFile]
+            print("Deleting unsorted bam file...")
+            try:
+                for output in executeCommand(delBamCmd):
+                         print (output)
+            except subprocess.CalledProcessError as e:
+                 print ("Error in command")
+                 return False
+        
+        #check if bam file exists
+        if not checkFilesExists(outSortedBamFile):
+            return False,"NA"
+        #return status and file
+        return True,outSortedBamFile
+    
+    def samToSortedBam(self,samFile,proc,deleteSam=True,deleteOriginalBam=True):
+        """Convert sam file to bam and sort the bam file.
+        """
+        
+        sam2BamStatus=self.samToBam(samFile,proc,deleteSam)
+        
+        if not sam2BamStatus[0]:
+            raise Exception("ERROR in converting sam to bam: "+samFile)
+        
+        bamSortStatus=self.sortBam(sam2BamStatus[1],proc,deleteOriginalBam)
+        
+        if not bamSortStatus[0]:
+            raise Exception("ERROR sorting bam file: "+sam2BamStatus[1])
+        
+        return bamSortStatus[1]
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         

@@ -216,20 +216,6 @@ class SRA:
 if __name__ == "__main__":
     #test
     testDir="/home/usingh/work/urmi/hoap/test"
-    '''
-    newOb=SRA('SRR10408795',testDir)
-    print(newOb.sraFileExistsLocally())
-    newOb.downloadSRAFile(**{})
-    print(newOb.sraFileExistsLocally())
-    #-e numthreads, -S split files, -t temp directory
-    newOb.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
-    
-    
-    sraOb2=SRA("ERR3520221",testDir)
-    sraOb2.downloadSRAFile()
-    #-e numthreads, -S split files, -t temp directory
-    sraOb2.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
-    '''
     
     yeastList=['SRR1583780','SRR5507495','SRR5507442','SRR5507362','SRR5507343','SRR5507356','SRR5507413','SRR5507339','SRR5507399','SRR5507353','SRR5507415','SRR5507444','SRR5507419','SRR5507379','SRR5507434']
     
@@ -240,9 +226,33 @@ if __name__ == "__main__":
     
     #create hisat index
     import mapping
-    hs=mapping.HISAT2("/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex")
+    hs=mapping.Hisat2("/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex")
+    samtOb=mapping.Samtools()
     
-    print(hs.runHisat2(sra3,"newHS",**{"-p":"10","--dta-cufflinks":""}))
+    temp=hs.runHisat2(sra3,**{"-p":"10","--dta-cufflinks":""})
+    
+    if temp[0]:
+        samtOb.samToSortedBam(temp[1],10)
+    
+    
+    
+    shortList=yeastList[0:3]
+    sraOBs=[]
+    #download all sra
+    for r in shortList:
+        thisOb=SRA(r,testDir)
+        thisOb.downloadSRAFile()
+        thisOb.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir,"-f":""})
+        #run hisat
+        hisatStatus=hs.runHisat2(thisOb,**{"-p":"10","--dta-cufflinks":""})
+        if hisatStatus[0]: samtOb.samToSortedBam(hisatStatus[1],10)
+    
+    
+    
+    
+    
+    
+    
     
     
     

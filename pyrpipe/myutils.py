@@ -172,6 +172,32 @@ def isPairedSRA(pathToSraFile):
         raise Exception("Error running fastq-dump");
     
     
+    
+def checkDep(depList):
+    """Check whether specified programs exist in the environment.
+    This uses the which command to test whether a program is present.
+    
+    Parameters
+    ----------
+    arg1: list
+        list of programs to test
+        
+    Returns
+    -------
+        bool True is all dependencies are satified, False otherwise.
+    """
+    errorFlag=False
+    for s in depList:
+        printBlue("Checking "+s+"...")
+        thisCmd=['which',s]
+        if(getCommandReturnValue(thisCmd)==0):
+            printGreen ("Found "+s)
+        else:
+            printBoldRed ("Can not find "+s)
+            errorFlag=True
+    if errorFlag:
+        return False
+    return True
 
 if __name__ == "__main__":
     #test
