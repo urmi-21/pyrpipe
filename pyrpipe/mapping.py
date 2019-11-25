@@ -65,7 +65,7 @@ class Hisat2:
         
         
         #check if file exists. return if yes
-        if checkFilesExists(outSamFile):
+        if os.path.isfile(outSamFile):
             print("The file "+outSamFile+" already exists. Exiting..")
             return True,outSamFile
             
@@ -123,16 +123,7 @@ class Star:
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-if __name__ == "__main__":
-    #test
-    
-    hs=HISAT2("ssa","as","dsa","","dsadrr")
-    
-    print ("done")
-    
-    
-    
-    
+
     
 class Samtools:
     def __init__(self):

@@ -17,7 +17,7 @@ class Stringtie:
             
             
  #function to run stringtie
-    def runStringtie(inputBAM,proc,referenceGTF=False,outDir=False,outSuffix="_stie"):
+    def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,outSuffix="_stie"):
         
         #check if bam file exists
         if not checkFilesExists(inputBAM):
@@ -26,17 +26,18 @@ class Stringtie:
         #use bam file directory as default directory
         if not outDir:
             outDir=os.path.split(inputBAM)[0]
-        fname=outDir=os.path.split(inputBAM)[1]
+        fname=os.path.split(inputBAM)[1]
         outGtfFile=os.path.join(outDir,fname+outSuffix+'.gtf')
         
         #stie command
         stie_Cmd=['stringtie',inputBAM,'-p',str(proc)]
         
-        if len(referenceGTF)>0 and checkFilesExists(referenceGTF):
+        if referenceGTF and checkFilesExists(referenceGTF):
             stie_Cmd.extend(['-G',referenceGTF])
                 
         stie_Cmd.extend(['-o',outGtfFile])
         print("Executing: "+" ".join(stie_Cmd))
+        
         try:
             for output in executeCommand(stie_Cmd):
                 print (output)
