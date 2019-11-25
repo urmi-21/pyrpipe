@@ -12,6 +12,8 @@ from myutils import *
 class HISAT2:
     def __init__(self,hisat2Index="",*args):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
+        Parameters
+        ----------
         
         """
         
