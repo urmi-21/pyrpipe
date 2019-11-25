@@ -142,8 +142,34 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
             if len(value)>0:
                     popenArgs.append(value)
         else:
-            print("Unknown argument {0} = {1}. ignoring...".format(key, value))
+            print("Unknown argument {0} {1}. ignoring...".format(key, value))
     return popenArgs
+    
+
+#modyfied from https://www.biostars.org/p/139422/
+def isPairedSRA(pathToSraFile):
+    """Function to test wheather a .sra file is paired or single.
+    
+    Parameters
+    ----------
+    arg1: string
+        the path ro sra file
+    """
+    if not checkFilesExists(pathToSraFile):
+        raise Exception("Error checking layout. {0} doesn't exist".format(pathToSraFile));
+    
+    try:
+        fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", pathToSraFile]
+        output = subprocess.check_output(fastqdCmd,stderr=subprocess.DEVNULL);
+        numLines=output.decode("utf-8").count("\n")
+        if(numLines == 4):
+            return False;
+        elif(numLines == 8):
+            return True
+        else:
+            raise Exception("Unexpected output from fast-dump");
+    except subprocess.CalledProcessError as e:
+        raise Exception("Error running fastq-dump");
     
     
 
@@ -151,6 +177,8 @@ if __name__ == "__main__":
     #test
     #print(getSRADownloadPath('SRR002328'))
     print(findFiles("/home/usingh/work/urmi","*.py",False))
+    
+    print(isPairedSRA('/home/usingh/work/urmi/hoap/test/SRR10408795/SRR10408795.sra'))
  
 
     

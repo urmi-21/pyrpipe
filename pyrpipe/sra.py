@@ -108,7 +108,16 @@ class SRA:
             return False
         
         print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(getFileSize(self.localSRAFilePath)))
+        #test if file is paired or single end
+        if isPairedSRA(self.localSRAFilePath):
+            self.layout="PAIRED"
+        else:
+            self.layout="SINGLE"
+            
+        
         return True
+    
+    
            
     
     def sraFileExistsLocally(self):
@@ -142,9 +151,9 @@ class SRA:
         
         #first check is sra exists
         if not self.sraFileExistsLocally():
-            print ("{0} does'n exist".format(self.localSRAFilePath))
+            print ("Error executing fasterq-dump: .sra file not found. Please run downloadSRAFile().")
             return False
-        #else directly run fasterq-dump on accession
+        #else directly run fasterq-dump on accession ?
         
         fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V','-L','-v','-q','-b','-m','-e','-x','-S','-3','-P','-M','-B','--option-file','--strict','--table','--include-technical','--skip-technical','--concatenate-reads']
         
@@ -165,21 +174,58 @@ class SRA:
         
         fstrqd_Cmd=['fasterq-dump']
         fstrqd_Cmd.extend(parseUnixStyleArgs(fasterqdumpArgsList,kwargs))
+        #add location
         fstrqd_Cmd.extend(['-O',self.location])
+        #add output filename. output will be <srrAccession>.fastq or <srrAccession>_1.fastq and <srrAccession>_2.fastq
+        fstrqd_Cmd.extend(['-o',self.srrAccession+".fastq"])
         fstrqd_Cmd.append(self.localSRAFilePath)
         print("Executing:"+" ".join(fstrqd_Cmd))
+        
+        log=""
+        try:
+            for output in executeCommand(fstrqd_Cmd):
+                print (output)    
+                log=log+str(output)
+            #save to a log file
+
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False
+        
+        #check if fastq files are downloaded 
+        if(self.layout=="SINGLE"):
+            self.localfastqPath=os.path.join(self.location,self.srrAccession+".fastq")
+            
+            if not checkFilesExists(self.localfastqPath):
+                printBoldRed("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
+                return False
+            
+        else:
+            self.localfastq1Path=os.path.join(self.location,self.srrAccession+"_1.fastq")
+            self.localfastq2Path=os.path.join(self.location,self.srrAccession+"_2.fastq")
+            
+            if not checkFilesExists(self.localfastq1Path,self.localfastq2Path):
+                printBoldRed("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
+                return False
+        
+        return True
+        
+        
 
 if __name__ == "__main__":
     #test
-    newOb=SRA('SRR10408795',"/home/usingh/work/urmi/hoap/test")
-    print(newOb.getSrrAccession())
+    testDir="/home/usingh/work/urmi/hoap/test"
+    newOb=SRA('SRR10408795',testDir)
     print(newOb.sraFileExistsLocally())
-    newOb.downloadSRAFile(**{"-O": "/home/usingh/work/urmi/hoap", "Attr2": "Val2","-q":""})
+    newOb.downloadSRAFile(**{})
     print(newOb.sraFileExistsLocally())
-    newOb.runFasterQDump(**{"-O": "/home/usingh/work/urmi/hoap", "Attr2": "Val2","-S":"","--skip-technical":""})
+    newOb.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
     
-    sraOb2=SRA("ERR3520221","/home/usingh/work/urmi/hoap/test")
+    
+    sraOb2=SRA("ERR3520221",testDir)
     sraOb2.downloadSRAFile()
+    sraOb2.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
     
     
     
