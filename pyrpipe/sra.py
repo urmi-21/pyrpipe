@@ -220,11 +220,13 @@ if __name__ == "__main__":
     print(newOb.sraFileExistsLocally())
     newOb.downloadSRAFile(**{})
     print(newOb.sraFileExistsLocally())
+    #-e numthreads, -S split files, -t temp directory
     newOb.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
     
     
     sraOb2=SRA("ERR3520221",testDir)
     sraOb2.downloadSRAFile()
+    #-e numthreads, -S split files, -t temp directory
     sraOb2.runFasterQDump(**{"-e":"8","-S":"","--skip-technical":"","-t":testDir})
     
     
