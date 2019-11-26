@@ -30,12 +30,21 @@ class SRA:
         self.location=os.path.join(location,self.srrAccession)
         
         ##check if sra, fastq files already exists
+    
         
     def __setattr__(self, name, value):
-        if name not in self.__dict__:
-            self.__dict__[name] = value
+        """Make srr accession immutable
+        """
+        immutableFields=['srrAccession']
+        
+        if (name in immutableFields and name in self.__dict__):
+            raise Exception("Can not modify "+name)
         else:
-            raise Exception("Can not modify this field")
+            self.__dict__[name] = value
+                
+        
+        
+    
         
     def getSrrAccession(self):
             return self.srrAccession
@@ -244,9 +253,31 @@ class SRA:
             print ("Error: No valid QC object provided. Skipping QC for "+self.srrAccession)
             return False
         
+        #save thq qc object for later references
+        self.QCObject=qcObject
+        print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
-        
         qcStatus=qcObject.run(self)
+        print(qcStatus)
+        #if job failed
+        if not qcStatus[0]:
+            print ("Error performing QC for "+self.srrAccession)
+            return False
+        
+        if self.layout=='PAIRED':
+            #create new fields to refer to older fastq files
+            self.localRawfastq1Path=self.localfastq1Path
+            self.localRawfastq2Path=self.localfastq2Path
+            ##update local fastq path
+            self.localfastq1Path=qcStatus[1]    
+            self.localfastq2Path=qcStatus[2]
+        else:
+            self.localRawfastqPath=self.localfastqPath
+            self.localfastqPath=qcStatus[1]
+        
+        
+        return True
+            
             
         
         
