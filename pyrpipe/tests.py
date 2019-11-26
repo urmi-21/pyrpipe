@@ -15,9 +15,9 @@ hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64
 
 #single end ERR2929684
 #download sra->fq>qc
-newSRA=sra.SRA('ERR2929684',testDir)
+newSRA=sra.SRA('SRR5507343',testDir)
 newSRA.downloadSRAFile()
-newSRA.runFasterQDump(**{"-f":""})
+newSRA.runFasterQDump(**{"-f":"","-t":testDir})
 
 #run trimgalore
 tg=qc.Trimgalore(**{"-j":"8","--length":"1"})  #specify to use 8 cores
