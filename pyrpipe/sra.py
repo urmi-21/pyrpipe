@@ -29,6 +29,8 @@ class SRA:
         #append the SRR accession to the location
         self.location=os.path.join(location,self.srrAccession)
         
+        ##check if sra, fastq files already exists
+        
     def __setattr__(self, name, value):
         if name not in self.__dict__:
             self.__dict__[name] = value
@@ -238,12 +240,14 @@ class SRA:
         True
         """
         #check a valid qcObject
-        if qcObject == None:
+        if not (hasattr(qcObject,'category') and qcObject.category=='RNASeqQC'):
             print ("Error: No valid QC object provided. Skipping QC for "+self.srrAccession)
             return False
         
-        #test a valid QC object
-        print(qcObject.category)
+        #each qcObject has a function run() to execute their method
+        
+        qcStatus=qcObject.run(self)
+            
         
         
 

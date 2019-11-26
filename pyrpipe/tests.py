@@ -13,19 +13,21 @@ import sra,mapping,assembly,qc
 testDir="/home/usingh/work/urmi/hoap/test"
 hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex"
 
-
+#single end ERR3527958
 #download sra->fq>qc
 newSRA=sra.SRA('SRR1583780',testDir)
 newSRA.downloadSRAFile()
-#newSRA.runFasterQDump(**{"-f":""})
-newSRA.performQC(None)
+newSRA.runFasterQDump(**{"-f":""})
 
 #run trimgalore
-tg=qc.Trimgalore()
+tg=qc.Trimgalore(**{"-j":"8"})  #specify to use 8 cores
 
 newSRA.performQC(tg)
-#tg.runTrimGalorePaired()
 
+newSRA2=sra.SRA('ERR3527958',testDir)
+newSRA2.downloadSRAFile()
+newSRA2.runFasterQDump(**{"-f":""})
+newSRA2.performQC(tg)
 
 """
 yeastList=['SRR1583780','SRR5507495','SRR5507442','SRR5507362','SRR5507343','SRR5507356','SRR5507413','SRR5507339','SRR5507399','SRR5507353','SRR5507415','SRR5507444','SRR5507419','SRR5507379','SRR5507434']

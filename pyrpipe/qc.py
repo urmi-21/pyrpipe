@@ -13,21 +13,41 @@ class RNASeqQC:
         self.category="RNASeqQC"
 
 class Trimgalore(RNASeqQC):
-    def __init__(self):
+    def __init__(self,**kwargs):
+        """
+        Parameters
+        ----------
+        kwargs:
+            trim_galore arguments. could override later too.
+        """
+        
         #run super to inherit parent class properties
         super().__init__() 
         self.programName="trim_galore"
         self.depList=[self.programName,'cutadapt']
-        self.trim_galoreArgsList=['-h','-v','-q','--phred33   ','--phred64','--fastqc ','--fastqc_args','-a','-a2','--illumina','--nextera','--small_rna','--consider_already_trimmed         ','--max_length','--stringency','-e','--gzip','--dont_gzip','--length','--max_n ','--trim-n','-o','--no_report_file','--suppress_warn','--clip_R1','--clip_R2','--three_prime_clip_R1','--three_prime_clip_R2','--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3','--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t','--retain_unpaired','-r1','-r2']
+        self.validArgsList=['-h','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
+                            '--illumina','--nextera','--small_rna','--consider_already_trimmed',
+                            '--max_length','--stringency','-e','--gzip','--dont_gzip','--length',
+                            '--max_n','--trim-n','-o','--no_report_file','--suppress_warn',
+                            '--clip_R1','--clip_R2','--three_prime_clip_R1','--three_prime_clip_R2',
+                            '--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3',
+                            '--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t',
+                            '--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
+        #initialize the passed arguments
+        self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
+        print(self.passedArgumentList)
+        
+            
     def run(self,sraOb):
         """Run this class' program.
-        The function run() is consistent for all QC classess
+        The function run() is consistent for all QC classess.
+        This function returns a tuple containing the status and the file paths to the qc-corrected fastq files (in order 1,2 for paired)
         """
-        return self.runTrimGalore(self,sraOb)
+        return self.runTrimGalore(sraOb)
             
             
     def runTrimGalore(self,sraOb):
@@ -35,27 +55,47 @@ class Trimgalore(RNASeqQC):
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
-            return self.runTrimGalorePaired(fq1,fq2,8)
+            return self.runTrimGalorePaired(fq1,fq2)
         else:
-            return self.runTrimGaloreSingle(sraOb.localfastqPath,8)
+            return self.runTrimGaloreSingle(sraOb.localfastqPath)
             
         
             
-    def runTrimGaloreSingle(self,fastqFilePath,proc):
-        
-        #default output dir
-        outDir=os.path.split(fastqFilePath)[0]
-        
+    def runTrimGaloreSingle(self,fastqFilePath):
         print("Running trim_galore unpaired")
-        trimGaloreCmd=['trim_galore','-o',outDir,'--cores',str(proc),fastqFilePath]
+        
+        trimGaloreCmd=['trim_galore']
+        #check if out dir is specified
+        if '-o' not in self.passedArgumentList:            
+            #default output dir
+            outDir=os.path.split(fastqFilePath)[0]
+            trimGaloreCmd.extend(['-o',outDir])
+        trimGaloreCmd.extend(self.passedArgumentList)
+        trimGaloreCmd.extend([fastqFilePath])
+
+        print("Executing: "+" ".join(trimGaloreCmd))
+        try:
+            for output in executeCommand(trimGaloreCmd):
+                print (output)
+        except subprocess.CalledProcessError as e:
+            print ("Error in command")
+            return False
+        
+        print("Exiting...")
+        return True
         
             
-    def runTrimGalorePaired(self,fastqFile1Path,fastqFile2Path,proc):
+    def runTrimGalorePaired(self,fastqFile1Path,fastqFile2Path):
         print ("Running trim_galore paired")
-        #default output dir
-        outDir=os.path.split(fastqFile1Path)[0]
         
-        trimGaloreCmd=['trim_galore','-o',outDir,'--cores',str(proc),'--paired',fastqFile1Path,fastqFile1Path]
+        trimGaloreCmd=['trim_galore']
+        #check if out dir is specified
+        if '-o' not in self.passedArgumentList:            
+            #default output dir
+            outDir=os.path.split(fastqFile1Path)[0]
+            trimGaloreCmd.extend(['-o',outDir])
+        trimGaloreCmd.extend(self.passedArgumentList)
+        trimGaloreCmd.extend(['--paired',fastqFile1Path,fastqFile2Path])
         print("Executing: "+" ".join(trimGaloreCmd))
         try:
             for output in executeCommand(trimGaloreCmd):
