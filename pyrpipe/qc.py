@@ -111,16 +111,37 @@ class Trimgalore(RNASeqQC):
 
 class BBmap(RNASeqQC):
     def __init__(self):
+        """
+        Parameters
+        ----------
+        kwargs:
+            bbduk.sh arguments. could override later too.
+        """
         #run super to inherit parent class properties
         super().__init__() 
         self.programName="bbduk.sh"
         self.depList=[self.programName]
+        #note that bbduk.sh argument style is different that other linux commands
+        self.validArgsList=['-h','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
+                            '--illumina','--nextera','--small_rna','--consider_already_trimmed',
+                            '--max_length','--stringency','-e','--gzip','--dont_gzip','--length',
+                            '--max_n','--trim-n','-o','--no_report_file','--suppress_warn',
+                            '--clip_R1','--clip_R2','--three_prime_clip_R1','--three_prime_clip_R2',
+                            '--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3',
+                            '--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t',
+                            '--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
+    def run(self,sraOB):
+        """Execeute the QC method 
+        """
+        
+    def runBBdukSingle(self):
+        
             
-    def runBBDUK(self,filepath,accession,pathToAdapters,proc="auto",ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10):
+    def runBBdukPaired(self,fastqFile1Path,fastqFile2Path,pathToAdapters="",proc="auto",ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10):
         print ("Running bbduk")
         #file names will be accession_1.fastq accession_2.fastq
         bbdukCmd=['bbduk.sh','-Xmx1g','in1='+filepath+"/"+accession+'_1.fastq','in2='+filepath+"/"+accession+'_2.fastq','out1='+filepath+"/"+accession+'_1_val_1.fastq','out2='+filepath+"/"+accession+'_2_val_2.fastq','ref='+pathToAdapters,'ktrim='+ktrim,'k='+str(k),'mink='+str(mink),'hdist='+str(hdist),'qtrim='+qtrim,'trimq='+str(trimq),'threads='+str(proc)]
