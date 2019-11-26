@@ -8,14 +8,26 @@ Created on Mon Nov 25 17:48:00 2019
 
 from myutils import *
 
-class Trimgalore:
+class RNASeqQC:
     def __init__(self):
+        self.category="RNASeqQC"
+
+class Trimgalore(RNASeqQC):
+    def __init__(self):
+        #run super to inherit parent class properties
+        super().__init__() 
         self.programName="trim_galore"
         self.depList=[self.programName,'cutadapt']
         self.trim_galoreArgsList=['-h','-v','-q','--phred33   ','--phred64','--fastqc ','--fastqc_args','-a','-a2','--illumina','--nextera','--small_rna','--consider_already_trimmed         ','--max_length','--stringency','-e','--gzip','--dont_gzip','--length','--max_n ','--trim-n','-o','--no_report_file','--suppress_warn','--clip_R1','--clip_R2','--three_prime_clip_R1','--three_prime_clip_R2','--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3','--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t','--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
+            
+    def run(self,sraOb):
+        """Run this class' program.
+        The function run() is consistent for all QC classess
+        """
+        return self.runTrimGalore(self,sraOb)
             
             
     def runTrimGalore(self,sraOb):
@@ -57,8 +69,10 @@ class Trimgalore:
             
             
 
-class BBmap:
+class BBmap(RNASeqQC):
     def __init__(self):
+        #run super to inherit parent class properties
+        super().__init__() 
         self.programName="bbduk.sh"
         self.depList=[self.programName]
         #check if hisat2 exists

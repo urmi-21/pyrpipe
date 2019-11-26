@@ -243,7 +243,7 @@ class SRA:
             return False
         
         #test a valid QC object
-        
+        print(qcObject.category)
         
         
 
