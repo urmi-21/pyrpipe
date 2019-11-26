@@ -12,12 +12,16 @@ class Trimgalore:
     def __init__(self):
         self.programName="trim_galore"
         self.depList=[self.programName,'cutadapt']
+        self.trim_galoreArgsList=['-h','-v','-q','--phred33   ','--phred64','--fastqc ','--fastqc_args','-a','-a2','--illumina','--nextera','--small_rna','--consider_already_trimmed         ','--max_length','--stringency','-e','--gzip','--dont_gzip','--length','--max_n ','--trim-n','-o','--no_report_file','--suppress_warn','--clip_R1','--clip_R2','--three_prime_clip_R1','--three_prime_clip_R2','--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3','--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t','--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
     def runTrimGaloreSingle(self,filePath,proc):
+        
         print("Running trim_galore unpaired")
+        trimGaloreCmd=['trim_galore','-o',filepath,'--cores',str(proc),'--paired',filepath+"/"+accession+'_1.fastq',filepath+"/"+accession+'_2.fastq']
+        
             
     def runTrimGalorePaired(self,file1,file2,proc):
         print ("Running trim_galore paired")
