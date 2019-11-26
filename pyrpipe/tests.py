@@ -27,6 +27,9 @@ stieOb=assembly.Stringtie()
 #trim_galore object
 tg=qc.Trimgalore()
 
+#bbmap object
+bm=qc.BBmap()
+
     
     
 shortList=yeastList[0:10]
