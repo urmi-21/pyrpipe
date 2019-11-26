@@ -17,11 +17,12 @@ hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64
 #download sra->fq>qc
 newSRA=sra.SRA('SRR1583780',testDir)
 newSRA.downloadSRAFile()
-newSRA.runFasterQDump()
+newSRA.runFasterQDump(**{"-f":""})
+newSRA.performQC(None)
 
 #run trimgalore
 tg=qc.Trimgalore()
-tg.runTrimGalorePaired()
+#tg.runTrimGalorePaired()
 
 
 """

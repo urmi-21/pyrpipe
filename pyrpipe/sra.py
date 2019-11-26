@@ -210,6 +210,40 @@ class SRA:
                 return False
         
         return True
+    
+    def performQC(self,qcObject,deleteRawFastq=False):
+        """Function to perform quality control with specified qc object.
+        A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
+        The qcObject should be initialized with all the parameters.
+        By default the trimmed/qc fastq files will be generated in the same directory as the original fastq files.
+        After QC, this SRA object will update the localfastqPath or localfastq1Path and localfastq2Path variables to store the new fastq files.
+        New variables localRawfastqPath or localRawfastq1Path and localRawfastq2Path will be created to store the paths of original fastq files.
+      
+        Parameters
+        ----------
+        arg1: object
+            qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
+            
+        arg2: bool
+            Delete the raw fastq files after QC
+        
+        Returns
+        -------
+        bool
+            Return status of the QC. True if successful download and False if failed.
+
+        Examples
+        --------
+        >>> object.performQC(qc.BBmap())
+        True
+        """
+        #check a valid qcObject
+        if qcObject == None:
+            print ("Error: No valid QC object provided. Skipping QC for "+self.srrAccession)
+            return False
+        
+        #test a valid QC object
+        
         
         
 

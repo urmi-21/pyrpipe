@@ -17,16 +17,33 @@ class Trimgalore:
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-    def runTrimGaloreSingle(self,filePath,proc):
-        
-        print("Running trim_galore unpaired")
-        trimGaloreCmd=['trim_galore','-o',filepath,'--cores',str(proc),'--paired',filepath+"/"+accession+'_1.fastq',filepath+"/"+accession+'_2.fastq']
+            
+    def runTrimGalore(self,sraOb):
+        #get layout
+        if sraOb.layout=='PAIRED':
+            fq1=sraOb.localfastq1Path
+            fq2=sraOb.localfastq2Path
+            return self.runTrimGalorePaired(fq1,fq2,8)
+        else:
+            return self.runTrimGaloreSingle(sraOb.localfastqPath,8)
+            
         
             
-    def runTrimGalorePaired(self,file1,file2,proc):
-        print ("Running trim_galore paired")
+    def runTrimGaloreSingle(self,fastqFilePath,proc):
         
-        trimGaloreCmd=['trim_galore','-o',filepath,'--cores',str(proc),'--paired',filepath+"/"+accession+'_1.fastq',filepath+"/"+accession+'_2.fastq']
+        #default output dir
+        outDir=os.path.split(fastqFilePath)[0]
+        
+        print("Running trim_galore unpaired")
+        trimGaloreCmd=['trim_galore','-o',outDir,'--cores',str(proc),fastqFilePath]
+        
+            
+    def runTrimGalorePaired(self,fastqFile1Path,fastqFile2Path,proc):
+        print ("Running trim_galore paired")
+        #default output dir
+        outDir=os.path.split(fastqFile1Path)[0]
+        
+        trimGaloreCmd=['trim_galore','-o',outDir,'--cores',str(proc),'--paired',fastqFile1Path,fastqFile1Path]
         print("Executing: "+" ".join(trimGaloreCmd))
         try:
             for output in executeCommand(trimGaloreCmd):
@@ -49,7 +66,7 @@ class BBmap:
             raise Exception("ERROR: "+ self.programName+" not found.")
             
             
-    def runBBDUK(filepath,accession,pathToAdapters,proc="auto",ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10):
+    def runBBDUK(self,filepath,accession,pathToAdapters,proc="auto",ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10):
         print ("Running bbduk")
         #file names will be accession_1.fastq accession_2.fastq
         bbdukCmd=['bbduk.sh','-Xmx1g','in1='+filepath+"/"+accession+'_1.fastq','in2='+filepath+"/"+accession+'_2.fastq','out1='+filepath+"/"+accession+'_1_val_1.fastq','out2='+filepath+"/"+accession+'_2_val_2.fastq','ref='+pathToAdapters,'ktrim='+ktrim,'k='+str(k),'mink='+str(mink),'hdist='+str(hdist),'qtrim='+qtrim,'trimq='+str(trimq),'threads='+str(proc)]
