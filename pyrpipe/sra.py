@@ -139,7 +139,8 @@ class SRA:
     
     def runFasterQDump(self,deleteSRA=False,**kwargs):
         """Execute fasterq-dump to convert .sra file to fastq files.
-        The fastq files will be stored in the same directory as the sra file.
+        The fastq files will be stored in the same directory as the sra file. All fastq files should be consistently named
+        using the extension .fastq
         
         Parameters
         ----------
@@ -274,6 +275,7 @@ class SRA:
         else:
             self.localRawfastqPath=self.localfastqPath
             self.localfastqPath=qcStatus[1]
+        
         
         
         return True

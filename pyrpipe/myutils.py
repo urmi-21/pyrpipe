@@ -199,6 +199,23 @@ def checkDep(depList):
         return False
     return True
 
+
+def getFileDirectory(filePath):
+    return os.path.split(filePath)[0]
+
+def getFileName(filePath):
+    return os.path.split(filePath)[1]
+
+def getFileExtension(filePath):
+    return os.path.splitext(filePath)[1]
+
+def getFileBaseName(filePath):
+    """return file name without the extension
+    arg1:
+        file path or file name
+    """
+    return os.path.splitext(getFileName(filePath))[0]
+
 if __name__ == "__main__":
     #test
     #print(getSRADownloadPath('SRR002328'))

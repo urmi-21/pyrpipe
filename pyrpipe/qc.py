@@ -86,14 +86,32 @@ class Trimgalore(RNASeqQC):
         
             
     def runTrimGalorePaired(self,fastqFile1Path,fastqFile2Path):
+        """Run trim_galore on paired data
+        """
         print ("Running trim_galore paired")
         
+        '''
+        out put files will be written as 
+        <file name>_val_1.fq and <file name>_val_2.fq
+        change this to <file name>_<suffix>.fastq and <file name>_<suffix>.fastq
+        '''        
+        fnameSuffix="_trimGalore"
+        outFile1Name=getFileBaseName(fastqFile1Path)+"_val_1.fq"
+        outFile2Name=getFileBaseName(fastqFile2Path)+"_val_2.fq"
+        newOutFile1Name=getFileBaseName(fastqFile1Path)+fnameSuffix+".fastq"
+        newOutFile2Name=getFileBaseName(fastqFile2Path)+fnameSuffix+".fastq"
+        
+        
+        outDir="" #the out put directory
         trimGaloreCmd=['trim_galore']
         #check if out dir is specified
         if '-o' not in self.passedArgumentList:            
             #default output dir
             outDir=os.path.split(fastqFile1Path)[0]
             trimGaloreCmd.extend(['-o',outDir])
+        else:
+            outDir=self.passedArgumentList[self.passedArgumentList.index('-o')+1]
+            
         trimGaloreCmd.extend(self.passedArgumentList)
         trimGaloreCmd.extend(['--paired',fastqFile1Path,fastqFile2Path])
         print("Executing: "+" ".join(trimGaloreCmd))
@@ -104,8 +122,27 @@ class Trimgalore(RNASeqQC):
             print ("Error in command")
             return False
         
-        print("Exiting...")
-        return True
+        outFile1Path=os.path.join(outDir,outFile1Name)
+        outFile2Path=os.path.join(outDir,outFile2Name)
+        newOutFile1Path=os.path.join(outDir,newOutFile1Name)
+        newOutFile2Path=os.path.join(outDir,newOutFile2Name)
+        #rename the files
+        rename_Cmd=['mv',outFile1Path,newOutFile1Path]
+        print("Executing:"+ " ".join(rename_Cmd))
+        if getCommandReturnValue(rename_Cmd)!=0:
+            print("Error in moving files")
+            return False,"",""
+        rename_Cmd=['mv',outFile2Path,newOutFile2Path]
+        if getCommandReturnValue(rename_Cmd)!=0:
+            print("Error in moving files")
+            return False,"",""
+        
+        #check if files exist
+        if not checkFilesExists(newOutFile1Path,newOutFile2Path):
+            print ("ERROR in running"+ self.programName)
+            return False,"",""
+            
+        return True,newOutFile1Path,newOutFile2Path
             
             
 
