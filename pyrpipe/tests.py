@@ -13,14 +13,14 @@ import sra,mapping,assembly,qc
 testDir="/home/usingh/work/urmi/hoap/test"
 hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex"
 
-#single end ERR3527958
+#single end ERR2929684
 #download sra->fq>qc
-newSRA=sra.SRA('SRR5507399',testDir)
+newSRA=sra.SRA('ERR2929684',testDir)
 newSRA.downloadSRAFile()
 newSRA.runFasterQDump(**{"-f":""})
 
 #run trimgalore
-tg=qc.Trimgalore(**{"-j":"8"})  #specify to use 8 cores
+tg=qc.Trimgalore(**{"-j":"8","--length":"1"})  #specify to use 8 cores
 bd=qc.BBmap()
 
 #newSRA.performQC(bd)
