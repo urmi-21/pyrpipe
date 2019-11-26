@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:53:26 2019
 @author: usingh
 """
 
-import sra,mapping,assembly
+import sra,mapping,assembly,qc
 
 
 #########define directories indices, reference gtf etc####
@@ -17,10 +17,15 @@ hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64
 yeastList=['SRR1583780','SRR5507495','SRR5507442','SRR5507362','SRR5507343','SRR5507356','SRR5507413','SRR5507339','SRR5507399','SRR5507353','SRR5507415','SRR5507444','SRR5507419','SRR5507379','SRR5507434']
     
 
+#hisat object
 hs=mapping.Hisat2(hisatInd)
+#samtools object
 samtOb=mapping.Samtools()
+#string tie object
 stieOb=assembly.Stringtie()
-    
+
+#trim_galore object
+tg=qc.Trimgalore()
 
     
     
