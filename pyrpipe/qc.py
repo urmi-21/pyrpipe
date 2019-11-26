@@ -16,19 +16,23 @@ class Trimgalore:
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-    def runTrimGalorePaired(filepath,accession,proc):
-        print ("Running trimgalore")
-        #file names will be accession_1.fastq accession_2.fastq
+    def runTrimGaloreSingle(self,filePath,proc):
+        print("Running trim_galore unpaired")
+            
+    def runTrimGalorePaired(self,file1,file2,proc):
+        print ("Running trim_galore paired")
+        
         trimGaloreCmd=['trim_galore','-o',filepath,'--cores',str(proc),'--paired',filepath+"/"+accession+'_1.fastq',filepath+"/"+accession+'_2.fastq']
         print("Executing: "+" ".join(trimGaloreCmd))
         try:
-            	for output in executeCommand(trimGaloreCmd):
-                    nt (output)
+            for output in executeCommand(trimGaloreCmd):
+                print (output)
         except subprocess.CalledProcessError as e:
-            	print ("Error in command")
+            print ("Error in command")
             return False
-    print("Exiting...")
-    return True
+        
+        print("Exiting...")
+        return True
             
             
 
@@ -47,10 +51,10 @@ class BBmap:
         bbdukCmd=['bbduk.sh','-Xmx1g','in1='+filepath+"/"+accession+'_1.fastq','in2='+filepath+"/"+accession+'_2.fastq','out1='+filepath+"/"+accession+'_1_val_1.fastq','out2='+filepath+"/"+accession+'_2_val_2.fastq','ref='+pathToAdapters,'ktrim='+ktrim,'k='+str(k),'mink='+str(mink),'hdist='+str(hdist),'qtrim='+qtrim,'trimq='+str(trimq),'threads='+str(proc)]
         print("Executing: "+" ".join(bbdukCmd))
         try:
-            	for output in executeCommand(bbdukCmd):
+                for output in executeCommand(bbdukCmd):
                     print (output)
         except subprocess.CalledProcessError as e:
-            	print ("Error in command")
-            return False
+                print ("Error in command")
+                return False
         print("Exiting...")
         return True
