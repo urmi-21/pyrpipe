@@ -52,7 +52,7 @@ class Stringtie:
         
         #check gtf file
         if not checkFilesExists(outGtfFile):
-            return False,"NA"
+            return False,""
         
         
         

@@ -26,7 +26,7 @@ class SRA:
         
         """
         
-        self.depList=['prefetch',"fasterq-dump","sdas"]
+        self.depList=['prefetch',"fasterq-dump"]
         if not checkDep(self.depList):
             raise Exception("ERROR: Please install missing programs.")
         

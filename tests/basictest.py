@@ -107,7 +107,7 @@ if not hisatStatus[0]:
 #remove qc corrected fastq
 sraOb.deleteFastqFiles()
 #run sam to sorted bam then run stringtie
-stieOb.runStringtie(samtOb.samToSortedBam(hisatStatus[1],10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
+gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatStatus[1],10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
 
 
 

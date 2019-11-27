@@ -37,6 +37,12 @@ def getCommandReturnValue(cmd):
     stdout,stderr = result.communicate()
     return result.returncode
 
+def getCommandReturnStatus(cmd):
+    returnValue=getCommandReturnValue(cmd)
+    if returnValue==0:
+        return True
+    return False
+
 def executeCommand(cmd):
       
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
@@ -228,8 +234,10 @@ def deleteMultipleFilesFromDisk(*args):
 def deleteFileFromDisk(filePath):
     if checkFilesExists(filePath):
         rm_Cmd=['rm',filePath]
-        print("Deleting file: "+filePath+" "+" ".join(rm_Cmd))
-        return getCommandReturnValue(rm_Cmd)
+        print("Deleting file: "+filePath+" \n"+" ".join(rm_Cmd))
+        rv= getCommandReturnStatus(rm_Cmd)
+        return rv
+    #if file doesn't exist return true
     return True
 
 if __name__ == "__main__":
