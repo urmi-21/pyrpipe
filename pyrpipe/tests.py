@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:53:26 2019
 @author: usingh
 """
 
-import sra,mapping,assembly,qc
+from pyrpipe import sra,mapping,assembly,qc
 
 
 #########define directories indices, reference gtf etc####
@@ -89,7 +89,7 @@ samtOb=mapping.Samtools()
 #Stringtie object
 stieOb=assembly.Stringtie()
 
-sraOb=sra.SRA('SRR5507495',testDir)
+sraOb=sra.SRA('SRR1583780',testDir)
 
 #download sra
 sraOb.downloadSRAFile()

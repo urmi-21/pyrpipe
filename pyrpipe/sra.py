@@ -25,6 +25,7 @@ class SRA:
             For consistency, location and SRR Accession id are not allowed to be modified.
         
         """
+        
         printBlue("Creating SRA: "+srrAccession)
         self.srrAccession=srrAccession
         #append the SRR accession to the location
@@ -137,6 +138,32 @@ class SRA:
             return(os.path.isfile(self.localSRAFilePath))
         else:
             return False
+        
+    def fastqFilesExistsLocally(self):
+        if not hasattr(self,'layout'):
+            return False
+        
+        if self.layout=='PAIRED':
+            errorFlag=False
+            if hasattr(self,'localfastq1Path'):
+                if not checkFilesExists(self.localfastq1Path):
+                    return False
+            else:
+                return False
+            
+            if hasattr(self,'localfastq2Path'):
+                if not checkFilesExists(self.localfastq2Path):
+                    return False
+            else:
+                return False
+            
+            return True
+            
+        else:
+            if hasattr(self,'localfastqPath'):
+                return checkFilesExists(self.localfastqPath)
+            else:            
+                return False
     
     def runFasterQDump(self,deleteSRA=False,**kwargs):
         """Execute fasterq-dump to convert .sra file to fastq files.
