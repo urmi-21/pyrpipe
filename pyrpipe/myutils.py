@@ -216,6 +216,12 @@ def getFileBaseName(filePath):
     """
     return os.path.splitext(getFileName(filePath))[0]
 
+def deleteFileFromDisk(filePath):
+    if checkFilesExists(filePath):
+        rm_Cmd=['rm',filePath]
+        return getCommandReturnValue(rm_Cmd)
+    return True
+
 if __name__ == "__main__":
     #test
     #print(getSRADownloadPath('SRR002328'))

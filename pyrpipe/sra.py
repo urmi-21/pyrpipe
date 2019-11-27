@@ -266,40 +266,63 @@ class SRA:
             return False
         
         if self.layout=='PAIRED':
-            #create new fields to refer to older fastq files
-            self.localRawfastq1Path=self.localfastq1Path
-            self.localRawfastq2Path=self.localfastq2Path
+            
+            #delete old fastq files if specified
+            if deleteRawFastq:
+                self.deleteFastqFiles()
+            
+            else:
+                #create new fields to refer to older fastq files
+                self.localRawfastq1Path=self.localfastq1Path
+                self.localRawfastq2Path=self.localfastq2Path
+            
             ##update local fastq path
             self.localfastq1Path=qcStatus[1]    
             self.localfastq2Path=qcStatus[2]
         else:
-            self.localRawfastqPath=self.localfastqPath
+            if deleteRawFastq:
+                self.deleteFastqFiles()
+            else:
+                self.localRawfastqPath=self.localfastqPath
+                
             self.localfastqPath=qcStatus[1]
         
         
         
         return True
-            
-            
+    
+    def deleteFastqFiles(self):
+        """Delte the fastq files from the disk.
+        The files are referenced by self.localfastqPath or self.localfastq1Path and self.localfastq2Path
+        """
+        if self.layout=='PAIRED':
+            if (deleteFileFromDisk(self.localfastq1Path) and deleteFileFromDisk(self.localfastq2Path)):
+                del self.localfastq1Path
+                del self.localfastq2Path
+                return True
+            return False
+                
+        else:
+            if deleteFileFromDisk(self.localfastqPath):
+                del self.localfastqPath
+                return True
+            return False
+        
+        
+    def deleteSRAFile(self):
+        """Delete the downloaded SRA files.
+        """
+        if(deleteFileFromDisk(self.localSRAFilePath)):
+            del self.localSRAFilePath
+            return True
+        return False
         
         
 
 if __name__ == "__main__":
     #test
- 
+    print("main")
         
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
     
     
     
