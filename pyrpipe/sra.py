@@ -26,6 +26,11 @@ class SRA:
         
         """
         
+        self.depList=['prefetch',"fasterq-dump","sdas"]
+        if not checkDep(self.depList):
+            raise Exception("ERROR: Please install missing programs.")
+        
+        
         printBlue("Creating SRA: "+srrAccession)
         self.srrAccession=srrAccession
         #append the SRR accession to the location
