@@ -25,6 +25,7 @@ class SRA:
             For consistency, location and SRR Accession id are not allowed to be modified.
         
         """
+        printBlue("Creating SRA: "+srrAccession)
         self.srrAccession=srrAccession
         #append the SRR accession to the location
         self.location=os.path.join(location,self.srrAccession)
