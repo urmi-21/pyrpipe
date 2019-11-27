@@ -7,7 +7,7 @@ Created on Sun Nov 24 19:53:42 2019
 contains classes of RNA-Seq mapping programs
 """
 
-from myutils import *
+from pyrpipe.myutils import *
 
 class Hisat2:
     def __init__(self,hisat2Index="",*args):

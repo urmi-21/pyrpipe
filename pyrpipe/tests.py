@@ -89,7 +89,7 @@ samtOb=mapping.Samtools()
 #Stringtie object
 stieOb=assembly.Stringtie()
 
-sraOb=sra.SRA('ERR2929684',testDir)
+sraOb=sra.SRA('SRR5507495',testDir)
 
 #download sra
 sraOb.downloadSRAFile()

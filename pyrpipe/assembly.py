@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:21:01 2019
 @author: usingh
 """
 
-from myutils import *
+from pyrpipe.myutils import *
 
 class Stringtie:
     def __init__(self):
