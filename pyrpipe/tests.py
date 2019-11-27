@@ -13,6 +13,7 @@ import sra,mapping,assembly,qc
 testDir="/home/usingh/work/urmi/hoap/test"
 hisatInd="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/yeastIndex"
 
+'''
 #single end ERR2929684
 #download sra->fq>qc
 newSRA=sra.SRA('SRR5507343',testDir)
@@ -29,7 +30,7 @@ newSRA.performQC(tg)
 #run hisat and stie
 hs=mapping.Hisat2(hisatInd)
 hisatStatus=hs.runHisat2(newSRA,**{"-p":"10","--dta-cufflinks":""})
-
+'''
 
 '''
 newSRA2=sra.SRA('ERR3527958',testDir)
@@ -73,3 +74,43 @@ for r in shortList:
     else:
         print("Failed Hisat for "+r)
 """ 
+
+
+
+#build pipeline with cleanup
+#bbduk object
+bd=qc.BBmap()
+#trimgalore object to run trim_galore
+tg=qc.Trimgalore(**{"-j":"8","--length":"1"})  #specify to use 8 cores
+#Hisat2 object
+hs=mapping.Hisat2(hisatInd)
+#samtools object
+samtOb=mapping.Samtools()
+#Stringtie object
+stieOb=assembly.Stringtie()
+
+sraOb=sra.SRA('ERR2929684',testDir)
+
+#download sra
+sraOb.downloadSRAFile()
+#run fastqdump;delete sra when done
+sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
+#perform qc using trim_galore
+sraOb.performQC(tg,deleteRawFastq=True)
+#run hisat and store the status and return Sam file path
+hisatStatus=hs.runHisat2(sraOb,**{"-p":"10","--dta-cufflinks":""})
+
+#check if hisat is sucessful
+if not hisatStatus[0]:
+    raise Exception("ERROR: Hisat failed")
+    
+#remove qc corrected fastq
+sraOb.deleteFastqFiles()
+#run sam to sorted bam then run stringtie
+stieOb.runStringtie(samtOb.samToSortedBam(hisatStatus[1],10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
+
+
+
+
+
+

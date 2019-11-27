@@ -132,7 +132,7 @@ class Samtools:
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-    def samToBam(self,samFile,proc,deleteSam=True):
+    def samToBam(self,samFile,proc,deleteSam=False):
         """Convert sam file to a bam file. Output bam file will have same name as input sam.
         """
         fname=samFile.split('.sam')[0]
@@ -168,7 +168,7 @@ class Samtools:
         
         
     #sort bam file.output will be bamFile_sorted.bam
-    def sortBam(self,bamFile,proc,deleteOriginalBam=True):
+    def sortBam(self,bamFile,proc,deleteOriginalBam=False):
         fname=bamFile.split('.bam')[0]
         outSortedBamFile=fname+"_sorted.bam"
         bamSortCmd=['samtools','sort','-o',outSortedBamFile,'-@',str(proc),bamFile]
@@ -197,7 +197,7 @@ class Samtools:
         #return status and file
         return True,outSortedBamFile
     
-    def samToSortedBam(self,samFile,proc,deleteSam=True,deleteOriginalBam=True):
+    def samToSortedBam(self,samFile,proc,deleteSam=False,deleteOriginalBam=False):
         """Convert sam file to bam and sort the bam file.
         """
         

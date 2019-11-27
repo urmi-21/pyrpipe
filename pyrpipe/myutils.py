@@ -216,9 +216,19 @@ def getFileBaseName(filePath):
     """
     return os.path.splitext(getFileName(filePath))[0]
 
+def deleteMultipleFilesFromDisk(*args):
+    errorFlag=False
+    for filePath in args:
+        status=deleteFileFromDisk(filePath)
+        if not status:
+            errorFlag=True
+    
+    return not(errorFlag)
+    
 def deleteFileFromDisk(filePath):
     if checkFilesExists(filePath):
         rm_Cmd=['rm',filePath]
+        print("Deleting file: "+filePath+" "+" ".join(rm_Cmd))
         return getCommandReturnValue(rm_Cmd)
     return True
 

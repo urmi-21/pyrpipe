@@ -220,7 +220,11 @@ class SRA:
             if not checkFilesExists(self.localfastq1Path,self.localfastq2Path):
                 printBoldRed("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
                 return False
-        
+            
+        #delete sra file if specified
+        if deleteSRA:
+            self.deleteSRAFile()
+            
         return True
     
     def performQC(self,qcObject,deleteRawFastq=False):
@@ -296,7 +300,7 @@ class SRA:
         The files are referenced by self.localfastqPath or self.localfastq1Path and self.localfastq2Path
         """
         if self.layout=='PAIRED':
-            if (deleteFileFromDisk(self.localfastq1Path) and deleteFileFromDisk(self.localfastq2Path)):
+            if deleteMultipleFilesFromDisk(self.localfastq1Path,self.localfastq2Path):
                 del self.localfastq1Path
                 del self.localfastq2Path
                 return True

@@ -17,7 +17,7 @@ class Stringtie:
             
             
  #function to run stringtie
-    def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,outSuffix="_stie"):
+    def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
         
         #check if bam file exists
         if not checkFilesExists(inputBAM):
@@ -45,8 +45,15 @@ class Stringtie:
             print ("Error in command")
             return False,"NA"
         
+        
+        if deleteInputBam:
+            if not deleteFileFromDisk(inputBAM):
+                return False,""
+        
         #check gtf file
         if not checkFilesExists(outGtfFile):
             return False,"NA"
+        
+        
         
         return True,outGtfFile
