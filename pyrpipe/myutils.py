@@ -241,11 +241,5 @@ def deleteFileFromDisk(filePath):
     return True
 
 if __name__ == "__main__":
-    #test
-    #print(getSRADownloadPath('SRR002328'))
-    print(findFiles("/home/usingh/work/urmi","*.py",False))
     
-    print(isPairedSRA('/home/usingh/work/urmi/hoap/test/SRR10408795/SRR10408795.sra'))
- 
-
     
