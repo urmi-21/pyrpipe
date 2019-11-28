@@ -4,7 +4,7 @@
 Dev
 
 ## Prerequisites
-
+* python 3.6 or higher
 * OS: Unix based
 
 Required third-party programs
