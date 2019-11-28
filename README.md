@@ -3,9 +3,21 @@
 ### Version
 Dev
 
+## Prerequisites
+
+* OS: Unix based
+
+Required third-party programs
+
+* SRA Tools [https://github.com/ncbi/sra-tools]
+
+
 ## Introduction
 pyrpipe is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs.
 pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
+
+## Requirements
+
 
 ## Installation
 Please follow these instruction 
