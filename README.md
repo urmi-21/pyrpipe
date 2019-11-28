@@ -11,7 +11,9 @@ Required third-party programs
 
 * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9 or higher)
 * [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
-* [Hisat2]
+* [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
+* [Stringtie](https://github.com/gpertea/stringtie)
+* [Samtools](https://github.com/samtools/samtools)
 
 
 ## Introduction
