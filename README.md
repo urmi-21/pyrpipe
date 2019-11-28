@@ -9,7 +9,9 @@ Dev
 
 Required third-party programs
 
-* SRA Tools [https://github.com/ncbi/sra-tools]
+* [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9 or higher)
+* [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
+* [Hisat2]
 
 
 ## Introduction
