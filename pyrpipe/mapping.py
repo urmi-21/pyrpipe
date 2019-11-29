@@ -9,6 +9,10 @@ contains classes of RNA-Seq mapping programs
 
 from pyrpipe.myutils import *
 
+class Aligner:
+    def __init__(self):
+        self.category="Alignement"
+
 class Hisat2:
     def __init__(self,hisat2Index="",*args):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
@@ -16,6 +20,7 @@ class Hisat2:
         ----------
         
         """ 
+        super().__init__() 
         self.programName="hisat2"
         #check if hisat2 exists
         if not checkDep([self.programName]):

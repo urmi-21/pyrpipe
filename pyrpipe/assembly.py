@@ -8,6 +8,10 @@ Created on Mon Nov 25 15:21:01 2019
 
 from pyrpipe.myutils import *
 
+class Assembly:
+    def __init__(self):
+        self.category="Assembler"
+
 class Stringtie:
     def __init__(self):
         self.programName="stringtie"
