@@ -14,14 +14,30 @@ class Assembly:
 
 class Stringtie:
     def __init__(self):
-        self.programName="stringtie"
-        #check if hisat2 exists
+        
+         """Stringtie constructor. Initialize stringtie parameters.
+        Parameters
+        ----------
+        
+        """ 
+        
+         super().__init__() 
+         self.programName="stringtie"
+        #check if stringtie exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
             
  #function to run stringtie
     def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
+        
+        """Run stringtie and assemble transcript.
+        
+        Returns
+        -------
+        string
+            Returns the absolute path og the GTF file if the assembly was successful. Returns empty string otherwise.
+        """
         
         #check if bam file exists
         if not checkFilesExists(inputBAM):
@@ -47,17 +63,17 @@ class Stringtie:
                 print (output)
         except subprocess.CalledProcessError as e:
             print ("Error in command")
-            return False,"NA"
+            return ""
         
         
         if deleteInputBam:
             if not deleteFileFromDisk(inputBAM):
-                return False,""
+                return ""
         
         #check gtf file
         if not checkFilesExists(outGtfFile):
-            return False,""
+            return ""
         
         
         
-        return True,outGtfFile
+        return outGtfFile
