@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/urmi-21/pyrpipe.svg?branch=master)](https://travis-ci.org/urmi-21/pyrpipe)
+
 # pyrpipe: python rna-seq pipeliner
 
 ### Version
