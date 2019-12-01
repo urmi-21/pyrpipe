@@ -14,15 +14,12 @@ class Assembly:
 
 class Stringtie:
     def __init__(self):
-        
-         """Stringtie constructor. Initialize stringtie parameters.
+        """Stringtie constructor. Initialize stringtie parameters.
         Parameters
         ----------
-        
-        """ 
-        
-         super().__init__() 
-         self.programName="stringtie"
+        """
+        super().__init__()
+        self.programName="stringtie"
         #check if stringtie exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")

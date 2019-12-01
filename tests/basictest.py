@@ -98,16 +98,16 @@ sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 #perform qc using trim_galore
 sraOb.performQC(tg,deleteRawFastq=True)
 #run hisat and store the status and return Sam file path
-hisatStatus=hs.runHisat2(sraOb,**{"-p":"10","--dta-cufflinks":""})
+hisatSam=hs.runHisat2(sraOb,**{"-p":"10","--dta-cufflinks":""})
 
 #check if hisat is sucessful
-if not hisatStatus[0]:
+if not hisatSam:
     raise Exception("ERROR: Hisat failed")
     
 #remove qc corrected fastq
 sraOb.deleteFastqFiles()
 #run sam to sorted bam then run stringtie
-gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatStatus[1],10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
+gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
 
 
 
