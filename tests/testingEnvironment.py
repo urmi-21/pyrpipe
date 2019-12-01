@@ -9,5 +9,5 @@ Created on Wed Nov 27 13:35:31 2019
 class testSpecs:
     def __init__(self):
         self.srr='SRR1583780'
-        self.testDir="/home/usingh/work/urmi/hoap/test"
+        self.testDir="testDir"
         
