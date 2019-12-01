@@ -14,5 +14,3 @@ install:
 # command to run tests
 script:
   - pytest
-
-after_success: "sbt coveralls"
