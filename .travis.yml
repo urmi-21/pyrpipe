@@ -10,7 +10,7 @@ install:
   - pip install .
   - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
   - tar -xvzf /tmp/sratools.tar.gz
-  - export PATH=:$PATH
+  - export PATH=$PATH:$PWD/sratoolkit.2.9.6-1-ubuntu64/bin/
 # command to run tests
 script:
   - pytest
