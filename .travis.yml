@@ -6,8 +6,11 @@ python:
   - "3.8-dev"  # 3.8 development branch
   - "nightly"  # nightly build
 # command to install dependencies
-#install:
+install:
   - pip install .
+  - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
+  - tar -xvzf /tmp/sratools.tar.gz
+  - export PATH=:$PATH
 # command to run tests
 script:
   - pytest
