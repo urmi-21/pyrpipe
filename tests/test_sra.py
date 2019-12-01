@@ -8,9 +8,10 @@ Created on Sun Nov 24 16:24:44 2019
 import pytest
 from pyrpipe import sra
 from testingEnvironment import testSpecs
+import os
 
 testVars=testSpecs()
-    
+testVars.testDir=os.path.join(os.getcwd(),"testDir")
 
 def test_sra():
     srrID=testVars.srr
