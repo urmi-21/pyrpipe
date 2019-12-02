@@ -22,6 +22,24 @@ class Hisat2:
         """ 
         super().__init__() 
         self.programName="hisat2"
+        
+        self.validArgsList=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
+                            '-u','-5','-3','--phred33','--phred64','--int-quals',
+                            '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
+                            '--pen-noncansplice','--pen-canintronlen','--pen-noncanintronlen','--min-intronlen'
+                            ,'--max-intronlen','--known-splicesite-infile','--novel-splicesite-outfile',
+                            '--novel-splicesite-infile','--no-temp-splicesite','--no-spliced-alignment',
+                            '--rna-strandness','--tmo','--dta','--dta-cufflinks','--avoid-pseudogene',
+                            '--no-templatelen-adjustment','--mp','--sp','--no-softclip','--np','--rdg',
+                            '--rfg','--score-min','-k','-I','-X','--fr','--rf','--ff','--no-mixed',
+                            '--no-discordant','-t','--un','--al','--un-conc','--al-conc','--un-gz',
+                            '--summary-file','--new-summary','--quiet','--met-file','--met-stderr',
+                            '--met','--no-head','--no-sq','--rg-id','--rgit-sec-seq','-o','-p',
+                            '--reorder','--mm','--qc-filter','--seed','--non-deterministic',
+                            '--remove-chrname','--add-chrname','--version']
+        
+        
+        
         #check if hisat2 exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
