@@ -69,7 +69,7 @@ def findFiles(path,name,recursive):
         find_cmd=['find', path,'-type', 'f','-name',name]   
     else:
         find_cmd=['find', path,'-type', 'f','-maxdepth', '1','-name',name] 
-    print ("Executing: "+ ' '.join(find_cmd))
+    #print ("Executing: "+ ' '.join(find_cmd))
     #get output as string
     out = subprocess.check_output(find_cmd,universal_newlines=True)
     results=out.split()
@@ -79,7 +79,7 @@ def checkPathsExists(*args):
     failFlag=False
     for path in args:
         if not os.path.exists(path):
-            printBoldRed("Path not found: "+path)
+            #printBoldRed("Path not found: "+path)
             failFlag=True
     if failFlag==True:
         return False
@@ -90,7 +90,7 @@ def checkFilesExists(*args):
     failFlag=False
     for path in args:
         if not os.path.isfile(path):
-            printBoldRed("File not found: "+path)
+            #printBoldRed("File not found: "+path)
             failFlag=True
     
     if failFlag:
@@ -238,6 +238,17 @@ def deleteFileFromDisk(filePath):
         rv= getCommandReturnStatus(rm_Cmd)
         return rv
     #if file doesn't exist return true
+    return True
+
+
+def mkdir(dirPath):
+    """Create a directory
+    """
+    print("creating Dir:"+dirPath)
+    try:
+        os.mkdir(dirPath)
+    except OSError:
+        return False
     return True
 
 if __name__ == "__main__":

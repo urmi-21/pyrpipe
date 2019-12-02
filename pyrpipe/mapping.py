@@ -14,16 +14,21 @@ class Aligner:
         self.category="Alignement"
 
 class Hisat2:
-    def __init__(self,hisat2Index="",*args):
+    def __init__(self,hisat2Index="",**kwargs):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
         Parameters
+        ----------
+        hisat2Index string
+            path to q histat2 index (note -x is ommited from validArgsList). This index will be used when hisat is invoked.
+        dict
+            parameters passed to the hisat2 program. These parameters could be overridden later when running hisat.
         ----------
         
         """ 
         super().__init__() 
         self.programName="hisat2"
         
-        self.validArgsList=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
+        self.validArgsList=['-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
                             '-u','-5','-3','--phred33','--phred64','--int-quals',
                             '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
                             '--pen-noncansplice','--pen-canintronlen','--pen-noncanintronlen','--min-intronlen'
@@ -49,15 +54,21 @@ class Hisat2:
         if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
             print("Found HISAT2 index files.")
             self.hisat2Index=hisat2Index
-        elif args :
-            print("Building HISAT2 index with "+ str(args))
-            indexPath,indexName=os.path.split(hisat2Index)
-            self.buildHisat2Index(indexPath,indexName,*args)
         else:
-            raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
+            print("No Hisat2 index provided. Please run build index now to generate an index....")
             
-    def buildHisat2Index(self,indexPath,indexName,*args):
+    def buildHisat2Index(self,indexPath,indexName,*args,**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
+        Parameters
+        ----------
+        arg1: string
+            Path where the index will be created
+        arg2: string
+            A name for the index
+        arg3: tuple
+            Path to reference input files
+        arg4: dict
+            Parameters for the hisat2-build command
         
         Returns
         -------
@@ -65,6 +76,30 @@ class Hisat2:
             Returns the status of hisat2-build
         """
         print("Building hisat index...")
+        
+        hisat2BuildValidArgsList=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
+                                  '-t','--localoffrate','--localftabchars','--snp','--haplotype','--ss','--exon',
+                                  '--seed','-q','-h','--usage','--version']
+        #create the out dir
+        if not checkPathsExists(indexPath):
+            if not mkdir(indexPath):
+                print("ERROR in building hisat2 index. Failed to create index directory.")
+                return False
+        
+        #check if files exists
+        if checkHisatIndex(os.path.join(indexPath,indexName)):
+            print("Hisat2 index with same name already exists. Exiting...")
+            return False
+        
+        hisat2Build_Cmd=['hisat2-build']
+        #add options
+        hisat2Build_Cmd.extend(parseUnixStyleArgs(hisat2BuildValidArgsList,kwargs))
+        #add input files
+        hisat2Build_Cmd.append(str(",".join(args)))
+        #add dir/basenae
+        hisat2Build_Cmd.append(os.path.join(indexPath,indexName))
+        print("Executing:"+str(" ".join(hisat2Build_Cmd)))
+        
         
         
         

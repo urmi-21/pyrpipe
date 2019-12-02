@@ -76,7 +76,7 @@ for r in shortList:
 """ 
 
 
-
+"""
 #build pipeline with cleanup
 #bbduk object
 bd=qc.BBmap()
@@ -108,7 +108,11 @@ if not hisatSam:
 sraOb.deleteFastqFiles()
 #run sam to sorted bam then run stringtie
 gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
+"""
 
+#build hisat index
+hs=mapping.Hisat2()
+hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa")
 
 
 
