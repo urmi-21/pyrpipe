@@ -55,7 +55,7 @@ class Hisat2:
         
         #check index exists
         if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
-            print("Found HISAT2 index files.")
+            print("HISAT2 index is: "+hisat2Index)
             self.hisat2Index=hisat2Index
         else:
             print("No Hisat2 index provided. Please run build index now to generate an index....")
@@ -146,19 +146,21 @@ class Hisat2:
         arg3: dict
             Options to pass to hisat2.
         """
+        
         #find layout and fq file paths
         if sraOb.layout == 'PAIRED':
             pairedFlag=True
-            fastqFiles=[sraOb.localfastq1Path,sraOb.localfastq2Path]
+            fastqFileList=[sraOb.localfastq1Path,sraOb.localfastq2Path]
         else:
             pairedFlag=False
-            fastqFiles=[sraOb.localfastqPath]
+            fastqFileList=[sraOb.localfastqPath]
         
         #create path to output sam file
         outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
         
+        
         #call runHisat2
-        self.runHisat2(fastqFiles,pairedFlag,outSamFile,kwargs)
+        return self.runHisat2(fastqFileList,pairedFlag,outSamFile,**kwargs)
             
         
         
@@ -206,7 +208,7 @@ class Hisat2:
             
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
-        
+       
         
         hisat2_Cmd=['hisat2']
         #add options

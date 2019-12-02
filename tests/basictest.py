@@ -110,19 +110,27 @@ sraOb.deleteFastqFiles()
 gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,deleteOriginalBam=True),deleteInputBam=True,proc=10)
 """
 
-#build hisat index
-hs=mapping.Hisat2()
-hsbArgs={"-p":"8","-a":"","-q":""}
-if hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa",**hsbArgs):
-    print("Success")
 
-
-
-sraOb=sra.SRA('SRR1583780',testDir)
+sraOb=sra.SRA('SRR5507495',testDir)
 #download sra
 sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done
 sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
+
+#build hisat index
+hsOpts={"--dta-cufflinks":"","-p":"12"}
+hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
+#hsbArgs={"-p":"8","-a":"","-q":""}
+#if hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa",**hsbArgs):
+#    print("Success")
+    
+#run hisat
+hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
+
+
+
+
+
 
 
 
