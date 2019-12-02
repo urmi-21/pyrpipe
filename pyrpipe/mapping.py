@@ -12,6 +12,9 @@ from pyrpipe.myutils import *
 class Aligner:
     def __init__(self):
         self.category="Alignement"
+    
+    def performAlignment(self):
+        pass
 
 class Hisat2:
     def __init__(self,hisat2Index="",**kwargs):
@@ -56,6 +59,10 @@ class Hisat2:
             self.hisat2Index=hisat2Index
         else:
             print("No Hisat2 index provided. Please run build index now to generate an index....")
+            
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
             
     def buildHisat2Index(self,indexPath,indexName,*args,**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
@@ -127,21 +134,55 @@ class Hisat2:
         return True
         
         
+    def performAlignment(self,sraOb,outSamSuffix="_hisat2",**kwargs):
+        """Function to perform alignment using self object and the provided sraOb.
+        
+        Parameters
+        ----------
+        arg1: SRA object
+            An object of type SRA. The path to fastq files will be obtained from this object.
+        arg2: string
+            Suffix for the output sam file
+        arg3: dict
+            Options to pass to hisat2.
+        """
+        #find layout and fq file paths
+        if sraOb.layout == 'PAIRED':
+            pairedFlag=True
+            fastqFiles=[sraOb.localfastq1Path,sraOb.localfastq2Path]
+        else:
+            pairedFlag=False
+            fastqFiles=[sraOb.localfastqPath]
+        
+        #create path to output sam file
+        outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+        
+        #call runHisat2
+        self.runHisat2(fastqFiles,pairedFlag,outSamFile,kwargs)
+            
+        
         
         
         
     
-    def runHisat2(self,sraOb,outSamSuffix="_hisat2",**kwargs):
+    #def runHisat2(self,sraOb,outSamSuffix="_hisat2",**kwargs):
+    def runHisat2(self,fastqFileList,pairedFlag,outSamFile,**kwargs):
         """Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
         All output will be written to SRA.location by default.
         
         Parameters
         ----------
-        arg1: SRA object
-            An object of type SRA which contains valid fastq files
+        arg1: list
+            A list containing path to fastq files
         
-        arg2: dict
-            arguments to be passed to hisat2
+        arg2: bool
+            bool indicating whether data is paired. True --> Paired; False --> single
+        
+        arg3: string
+            path to output sam file
+        
+        arg4: dict
+            arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
         Returns
         -------
@@ -152,33 +193,36 @@ class Hisat2:
         #check for a valid index
         if not self.checkHisat2Index():
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
+        
+        """
+        Handle overwrite
+        """
+        overwrite=True
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outSamFile):
+                print("The file "+outSamFile+" already exists. Exiting..")
+                return outSamFile
             
-         #save information about the SRAobject
-         #self.SRAob=SRAob
-         
-        
-        hisatArgsList=['-p','--dta-cufflinks']
-        
-        outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
         
         
-        #check if file exists. return if yes
-        if os.path.isfile(outSamFile):
-            print("The file "+outSamFile+" already exists. Exiting..")
-            return outSamFile
-            
         hisat2_Cmd=['hisat2']
-        hisat2_Cmd.extend(parseUnixStyleArgs(hisatArgsList,kwargs))
+        #add options
+        hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
         hisat2_Cmd.extend(['-x',self.hisat2Index])
-        if sraOb.layout == 'PAIRED':
-            hisat2_Cmd.extend(['-1',sraOb.localfastq1Path])
-            hisat2_Cmd.extend(['-2',sraOb.localfastq2Path])
+        if pairedFlag:
+            hisat2_Cmd.extend(['-1',fastqFileList[0]])
+            hisat2_Cmd.extend(['-2',fastqFileList[1]])
         else:
-            hisat2_Cmd.extend(['-U',sraOb.localfastqPath])
+            hisat2_Cmd.extend(['-U',fastqFileList[0]])
         #save output to the sraob location folder 
         hisat2_Cmd.extend(['-S',outSamFile])
         print("Executing:"+" ".join(hisat2_Cmd))
         
+        
+        """
         #start ececution
         log=""
         try:
@@ -199,7 +243,7 @@ class Hisat2:
         #return the path to output sam
         return outSamFile
         
-        
+        """
     
     def checkHisat2Index(self):
         if hasattr(self,'hisat2Index'):
@@ -207,7 +251,7 @@ class Hisat2:
         else:
             return False
 
-
+    
 
 
 

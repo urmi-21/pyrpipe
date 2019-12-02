@@ -118,6 +118,11 @@ if hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/
 
 
 
+sraOb=sra.SRA('SRR1583780',testDir)
+#download sra
+sraOb.downloadSRAFile()
+#run fastqdump;delete sra when done
+sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 
 
 
