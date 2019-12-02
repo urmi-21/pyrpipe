@@ -75,6 +75,7 @@ class Hisat2:
         bool:
             Returns the status of hisat2-build
         """
+        overwrite=True
         print("Building hisat index...")
         
         hisat2BuildValidArgsList=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
@@ -86,10 +87,11 @@ class Hisat2:
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
         
-        #check if files exists
-        if checkHisatIndex(os.path.join(indexPath,indexName)):
-            print("Hisat2 index with same name already exists. Exiting...")
-            return False
+        if not overwrite:
+            #check if files exists
+            if checkHisatIndex(os.path.join(indexPath,indexName)):
+                print("Hisat2 index with same name already exists. Exiting...")
+                return False
         
         hisat2Build_Cmd=['hisat2-build']
         #add options
@@ -100,6 +102,29 @@ class Hisat2:
         hisat2Build_Cmd.append(os.path.join(indexPath,indexName))
         print("Executing:"+str(" ".join(hisat2Build_Cmd)))
         
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(hisat2Build_Cmd):
+                print (output)    
+                log=log+str(output)
+            #save to a log file
+
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return ""
+        
+        #check if sam file is present in the location directory of sraOb
+        if not checkHisatIndex(os.path.join(indexPath,indexName)):
+            print("ERROR in building hisat2 index.")
+            return False
+        
+        #set the index path
+        self.hisat2Index=os.path.join(indexPath,indexName)
+        
+        #return the path to output sam
+        return True
         
         
         
