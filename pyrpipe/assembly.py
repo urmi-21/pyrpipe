@@ -12,7 +12,7 @@ class Assembly:
     def __init__(self):
         self.category="Assembler"
 
-class Stringtie:
+class Stringtie(Assembly):
     def __init__(self):
         """Stringtie constructor. Initialize stringtie parameters.
         Parameters

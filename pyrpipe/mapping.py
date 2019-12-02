@@ -39,7 +39,17 @@ class Hisat2:
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
     def buildHisat2Index(self,indexPath,indexName,*args):
+        """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
+        
+        Returns
+        -------
+        bool:
+            Returns the status of hisat2-build
+        """
         print("Building hisat index...")
+        
+        
+        
         
         
     
@@ -68,7 +78,7 @@ class Hisat2:
          #save information about the SRAobject
          #self.SRAob=SRAob
          
-        #scan for prefetch arguments
+        
         hisatArgsList=['-p','--dta-cufflinks']
         
         outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
