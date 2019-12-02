@@ -43,16 +43,19 @@ def getCommandReturnStatus(cmd):
         return True
     return False
 
-def executeCommand(cmd):
-      
+#prints stdout in real time. optimal for huge stdout and no stderr
+def executeCommand(cmd):      
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
+    
     for stdout_line in iter(popen.stdout.readline, ""):
             yield stdout_line 
     popen.stdout.close()
+    
+    
     return_code = popen.wait()
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
-        
+     
 
 def getSRADownloadPath(srrID):
     if len(srrID) <6:

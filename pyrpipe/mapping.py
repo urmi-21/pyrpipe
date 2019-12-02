@@ -224,15 +224,15 @@ class Hisat2:
         print("Executing:"+" ".join(hisat2_Cmd))
         
         
-        """
+        
         #start ececution
         log=""
         try:
             for output in executeCommand(hisat2_Cmd):
-                print (output)    
+                #print (output)    
                 log=log+str(output)
             #save to a log file
-
+            
         except subprocess.CalledProcessError as e:
             print ("Error in command...\n"+str(e))
             #save error to error.log file
@@ -245,7 +245,7 @@ class Hisat2:
         #return the path to output sam
         return outSamFile
         
-        """
+        
     
     def checkHisat2Index(self):
         if hasattr(self,'hisat2Index'):
@@ -262,12 +262,70 @@ class Star:
         """STAR constructor. Initialize star's index and other parameters.
         """
         
+        
+        super().__init__() 
         self.programName="star"
+        
+        self.validArgsList=[]
+        self.depList=[self.programName]        
         #check if hisat2 exists
-        if not checkDep([self.programName]):
+        if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
+            
+            
+    def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
+        """Function to perform alignment using self object and the provided sraOb.
+        
+        Parameters
+        ----------
+        arg1: SRA object
+            An object of type SRA. The path to fastq files will be obtained from this object.
+        arg2: string
+            Suffix for the output sam file
+        arg3: dict
+            Options to pass to hisat2.
+        """
+        
+        pass
+            
 
+class Bowtie2(Aligner):
+    def __init__(self,bowtie2Index):
+        """Bowtie2 constructor. Initialize star's index and other parameters.
+        """       
+        
+        super().__init__() 
+        self.programName="bowtie2"
+        
+        self.validArgsList=[]
+        self.depList=[self.programName]        
+        #check if hisat2 exists
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+    
+    
+    def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
+        """Function to perform alignment using self object and the provided sraOb.
+        
+        Parameters
+        ----------
+        arg1: SRA object
+            An object of type SRA. The path to fastq files will be obtained from this object.
+        arg2: string
+            Suffix for the output sam file
+        arg3: dict
+            Options to pass to hisat2.
+        """
+        
+        pass
+    
+    def runBowTie2(self,sraOb,**kwargs):
+        """Function to run bowtie2
+        """
+        
+    
+    
     
 class Samtools:
     def __init__(self):
