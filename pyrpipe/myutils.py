@@ -264,6 +264,16 @@ def mkdir(dirPath):
         return False
     return True
 
+def moveFile(source,destination):
+    """
+    perform mv command
+    """
+    mv_cmd=['mv',outFile2Path,newOutFile2Path]
+    if not getCommandReturnStatus(mv_cmd):
+        return False
+    return True
+    
+
 if __name__ == "__main__":
     print("main")
     #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":"IN"}))

@@ -114,7 +114,7 @@ gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,delete
 
 btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
 #riboseq SRR3590744
-sraOb=sra.SRA('SRR3590744',testDir)
+sraOb=sra.SRA('SRR5507442',testDir)
 #download sra
 sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done

@@ -11,6 +11,8 @@ from pyrpipe.myutils import *
 class RNASeqQC:
     def __init__(self):
         self.category="RNASeqQC"
+    def performQC(self):
+        pass
 
 class Trimgalore(RNASeqQC):
     def __init__(self,**kwargs):
@@ -42,22 +44,108 @@ class Trimgalore(RNASeqQC):
         print(self.passedArgumentList)
         
             
-    def run(self,sraOb):
-        """Run this class' program.
-        The function run() is consistent for all QC classess.
-        This function returns a tuple containing the status and the file paths to the qc-corrected fastq files (in order 1,2 for paired)
+    def performQC(self,sraOb,outFileSuffix="_trimgalore",**kwargs):
+        """Function to perform qc using trimgalore.
+        The function performQC() is consistent for all QC classess.
+        
+        Parameters
+        ----------
+        arg1: SRA
+            An SRA object whose fastq files will be used
+        
+        Returns
+        -------
+        tuple
+            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+            
         """
-        return self.runTrimGalore(sraOb)
-            
-            
-    def runTrimGalore(self,sraOb):
+        #create path to output files
+        outDir=sraOb.location
+        
+        #create new options based on parametrs
+        newOpts={}
         #get layout
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
-            return self.runTrimGalorePaired(fq1,fq2)
+            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
+            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
+            outFile=os.path.join(outDir,outFileName)
+            newOpts={"--paired":"","--":fq1,"--":fq2,"-o":outDir}
+            mergedOpts={**kwargs,**newOpts}
+            #run trimgalore
+            self.runTrimGalore(**mergedOpts)
+            """
+            running trim galore will create two files named <input>_val_1.fq and <input>_val_2.fq
+            move these files to the specified out files
+            """
+            oldFile1=os.path.join(outDir,getFileBaseName(fq1)+"_val_1.fq")
+            oldFile2=os.path.join(outDir,getFileBaseName(fq2)+"_val_2.fq")
+            
+            mv1=moveFile(oldFile1,outFileName1)
+            mv2=moveFile(oldFile2,outFileName2)
+            
+            if not checkFilesExists(outFileName1,outFileName2):
+                print("Trimgalore failed")
+                return False
+            return True
+            
         else:
-            return self.runTrimGaloreSingle(sraOb.localfastqPath)
+            fq=sraOb.localfastqPath
+            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
+            outFile=os.path.join(outDir,outFileName)
+            newOpts={"--":fq,"-o":outDir}
+            #run trimgalore
+            mergedOpts={**kwargs,**newOpts}
+            self.runTrimGalore(**mergedOpts)
+            """
+            running trim galore will create one file named <input>_trimmed.fq
+            move these files to the specified out files
+            """
+            oldFile=os.path.join(outDir,getFileBaseName(fq)+"_trimmed.fq")
+            
+            mv=moveFile(oldFile,outFileName)
+            
+            if not checkFilesExists(outFileName):
+                print("Trimgalore failed")
+                return False
+            return True
+        
+        
+            
+    def runTrimGalore(self,**kwargs):
+        """Wrapper for running trimgalore
+        
+        Parameters
+        ----------
+        arg1: dict
+            Options to pass to trimgalore (will override existing parameters)
+        """
+        
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        
+        #create command to run
+        trimGalore_Cmd=['trim_galore']
+        trimGalore_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        print("Executing:"+" ".join(trimGalore_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(trimGalore_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+        
+
+        
             
         
             
