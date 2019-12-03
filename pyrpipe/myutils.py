@@ -139,10 +139,17 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
 
         Examples
         --------
-        >>> parseUnixStyleArgs(['-O','-t','-q'], **{"-O": "./test", "Attr2": "XX","-q":""})
-        ['-O','./test','-q']
+        >>> parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":"IN"})
+        Unknown argument Attr2 XX. ignoring...
+        ['-O', './test', 'IN']
     """
     popenArgs=[]
+    """
+    Define some special arguments.
+    -- to pass input which don't follow any flag e.g. mypro.sh input1 input2
+    """
+    specialArgList=["--"]
+    appendAtEndArgs=[]
     for key, value in passedArgs.items():
         #check if key is a valid argument
         if key in validArgsList:
@@ -150,8 +157,11 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
             #do not add emty parameters e.g. -q or -v
             if len(value)>0:
                     popenArgs.append(value)
+        elif key in specialArgList:
+            appendAtEndArgs.append(value)
         else:
             print("Unknown argument {0} {1}. ignoring...".format(key, value))
+    popenArgs.extend(appendAtEndArgs)
     return popenArgs
     
 
@@ -256,5 +266,5 @@ def mkdir(dirPath):
 
 if __name__ == "__main__":
     print("main")
-    
+    #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":"IN"}))
     

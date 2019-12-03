@@ -139,10 +139,13 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 #    print("Success")
     
 #run hisat
-hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
+bam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 
+#run stringtie
+st=assembly.Stringtie()
 
+st.performAssembly(bam)
 
 
 

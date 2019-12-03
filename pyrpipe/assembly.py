@@ -21,7 +21,7 @@ class Stringtie(Assembly):
         Parameters
         ----------
         arg1: string
-            Path to the reference gtf file. Note: -G is not in the validArgsList
+            Path to the reference gtf file.
         arg2: dict
             Options passed to stringtie. These could be overridden later when executing stringtie.
         """
@@ -30,20 +30,107 @@ class Stringtie(Assembly):
         #check if stringtie exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
-        self.validArgsList=['--version','--conservative','--rf','--fr','-o','-l',
+        self.validArgsList=['-G','--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
                             '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
         
         #keep the passed arguments
         self.passedArgumentDict=kwargs
         
-    def performAssembly():
+        #check the reference GTF
+        if len(referenceGTF)>0 and checkFilesExists(referenceGTF):
+            self.referenceGTF=referenceGTF
+            self.passedArgumentDict['-G']=referenceGTF
+        
+    def performAssembly(self,inputBAM,outFileSuffix="_stringtie",overwrite=True,**kwargs):
         """Function to run stringtie with an object of SRA class.
-        """
-        pass
+                
+        Parameters
+        ----------
+        arg1: string
+            path to bam file
+        arg2: string
+            Suffix for the output gtf file
+        arg3: dict
+            Options to pass to stringtie. This will override the existing options self.passedArgumentDict (only replace existing arguments and not replace all the arguments).
             
- #function to run stringtie
-    def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
+        Returns
+        -------
+        string
+            path to output GTF file
+        """
+        
+        #create path to output sam file
+        fname=getFileBaseName(inputBAM)
+        outDir=getFileDirectory(inputBAM)
+        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        
+        """
+        Handle overwrite
+        """
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outGtfFile):
+                print("The file "+outGtfFile+" already exists. Exiting..")
+                return outGtfFile
+        
+        #Add output file name and input bam
+        newOpts={"-o":outGtfFile,"--":inputBAM}
+        mergedOpts={**kwargs,**newOpts}
+        print("MS:"+str(mergedOpts))
+        #call stringtie
+        status=self.runStringtie(**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(outGtfFile):
+                return outGtfFile
+        else:
+            return ""
+        
+            
+    
+    def runStringtie(self,**kwargs):
+        """Wrapper for running stringtie
+        
+        Parameters
+        ----------
+        arg1: dict
+            Options passed to stringtie
+        
+        Returns
+        -------
+        bool
+            status of stringtie command.
+        """
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        stie_Cmd=['stringtie']
+        #add options
+        stie_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        
+        print("Executing:"+" ".join(stie_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(stie_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+        
+        
+    #function to run stringtie
+    def runStringtieold(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
                 
         """A wrapper to run stringtie. All arguments are passed through **kwargs.
         This function is called by performAssembly() or could be called independently.
