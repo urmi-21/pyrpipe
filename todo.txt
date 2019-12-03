@@ -1,5 +1,13 @@
-handle paired and single files differently
+todo
 generate reports for each analysis
-separate basic and advance parameters for each program
 refactor : allow modifications by class objects only
 streamline return values
+
+Add programs
+Star
+Cufflinks
+Ribocode
+portcullis
+mikado
+
+

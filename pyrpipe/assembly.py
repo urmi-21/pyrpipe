@@ -51,7 +51,9 @@ class Stringtie(Assembly):
             path to bam file
         arg2: string
             Suffix for the output gtf file
-        arg3: dict
+        arg3: bool
+            Overwrite if output file already exists.
+        arg4: dict
             Options to pass to stringtie. This will override the existing options self.passedArgumentDict (only replace existing arguments and not replace all the arguments).
             
         Returns
@@ -60,7 +62,7 @@ class Stringtie(Assembly):
             path to output GTF file
         """
         
-        #create path to output sam file
+        #create path to output file
         fname=getFileBaseName(inputBAM)
         outDir=getFileDirectory(inputBAM)
         outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
@@ -77,7 +79,7 @@ class Stringtie(Assembly):
         #Add output file name and input bam
         newOpts={"-o":outGtfFile,"--":inputBAM}
         mergedOpts={**kwargs,**newOpts}
-        print("MS:"+str(mergedOpts))
+        
         #call stringtie
         status=self.runStringtie(**mergedOpts)
         
@@ -87,6 +89,51 @@ class Stringtie(Assembly):
                 return outGtfFile
         else:
             return ""
+        
+    def performStringtieMerge(self,outFileSuffix="_stringtieMerge",overwrite=True,*args,**kwargs):
+        """Function to run stringtie merge.
+        Parameters
+        ----------
+        arg1: string
+            Suffix for output gtf file name
+        arg2: tuple
+            input Gtf files
+        arg3: bool
+            Overwrite if output file already exists.
+        arg4: dict
+            options to pass to stringtie
+        """
+        if len(args) < 1:
+            print("ERROR: No input gtf for stringtie merge.")
+            return ""
+        
+        #create path to output sam file
+        fname=getFileBaseName(args[0])
+        outDir=getFileDirectory(args[0])
+        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outGtfFile):
+                print("The file "+outGtfFile+" already exists. Exiting..")
+                return outGtfFile
+        
+        #Add merge flag, output file name and input bam
+        newOpts={"--merge":"","-o":outGtfFile,"--":inputBAM}
+        
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call stringtie
+        status=self.runStringtie(**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(outGtfFile):
+                return outGtfFile
+        else:
+            return ""
+        
+        
         
             
     
@@ -127,55 +174,77 @@ class Stringtie(Assembly):
             return False        
         #return status
         return True
+    
+    
+    
+class Cufflinks(Assembly):
+    def __init__(self,referenceGTF="",**kwargs):
+        """Stringtie constructor. Initialize stringtie parameters.
         
+        Parameters
+        ----------
+        arg1: string
+            Path to the reference gtf file.
+        arg2: dict
+            Options passed to stringtie. These could be overridden later when executing stringtie.
+        """
+        super().__init__()
+        self.programName="cufflinks"
+        #check if stringtie exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        self.validArgsList=[]
         
-    #function to run stringtie
-    def runStringtieold(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
-                
-        """A wrapper to run stringtie. All arguments are passed through **kwargs.
-        This function is called by performAssembly() or could be called independently.
+        #keep the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #check the reference GTF
+        if len(referenceGTF)>0 and checkFilesExists(referenceGTF):
+            self.referenceGTF=referenceGTF
+            self.passedArgumentDict['-g']=referenceGTF
+    
+    
+    def performAssembly(self,inputBAM,outFileSuffix="_cufflinks",overwrite=True,**kwargs):
+        """
+        """
+        pass
+    
+    
+    
+    def runCufflinks(self,**kwargs):
+        """Wrapper for running cufflinks
+        
+        Parameters
+        ----------
+        arg1: dict
+            Options passed to cufflinks
         
         Returns
         -------
-        string
-            Returns the absolute path og the GTF file if the assembly was successful. Returns empty string otherwise.
+        bool
+            status of cufflinks command.
         """
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        cufflinks_Cmd=['cufflinks']
+        #add options
+        cufflinks_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
-        #check if bam file exists
-        if not checkFilesExists(inputBAM):
-            raise Exception("ERROR: Can not find bam file: "+ inputBAM)
+        print("Executing:"+" ".join(cufflinks_Cmd))
         
-        #use bam file directory as default directory
-        if not outDir:
-            outDir=os.path.split(inputBAM)[0]
-        fname=os.path.split(inputBAM)[1]
-        outGtfFile=os.path.join(outDir,fname+outSuffix+'.gtf')
-        
-        #stie command
-        stie_Cmd=['stringtie',inputBAM,'-p',str(proc)]
-        
-        if referenceGTF and checkFilesExists(referenceGTF):
-            stie_Cmd.extend(['-G',referenceGTF])
-                
-        stie_Cmd.extend(['-o',outGtfFile])
-        print("Executing: "+" ".join(stie_Cmd))
-        
+        #start ececution
+        log=""
         try:
-            for output in executeCommand(stie_Cmd):
-                print (output)
+            for output in executeCommand(cufflinks_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
         except subprocess.CalledProcessError as e:
-            print ("Error in command")
-            return ""
-        
-        
-        if deleteInputBam:
-            if not deleteFileFromDisk(inputBAM):
-                return ""
-        
-        #check gtf file
-        if not checkFilesExists(outGtfFile):
-            return ""
-        
-        
-        
-        return outGtfFile
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
