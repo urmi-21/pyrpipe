@@ -12,6 +12,7 @@ from pyrpipe.myutils import *
 class Aligner:
     def __init__(self):
         self.category="Alignement"
+        self.passedArgumentDict={}
     
     def performAlignment(self):
         pass
@@ -34,7 +35,7 @@ class Hisat2:
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=['-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
+        self.validArgsList=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
                             '-u','-5','-3','--phred33','--phred64','--int-quals',
                             '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
                             '--pen-noncansplice','--pen-canintronlen','--pen-noncanintronlen','--min-intronlen'
@@ -50,16 +51,19 @@ class Hisat2:
                             '--remove-chrname','--add-chrname','--version']
         
         
-        #check index exists
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #if index is passed, update the passed arguments
         if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
             print("HISAT2 index is: "+hisat2Index)
             self.hisat2Index=hisat2Index
+            self.passedArgumentDict['-x']=self.hisat2Index
         else:
-            print("No Hisat2 index provided. Please run build index now to generate an index....")
+            print("No Hisat2 index provided. Please build index now to generate an index using buildHisat2Index()....")
             
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
-        #self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
+        
+        
             
     def buildHisat2Index(self,indexPath,indexName,*args,**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
@@ -126,6 +130,7 @@ class Hisat2:
         
         #set the index path
         self.hisat2Index=os.path.join(indexPath,indexName)
+        self.passedArgumentDict['-x']=self.hisat2Index
         
         #return the path to output sam
         return True
@@ -160,23 +165,20 @@ class Hisat2:
         
         #find layout and fq file paths
         if sraOb.layout == 'PAIRED':
-            pairedFlag=True
             newOpts={"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path,"-S":outSamFile}
         else:
-            pairedFlag=False
             newOpts={"-U":sraOb.localfastqPath,"-S":outSamFile}
-        
-        
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
-            
         
         #call runHisat2
         status=self.runHisat2(**mergedOpts)
         
         if status:
-            return outSamFile
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(outSamFile):
+                return outSamFile
         else:
             return ""
             
@@ -206,8 +208,7 @@ class Hisat2:
        
         hisat2_Cmd=['hisat2']
         #add options
-        hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
-        hisat2_Cmd.extend(['-x',self.hisat2Index])
+        hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
         print("Executing:"+" ".join(hisat2_Cmd))
         
@@ -223,13 +224,8 @@ class Hisat2:
         except subprocess.CalledProcessError as e:
             print ("Error in command...\n"+str(e))
             #save error to error.log file
-            return False
-        
-        #check if sam file is present in the location directory of sraOb
-        if not checkFilesExists(outSamFile):
-            return False
-        
-        #return the path to output sam
+            return False        
+        #return status
         return True
         
         
@@ -341,11 +337,14 @@ class Bowtie2(Aligner):
     
     
 class Samtools:
-    def __init__(self):
+    def __init__(self,**kwargs):
         self.programName="samtools"
         #check if hisat2 exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
+            
+        self.passedArgumentDict=kwargs
+        
         
     def samToBam(self,samFile,proc,deleteSam=False):
         """Convert sam file to a bam file. Output bam file will have same name as input sam.
@@ -444,7 +443,48 @@ class Samtools:
             return ""
         
         return bamSorted
-
+    
+    
+    def runSamtools(self,**kwargs):
+        """A wrapper to run samtools.
+        
+        Parameters
+        ----------
+        arg1: dict
+            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            
+        Returns
+        -------
+        bool:
+                Returns the status of samtools. True is passed, False if failed.
+        """
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        samtools_Cmd=['samtools']
+        #add options
+        samtools_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+                
+        print("Executing:"+" ".join(samtools_Cmd))
+        
+        """
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(samtools_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+        """
+        
         
         
         
