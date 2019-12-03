@@ -144,17 +144,23 @@ class Hisat2:
             Options to pass to hisat2.
         """
         
-        #find layout and fq file paths
-        if sraOb.layout == 'PAIRED':
-            pairedFlag=True
-            fastqFileList=[sraOb.localfastq1Path,sraOb.localfastq2Path]
-        else:
-            pairedFlag=False
-            fastqFileList=[sraOb.localfastqPath]
         
         #create path to output sam file
         outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
         
+        #find layout and fq file paths
+        if sraOb.layout == 'PAIRED':
+            pairedFlag=True
+            newOpts={"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path,"-S":outSamFile}
+        else:
+            pairedFlag=False
+            newOpts={"-U":sraOb.localfastqPath,"-S":outSamFile}
+        
+        
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+            
         
         #call runHisat2
         return self.runHisat2(fastqFileList,pairedFlag,outSamFile,**kwargs)
