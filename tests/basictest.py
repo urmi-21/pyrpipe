@@ -128,7 +128,10 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #run bowtie
-bob=mapping.Bowtie2("")
+btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
+bob=mapping.Bowtie2(btIndex)
+
+bob.runBowTie2(sraOb)
 
 
 

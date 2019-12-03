@@ -303,6 +303,9 @@ class Bowtie2(Aligner):
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        
+        self.bowtie2Index=bowtie2Index
     
     
     def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
@@ -323,6 +326,14 @@ class Bowtie2(Aligner):
     def runBowTie2(self,sraOb,**kwargs):
         """Function to run bowtie2
         """
+        outDir=sraOb.location
+        outSamFile=os.path.join(outDir,"bt2.sam")
+        unmapFname=os.path.join(outDir,sraOb.srrAccession+"norRNA.fastq")
+        
+        bowtie2_Cmd=[self.programName]
+        bowtie2_Cmd.extend(["-p","10","--norc","-x",self.bowtie2Index,"-S",outSamFile,"--un",unmapFname])
+        
+        print("Executing:"+" ".join(bowtie2_Cmd))
         
     
     
