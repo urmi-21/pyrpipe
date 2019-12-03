@@ -40,8 +40,8 @@ class Trimgalore(RNASeqQC):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         #initialize the passed arguments
-        self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
-        print(self.passedArgumentList)
+        self.passedArgumentDict=kwargs
+        
         
             
     def performQC(self,sraOb,outFileSuffix="_trimgalore",**kwargs):
@@ -70,8 +70,7 @@ class Trimgalore(RNASeqQC):
             fq2=sraOb.localfastq2Path
             outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
             outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
-            outFile=os.path.join(outDir,outFileName)
-            newOpts={"--paired":"","--":fq1,"--":fq2,"-o":outDir}
+            newOpts={"--paired":"","--":(fq1,fq2),"-o":outDir}
             mergedOpts={**kwargs,**newOpts}
             #run trimgalore
             self.runTrimGalore(**mergedOpts)
@@ -87,8 +86,8 @@ class Trimgalore(RNASeqQC):
             
             if not checkFilesExists(outFileName1,outFileName2):
                 print("Trimgalore failed")
-                return False
-            return True
+                return ("",)
+            return outFileName1,outFileName2
             
         else:
             fq=sraOb.localfastqPath
@@ -108,8 +107,8 @@ class Trimgalore(RNASeqQC):
             
             if not checkFilesExists(outFileName):
                 print("Trimgalore failed")
-                return False
-            return True
+                return ("",)
+            return (outFileName,)
         
         
             

@@ -260,7 +260,7 @@ class SRA:
             
         return True
     
-    def performQC(self,qcObject,deleteRawFastq=False):
+    def performFastqQC(self,qcObject,deleteRawFastq=False):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
         The qcObject should be initialized with all the parameters.
@@ -283,7 +283,7 @@ class SRA:
 
         Examples
         --------
-        >>> object.performQC(qc.BBmap())
+        >>> object.performFastqQC(qc.BBmap())
         True
         """
         #check a valid qcObject
@@ -295,7 +295,7 @@ class SRA:
         self.QCObject=qcObject
         print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
-        qcStatus=qcObject.run(self)
+        qcStatus=qcObject.performQC(self)
         print(qcStatus)
         #if job failed
         if not qcStatus[0]:

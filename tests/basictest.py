@@ -120,6 +120,10 @@ sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done
 sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 
+tgOb=qc.Trimgalore()
+
+sraOb.performFastqQC(tgOb)
+
 #run bbmap
 #bd=qc.BBmap()
 #sraOb.performQC(bd)
@@ -131,6 +135,7 @@ sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 #update fastq as
 #sraOb.localfastqPath=unMappedReads
 
+"""
 #build hisat index
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
@@ -150,7 +155,7 @@ st=assembly.Stringtie()
 
 st.performAssembly(bam)
 
-
+"""
 
 
 

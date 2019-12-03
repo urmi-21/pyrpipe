@@ -139,9 +139,9 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
 
         Examples
         --------
-        >>> parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":"IN"})
+        >>> parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
         Unknown argument Attr2 XX. ignoring...
-        ['-O', './test', 'IN']
+        ['-O', './test', 'IN1', 'IN2']
     """
     popenArgs=[]
     """
@@ -158,7 +158,7 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
             if len(value)>0:
                     popenArgs.append(value)
         elif key in specialArgList:
-            appendAtEndArgs.append(value)
+            appendAtEndArgs.extend(value)
         else:
             print("Unknown argument {0} {1}. ignoring...".format(key, value))
     popenArgs.extend(appendAtEndArgs)
@@ -268,7 +268,7 @@ def moveFile(source,destination):
     """
     perform mv command
     """
-    mv_cmd=['mv',outFile2Path,newOutFile2Path]
+    mv_cmd=['mv',source,destination]
     if not getCommandReturnStatus(mv_cmd):
         return False
     return True
@@ -276,5 +276,5 @@ def moveFile(source,destination):
 
 if __name__ == "__main__":
     print("main")
-    #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":"IN"}))
+    #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
     
