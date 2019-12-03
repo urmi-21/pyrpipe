@@ -30,6 +30,9 @@ class Hisat2:
         """ 
         super().__init__() 
         self.programName="hisat2"
+        #check if hisat2 exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=['-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
                             '-u','-5','-3','--phred33','--phred64','--int-quals',
@@ -47,12 +50,6 @@ class Hisat2:
                             '--remove-chrname','--add-chrname','--version']
         
         
-        
-        #check if hisat2 exists
-        if not checkDep([self.programName]):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-        
-        
         #check index exists
         if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
             print("HISAT2 index is: "+hisat2Index)
@@ -62,7 +59,7 @@ class Hisat2:
             
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
-        self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
+        #self.passedArgumentList=parseUnixStyleArgs(self.validArgsList,kwargs)
             
     def buildHisat2Index(self,indexPath,indexName,*args,**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2Index.

@@ -11,28 +11,42 @@ from pyrpipe.myutils import *
 class Assembly:
     def __init__(self):
         self.category="Assembler"
+    def performAssembly():
+        pass
 
 class Stringtie(Assembly):
-    def __init__(self):
+    def __init__(self,referenceGTF="",**kwargs):
         """Stringtie constructor. Initialize stringtie parameters.
+        
         Parameters
         ----------
+        arg1: string
+            Path to the reference gtf file. Note: -G is not in the validArgsList
+        arg2: dict
+            Options passed to stringtie. These could be overridden later when executing stringtie.
         """
         super().__init__()
         self.programName="stringtie"
         #check if stringtie exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
-        self.validArgsList=['--version','--conservative','--rf','--fr','-G','-o','-l',
+        self.validArgsList=['--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
                             '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
         
-            
+        #keep the passed arguments
+        self.passedArgumentDict=kwargs
+        
+    def performAssembly():
+        """Function to run stringtie with an object of SRA class.
+        """
+        pass
             
  #function to run stringtie
     def runStringtie(self,inputBAM,proc,referenceGTF=False,outDir=False,deleteInputBam=False,outSuffix="_stie"):
-        
-        """Run stringtie and assemble transcript.
+                
+        """A wrapper to run stringtie. All arguments are passed through **kwargs.
+        This function is called by performAssembly() or could be called independently.
         
         Returns
         -------
