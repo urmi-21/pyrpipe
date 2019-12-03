@@ -148,6 +148,16 @@ class Hisat2:
         #create path to output sam file
         outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
         
+        """
+        Handle overwrite
+        """
+        overwrite=True
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outSamFile):
+                print("The file "+outSamFile+" already exists. Exiting..")
+                return outSamFile
+        
         #find layout and fq file paths
         if sraOb.layout == 'PAIRED':
             pairedFlag=True
@@ -163,71 +173,45 @@ class Hisat2:
             
         
         #call runHisat2
-        return self.runHisat2(fastqFileList,pairedFlag,outSamFile,**kwargs)
+        status=self.runHisat2(**mergedOpts)
+        
+        if status:
+            return outSamFile
+        else:
+            return ""
             
         
-        
-        
-        
-    
-    #def runHisat2(self,sraOb,outSamSuffix="_hisat2",**kwargs):
-    def runHisat2(self,fastqFileList,pairedFlag,outSamFile,**kwargs):
-        """Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
+    def runHisat2(self,**kwargs):
+        """Wrapper for running hisat2.
+        Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
         All output will be written to SRA.location by default.
         
         Parameters
         ----------
-        arg1: list
-            A list containing path to fastq files
-        
-        arg2: bool
-            bool indicating whether data is paired. True --> Paired; False --> single
-        
-        arg3: string
-            path to output sam file
-        
-        arg4: dict
+        arg1: dict
             arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
         Returns
         -------
-        string:
-                Returns the path to the sam file created. If hisat2 fails, then returns the empty string.
+        bool:
+                Returns the status of hisat2. True is passed, False if failed.
         """
         
         #check for a valid index
         if not self.checkHisat2Index():
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
-        
-        """
-        Handle overwrite
-        """
-        overwrite=True
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(outSamFile):
-                print("The file "+outSamFile+" already exists. Exiting..")
-                return outSamFile
             
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        
         hisat2_Cmd=['hisat2']
         #add options
         hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
         hisat2_Cmd.extend(['-x',self.hisat2Index])
-        if pairedFlag:
-            hisat2_Cmd.extend(['-1',fastqFileList[0]])
-            hisat2_Cmd.extend(['-2',fastqFileList[1]])
-        else:
-            hisat2_Cmd.extend(['-U',fastqFileList[0]])
-        #save output to the sraob location folder 
-        hisat2_Cmd.extend(['-S',outSamFile])
+        
         print("Executing:"+" ".join(hisat2_Cmd))
         
-        
-        
+                
         #start ececution
         log=""
         try:
@@ -239,14 +223,14 @@ class Hisat2:
         except subprocess.CalledProcessError as e:
             print ("Error in command...\n"+str(e))
             #save error to error.log file
-            return ""
+            return False
         
         #check if sam file is present in the location directory of sraOb
         if not checkFilesExists(outSamFile):
-            return ""
+            return False
         
         #return the path to output sam
-        return outSamFile
+        return True
         
         
     
