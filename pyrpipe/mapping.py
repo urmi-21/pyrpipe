@@ -331,9 +331,24 @@ class Bowtie2(Aligner):
         unmapFname=os.path.join(outDir,sraOb.srrAccession+"norRNA.fastq")
         
         bowtie2_Cmd=[self.programName]
-        bowtie2_Cmd.extend(["-p","10","--norc","-x",self.bowtie2Index,"-S",outSamFile,"--un",unmapFname])
+        bowtie2_Cmd.extend(["-p","10","--norc","-x",self.bowtie2Index,"-S",outSamFile,"--un",unmapFname,"-U",sraOb.localfastqPath])
         
         print("Executing:"+" ".join(bowtie2_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(bowtie2_Cmd):
+                print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return ""
+        
+        return unmapFname
         
     
     

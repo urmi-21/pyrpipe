@@ -111,14 +111,27 @@ gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,delete
 """
 
 
-sraOb=sra.SRA('SRR5507495',testDir)
+
+btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
+sraOb=sra.SRA('SRR7215550',testDir)
 #download sra
 sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done
 sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 
+#run bbmap
+bd=qc.BBmap()
+sraOb.performQC(bd)
+
+#run bowtie
+bob=mapping.Bowtie2(btIndex)
+unMappedReads=bob.runBowTie2(sraOb)
+
+#update fastq as
+sraOb.localfastqPath=unMappedReads
+
 #build hisat index
-hsOpts={"--dta-cufflinks":"","-p":"12"}
+hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--end-to-end":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
 #hsbArgs={"-p":"8","-a":"","-q":""}
 #if hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa",**hsbArgs):
@@ -127,11 +140,8 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 #run hisat
 hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
-#run bowtie
-btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
-bob=mapping.Bowtie2(btIndex)
 
-bob.runBowTie2(sraOb)
+
 
 
 

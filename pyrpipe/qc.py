@@ -207,11 +207,12 @@ class BBmap(RNASeqQC):
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
-            return self.runBBdukPaired(fq1,fq2,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters.fa")
+            return self.runBBdukPaired(fq1,fq2,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa")
         else:
-            return self.runBBdukSingle(sraOb.localfastqPath,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters.fa")
+            return self.runBBdukSingle(sraOb.localfastqPath,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa")
     
-    def runBBdukSingle(self,fastqFilePath,pathToAdapters="",proc="auto",ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10):
+    #default ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10
+    def runBBdukSingle(self,fastqFilePath,pathToAdapters="",proc="auto",ktrim='r',k=13,mink=5,hdist=1,qtrim='rl',trimq=10):
         """Run trim_galore in single mode
         
         Returns
