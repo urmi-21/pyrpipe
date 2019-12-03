@@ -23,6 +23,10 @@ class Stringtie(Assembly):
         #check if stringtie exists
         if not checkDep([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
+        self.validArgsList=['--version','--conservative','--rf','--fr','-G','-o','-l',
+                            '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
+                            '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
+        
             
             
  #function to run stringtie
