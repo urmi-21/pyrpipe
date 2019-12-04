@@ -96,7 +96,7 @@ class Trimgalore(RNASeqQC):
             newOpts={"--":(fq,),"-o":outDir}
             #run trimgalore
             mergedOpts={**kwargs,**newOpts}
-            print("RUN Single TG:"+str(mergedOpts))
+            
             self.runTrimGalore(**mergedOpts)
             """
             running trim galore will create one file named <input>_trimmed.fq

@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:53:26 2019
 @author: usingh
 """
 
-from pyrpipe import sra,mapping,assembly,qc
+from pyrpipe import sra,mapping,assembly,qc,tools
 
 
 #########define directories indices, reference gtf etc####
@@ -140,7 +140,7 @@ sraOb.performFastqQC(bbdOb)
 #update fastq as
 #sraOb.localfastqPath=unMappedReads
 
-"""
+
 #build hisat index
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
@@ -152,15 +152,15 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #get sorted bam
-samOb=mapping.Samtools()
-bam=samOb.samToSortedBam(sam,8)
+samOb=tools.Samtools()
+bam=samOb.samToBam(sam,"_US2")
 
 #run stringtie
-st=assembly.Stringtie()
+#st=assembly.Stringtie()
 
-st.performAssembly(bam)
+#st.performAssembly(bam)
 
-"""
+
 
 
 

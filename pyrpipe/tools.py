@@ -1,0 +1,182 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Wed Dec  4 14:54:22 2019
+
+@author: usingh
+"""
+from pyrpipe.myutils import *
+
+class RNASeqTools:
+    def __init__(self):
+        self.category="RNASeqTools"
+    
+    
+class Samtools(RNASeqTools):
+    def __init__(self,**kwargs):
+        self.programName="samtools"
+        #check if hisat2 exists
+        if not checkDep([self.programName]):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        self.validArgsList=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r',
+                            '-R','-q','-l','-m','-f','-F','-G','-s','-M','-x','-B','-?','-S','-O','-T','-@']
+        
+        self.passedArgumentDict=kwargs
+        
+        
+        
+    def samToBam(self,samFile,outFileSuffix="",deleteSam=False,**kwargs):
+        """Convert sam file to a bam file. 
+        Output bam file will have same name as input sam.
+        
+        Returns
+        -------
+        string
+                Returns the path to the bam file. Returns empty string if operation failed.
+        """        
+        
+        outDir=getFileDirectory(samFile)
+        fname=getFileBaseName(samFile)
+        #output will be outBamFile
+        outBamFile=os.path.join(outDir,fname+outFileSuffix+'.bam')
+        
+        newOpts={"--":(samFile,),"-o":outBamFile,"-b":""}
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runSamtools("view",**mergedOpts)
+                
+        if not status:
+            print("Sam to bam failed for:"+samFile)
+            return ""
+        
+        #check if bam file exists
+        if not checkFilesExists(outBamFile):
+            return ""
+        
+        #deletesamfile
+        if deleteSam:
+            if not deleteFileFromDisk(samFile):
+                print("Error deleting sam file:"+samFile)
+                
+        #return path to file
+        return outBamFile
+        
+        
+        
+        
+    #sort bam file.output will be bamFile_sorted.bam
+    def sortBam(self,bamFile,proc,deleteOriginalBam=False):
+        """Sorts an input bam file.
+        
+        Returns
+        -------
+        string
+                Returns path to the sorted bam file. Returns empty string if operation failed.
+        
+        """
+        fname=bamFile.split('.bam')[0]
+        outSortedBamFile=fname+"_sorted.bam"
+        bamSortCmd=['samtools','sort','-o',outSortedBamFile,'-@',str(proc),bamFile]
+        print("Executing: "+" ".join(bamSortCmd))
+        try:
+            for output in executeCommand(bamSortCmd):
+                print (output)
+        except subprocess.CalledProcessError as e:
+            print ("Error in command")
+            return ""
+        
+    
+        if deleteOriginalBam:
+            delBamCmd=['rm',bamFile]
+            print("Deleting unsorted bam file...")
+            try:
+                for output in executeCommand(delBamCmd):
+                         print (output)
+            except subprocess.CalledProcessError as e:
+                 print ("Error deleting unsorted bam file...")
+                 
+        
+        #check if bam file exists
+        if not checkFilesExists(outSortedBamFile):
+            return ""
+        #return path to file
+        return outSortedBamFile
+    
+    def samToSortedBam(self,samFile,proc,deleteSam=False,deleteOriginalBam=False):
+        """Convert sam file to bam and sort the bam file.
+        
+        Returns
+        -------
+        string
+                Returns path to the sorted bam file. Returns empty string if operation failed.
+        """
+        
+        sam2BamFile=self.samToBam(samFile,proc,deleteSam)
+        
+        if not sam2BamFile:
+            return ""
+            
+        bamSorted=self.sortBam(sam2BamFile,proc,deleteOriginalBam)
+        
+        if not bamSorted:
+            return ""
+        
+        return bamSorted
+    
+    
+    def runSamtools(self,subCommand,**kwargs):
+        """A wrapper to run samtools.
+        
+        Parameters
+        ----------
+        arg1: dict
+            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            
+        Returns
+        -------
+        bool:
+                Returns the status of samtools. True is passed, False if failed.
+        """
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        samtools_Cmd=['samtools',subCommand]
+        #add options
+        samtools_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+                
+        print("Executing:"+" ".join(samtools_Cmd))
+        
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(samtools_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
