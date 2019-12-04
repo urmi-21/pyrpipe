@@ -154,27 +154,66 @@ class BBmap(RNASeqQC):
         Parameters
         ----------
         kwargs:
-            bbduk.sh arguments. could override later too.
+            bbduk.sh arguments.
         """
         #run super to inherit parent class properties
         super().__init__() 
         self.programName="bbduk.sh"
         self.depList=[self.programName]
         #note that bbduk.sh argument style is different that other linux commands
-        self.validArgsList=[]
+        self.validArgsList=['in','in2','ref','literal','touppercase','interleaved','qin','reads','copyundefined',
+                            'samplerate','samref','out','out2','outm','outm2','outs','stats','refstats','rpkm',
+                            'dump','duk','nzo','overwrite','showspeed','ziplevel','fastawrap','qout','statscolumns',
+                            'rename','refnames','trd','ordered','maxbasesout','maxbasesoutm','','json','bhist','qhist',
+                            'qchist','aqhist','bqhist','lhist','phist','gchist','ihist','gcbins','maxhistlen','histbefore',
+                            'ehist','qahist','indelhist','mhist','idhist','idbins','varfile','vcf','ignorevcfindels',
+                            'k','rcomp','maskmiddle','minkmerhits','minkmerfraction','mincovfraction','hammingdistance',
+                            'qhdist','editdistance','hammingdistance2','qhdist2','editdistance2','forbidn','removeifeitherbad',
+                            'trimfailures','findbestmatch','skipr1','skipr2','ecco','recalibrate','sam','le.','amino',
+                            'threads','prealloc','monitor','minrskip','maxrskip','rskip','qskip','speed','ktrim','kmask',
+                            'maskfullycovered','ksplit','mink','qtrim','trimq','trimclip','minlength','mlf','maxlength',
+                            'minavgquality','maqb','minbasequality','maxns','mcb','ottm','tp','tbo','strictoverlap',
+                            'minoverlap','mininsert','tpe','forcetrimleft','forcetrimright','forcetrimright2',
+                            'forcetrimmod','restrictleft','restrictright','mingc','maxgc','gcpairs','tossjunk',
+                            'swift','chastityfilter','barcodefilter','barcodes','xmin','ymin','xmax','ymax','trimpolya',
+                            'trimpolygleft','trimpolygright','trimpolyg','filterpolyg','pratio','plen','entropy','entropywindow',
+                            'entropyk','minbasefrequency','entropytrim','entropymask','entropymark','cardinality',
+                            'cardinalityout','loglogk','loglogbuckets','-Xmx','-eoom','-da']
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-    def run(self,sraOb):
+            
+            
+    def performQC(self,sraOb,outFileSuffix,overwrite=True,**kwargs):
         """Execeute the QC method 
         """
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
-            return self.runBBdukPaired(fq1,fq2,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa")
+            #append input and output options
+            outDir=sraOb.location
+            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
+            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
+            outFile1Path=os.path.join(outDir,outFileName1)
+            outFile2Path=os.path.join(outDir,outFileName2)
+            
+            newOpts={"in":fq1,"in2":fq2,"out":outFile1Path,"out2":outFile2Path}
+            mergedOpts={**kwargs,**newOpts}
+            
+            #run bbduk
+            self.rubBBduk(**mergedOpts)
+            
+            
         else:
             return self.runBBdukSingle(sraOb.localfastqPath,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa")
+    
+    
+    
+    def rubBBduk(self,**kwargs):
+        """Wrapper to run bbduk.sh
+        """
+        pass
     
     #default ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10
     def runBBdukSingle(self,fastqFilePath,pathToAdapters="",proc="auto",ktrim='r',k=13,mink=5,hdist=1,qtrim='rl',trimq=10):
