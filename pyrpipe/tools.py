@@ -66,8 +66,8 @@ class Samtools(RNASeqTools):
         
         
     #sort bam file.output will be bamFile_sorted.bam
-    def sortBam(self,bamFile,proc,deleteOriginalBam=False):
-        """Sorts an input bam file.
+    def sortBam(self,bamFile,outFileSuffix="",deleteOriginalBam=False,**kwargs):
+        """Sorts an input bam file. Outpufile will end in _sorted.bam
         
         Returns
         -------
@@ -75,31 +75,29 @@ class Samtools(RNASeqTools):
                 Returns path to the sorted bam file. Returns empty string if operation failed.
         
         """
-        fname=bamFile.split('.bam')[0]
-        outSortedBamFile=fname+"_sorted.bam"
-        bamSortCmd=['samtools','sort','-o',outSortedBamFile,'-@',str(proc),bamFile]
-        print("Executing: "+" ".join(bamSortCmd))
-        try:
-            for output in executeCommand(bamSortCmd):
-                print (output)
-        except subprocess.CalledProcessError as e:
-            print ("Error in command")
-            return ""
         
-    
-        if deleteOriginalBam:
-            delBamCmd=['rm',bamFile]
-            print("Deleting unsorted bam file...")
-            try:
-                for output in executeCommand(delBamCmd):
-                         print (output)
-            except subprocess.CalledProcessError as e:
-                 print ("Error deleting unsorted bam file...")
-                 
+        outDir=getFileDirectory(bamFile)
+        fname=getFileBaseName(bamFile)
+        #output will be outBamFile
+        outSortedBamFile=os.path.join(outDir,fname+outFileSuffix+'_sorted.bam')
+        
+        newOpts={"--":(bamFile,),"-o":outSortedBamFile}
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runSamtools("sort",**mergedOpts)
+        
+        if not status:
+            print("Bam sort failed for:"+bamFile)
+            return ""
         
         #check if bam file exists
         if not checkFilesExists(outSortedBamFile):
             return ""
+
+        if deleteOriginalBam:
+            if not deleteFileFromDisk(bamFile):
+                print("Error deleting sam file:"+bamFile)
+                
         #return path to file
         return outSortedBamFile
     

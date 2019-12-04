@@ -154,6 +154,7 @@ sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 #get sorted bam
 samOb=tools.Samtools()
 bam=samOb.samToBam(sam,"_US2")
+sbam=samOb.sortBam(bam,"_ZZY")
 
 #run stringtie
 #st=assembly.Stringtie()
