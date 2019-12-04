@@ -220,7 +220,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.rubBBduk(**mergedOpts):
+            if self.runBBduk(**mergedOpts):
                 if checkFilesExists(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
             
@@ -235,13 +235,15 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.rubBBduk(**mergedOpts):
+            if self.runBBduk(**mergedOpts):
                 if checkFilesExists(outFilePath):
                     return(outFilePath,)
+                    
     
     
     
-    def rubBBduk(self,**kwargs):
+    
+    def runBBduk(self,**kwargs):
         """Wrapper to run bbduk.sh
         """
         #override existing arguments
@@ -267,4 +269,16 @@ class BBmap(RNASeqQC):
             return False        
         #return status
         return True
+    
+    
+    def performCleaning(self,sraOb,outFileSuffix="_bbsplit",overwrite=True,**kwargs):
+        """
+        Remove contaminated reads mapping to given reference
+        """
+        pass
+    
+    def runBBsplit(self,**kwargs):
+        """wrapper to run bbsplit
+        """
+        pass
         
