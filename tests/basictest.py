@@ -152,9 +152,8 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #get sorted bam
-samOb=tools.Samtools()
-bam=samOb.samToBam(sam,"_US2")
-sbam=samOb.sortBam(bam,"_ZZY")
+samOb=tools.Samtools(**{"-@":"8"})
+sbs=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 
 #run stringtie
 #st=assembly.Stringtie()
