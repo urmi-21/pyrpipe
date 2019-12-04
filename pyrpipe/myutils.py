@@ -144,7 +144,8 @@ def parseJavaStyleArgs(validArgsList,passedArgs):
         ['A=3', 'B=22', '-C']
     """
     popenArgs=[]
-    
+    specialArgList=["--"]
+    appendAtEndArgs=[]
     for key, value in passedArgs.items():
         #check if key is a valid argument
         if key in validArgsList:
@@ -153,10 +154,12 @@ def parseJavaStyleArgs(validArgsList,passedArgs):
                 popenArgs.append(key+"="+value)
             else:
                 popenArgs.append(key)
+        elif key in specialArgList:
+            appendAtEndArgs.extend(value)
         
         else:
             print("Unknown argument {0} {1}. ignoring...".format(key, value))
-    
+    popenArgs.extend(appendAtEndArgs)
     return popenArgs
     
     
@@ -315,4 +318,4 @@ def moveFile(source,destination):
 if __name__ == "__main__":
     print("main")
     #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
-    print(parseJavaStyleArgs(['A','B','-C'], {"A": "3", "B": "22","-C":""}))
+    print(parseJavaStyleArgs(['A','B','-C'], {"A": "3", "B": "22","-C":"","--":("-Xmx2g","-da",)}))

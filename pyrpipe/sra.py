@@ -296,7 +296,7 @@ class SRA:
         print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
         qcStatus=qcObject.performQC(self)
-        print(qcStatus)
+        
         #if job failed
         if not qcStatus[0]:
             print ("Error performing QC for "+self.srrAccession)

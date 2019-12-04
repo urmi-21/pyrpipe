@@ -149,7 +149,7 @@ class Trimgalore(RNASeqQC):
             
 
 class BBmap(RNASeqQC):
-    def __init__(self):
+    def __init__(self,**kwargs):
         """
         Parameters
         ----------
@@ -160,7 +160,11 @@ class BBmap(RNASeqQC):
         super().__init__() 
         self.programName="bbduk.sh"
         self.depList=[self.programName]
-        #note that bbduk.sh argument style is different that other linux commands
+        #check if program exists
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+            
+        
         self.validArgsList=['in','in2','ref','literal','touppercase','interleaved','qin','reads','copyundefined',
                             'samplerate','samref','out','out2','outm','outm2','outs','stats','refstats','rpkm',
                             'dump','duk','nzo','overwrite','showspeed','ziplevel','fastawrap','qout','statscolumns',
@@ -179,14 +183,28 @@ class BBmap(RNASeqQC):
                             'trimpolygleft','trimpolygright','trimpolyg','filterpolyg','pratio','plen','entropy','entropywindow',
                             'entropyk','minbasefrequency','entropytrim','entropymask','entropymark','cardinality',
                             'cardinalityout','loglogk','loglogbuckets','-Xmx','-eoom','-da']
-        #check if hisat2 exists
-        if not checkDep(self.depList):
-            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        self.passedArgumentDict=kwargs
             
             
             
-    def performQC(self,sraOb,outFileSuffix,overwrite=True,**kwargs):
-        """Execeute the QC method 
+    def performQC(self,sraOb,outFileSuffix="_bbduk",overwrite=True,**kwargs):
+        """Run bbduk on fastq files specified by the sraOb
+        
+        Parameters
+        ----------
+        arg1: SRA
+            an SRA object
+        arg2: string
+            Suffix for output file name
+        arg3: bool
+            overwrite existing files
+        arg3: dict
+            options passed to bbduk
+            
+        Returns
+        tuple
+            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         """
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
@@ -202,18 +220,56 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            self.rubBBduk(**mergedOpts)
+            if self.rubBBduk(**mergedOpts):
+                if checkFilesExists(outFile1Path,outFile2Path):
+                    return(outFile1Path,outFile2Path)
             
             
         else:
-            return self.runBBdukSingle(sraOb.localfastqPath,"/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa")
+            fq=sraOb.localfastqPath
+            #append input and output options
+            outDir=sraOb.location
+            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
+            outFilePath=os.path.join(outDir,outFileName)
+            newOpts={"in":fq,"out":outFilePath}
+            mergedOpts={**kwargs,**newOpts}
+            
+            #run bbduk
+            if self.rubBBduk(**mergedOpts):
+                if checkFilesExists(outFilePath):
+                    return(outFilePath,)
     
     
     
     def rubBBduk(self,**kwargs):
         """Wrapper to run bbduk.sh
         """
-        pass
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        
+        #create command to run
+        bbduk_Cmd=["bbduk.sh"]
+        
+        #bbduk.sh follows java style arguments
+        bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
+        print("Executing:"+" ".join(bbduk_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(bbduk_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+        
+    
+    
     
     #default ktrim='r',k=23,mink=11,hdist=1,qtrim='rl',trimq=10
     def runBBdukSingle(self,fastqFilePath,pathToAdapters="",proc="auto",ktrim='r',k=13,mink=5,hdist=1,qtrim='rl',trimq=10):

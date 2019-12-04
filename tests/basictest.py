@@ -114,7 +114,7 @@ gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,delete
 
 btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
 #riboseq SRR3590744
-sraOb=sra.SRA('SRR5507442',testDir)
+sraOb=sra.SRA('SRR3590744',testDir)
 #download sra
 sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done
@@ -122,7 +122,12 @@ sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
 
 tgOb=qc.Trimgalore()
 
-sraOb.performFastqQC(tgOb)
+#sraOb.performFastqQC(tgOb)
+pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
+bbdOpts={"proc":"auto","ktrim":"r","k":"13","mink":"5","hdist":"1","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
+bbdOb=qc.BBmap(**bbdOpts)
+sraOb.performFastqQC(bbdOb)
+
 
 #run bbmap
 #bd=qc.BBmap()
