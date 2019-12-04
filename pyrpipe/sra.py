@@ -314,15 +314,15 @@ class SRA:
                 self.localRawfastq2Path=self.localfastq2Path
             
             ##update local fastq path
-            self.localfastq1Path=qcStatus[1]    
-            self.localfastq2Path=qcStatus[2]
+            self.localfastq1Path=qcStatus[0]    
+            self.localfastq2Path=qcStatus[1]
         else:
             if deleteRawFastq:
                 self.deleteFastqFiles()
             else:
                 self.localRawfastqPath=self.localfastqPath
                 
-            self.localfastqPath=qcStatus[1]
+            self.localfastqPath=qcStatus[0]
         
         
         

@@ -68,8 +68,8 @@ class Trimgalore(RNASeqQC):
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
-            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
-            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
+            outFile1=os.path.join(outDir,getFileBaseName(fq1)+outFileSuffix+".fastq")
+            outFile2=os.path.join(outDir,getFileBaseName(fq2)+outFileSuffix+".fastq")
             newOpts={"--paired":"","--":(fq1,fq2),"-o":outDir}
             mergedOpts={**kwargs,**newOpts}
             #run trimgalore
@@ -81,21 +81,22 @@ class Trimgalore(RNASeqQC):
             oldFile1=os.path.join(outDir,getFileBaseName(fq1)+"_val_1.fq")
             oldFile2=os.path.join(outDir,getFileBaseName(fq2)+"_val_2.fq")
             
-            mv1=moveFile(oldFile1,outFileName1)
-            mv2=moveFile(oldFile2,outFileName2)
+            mv1=moveFile(oldFile1,outFile1)
+            mv2=moveFile(oldFile2,outFile2)
             
-            if not checkFilesExists(outFileName1,outFileName2):
+            if not checkFilesExists(outFile1,outFile2):
                 print("Trimgalore failed")
                 return ("",)
-            return outFileName1,outFileName2
+            return outFile1,outFile2
             
         else:
             fq=sraOb.localfastqPath
-            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
-            outFile=os.path.join(outDir,outFileName)
-            newOpts={"--":fq,"-o":outDir}
+            outFile=os.path.join(outDir, getFileBaseName(fq)+outFileSuffix+".fastq")
+            #giving input arguments as a tuple "--":(fq,)
+            newOpts={"--":(fq,),"-o":outDir}
             #run trimgalore
             mergedOpts={**kwargs,**newOpts}
+            print("RUN Single TG:"+str(mergedOpts))
             self.runTrimGalore(**mergedOpts)
             """
             running trim galore will create one file named <input>_trimmed.fq
@@ -103,12 +104,12 @@ class Trimgalore(RNASeqQC):
             """
             oldFile=os.path.join(outDir,getFileBaseName(fq)+"_trimmed.fq")
             
-            mv=moveFile(oldFile,outFileName)
+            mv=moveFile(oldFile,outFile)
             
-            if not checkFilesExists(outFileName):
+            if not checkFilesExists(outFile):
                 print("Trimgalore failed")
                 return ("",)
-            return (outFileName,)
+            return (outFile,)
         
         
             
@@ -144,129 +145,6 @@ class Trimgalore(RNASeqQC):
         return True
         
 
-        
-            
-        
-            
-    def runTrimGaloreSingle(self,fastqFilePath):
-        """Run trim_galore in single mode
-        
-        Returns
-        -------
-        tuple
-            returns a tuple with two values. First is status of the command; True for success and False for failiure.
-            second item in the tupple is the path to the qc corrected file
-        """
-        print("Running trim_galore unpaired")
-        
-        '''
-        outfile will be named as <fastqFileName>_trimmed.fq
-        this will be renamed to <fastqFileName><suffix>.fastq
-        '''
-        fnameSuffix="_trimGalore"
-        outFileName=getFileBaseName(fastqFilePath)+"_trimmed.fq"
-        newOutFileName=getFileBaseName(fastqFilePath)+fnameSuffix+".fastq"
-        
-        outDir=""
-        trimGaloreCmd=['trim_galore']
-        #check if out dir is specified
-        if '-o' not in self.passedArgumentList:            
-            #default output dir
-            outDir=os.path.split(fastqFilePath)[0]
-            trimGaloreCmd.extend(['-o',outDir])
-        else:
-            outDir=self.passedArgumentList[self.passedArgumentList.index('-o')+1]
-        trimGaloreCmd.extend(self.passedArgumentList)
-        trimGaloreCmd.extend([fastqFilePath])
-
-        print("Executing: "+" ".join(trimGaloreCmd))
-        try:
-            for output in executeCommand(trimGaloreCmd):
-                print (output)
-        except subprocess.CalledProcessError as e:
-            print ("Error in command")
-            return False,""
-        
-        outFilePath=os.path.join(outDir,outFileName)
-        newOutFilePath=os.path.join(outDir,newOutFileName)
-        #rename the files
-        rename_Cmd=['mv',outFilePath,newOutFilePath]
-        print("Executing:"+ " ".join(rename_Cmd))
-        if getCommandReturnValue(rename_Cmd)!=0:
-            print("Error in moving files")
-            return False,"",""
-        #check if file exist
-        if not checkFilesExists(newOutFilePath):
-            print ("ERROR in running"+ self.programName)
-            return False,""
-        
-        return True,newOutFilePath
-        
-            
-    def runTrimGalorePaired(self,fastqFile1Path,fastqFile2Path):
-        """Run trim_galore on paired data
-        
-        Returns
-        -------
-        tuple
-            returns a tuple with three values. First is status of the command; True for success and False for failiure.
-            second item in the tupple is the paths to the qc corrected file in order 1 and 2.
-        """
-        print ("Running trim_galore paired")
-        
-        '''
-        out put files will be written as 
-        <file name>_val_1.fq and <file name>_val_2.fq
-        change this to <file name>_<suffix>.fastq and <file name>_<suffix>.fastq
-        '''        
-        fnameSuffix="_trimGalore"
-        outFile1Name=getFileBaseName(fastqFile1Path)+"_val_1.fq"
-        outFile2Name=getFileBaseName(fastqFile2Path)+"_val_2.fq"
-        newOutFile1Name=getFileBaseName(fastqFile1Path)+fnameSuffix+".fastq"
-        newOutFile2Name=getFileBaseName(fastqFile2Path)+fnameSuffix+".fastq"
-        
-        
-        outDir="" #the out put directory
-        trimGaloreCmd=['trim_galore']
-        #check if out dir is specified
-        if '-o' not in self.passedArgumentList:            
-            #default output dir
-            outDir=os.path.split(fastqFile1Path)[0]
-            trimGaloreCmd.extend(['-o',outDir])
-        else:
-            outDir=self.passedArgumentList[self.passedArgumentList.index('-o')+1]
-            
-        trimGaloreCmd.extend(self.passedArgumentList)
-        trimGaloreCmd.extend(['--paired',fastqFile1Path,fastqFile2Path])
-        print("Executing: "+" ".join(trimGaloreCmd))
-        try:
-            for output in executeCommand(trimGaloreCmd):
-                print (output)
-        except subprocess.CalledProcessError as e:
-            print ("Error in command")
-            return False,"",""
-        
-        outFile1Path=os.path.join(outDir,outFile1Name)
-        outFile2Path=os.path.join(outDir,outFile2Name)
-        newOutFile1Path=os.path.join(outDir,newOutFile1Name)
-        newOutFile2Path=os.path.join(outDir,newOutFile2Name)
-        #rename the files
-        rename_Cmd=['mv',outFile1Path,newOutFile1Path]
-        print("Executing:"+ " ".join(rename_Cmd))
-        if getCommandReturnValue(rename_Cmd)!=0:
-            print("Error in moving files")
-            return False,"",""
-        rename_Cmd=['mv',outFile2Path,newOutFile2Path]
-        if getCommandReturnValue(rename_Cmd)!=0:
-            print("Error in moving files")
-            return False,"",""
-        
-        #check if files exist
-        if not checkFilesExists(newOutFile1Path,newOutFile2Path):
-            print ("ERROR in running"+ self.programName)
-            return False,"",""
-            
-        return True,newOutFile1Path,newOutFile2Path
             
             
 

@@ -123,6 +123,30 @@ def getFileSize(file_path):
         file_info = os.stat(file_path)
         return bytetoReadable(file_info.st_size)
     
+    
+def parseJavaStyleArgs(validArgsList,passedArgs):
+    """
+    Function creates arguments to pass to unix systems through popen
+    Parameters
+    ----------
+    arg1 : list
+        list of valid arguments. Invalid arguments will be ignored
+    arg2: keyword value argument list to be parsed
+        
+    Returns
+    -------
+        list
+            a list with command line arguments to be used with popen
+
+        Examples
+        --------
+        >>> parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
+        Unknown argument Attr2 XX. ignoring...
+        ['-O', './test', 'IN1', 'IN2']
+    """
+    popenArgs=[]
+    
+    
 def parseUnixStyleArgs(validArgsList,passedArgs):
     """
     Function creates arguments to pass to unix systems through popen
@@ -268,6 +292,7 @@ def moveFile(source,destination):
     """
     perform mv command
     """
+    print("MOV:"+source+"-->"+destination)
     mv_cmd=['mv',source,destination]
     if not getCommandReturnStatus(mv_cmd):
         return False
