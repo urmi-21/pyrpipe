@@ -274,24 +274,45 @@ class Star:
             
 
 class Bowtie2(Aligner):
-    def __init__(self,bowtie2Index):
+    def __init__(self,bowtie2Index,**kwargs):
         """Bowtie2 constructor. Initialize star's index and other parameters.
         """       
         
         super().__init__() 
         self.programName="bowtie2"
-        
-        self.validArgsList=[]
         self.depList=[self.programName]        
-        #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
+        self.validArgsList=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
+                            '--trim-to','--phred33','--phred64','--int-quals','--very-fast','--fast',
+                            '--sensitive','--very-sensitive','--very-fast-local','--fast-local',
+                            '--sensitive-local','--very-sensitive-local','-N','-L','-i','--n-ceil',
+                            '--dpad','--gbar','--ignore-quals','--nofw','--norc','--no-1mm-upfront',
+                            '--end-to-end','--local','--ma','--mp','--np','--rdg','--rfg','--score-min',
+                            '-k','-a','-D','-R','-I','-X','--fr','--rf','--ff','--no-mixed','--no-discordant',
+                            '--dovetail','--no-contain','--no-overlap','--align-paired-reads','--preserve-tags',
+                            '-t','--un','--al','--un-conc','--al-conc','--un-gz','--quiet','--met-file',
+                            '--met-stderr','--met','--no-unal','--no-head','--no-sq','--rg-id','--rg',
+                            '--omit-sec-seq','--sam-no-qname-trunc','--xeq','--soft-clipped-unmapped-tlen',
+                            '-p','--threads','--reorder','--mm','--qc-filter','--seed','--non-deterministic',
+                            '--version','-h','--help']
         
-        self.bowtie2Index=bowtie2Index
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #if index is passed, update the passed arguments
+        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
+            print("Bowtie2 index is: "+bowtie2Index)
+            self.bowtie2Index=bowtie2Index
+            self.passedArgumentDict['-x']=self.bowtie2Index
+        else:
+            print("No Bowtie2 index provided. Please build index now to generate an index...")
+        
+        
     
     
-    def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
+    def performAlignment(self,sraOb,outSamSuffix="_bt2",overwrite=True,**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
         
         Parameters
@@ -301,20 +322,65 @@ class Bowtie2(Aligner):
         arg2: string
             Suffix for the output sam file
         arg3: dict
-            Options to pass to hisat2.
+            Options to pass to bowtie.
         """
         
-        pass
+        #create path to output sam file
+        outFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+                    
+        """
+        Handle overwrite
+        """
+        overwrite=True
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outFile):
+                print("The file "+outFile+" already exists. Exiting..")
+                return outFile
+        
+        #find layout and fq file paths
+        if sraOb.layout == 'PAIRED':
+            newOpts={"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path,"-S":outFile}
+        else:
+            newOpts={"-U":sraOb.localfastqPath,"-S":outFile}
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runBowTie2(**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(outFile):
+                return outFile
+        else:
+            return ""
+        
+        
+        
     
-    def runBowTie2(self,sraOb,**kwargs):
-        """Function to run bowtie2
-        """
-        outDir=sraOb.location
-        outSamFile=os.path.join(outDir,"bt2.sam")
-        unmapFname=os.path.join(outDir,sraOb.srrAccession+"norRNA.fastq")
+    def runBowTie2(self,**kwargs):
+        """Wrapper for running bowtie2.
         
-        bowtie2_Cmd=[self.programName]
-        bowtie2_Cmd.extend(["-p","10","--norc","-x",self.bowtie2Index,"-S",outSamFile,"--un",unmapFname,"-U",sraOb.localfastqPath])
+        ----------
+        arg1: dict
+            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+            
+        Returns
+        -------
+        bool:
+                Returns the status of bowtie2. True is passed, False if failed.
+        """
+        
+        #check for a valid index
+        if not self.checkIndex():
+            raise Exception("ERROR: Invalid Bowtie2 index. Please run build index to generate an index.")
+        
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+            
+        bowtie2_Cmd=['bowtie2']
+        bowtie2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
         
         print("Executing:"+" ".join(bowtie2_Cmd))
         
@@ -322,16 +388,23 @@ class Bowtie2(Aligner):
         log=""
         try:
             for output in executeCommand(bowtie2_Cmd):
-                print (output)    
+                #print (output)    
                 log=log+str(output)
             #save to a log file
             
         except subprocess.CalledProcessError as e:
             print ("Error in command...\n"+str(e))
             #save error to error.log file
-            return ""
-        
-        return unmapFname
+            return False        
+        #return status
+        return True
+    
+    
+    def checkIndex(self):
+        if hasattr(self,'bowtie2Index'):
+            return(checkBowtie2Index(self.bowtie2Index))
+        else:
+            return False
         
     
     

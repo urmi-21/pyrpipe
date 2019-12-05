@@ -102,6 +102,9 @@ def checkFilesExists(*args):
 
 def checkHisatIndex(index):
     return checkFilesExists(index+".1.ht2")
+
+def checkBowtie2Index(index):
+    return checkFilesExists(index+".1.bt2")
     
 
 def bytetoReadable(sizeInBytes):
