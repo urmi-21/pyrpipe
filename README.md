@@ -12,7 +12,7 @@ Dev
 
 Required third-party programs
 
-* [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9 or higher)
+* [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
 * [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
 * [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
 * [Stringtie](https://github.com/gpertea/stringtie)

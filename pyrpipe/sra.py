@@ -200,7 +200,10 @@ class SRA:
             return False
         #else directly run fasterq-dump on accession ?
         
-        fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V','-L','-v','-q','-b','-m','-e','-x','-S','-3','-P','-M','-B','--option-file','--strict','--table','--include-technical','--skip-technical','--concatenate-reads']
+        fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V',
+                             '-L','-v','-q','-b','-m','-e','-x','-S','-3','-P','-M',
+                             '-B','--option-file','--strict','--table','--include-technical',
+                             '--skip-technical','--concatenate-reads']
         
         
         
