@@ -153,19 +153,23 @@ sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #get sorted bam
 samOb=tools.Samtools(**{"-@":"8"})
-sbs=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
+bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 
 
 bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
 bt2.performAlignment(sraOb)
 
 #run stringtie
-#st=assembly.Stringtie()
-
-#st.performAssembly(bam)
-
+st=assembly.Stringtie()
+g1=st.performAssembly(bam)
 
 
+gtfs=(g1,)
+#test stmerge
+merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
+
+if not merged:
+    print("Fail")
 
 
 

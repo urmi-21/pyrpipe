@@ -77,7 +77,7 @@ class Stringtie(Assembly):
                 return outGtfFile
         
         #Add output file name and input bam
-        newOpts={"-o":outGtfFile,"--":inputBAM}
+        newOpts={"-o":outGtfFile,"--":(inputBAM,)}
         mergedOpts={**kwargs,**newOpts}
         
         #call stringtie
@@ -90,7 +90,7 @@ class Stringtie(Assembly):
         else:
             return ""
         
-    def performStringtieMerge(self,outFileSuffix="_stringtieMerge",overwrite=True,*args,**kwargs):
+    def performStringtieMerge(self,*args,outFileSuffix="_stringtieMerge",overwrite=True,**kwargs):
         """Function to run stringtie merge.
         Parameters
         ----------
@@ -103,6 +103,7 @@ class Stringtie(Assembly):
         arg4: dict
             options to pass to stringtie
         """
+        
         if len(args) < 1:
             print("ERROR: No input gtf for stringtie merge.")
             return ""
@@ -119,7 +120,7 @@ class Stringtie(Assembly):
                 return outGtfFile
         
         #Add merge flag, output file name and input bam
-        newOpts={"--merge":"","-o":outGtfFile,"--":inputBAM}
+        newOpts={"--merge":"","-o":outGtfFile,"--":args}
         
         mergedOpts={**kwargs,**newOpts}
         
