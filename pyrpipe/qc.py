@@ -273,12 +273,87 @@ class BBmap(RNASeqQC):
     
     def performCleaning(self,sraOb,outFileSuffix="_bbsplit",overwrite=True,**kwargs):
         """
-        Remove contaminated reads mapping to given reference
+        Remove contaminated reads mapping to given reference using bbsplit
+        
+        Parameters
+        ----------
+        arg1: SRA
+            an SRA object
+        arg2: string
+            Suffix for output file name
+        arg3: bool
+            overwrite existing files
+        arg3: dict
+            options passed to bbsplit
+            
+        Returns
+        tuple
+            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         """
-        pass
+        if sraOb.layout=='PAIRED':
+            fq1=sraOb.localfastq1Path
+            fq2=sraOb.localfastq2Path
+            #append input and output options
+            outDir=sraOb.location
+            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
+            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
+            outFile1Path=os.path.join(outDir,outFileName1)
+            outFile2Path=os.path.join(outDir,outFileName2)
+            
+            newOpts={"in":fq1,"in2":fq2,"out":outFile1Path,"out2":outFile2Path}
+            mergedOpts={**kwargs,**newOpts}
+            
+            #run bbduk
+            if self.runBBduk(**mergedOpts):
+                if checkFilesExists(outFile1Path,outFile2Path):
+                    return(outFile1Path,outFile2Path)
+            
+            
+        else:
+            fq=sraOb.localfastqPath
+            #append input and output options
+            outDir=sraOb.location
+            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
+            outFilePath=os.path.join(outDir,outFileName)
+            newOpts={"in":fq,"out":outFilePath}
+            mergedOpts={**kwargs,**newOpts}
+            
+            #run bbduk
+            if self.runBBduk(**mergedOpts):
+                if checkFilesExists(outFilePath):
+                    return(outFilePath,)
+        
     
     def runBBsplit(self,**kwargs):
         """wrapper to run bbsplit
         """
-        pass
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        
+        #create command to run
+        bbduk_Cmd=["bbduk.sh"]
+        
+        #bbduk.sh follows java style arguments
+        bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
+        print("Executing:"+" ".join(bbduk_Cmd))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(bbduk_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
+    
+    
+    
+    
+    
+    
         
