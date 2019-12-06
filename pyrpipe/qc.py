@@ -318,7 +318,7 @@ class BBmap(RNASeqQC):
             else:
                 #create new index
                 print("Creating new index"+indexPath)
-                newOpts={"ref":bbsplitIndex,"path":getFileDirectory(bbsplitIndex)}
+                newOpts={"ref_x":bbsplitIndex,"path":getFileDirectory(bbsplitIndex)}
                 mergedOpts={**kwargs,**newOpts}
                 #run bbduk
                 if not self.runBBsplit(**mergedOpts):
@@ -375,14 +375,21 @@ class BBmap(RNASeqQC):
     def runBBsplit(self,**kwargs):
         """wrapper to run bbsplit
         """
+        
+        bbSplitValidArgs=['ref','ref_x','build','path','in','in2','outu','outu2','outu1','qin','interleaved',
+                          'maxindel','minratio','minhits','ambiguous','ambiguous2',
+                          'qtrim','untrim','out_','basename','bs','scafstats',
+                          'refstats','nzo','-Xmx','-eoom','-da']
+        
         #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        #don't use class arguments
+        mergedArgsDict={**kwargs}
         
         #create command to run
         bbduk_Cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
-        bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
+        bbduk_Cmd.extend(parseJavaStyleArgs(bbSplitValidArgs,mergedArgsDict))
         print("CCCCCDDDDDDDD Executing:"+" ".join(bbduk_Cmd))
         
         #start ececution

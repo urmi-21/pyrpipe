@@ -124,7 +124,7 @@ tgOb=qc.Trimgalore()
 
 #sraOb.performFastqQC(tgOb)
 pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
-bbdOpts={"proc":"auto","ktrim":"r","k":"23","mink":"11","hdist":"1","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
+bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
 bbdOb=qc.BBmap(**bbdOpts)
 
 sraOb.performFastqQC(bbdOb)
