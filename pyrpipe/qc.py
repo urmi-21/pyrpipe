@@ -309,7 +309,7 @@ class BBmap(RNASeqQC):
             #index folder doesn't exist
             #check if input is path to fasta
             if not checkFilesExists(bbsplitIndex):
-                print("Error: Please check bbspli index")
+                print("Error: Please check bbsplit index")
                 return ("",)
             #check if index folder "ref" exists in this directory
             indexPath=os.path.join(getFileDirectory(bbsplitIndex),"ref")
@@ -331,7 +331,8 @@ class BBmap(RNASeqQC):
             indexPath=bbsplitIndex
                 
         
-                
+        #indexPath point to the ref directory, go one directory higher
+        indexPath=os.path.dirname(indexPath)
         
         
         if sraOb.layout=='PAIRED':
@@ -344,7 +345,7 @@ class BBmap(RNASeqQC):
             outFile1Path=os.path.join(outDir,outFileName1)
             outFile2Path=os.path.join(outDir,outFileName2)
             
-            newOpts={"in":fq1,"in2":fq2,"outu1":outFile1Path,"outu2":outFile2Path,"ref":indexPath}
+            newOpts={"in1":fq1,"in2":fq2,"outu1":outFile1Path,"outu2":outFile2Path,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
@@ -360,7 +361,7 @@ class BBmap(RNASeqQC):
             outDir=sraOb.location
             outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
             outFilePath=os.path.join(outDir,outFileName)
-            newOpts={"in":fq,"outu":outFilePath,"ref":indexPath}
+            newOpts={"in":fq,"outu":outFilePath,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
@@ -376,7 +377,7 @@ class BBmap(RNASeqQC):
         """wrapper to run bbsplit
         """
         
-        bbSplitValidArgs=['ref','ref_x','build','path','in','in2','outu','outu2','outu1','qin','interleaved',
+        bbSplitValidArgs=['ref','ref_x','build','path','in','in1','in2','outu','outu2','outu1','qin','interleaved',
                           'maxindel','minratio','minhits','ambiguous','ambiguous2',
                           'qtrim','untrim','out_','basename','bs','scafstats',
                           'refstats','nzo','-Xmx','-eoom','-da']
