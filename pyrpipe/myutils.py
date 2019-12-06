@@ -79,10 +79,12 @@ def findFiles(path,name,recursive):
     return results
 
 def checkPathsExists(*args):
+    """
+    check if a directory exists
+    """
     failFlag=False
     for path in args:
-        if not os.path.exists(path):
-            #printBoldRed("Path not found: "+path)
+        if not (os.path.exists(path) and os.path.isdir(path)):
             failFlag=True
     if failFlag==True:
         return False

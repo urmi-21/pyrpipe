@@ -223,6 +223,7 @@ class BBmap(RNASeqQC):
             if self.runBBduk(**mergedOpts):
                 if checkFilesExists(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
+            return("",)
             
             
         else:
@@ -238,6 +239,7 @@ class BBmap(RNASeqQC):
             if self.runBBduk(**mergedOpts):
                 if checkFilesExists(outFilePath):
                     return(outFilePath,)
+            return("",)
                     
     
     
@@ -271,7 +273,15 @@ class BBmap(RNASeqQC):
         return True
     
     
-    def performCleaning(self,sraOb,outFileSuffix="_bbsplit",overwrite=True,**kwargs):
+    """
+    index 
+    bbsplit.sh ref_x=/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa path=./xds
+    
+    clean
+    bbsplit.sh in1=reads1.fq in2=reads2.fq ref=path_to_ref outu1=clean1.fq outu2=clean2.fq
+    """
+    
+    def performCleaning(self,sraOb,bbsplitIndex,outFileSuffix="_bbsplit",overwrite=True,**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         
@@ -280,16 +290,50 @@ class BBmap(RNASeqQC):
         arg1: SRA
             an SRA object
         arg2: string
+            Path to bbsplit index or fasta file which will generate index
+        arg3: string
             Suffix for output file name
-        arg3: bool
+        arg4: bool
             overwrite existing files
-        arg3: dict
+        arg5: dict
             options passed to bbsplit
             
         Returns
         tuple
             Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         """
+        
+        #check index
+        indexPath=""
+        if not checkPathsExists(bbsplitIndex):
+            #index folder doesn't exist
+            #check if input is path to fasta
+            if not checkFilesExists(bbsplitIndex):
+                print("Error: Please check bbspli index")
+                return ("",)
+            #check if index folder "ref" exists in this directory
+            indexPath=os.path.join(getFileDirectory(bbsplitIndex),"ref")
+            if checkPathsExists(indexPath):
+                print("Using bbsplit index: "+indexPath)
+            else:
+                #create new index
+                print("Creating new index"+indexPath)
+                newOpts={"ref":bbsplitIndex,"path":getFileDirectory(bbsplitIndex)}
+                mergedOpts={**kwargs,**newOpts}
+                #run bbduk
+                if not self.runBBsplit(**mergedOpts):
+                    print("Error creating bbsplit index.")
+                    return ("",)
+                if not checkPathsExists(indexPath):
+                    print("Error creating bbsplit index.")
+                    return ("",)
+        else:
+            indexPath=bbsplitIndex
+                
+        
+                
+        
+        
         if sraOb.layout=='PAIRED':
             fq1=sraOb.localfastq1Path
             fq2=sraOb.localfastq2Path
@@ -300,13 +344,14 @@ class BBmap(RNASeqQC):
             outFile1Path=os.path.join(outDir,outFileName1)
             outFile2Path=os.path.join(outDir,outFileName2)
             
-            newOpts={"in":fq1,"in2":fq2,"out":outFile1Path,"out2":outFile2Path}
+            newOpts={"in":fq1,"in2":fq2,"outu1":outFile1Path,"outu2":outFile2Path,"ref":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(**mergedOpts):
+            if self.runBBsplit(**mergedOpts):
                 if checkFilesExists(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
+            return("",)
             
             
         else:
@@ -315,14 +360,17 @@ class BBmap(RNASeqQC):
             outDir=sraOb.location
             outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
             outFilePath=os.path.join(outDir,outFileName)
-            newOpts={"in":fq,"out":outFilePath}
+            newOpts={"in":fq,"outu":outFilePath,"ref":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(**mergedOpts):
+            if self.runBBsplit(**mergedOpts):
                 if checkFilesExists(outFilePath):
                     return(outFilePath,)
-        
+            
+            return("",)
+    
+    
     
     def runBBsplit(self,**kwargs):
         """wrapper to run bbsplit
@@ -331,11 +379,11 @@ class BBmap(RNASeqQC):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
         
         #create command to run
-        bbduk_Cmd=["bbduk.sh"]
+        bbduk_Cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
         bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
-        print("Executing:"+" ".join(bbduk_Cmd))
+        print("CCCCCDDDDDDDD Executing:"+" ".join(bbduk_Cmd))
         
         #start ececution
         log=""

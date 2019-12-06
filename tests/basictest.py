@@ -126,7 +126,9 @@ tgOb=qc.Trimgalore()
 pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
 bbdOpts={"proc":"auto","ktrim":"r","k":"23","mink":"11","hdist":"1","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
 bbdOb=qc.BBmap(**bbdOpts)
-#sraOb.performFastqQC(bbdOb)
+
+sraOb.performFastqQC(bbdOb)
+status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
 
 
 #run bbmap
@@ -142,6 +144,7 @@ bbdOb=qc.BBmap(**bbdOpts)
 
 
 #build hisat index
+"""
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
 #hsbArgs={"-p":"8","-a":"","-q":""}
@@ -170,7 +173,7 @@ merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
 
 if not merged:
     print("Fail")
-
+"""
 
 
 

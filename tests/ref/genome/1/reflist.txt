@@ -1,0 +1,1 @@
+/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa
