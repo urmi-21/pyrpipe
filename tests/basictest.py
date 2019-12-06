@@ -146,7 +146,7 @@ bbdOb=qc.BBmap(**bbdOpts)
 
 
 #build hisat index
-"""
+
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
 #hsbArgs={"-p":"8","-a":"","-q":""}
@@ -161,21 +161,30 @@ samOb=tools.Samtools(**{"-@":"8"})
 bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 
 
-bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
-bt2.performAlignment(sraOb)
+#bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
+#bt2.performAlignment(sraOb)
 
 #run stringtie
-st=assembly.Stringtie()
-g1=st.performAssembly(bam)
+#st=assembly.Stringtie()
+#g1=st.performAssembly(bam)
 
 
-gtfs=(g1,)
+#gtfs=(g1,)
 #test stmerge
-merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
+#merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
+#if not merged:
+#    print("Fail")
 
-if not merged:
-    print("Fail")
-"""
+bamList=[]
+for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
+    sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
+    #get sorted bam
+    bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
+    bamList.append(bam)
+    
+
+#bam merge
+samOb.mergeBamFiles(bamList,outPath=testDir,outFileName="myMergedXXDD")
 
 
 
