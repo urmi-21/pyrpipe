@@ -124,7 +124,7 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def mergeBamFiles(self,outFileName,*args,outPath="",**kwargs):
+    def mergeBamFiles(self,*args,outFileName="merged",outPath="",deleteOriginalBamFiles=False,**kwargs):
         """Merge multiple bam files into a single file
         
         Parameters
@@ -143,6 +143,33 @@ class Samtools(RNASeqTools):
         string
             Returns the path to the merged bam file.
         """
+        if len(args) < 2:
+            print("Please supply at least 2 files to merge")
+            return ""
+        
+        if outPath == "":
+            outPath=getFileDirectory(args[0])
+        
+        outMergedFile=os.path.join(outFileName,outPath)
+        
+        newOpts={"--":(outMergedFile,)+args}
+        
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runSamtools("merge",**mergedOpts)
+        
+        if not status:
+            print("Bam merge failed for:"+outMergedFile)
+            return ""
+        
+        #check if bam file exists
+        if not checkFilesExists(outMergedFile):
+            return ""
+
+        if deleteOriginalBamFiles:
+            for bamFile in args:
+                if not deleteFileFromDisk(bamFile):
+                    print("Error deleting sam file:"+bamFile)
         
         
         
