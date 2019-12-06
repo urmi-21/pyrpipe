@@ -216,7 +216,17 @@ class Samtools(RNASeqTools):
         
         
         
+class Portcullis(RNASeqTools):
+    def __init__(self,**kwargs):
+        self.programName="portcullis"
+        self.depList=[self.programName]
+        #check if program exists
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
+        self.validArgsList=[]
+        
+        self.passedArgumentDict=kwargs
         
         
         

@@ -128,9 +128,9 @@ bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xm
 bbdOb=qc.BBmap(**bbdOpts)
 
 #sraOb.performFastqQC(bbdOb)
-status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
+#status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
 
-print(status)
+#print(status)
 
 
 #run bbmap
