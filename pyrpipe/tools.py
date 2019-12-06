@@ -124,6 +124,28 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
+    def mergeBamFiles(self,outFileName,*args,outPath="",**kwargs):
+        """Merge multiple bam files into a single file
+        
+        Parameters
+        ----------
+        outFileName: string
+            Output file name to save the results. .bam will be added at the end.
+        args:tuple
+            Paths to bam files to combine
+        outPath: string
+            Path where to save the merged bam file. Default path is the same as the first bamfile's
+        kwargs: dict
+            arguments passed to samtools merge command
+            
+        Returns
+        -------
+        string
+            Returns the path to the merged bam file.
+        """
+        
+        
+        
     def runSamtools(self,subCommand,**kwargs):
         """A wrapper to run samtools.
         
