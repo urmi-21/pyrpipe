@@ -263,9 +263,10 @@ class Portcullis(RNASeqTools):
         newOpts={"--":(referenceFasta,bamFile)}
         mergedOpts={**kwargs,**newOpts}
         #add out dir path
-        if outDir:
-            mergedOpts={**mergedOpts,**{"-o":outDir}}
-                
+        if not outDir:
+            outDir=os.path.join(os.getcwd(),"portcullis_out")
+                  
+        mergedOpts={**mergedOpts,**{"-o":outDir}}
         
         status=self.runPortcullis("full",**mergedOpts)
         
@@ -340,7 +341,73 @@ class Mikado(RNASeqTools):
         self.validArgsList=[]        
         self.passedArgumentDict=kwargs
         
+        
+    #mikado prepare --start-method spawn --log mikadoPrepareLog --minimum_length 30
+    #--procs 28 --output-dir mikadoPrepOutNew 
+    #--fasta /pylon5/mc5pl7p/usingh/lib/hisatIndex/ensembl_release98/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
+    #--list smolGtfList
+    
+    def runMikadoPrepare(self,gtfList,referenceFasta,outDir="",**kwargs):
+        """Wrapper to run mikado pick
+        """
+        
+        #check input files exist
+        if not checkFilesExists(gtfList,referenceFasta):
+            print("Please check the input to mikado.")
+            return ""
+        if not outDir:
+            outDir=os.getcwd()
+
+        newOpts={"--fasta":referenceFasta,"--list":gtfList,"--output-dir":outDir}
+        
+        #merge with kwargs
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runMikado("prepare",**mergedOpts)
+        
+        if not status:
+            print("Mikado prepare full failed for:"+gtfList)
+            return ""
+        
+        #check if bam file exists
+        if not checkPathsExists(outDir):
+            return ""
+        
+        return outDir
+        
+        
+        
     def runMikadoPick(self):
+        """Wrapper to run mikado pick
+        """
+        pass
+        
+    def runMikadoPick(self):
+        """Wrapper to run mikado pick
+        """
+        pass
+        
+    def runMikado(self,subCommand,**kwargs):
+        """Wrapper to run mikado pick
+        """
+        pass
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
         
         
         
