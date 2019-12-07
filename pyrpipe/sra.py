@@ -126,6 +126,8 @@ class SRA:
             return False
         
         print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(getFileSize(self.localSRAFilePath)))
+        #save file .sra file size
+        self.sraFileSize=getFileSize(self.localSRAFilePath)
         #test if file is paired or single end
         if isPairedSRA(self.localSRAFilePath):
             self.layout="PAIRED"
