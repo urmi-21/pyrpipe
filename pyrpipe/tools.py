@@ -181,6 +181,8 @@ class Samtools(RNASeqTools):
         
         Parameters
         ----------
+        subcommand: string
+            Subcommand to pass to samtools e.g. sort, merge etc
         arg1: dict
             arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
             
@@ -234,6 +236,25 @@ class Portcullis(RNASeqTools):
                             '--save_bad']
         
         self.passedArgumentDict=kwargs
+    
+    
+    def runPortcullis(self,subCommand,**kwargs):
+        """
+        Wrapper to run portcullis.
+        
+        Parameters
+        ----------
+         subcommand: string
+            Subcommand to pass to portcullis e.g. full, prep, junc etc.
+        arg1: dict
+            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            
+        Returns
+        -------
+        bool:
+                Returns the status of samtools. True is passed, False if failed.
+        """
+        
         
         
         
