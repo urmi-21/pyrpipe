@@ -168,11 +168,14 @@ class Samtools(RNASeqTools):
         #check if bam file exists
         if not checkFilesExists(outMergedFile):
             return ""
+        
 
         if deleteOriginalBamFiles:
             for bamFile in args:
                 if not deleteFileFromDisk(bamFile):
                     print("Error deleting sam file:"+bamFile)
+                    
+        return outMergedFile
         
         
         
@@ -271,14 +274,14 @@ class Portcullis(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathExists(outDir):
+        if not checkPathsExists(outDir):
             return ""
 
         if deleteOriginalBamFile:
             if not deleteFileFromDisk(bamFile):
                     print("Error deleting bam file:"+bamFile)
         
-    
+        return outDir
     
     def runPortcullis(self,subCommand,**kwargs):
         """
@@ -325,7 +328,17 @@ class Portcullis(RNASeqTools):
         
         
         
+
+class Mikado(RNASeqTools):
+    def __init__(self,**kwargs):
+        self.programName="mikado"
+        self.depList=[self.programName]
+        #check if program exists
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
+        self.validArgsList=[]        
+        self.passedArgumentDict=kwargs
         
         
         
