@@ -11,7 +11,9 @@ class RNASeqTools:
     def __init__(self):
         self.category="RNASeqTools"
     
-    
+
+##Replace with pysam
+
 class Samtools(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="samtools"
@@ -143,6 +145,7 @@ class Samtools(RNASeqTools):
         string
             Returns the path to the merged bam file.
         """
+        
         if len(args) < 2:
             print("Please supply at least 2 files to merge")
             return ""
@@ -150,7 +153,7 @@ class Samtools(RNASeqTools):
         if outPath == "":
             outPath=getFileDirectory(args[0])
         
-        outMergedFile=os.path.join(outFileName,outPath)
+        outMergedFile=os.path.join(outPath,outFileName+".bam")
         
         newOpts={"--":(outMergedFile,)+args}
         

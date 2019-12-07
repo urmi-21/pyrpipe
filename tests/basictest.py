@@ -184,7 +184,7 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
     
 
 #bam merge
-samOb.mergeBamFiles(bamList,outPath=testDir,outFileName="myMergedXXDD")
+samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD")
 
 
 
