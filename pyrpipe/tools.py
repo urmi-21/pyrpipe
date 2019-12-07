@@ -236,6 +236,48 @@ class Portcullis(RNASeqTools):
                             '--save_bad']
         
         self.passedArgumentDict=kwargs
+        
+        
+    def runPortcullisFull(self,referenceFasta,bamFile,outDir="",deleteOriginalBamFile=False,**kwargs):
+        """
+        run portculis full
+        
+        Parameters
+        ----------
+        referenceFasta: string
+            Path to the reference fasta file
+        bamFile: string
+            Path to input bam file
+        outDir: string
+            Path to the out put dir. current directory is not given.
+        """
+        
+        if not checkFilesExists(referenceFasta,bamFile):
+            print ("Please check input for portcullis.")
+            return ""
+        
+        
+        newOpts={"--":(referenceFasta,bamFile)}
+        mergedOpts={**kwargs,**newOpts}
+        #add out dir path
+        if outDir:
+            mergedOpts={**mergedOpts,**{"-o":outDir}}
+                
+        
+        status=self.runPortcullis("full",**mergedOpts)
+        
+        if not status:
+            print("portcullis full failed for:"+bamFile)
+            return ""
+        
+        #check if bam file exists
+        if not checkPathExists(outDir):
+            return ""
+
+        if deleteOriginalBamFile:
+            if not deleteFileFromDisk(bamFile):
+                    print("Error deleting bam file:"+bamFile)
+        
     
     
     def runPortcullis(self,subCommand,**kwargs):
@@ -252,11 +294,34 @@ class Portcullis(RNASeqTools):
         Returns
         -------
         bool:
-                Returns the status of samtools. True is passed, False if failed.
+                Returns the status of portcullis. True is passed, False if failed.
         """
         
         
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        portcullis_Cmd=['portcullis',subCommand]
+        #add options
+        portcullis_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+                
+        print("Executing:"+" ".join(portcullis_Cmd))
         
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(portcullis_Cmd):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
         
         
         

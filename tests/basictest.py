@@ -190,12 +190,17 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
     
 
 #bam merge
-samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",*{"-f":""})
+mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",*{"-f":""})
 
 #using pysam
 #import pysam
 #pysam.merge("-@","8","myMerge",*bamList,"-f")
 
+
+#portc
+pob=tools.Portcullis()
+
+pob.runPortcullisFull("S288C_reference_sequence_R64-2-1_20150113.fsa",mergedBam,outDir=testDir+"/portOut")
 
 
 
