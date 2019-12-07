@@ -340,6 +340,9 @@ class Mikado(RNASeqTools):
         self.validArgsList=[]        
         self.passedArgumentDict=kwargs
         
+    def runMikadoPick(self):
+        
+        
         
         
         
