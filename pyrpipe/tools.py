@@ -227,7 +227,11 @@ class Portcullis(RNASeqTools):
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=[]
+        self.validArgsList=['-t','--threads','-v','--verbose','--help','-o','-b',
+                            '--bam_filter','--exon_gff','--intron_gff','--source',
+                            '--force','--copy','--use_csi','--orientation','--strandedness',
+                            '--separate','--extra','-r','--max_length','--canonical','--min_cov',
+                            '--save_bad']
         
         self.passedArgumentDict=kwargs
         

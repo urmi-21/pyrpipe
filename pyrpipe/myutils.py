@@ -128,7 +128,8 @@ def getFileSize(file_path):
         file_info = os.stat(file_path)
         return bytetoReadable(file_info.st_size)
     
-    
+
+#TODO: override in case of empty list
 def parseJavaStyleArgs(validArgsList,passedArgs):
     """
     Function creates arguments to pass to unix systems through popen
@@ -151,6 +152,15 @@ def parseJavaStyleArgs(validArgsList,passedArgs):
     popenArgs=[]
     specialArgList=["--"]
     appendAtEndArgs=[]
+    
+    #empty list supplied consider all armunets valid
+    if len(validArgsList)<1:
+        validArgsList=passedArgs.keys()
+        #above command will also add specialArgs, remove those
+        for x in specialArgList:
+            if x in validArgsList:
+                validArgsList.remove(x)
+    
     for key, value in passedArgs.items():
         #check if key is a valid argument
         if key in validArgsList:
@@ -188,6 +198,9 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
         Unknown argument Attr2 XX. ignoring...
         ['-O', './test', 'IN1', 'IN2']
     """
+    
+        
+    
     popenArgs=[]
     """
     Define some special arguments.
@@ -195,6 +208,16 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
     """
     specialArgList=["--"]
     appendAtEndArgs=[]
+    
+    #empty list supplied consider all armunets valid
+    if len(validArgsList)<1:
+        validArgsList=passedArgs.keys()
+        #above command will also add specialArgs, remove those
+        for x in specialArgList:
+            if x in validArgsList:
+                validArgsList.remove(x)
+        
+        
     for key, value in passedArgs.items():
         #check if key is a valid argument
         if key in validArgsList:
