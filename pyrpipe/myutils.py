@@ -8,6 +8,8 @@ Created on Mon Oct 21 12:04:28 2019
 
 import os
 import subprocess
+import dill
+from datetime import datetime 
 
 #functions to print in color
 
@@ -31,6 +33,32 @@ def printBlue(text):
     print (bcolors.OKBLUE + text + bcolors.ENDC) 
 
 ######End color functions###################
+
+
+def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
+    """Save current workspace using dill.
+    """
+    timestamp=str(datetime.now()).replace(" ","-")
+    
+    if not outDir:
+        outDir=os.getcwd()
+    
+    outFile=os.path.join(outDir,filename)
+    outFile=outFile+"_"+timestamp+".pyrpipe"
+    
+    #save workspace
+    dill.dump_session(filename)
+    print("Session saved.")
+
+
+def restorePyrpipeWorkspace(file):
+    if not checkFilesExists(file):
+        print(file+" doesn't exist")
+        return False
+    #load the session
+    dill.load_session(file)
+    print("Session restored.")
+    return True
 
 def getCommandReturnValue(cmd):
     result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
