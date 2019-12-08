@@ -377,10 +377,33 @@ class Mikado(RNASeqTools):
         
         
         
-    def runMikadoPick(self):
-        """Wrapper to run mikado pick
+    def runMikadoSerialise(self,transcriptsFasta,junctions,blastTargets,orfs,xml,outDir="",**kwargs):
+        """Wrapper to run mikado serialise
         """
-        pass
+        #check input files exist
+        if not checkFilesExists(junctions,blastTargets,orfs,xml):
+            print("Please check the input to mikado.")
+            return ""
+        if not outDir:
+            outDir=os.getcwd()
+        
+        newOpts={"--transcripts":transcriptsFasta,"--junctions":junctions,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":outDir}
+        
+        #merge with kwargs
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runMikado("prepare",**mergedOpts)
+        
+        if not status:
+            print("Mikado prepare full failed for:"+gtfList)
+            return ""
+        
+        #check if bam file exists
+        if not checkPathsExists(outDir):
+            return ""
+        
+        return outDir
+        
         
     def runMikadoPick(self):
         """Wrapper to run mikado pick
