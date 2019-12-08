@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:21:01 2019
 @author: usingh
 """
 
-from pyrpipe.myutils import *
+from pyrpipe.pyrpipe_utils import *
 
 class Assembly:
     def __init__(self):

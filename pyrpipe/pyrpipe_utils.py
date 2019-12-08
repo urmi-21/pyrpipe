@@ -38,16 +38,17 @@ def printBlue(text):
 def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     """Save current workspace using dill.
     """
-    timestamp=str(datetime.now()).replace(" ","-")
+    #timestamp format YYYYMMDDHHMISE
+    timestamp=str(datetime.now()).split(".")[0].replace("-","").replace(" ","").replace(":","")
     
-    if not outDir:
+    if not outDir:        
         outDir=os.getcwd()
     
     outFile=os.path.join(outDir,filename)
     outFile=outFile+"_"+timestamp+".pyrpipe"
     
     #save workspace
-    dill.dump_session(filename)
+    dill.dump_session(outFile)
     print("Session saved.")
 
 

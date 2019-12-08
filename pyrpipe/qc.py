@@ -6,7 +6,7 @@ Created on Mon Nov 25 17:48:00 2019
 @author: usingh
 """
 
-from pyrpipe.myutils import *
+from pyrpipe.pyrpipe_utils import *
 
 class RNASeqQC:
     def __init__(self):

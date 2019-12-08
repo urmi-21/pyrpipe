@@ -7,7 +7,7 @@ Created on Sun Nov 24 19:53:42 2019
 contains classes of RNA-Seq mapping programs
 """
 
-from pyrpipe.myutils import *
+from pyrpipe.pyrpipe_utils import *
 
 class Aligner:
     def __init__(self):

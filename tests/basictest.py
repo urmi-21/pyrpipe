@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:53:26 2019
 @author: usingh
 """
 
-from pyrpipe import sra,mapping,assembly,qc,tools
+from pyrpipe import sra,mapping,assembly,qc,tools,pyrpipe_utils
 
 
 #########define directories indices, reference gtf etc####
@@ -221,12 +221,7 @@ for key in dir():
 my_shelf.close()
 """
 
-import dill                            #pip install dill --user
-filename = testDir+'/globalsave.pkl'
-dill.dump_session(filename)
-
-# and to load the session again:
-dill.load_session(filename)
+pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 
 

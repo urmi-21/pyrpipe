@@ -8,7 +8,7 @@ Created on Sat Nov 23 15:45:26 2019
 
 """
 
-from pyrpipe.myutils import *
+from pyrpipe.pyrpipe_utils import *
 import os
 
 class SRA:
