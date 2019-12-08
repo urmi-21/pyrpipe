@@ -11,3 +11,4 @@ portcullis
 mikado
 test bowtie2
 
+Save workspace
