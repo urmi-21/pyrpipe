@@ -176,13 +176,14 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 #    print("Fail")
 
 bamList=[]
+sraObList=[]
 for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
     sraOb=sra.SRA(s,testDir)
     #download sra
     sraOb.downloadSRAFile()
     #run fastqdump;delete sra when done
     sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
-
+    sraObList.append(sraOb)
     sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
     #get sorted bam
     bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
@@ -203,11 +204,29 @@ refGenome="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R6
 portDir=pob.runPortcullisFull(refGenome,mergedBam,outDir=testDir+"/portOut",deleteOriginalBamFile=True)
 
 
+#save work space
+"""
+import shelve
+filename='shelve.out'
+my_shelf = shelve.open(filename,'n') # 'n' for new
 
+for key in dir():
+    try:
+        my_shelf[key] = globals()[key]
+    except TypeError:
+        #
+        # __builtins__, my_shelf, and imported modules can not be shelved.
+        #
+        print('ERROR shelving: {0}'.format(key))
+my_shelf.close()
+"""
 
+import dill                            #pip install dill --user
+filename = testDir+'/globalsave.pkl'
+dill.dump_session(filename)
 
-
-
+# and to load the session again:
+dill.load_session(filename)
 
 
 
