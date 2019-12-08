@@ -348,7 +348,7 @@ class Mikado(RNASeqTools):
     #--list smolGtfList
     
     def runMikadoPrepare(self,gtfList,referenceFasta,outDir="",**kwargs):
-        """Wrapper to run mikado pick
+        """Wrapper to run mikado prepare
         """
         
         #check input files exist
@@ -392,10 +392,10 @@ class Mikado(RNASeqTools):
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runMikado("prepare",**mergedOpts)
+        status=self.runMikado("serialise",**mergedOpts)
         
         if not status:
-            print("Mikado prepare full failed for:"+gtfList)
+            print("Mikado serialise full failed for:"+transcriptsFasta)
             return ""
         
         #check if bam file exists
@@ -405,15 +405,61 @@ class Mikado(RNASeqTools):
         return outDir
         
         
-    def runMikadoPick(self):
+    def runMikadoPick(self,inputGTF,referenceFasta,scoringFile,outDir="",**kwargs):
         """Wrapper to run mikado pick
         """
-        pass
+        #check input files exist
+        if not checkFilesExists(referenceFasta,scoringFile):
+            print("Please check the input to mikado.")
+            return ""
+        if not outDir:
+            outDir=os.getcwd()
+        
+        newOpts={"--":(inputGTF,),"--fasta":junctions,"--scoring-file":scoringFile,"--output-dir":outDir}
+        
+        #merge with kwargs
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runMikado("pick",**mergedOpts)
+        
+        if not status:
+            print("Mikado pick full failed for:"+inputGTF)
+            return ""
+        
+        #check if bam file exists
+        if not checkPathsExists(outDir):
+            return ""
+        
+        return outDir
+        
         
     def runMikado(self,subCommand,**kwargs):
-        """Wrapper to run mikado pick
+        """Wrapper to run mikado
         """
-        pass
+        
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        mikado_Cmd=['mikado',subCommand]
+        #add options
+        mikado_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+                
+        print("Executing:"+" ".join(mergedArgsDict))
+        
+        #start ececution
+        log=""
+        try:
+            for output in executeCommand(mergedArgsDict):
+                #print (output)    
+                log=log+str(output)
+            #save to a log file
+            
+        except subprocess.CalledProcessError as e:
+            print ("Error in command...\n"+str(e))
+            #save error to error.log file
+            return False        
+        #return status
+        return True
         
         
         
