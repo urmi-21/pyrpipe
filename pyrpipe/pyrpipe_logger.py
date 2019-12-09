@@ -90,7 +90,9 @@ envLogger.warn("#START LOG\n")
 envLogger.debug("\n".join(output))
 envLogger.debug("sys.path:"+str(sys.path))
 
+#a list of logged programs
+loggedPrograms=[]
 
 
 
-print ('\033[94m' + "Logs will be written to {} {} {}:".format(cmdLogFname,stdOutLogFname,stdErrLogFname) + '\033[0m')
+print ('\033[94m' + "Logs will be written to {} {} {}:".format(cmdLogFname,stdOutLogFname,stdErrLogFname,programLogFname) + '\033[0m')

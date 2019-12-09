@@ -149,6 +149,11 @@ def executeCommand(cmd,verbose=False):
         pl.commandLogger.debug(fullMessage)
         
         ##get the program used
+        thisProgram=cmd[0]
+        if thisProgram not in pl.loggedPrograms:
+            ##get which thisProgram
+            pl.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram))
+            
     
         if exitCode==0:
             return True
@@ -366,7 +371,10 @@ def isPairedSRA(pathToSraFile):
     except subprocess.CalledProcessError as e:
         raise Exception("Error running fastq-dump");
     
-    
+def getProgramPath(programName):
+    whichCmd=['which',programName]
+    out = subprocess.check_output(whichCmd,universal_newlines=True)
+    return out
     
 def checkDep(depList):
     """Check whether specified programs exist in the environment.
