@@ -143,9 +143,12 @@ def executeCommand(cmd,verbose=False):
             printBlue("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
                 
         exitCode=result.returncode
-        ##Add to log
+        
+        ##Add to logs
         fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
         pl.commandLogger.debug(fullMessage)
+        
+        ##get the program used
     
         if exitCode==0:
             return True
