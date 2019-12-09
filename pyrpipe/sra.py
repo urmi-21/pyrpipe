@@ -103,19 +103,10 @@ class SRA:
         prefetch_Cmd.extend(parseUnixStyleArgs(prefetchArgsList,kwargs))
         prefetch_Cmd.extend(['-O',self.location])
         prefetch_Cmd.append(self.srrAccession)
-        print("Executing:"+" ".join(prefetch_Cmd))
-        
-        
-        log=""
-        try:
-            for output in executeCommand(prefetch_Cmd):
-                print (output)    
-                log=log+str(output)
-            #save to a log file
-
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
+                
+        cmdStatus=executeCommand(prefetch_Cmd)
+        if not cmdStatus:
+            print("prefetch failed for:"+self.srrAccession)
             return False
         
         #store path to the downloaded sra file
@@ -229,19 +220,13 @@ class SRA:
         #add output filename. output will be <srrAccession>.fastq or <srrAccession>_1.fastq and <srrAccession>_2.fastq
         fstrqd_Cmd.extend(['-o',self.srrAccession+".fastq"])
         fstrqd_Cmd.append(self.localSRAFilePath)
-        print("Executing:"+" ".join(fstrqd_Cmd))
         
-        log=""
-        try:
-            for output in executeCommand(fstrqd_Cmd):
-                print (output)    
-                log=log+str(output)
-            #save to a log file
-
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
+        #execute command
+        cmdStatus=executeCommand(fstrqd_Cmd)
+        if not cmdStatus:
+            print("prefetch failed for:"+self.srrAccession)
             return False
+        
         
         #check if fastq files are downloaded 
         if(self.layout=="SINGLE"):

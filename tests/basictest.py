@@ -199,9 +199,9 @@ mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD
 
 
 #portc
-pob=tools.Portcullis()
-refGenome="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa"
-portDir=pob.runPortcullisFull(refGenome,mergedBam,outDir=testDir+"/portOut",deleteOriginalBamFile=True)
+#pob=tools.Portcullis()
+#refGenome="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa"
+#portDir=pob.runPortcullisFull(refGenome,mergedBam,outDir=testDir+"/portOut",deleteOriginalBamFile=True)
 
 
 #save work space
@@ -221,7 +221,7 @@ for key in dir():
 my_shelf.close()
 """
 
-pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
+#pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 
 

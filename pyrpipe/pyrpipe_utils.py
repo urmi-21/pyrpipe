@@ -9,7 +9,11 @@ Created on Mon Oct 21 12:04:28 2019
 import os
 import subprocess
 import dill
-from datetime import datetime 
+import datetime as dt
+import time
+from pyrpipe import pyrpipe_logger as pl
+
+
 
 #functions to print in color
 
@@ -34,12 +38,20 @@ def printBlue(text):
 
 ######End color functions###################
 
+def getTimestamp(shorten=False):
+    
+    timestamp=str(dt.datetime.now()).split(".")[0].replace(" ","-")
+    if shorten:
+        timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
+    return timestamp
+    
 
 def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     """Save current workspace using dill.
     """
     #timestamp format YYYYMMDDHHMISE
-    timestamp=str(datetime.now()).split(".")[0].replace("-","").replace(" ","").replace(":","")
+    timestamp=getTimestamp(True)
+    
     
     if not outDir:        
         outDir=os.getcwd()
@@ -73,7 +85,9 @@ def getCommandReturnStatus(cmd):
     return False
 
 #prints stdout in real time. optimal for huge stdout and no stderr
-def executeCommand(cmd):      
+def executeCommandOld(cmd):
+    pl.logger.debug("Executing command:\n$ q"+" ".join(cmd)) 
+    start_time = time.time()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     
     for stdout_line in iter(popen.stdout.readline, ""):
@@ -82,9 +96,58 @@ def executeCommand(cmd):
     
     
     return_code = popen.wait()
+    
+    end_time = time.time()
+    pl.logger.debug("Executing command:\n$ q"+str(end_time - start_time)) 
+    
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
-     
+
+
+def executeCommand(cmd,verbose=False):
+    """
+    Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
+    """
+    print("Executing:"+" ".join(cmd))
+    
+    timeStart = time.time()
+    try:
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        stdout,stderr = result.communicate()
+        #convert to string
+        if stdout:
+            stdout=stdout.decode("utf-8")
+        else:
+            stdout=""
+        if stderr:
+            stderr=stderr.decode("utf-8")
+        else:
+            stderr=""
+            timeDiff = time.time() - timeStart
+    
+        if verbose:
+            if stdout:
+                print("STDOUT:\n"+stdout)
+            if stderr:
+                print("STDERR:\n"+stderr)
+    
+        print("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+        exitCode=result.returncode
+    
+        if exitCode==0:
+            return True
+        return False
+    
+    except OSError as e:
+        print("Fatal Error occured"+str(e))
+        return False
+    except subprocess.CalledProcessError as e:
+        print("Fatal  Error occured:"+str(e))
+        return False
+    except:
+        print("Fatal Error occured:"+str(e))
+        return False
+
 
 def getSRADownloadPath(srrID):
     if len(srrID) <6:
