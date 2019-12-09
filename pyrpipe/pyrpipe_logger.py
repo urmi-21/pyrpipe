@@ -85,11 +85,11 @@ stdErrLogger.warn("#START LOG")
 with Capturing() as output:
     sinfo(write_req_file=False)
 envLogger=createLogger("env",programLogFname,logging.Formatter("%(message)s"))
-envLogger.warn("#START LOG\n")
+envLogger.warn("#START LOG")
 
 envLogger.debug("\n".join(output))
 envLogger.debug("sys.path:"+str(sys.path))
-
+envLogger.debug("#PROGRAMS")
 #a list of logged programs
 loggedPrograms=[]
 

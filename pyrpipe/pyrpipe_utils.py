@@ -148,11 +148,17 @@ def executeCommand(cmd,verbose=False):
         fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
         pl.commandLogger.debug(fullMessage)
         
-        ##get the program used
+        ##log stdout
+        pl.stdOutLogger.debug(logMessage+"\n"+stdout)
+        ##log stderr
+        pl.stdErrLogger.debug(logMessage+"\n"+stderr)
+        
+        ##get the program used and log its path
         thisProgram=cmd[0]
         if thisProgram not in pl.loggedPrograms:
             ##get which thisProgram
-            pl.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram))
+            pl.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+            pl.loggedPrograms.append(thisProgram)
             
     
         if exitCode==0:
