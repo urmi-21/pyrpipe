@@ -95,4 +95,4 @@ loggedPrograms=[]
 
 
 
-print ('\033[94m' + "Logs will be written to {} {} {}:".format(cmdLogFname,stdOutLogFname,stdErrLogFname,programLogFname) + '\033[0m')
+print ('\033[94m' + "Logs will be written to {}, {}, {}, {}".format(cmdLogFname,stdOutLogFname,stdErrLogFname,programLogFname) + '\033[0m')

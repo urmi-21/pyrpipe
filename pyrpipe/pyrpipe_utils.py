@@ -21,6 +21,7 @@ class bcolors:
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
+    LightMagenta = "\033[95m"
     WARNING = '\033[93m'
     FAIL = '\033[91m'
     ENDC = '\033[0m'
@@ -35,6 +36,9 @@ def printGreen(text):
 
 def printBlue(text):
     print (bcolors.OKBLUE + text + bcolors.ENDC) 
+
+def printInfoMessage(text):
+    print (bcolors.LightMagenta + text + bcolors.ENDC) 
 
 ######End color functions###################
 
@@ -133,14 +137,14 @@ def executeCommand(cmd,verbose=False):
         timeDiff = time.time() - timeStart
     
         if verbose:
-            printBlue(logMessage)
+            
             
             if stdout:
                 printBlue("STDOUT:\n"+stdout)
             if stderr:
                 printBoldRed("STDERR:\n"+stderr)
-    
-            printBlue("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+        printBlue(logMessage)
+        printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
                 
         exitCode=result.returncode
         
@@ -397,10 +401,11 @@ def checkDep(depList):
     """
     errorFlag=False
     for s in depList:
-        printBlue("Checking "+s+"...")
+        #printBlue("Checking "+s+"...")
         thisCmd=['which',s]
         if(getCommandReturnValue(thisCmd)==0):
-            printGreen ("Found "+s)
+            #printGreen ("Found "+s)
+            pass
         else:
             printBoldRed ("Can not find "+s)
             errorFlag=True

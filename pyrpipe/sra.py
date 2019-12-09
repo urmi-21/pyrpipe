@@ -31,7 +31,7 @@ class SRA:
             raise Exception("ERROR: Please install missing programs.")
         
         
-        printBlue("Creating SRA: "+srrAccession)
+        printInfoMessage("Creating SRA: "+srrAccession)
         self.srrAccession=srrAccession
         #append the SRR accession to the location
         self.location=os.path.join(location,self.srrAccession)
@@ -82,7 +82,7 @@ class SRA:
         True
         """
         
-        print("Downloading "+self.srrAccession+" ...")
+        printInfoMessage("Downloading "+self.srrAccession+" ...")
         
         #scan for prefetch arguments
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']

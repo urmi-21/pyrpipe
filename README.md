@@ -31,3 +31,8 @@ Please follow these instruction
 git clone https://github.com/urmi-21/pyrpipe.git
 pip install -e path_to/pyrpipe
 ```
+
+## Setting NCBI SRA Toolkit
+Use  ```vdb-config -i``` to configure SRA Toolkit. Make sure that:
+* Under the **TOOLS** tab, prefetch downloads to is set to public user-repository
+* Under the **CACHE** tab, location of public user-repository should not be empty
