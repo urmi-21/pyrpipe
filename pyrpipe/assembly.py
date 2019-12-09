@@ -162,19 +162,12 @@ class Stringtie(Assembly):
         print("Executing:"+" ".join(stie_Cmd))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(stie_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(stie_Cmd)
+        if not status:
+            printBoldRed("stringtie failed")
+        
         #return status
-        return True
+        return status
     
     
     
@@ -236,16 +229,8 @@ class Cufflinks(Assembly):
         print("Executing:"+" ".join(cufflinks_Cmd))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(cufflinks_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(cufflinks_Cmd)
+        if not status:
+            printBoldRed("cufflinks failed")
         #return status
-        return True
+        return status

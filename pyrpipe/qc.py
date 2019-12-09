@@ -131,18 +131,12 @@ class Trimgalore(RNASeqQC):
         print("Executing:"+" ".join(trimGalore_Cmd))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(trimGalore_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(trimGalore_Cmd)
+        if not status:
+            printBoldRed("trimgalore failed")
+        
         #return status
-        return True
+        return status
         
 
             
@@ -259,18 +253,11 @@ class BBmap(RNASeqQC):
         print("Executing:"+" ".join(bbduk_Cmd))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(bbduk_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(bbduk_Cmd)
+        if not status:
+            printBoldRed("bbduk failed")
         #return status
-        return True
+        return status
     
     
     """
@@ -387,25 +374,18 @@ class BBmap(RNASeqQC):
         mergedArgsDict={**kwargs}
         
         #create command to run
-        bbduk_Cmd=["bbsplit.sh"]
+        bbsp_Cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
-        bbduk_Cmd.extend(parseJavaStyleArgs(bbSplitValidArgs,mergedArgsDict))
-        print("CCCCCDDDDDDDD Executing:"+" ".join(bbduk_Cmd))
+        bbsp_Cmd.extend(parseJavaStyleArgs(bbSplitValidArgs,mergedArgsDict))
+        
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(bbduk_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(bbsp_Cmd)
+        if not status:
+            printBoldRed("bbsplit failed")
         #return status
-        return True
+        return status
     
     
     

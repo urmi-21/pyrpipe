@@ -131,7 +131,8 @@ def executeCommand(cmd,verbose=False):
             if stderr:
                 print("STDERR:\n"+stderr)
     
-        print("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+            print("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+        
         exitCode=result.returncode
     
         if exitCode==0:
@@ -407,7 +408,6 @@ def deleteMultipleFilesFromDisk(*args):
 def deleteFileFromDisk(filePath):
     if checkFilesExists(filePath):
         rm_Cmd=['rm',filePath]
-        print("Deleting file: "+filePath+" \n"+" ".join(rm_Cmd))
         rv= getCommandReturnStatus(rm_Cmd)
         return rv
     #if file doesn't exist return true

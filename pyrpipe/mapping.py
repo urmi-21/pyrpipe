@@ -111,21 +111,14 @@ class Hisat2:
         print("Executing:"+str(" ".join(hisat2Build_Cmd)))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(hisat2Build_Cmd):
-                print (output)    
-                log=log+str(output)
-            #save to a log file
-
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return ""
+        status=executeCommand(hisat2Build_Cmd)
+        if not status:
+            printBoldRed("hisatBuild failed")
+            return False
         
         #check if sam file is present in the location directory of sraOb
         if not checkHisatIndex(os.path.join(indexPath,indexName)):
-            print("ERROR in building hisat2 index.")
+            printBoldRed("hisatBuild failed")
             return False
         
         #set the index path
@@ -210,23 +203,13 @@ class Hisat2:
         #add options
         hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
-        print("Executing:"+" ".join(hisat2_Cmd))
-        
-                
-        #start ececution
-        log=""
-        try:
-            for output in executeCommand(hisat2_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        #execute command
+        cmdStatus=executeCommand(hisat2_Cmd)
+        if not cmdStatus:
+            print("hisat2 failed:"+" ".join(hisat2_Cmd))
+     
         #return status
-        return True
+        return cmdStatus
         
         
     
@@ -385,19 +368,10 @@ class Bowtie2(Aligner):
         print("Executing:"+" ".join(bowtie2_Cmd))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(bowtie2_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
-        #return status
-        return True
+        status=executeCommand(bowtie2_Cmd)
+        if not status:
+            printBoldRed("bowtie2 failed")
+        return status
     
     
     def checkIndex(self):

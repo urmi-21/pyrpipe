@@ -202,23 +202,13 @@ class Samtools(RNASeqTools):
         #add options
         samtools_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
                 
-        print("Executing:"+" ".join(samtools_Cmd))
-        
-        
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(samtools_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(samtools_Cmd)
+        if not status:
+            printBoldRed("samtools failed")
+        
         #return status
-        return True
+        return status
         
         
         
@@ -313,19 +303,12 @@ class Portcullis(RNASeqTools):
         
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(portcullis_Cmd):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(portcullis_Cmd)
+        if not status:
+            printBoldRed("portcullis failed")
+                
         #return status
-        return True
+        return status
         
         
         
@@ -447,19 +430,11 @@ class Mikado(RNASeqTools):
         print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
-        log=""
-        try:
-            for output in executeCommand(mergedArgsDict):
-                #print (output)    
-                log=log+str(output)
-            #save to a log file
-            
-        except subprocess.CalledProcessError as e:
-            print ("Error in command...\n"+str(e))
-            #save error to error.log file
-            return False        
+        status=executeCommand(mergedArgsDict)
+        if not status:
+            printBoldRed("mikado failed")
         #return status
-        return True
+        return status
         
         
         
