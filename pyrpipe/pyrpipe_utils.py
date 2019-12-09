@@ -107,8 +107,16 @@ def executeCommandOld(cmd):
 def executeCommand(cmd,verbose=False):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
+    
+    Parameters
+    ----------
+    cmd: list
+        command to execute in a list
+    verbose
+        whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
     """
-    print("Executing:"+" ".join(cmd))
+    logMessage="Now executing:"+" ".join(cmd)
+    print(logMessage)
     
     timeStart = time.time()
     try:
@@ -127,11 +135,11 @@ def executeCommand(cmd,verbose=False):
     
         if verbose:
             if stdout:
-                print("STDOUT:\n"+stdout)
+                printBlue("STDOUT:\n"+stdout)
             if stderr:
-                print("STDERR:\n"+stderr)
+                printBoldRed("STDERR:\n"+stderr)
     
-            print("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+            printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
         
         exitCode=result.returncode
     
