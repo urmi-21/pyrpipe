@@ -7,6 +7,7 @@ python:
   - "nightly"  # nightly build
 # command to install dependencies
 install:
+  - pip install -r requirements.txt
   - pip install .
   - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
   - tar -xvzf /tmp/sratools.tar.gz
