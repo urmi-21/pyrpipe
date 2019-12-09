@@ -115,9 +115,7 @@ def executeCommand(cmd,verbose=False):
     verbose
         whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
     """
-    logMessage="Now executing:"+" ".join(cmd)
-    print(logMessage)
-    
+    logMessage="$ "+" ".join(cmd)
     timeStart = time.time()
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -131,17 +129,23 @@ def executeCommand(cmd,verbose=False):
             stderr=stderr.decode("utf-8")
         else:
             stderr=""
-            timeDiff = time.time() - timeStart
+        
+        timeDiff = time.time() - timeStart
     
         if verbose:
+            printBlue(logMessage)
+            
             if stdout:
                 printBlue("STDOUT:\n"+stdout)
             if stderr:
                 printBoldRed("STDERR:\n"+stderr)
     
-            printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
-        
+            printBlue("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+                
         exitCode=result.returncode
+        ##Add to log
+        fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
+        pl.commandLogger.debug(fullMessage)
     
         if exitCode==0:
             return True
