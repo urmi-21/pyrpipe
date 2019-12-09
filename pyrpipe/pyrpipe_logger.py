@@ -74,18 +74,18 @@ stdErrLogFname=os.path.join(logsDir,timestamp+"_pyrpipeERR.log")
 programLogFname=os.path.join(logsDir,timestamp+"_pyrpipeEnv.log")
 
 commandLogger=createLogger("cmd",cmdLogFname,LogFormatter())
-commandLogger.warn("#START LOG")
+commandLogger.debug("#START LOG")
 
 stdOutLogger=createLogger("stdout",stdOutLogFname,LogFormatter())
-stdOutLogger.warn("#START LOG")
+stdOutLogger.debug("#START LOG")
                    
 stdErrLogger=createLogger("stderr",stdErrLogFname,LogFormatter())
-stdErrLogger.warn("#START LOG")
+stdErrLogger.debug("#START LOG")
 
 with Capturing() as output:
     sinfo(write_req_file=False)
 envLogger=createLogger("env",programLogFname,logging.Formatter("%(message)s"))
-envLogger.warn("#START LOG")
+envLogger.debug("#START LOG")
 
 envLogger.debug("\n".join(output))
 envLogger.debug("sys.path:"+str(sys.path))
