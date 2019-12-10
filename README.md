@@ -29,6 +29,7 @@ pyrpipe can be used on local computers or on HPC environments to manage analysis
 Please follow these instruction 
 ```
 git clone https://github.com/urmi-21/pyrpipe.git
+pip install -r pyrpipe/requirements.txt
 pip install -e path_to/pyrpipe
 ```
 
