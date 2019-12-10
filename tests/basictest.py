@@ -221,7 +221,7 @@ for key in dir():
 my_shelf.close()
 """
 
-#pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
+pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 
 

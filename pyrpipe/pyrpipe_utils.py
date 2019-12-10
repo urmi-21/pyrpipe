@@ -176,7 +176,7 @@ def executeCommand(cmd,verbose=False):
         print("Fatal  Error occured:"+str(e))
         return False
     except:
-        print("Fatal Error occured:"+str(e))
+        print("Fatal Error occured")
         return False
 
 

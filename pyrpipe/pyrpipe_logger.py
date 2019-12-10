@@ -12,18 +12,20 @@ from datetime import datetime
 from datetime import timedelta
 import logging
 import os
-from sinfo import sinfo
+#from sinfo import sinfo
 import platform
 from multiprocessing import cpu_count
 
-##for sinfo output
+##for sinfo output #sinfo fails with dill.dumpsession
+"""
 try:
     from StringIO import StringIO
 except ImportError:
     from io import StringIO
-
+"""
 import sys
 
+"""
 class Capturing(list):
     def __enter__(self):
         self._stdout = sys.stdout
@@ -33,7 +35,7 @@ class Capturing(list):
         self.extend(self._stringio.getvalue().splitlines())
         del self._stringio    # free up some memory
         sys.stdout = self._stdout
-
+"""
 class LogFormatter():
     def __init__(self):
         self.start_time = time.time()
@@ -82,12 +84,31 @@ stdOutLogger.debug("#START LOG")
 stdErrLogger=createLogger("stderr",stdErrLogFname,LogFormatter())
 stdErrLogger.debug("#START LOG")
 
+"""
 with Capturing() as output:
     sinfo(write_req_file=False)
+"""
 envLogger=createLogger("env",programLogFname,logging.Formatter("%(message)s"))
 envLogger.debug("#START LOG")
 
-envLogger.debug("\n".join(output))
+#using 
+#envLogger.debug("\n".join(output))
+
+#get current time
+sesstime='Session information collected on {}'.format(
+        datetime.now().strftime('%Y-%m-%d %H:%M'))
+#get os
+osInfo=platform.platform()
+#get python version
+pyver='Python ' + sys.version.replace('\n', '')
+#get cpu
+cpu=str(cpu_count())+' logical CPU cores'
+
+envLogger.debug(sesstime)
+envLogger.debug(pyver)
+envLogger.debug(osInfo)
+envLogger.debug(cpu)
+envLogger.debug("#SYS PATH")
 envLogger.debug("sys.path:"+str(sys.path))
 envLogger.debug("#PROGRAMS")
 #a list of logged programs
