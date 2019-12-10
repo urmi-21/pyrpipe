@@ -159,8 +159,7 @@ class Stringtie(Assembly):
         #add options
         stie_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
-        print("Executing:"+" ".join(stie_Cmd))
-        
+                
         #start ececution
         status=executeCommand(stie_Cmd)
         if not status:
@@ -180,7 +179,7 @@ class Cufflinks(Assembly):
         arg1: string
             Path to the reference gtf file.
         arg2: dict
-            Options passed to stringtie. These could be overridden later when executing stringtie.
+            Options passed to stringtie. These could be overridden later when executing cufflinks.
         """
         super().__init__()
         self.programName="cufflinks"
@@ -226,7 +225,6 @@ class Cufflinks(Assembly):
         #add options
         cufflinks_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
-        print("Executing:"+" ".join(cufflinks_Cmd))
         
         #start ececution
         status=executeCommand(cufflinks_Cmd)
