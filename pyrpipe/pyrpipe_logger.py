@@ -110,6 +110,8 @@ envLogger.debug(osInfo)
 envLogger.debug(cpu)
 envLogger.debug("#SYS PATH")
 envLogger.debug("sys.path:"+str(sys.path))
+envLogger.debug("#SYS MODULES")
+envLogger.debug("sys.modules:"+str(sys.modules.keys()))                
 envLogger.debug("#PROGRAMS")
 #a list of logged programs
 loggedPrograms=[]
