@@ -128,7 +128,7 @@ class Trimgalore(RNASeqQC):
         #create command to run
         trimGalore_Cmd=['trim_galore']
         trimGalore_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
-        print("Executing:"+" ".join(trimGalore_Cmd))
+        
         
         #start ececution
         status=executeCommand(trimGalore_Cmd)
@@ -250,7 +250,7 @@ class BBmap(RNASeqQC):
         
         #bbduk.sh follows java style arguments
         bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
-        print("Executing:"+" ".join(bbduk_Cmd))
+        
         
         #start ececution
         status=executeCommand(bbduk_Cmd)
