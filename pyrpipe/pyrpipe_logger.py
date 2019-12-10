@@ -45,8 +45,7 @@ class LogFormatter():
         elapsed_seconds = record.created - self.start_time
         hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        elapsedTime = timedelta(seconds = elapsed_seconds)
-        
+        elapsedTime = timedelta(seconds = elapsed_seconds)        
         return "Time:{} \n{} \nDuration: {:02}:{:02}:{:02}".format(timeNow, record.getMessage(), int(hours), int(minutes), int(seconds) )    
     
 

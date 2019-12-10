@@ -11,6 +11,8 @@ Created on Sat Nov 23 15:45:26 2019
 from pyrpipe.pyrpipe_utils import *
 import os
 
+import pyrpipe.dummy
+
 class SRA:
     def __init__(self,srrAccession,location=os.getcwd()):
         """Init SRA object.

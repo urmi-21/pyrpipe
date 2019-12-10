@@ -8,6 +8,9 @@ Created on Tue Dec 10 13:40:01 2019
 import dill
 import datetime as dt
 import os
+import sys
+import pyrpipe
+
 def getTimestamp(shorten=False):
     
     timestamp=str(dt.datetime.now()).split(".")[0].replace(" ","-")
@@ -32,6 +35,10 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     Do not pickle logger. This causes problems when restoring session with python < 3.7
     Delete all logger instances. 
     """
+    print("deleting")
+    #del sys.modules["pyrpipe.pyrpipe_logger"]
+    #del pyrpipe.pyrpipe_logger
+    print("done")
     
     
     #save workspace
