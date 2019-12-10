@@ -66,7 +66,7 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     
     #save workspace
     dill.dump_session(outFile)
-    print("Session saved.")
+    print("Session saved to: "+outFile)
 
 
 def restorePyrpipeWorkspace(file):
@@ -109,7 +109,7 @@ def executeCommandOld(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def executeCommand(cmd,verbose=False):
+def executeCommand(cmd,verbose=False,quiet=False):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
     
@@ -121,6 +121,8 @@ def executeCommand(cmd,verbose=False):
         whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
     """
     logMessage="$ "+" ".join(cmd)
+    if not quiet:
+        printBlue(logMessage)
     timeStart = time.time()
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -144,8 +146,8 @@ def executeCommand(cmd,verbose=False):
                 printBlue("STDOUT:\n"+stdout)
             if stderr:
                 printBoldRed("STDERR:\n"+stderr)
-        printBlue(logMessage)
-        printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+        if not quiet:
+            printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
                 
         exitCode=result.returncode
         
