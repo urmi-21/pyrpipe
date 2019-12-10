@@ -36,11 +36,11 @@ class LogFormatter():
         return "Time:{} \n{} \nDuration: {:02}:{:02}:{:02}".format(timeNow, record.getMessage(), int(hours), int(minutes), int(seconds) )
 
 class pyrpipeLogger():
-    def __init__(self,name,logfile,formatter,level=logging.DEBUG):
+    def __init__(self,name,logfile,formatter,level):
         self.__name__="pyrpipeLogger"
-        self.logger=self.createLogger(name,logfile,formatter,level=logging.DEBUG)
+        self.logger=self.createLogger(name,logfile,formatter,level)
     
-    def createLogger(name,logfile,formatter,level=logging.DEBUG):
+    def createLogger(self,name,logfile,formatter,level=logging.DEBUG):
         #Get different loggers
         handler = logging.FileHandler(logfile)        
         handler.setFormatter(formatter)
@@ -61,8 +61,9 @@ if not os.path.isdir(logsDir):
     os.mkdir(logsDir)
 #log names
 cmdLogFname=os.path.join(logsDir,timestamp+"_pyrpipeCMD.log")
-cmdLogOb=pyrpipeLogger("cmd",cmdLogFname,LogFormatter())
-cmdLogOb.logger.debug("#START LOGNEWWWWW")
+
+cmdLogOb=pyrpipeLogger("cmd",cmdLogFname,LogFormatter(),logging.DEBUG)
+cmdLogOb.logger.debug("#START LOGNEW")
     
     
     
@@ -271,3 +272,8 @@ def moveFile(source,destination):
     if not getCommandReturnStatus(mv_cmd):
         return False
     return True
+
+if __name__ == "__main__": 
+    print ("Executed when invoked directly")
+
+
