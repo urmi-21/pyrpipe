@@ -6,4 +6,12 @@ Created on Tue Dec 10 11:16:40 2019
 @author: usingh
 """
 
-print("RUN DIAGnostic Tests")
+import sys
+import os
+import argparse
+
+print("pyrpipe diagnostic utility")
+
+parser = argparse.ArgumentParser()
+parser.parse_args()
+

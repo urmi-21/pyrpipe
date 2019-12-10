@@ -50,10 +50,10 @@ def getTimestamp(shorten=False):
         timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
     return timestamp
     
-
+"""
 def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
-    """Save current workspace using dill.
-    """
+    #Save current workspace using dill.
+    
     #timestamp format YYYYMMDDHHMISE
     timestamp=getTimestamp(True)
     
@@ -77,6 +77,7 @@ def restorePyrpipeWorkspace(file):
     dill.load_session(file)
     print("Session restored.")
     return True
+"""
 
 def getCommandReturnValue(cmd):
     result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
