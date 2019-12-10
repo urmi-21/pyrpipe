@@ -6,6 +6,11 @@
 ### Version
 Dev
 
+## Introduction
+pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs.
+pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
+
+
 ## Prerequisites
 * python 3.6 or higher
 * OS: Unix based
@@ -19,9 +24,6 @@ Required third-party programs
 * [Samtools](https://github.com/samtools/samtools)
 
 
-## Introduction
-pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs.
-pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
 
 
 
