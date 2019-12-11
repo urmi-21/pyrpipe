@@ -8,8 +8,8 @@ Created on Tue Dec 10 13:40:01 2019
 import dill
 import datetime as dt
 import os
-import sys
-from pyrpipe.pyrpipe_engine import *
+#importing pyrpipe_engine here causes issues and stalling of log
+#from pyrpipe import pyrpipe_engine as pre
 
 def getTimestamp(shorten=False):
     
@@ -34,7 +34,12 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     """
     Do not pickle logger. This causes problems when restoring session with python < 3.7
     Delete all logger instances. 
+    del pre.pyrpipeLoggerObject
+    
+    creating a logger class fixed this issue
     """ 
+    
+    
     
     #save workspace
     dill.dump_session(outFile)
