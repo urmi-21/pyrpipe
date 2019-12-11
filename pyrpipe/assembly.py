@@ -7,6 +7,7 @@ Created on Mon Nov 25 15:21:01 2019
 """
 
 from pyrpipe.pyrpipe_utils import *
+from pyrpipe.pyrpipe_engine import *
 
 class Assembly:
     def __init__(self):

@@ -8,6 +8,7 @@ contains classes of RNA-Seq mapping programs
 """
 
 from pyrpipe.pyrpipe_utils import *
+from pyrpipe.pyrpipe_engine import *
 
 class Aligner:
     def __init__(self):

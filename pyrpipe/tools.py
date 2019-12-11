@@ -6,6 +6,7 @@ Created on Wed Dec  4 14:54:22 2019
 @author: usingh
 """
 from pyrpipe.pyrpipe_utils import *
+from pyrpipe.pyrpipe_engine import *
 
 class RNASeqTools:
     def __init__(self):

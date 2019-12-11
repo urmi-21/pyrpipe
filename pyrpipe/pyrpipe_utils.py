@@ -7,13 +7,7 @@ Created on Mon Oct 21 12:04:28 2019
 """
 
 import os
-#import subprocess
-#import dill
 import datetime as dt
-import time
-from pyrpipe import pyrpipe_logger as pl
-
-import pyrpipe.dummy as dm
 
 
 
@@ -42,6 +36,8 @@ def printBlue(text):
 
 def printInfoMessage(text):
     print (bcolors.LightMagenta + text + bcolors.ENDC) 
+def printYellow(text):
+    print (bcolors.LightYellow + text + bcolors.ENDC) 
 
 ######End color functions###################
 
@@ -53,6 +49,7 @@ def getTimestamp(shorten=False):
     return timestamp
     
 """
+moved to session.py
 def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     #Save current workspace using dill.
     
@@ -268,15 +265,6 @@ def getFileBaseName(filePath):
         file path or file name
     """
     return os.path.splitext(getFileName(filePath))[0]
-
-def deleteMultipleFilesFromDisk(*args):
-    errorFlag=False
-    for filePath in args:
-        status=deleteFileFromDisk(filePath)
-        if not status:
-            errorFlag=True
-    
-    return not(errorFlag)
     
 
 

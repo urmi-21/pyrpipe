@@ -10,18 +10,13 @@ Methods and classes related to execution and logging
 
 import os
 import subprocess
-import datetime as dt
-import time
-
-#for log
 import time
 from datetime import datetime 
-from datetime import timedelta
 import logging
-import os
-#from sinfo import sinfo
+import sys
 import platform
 from multiprocessing import cpu_count
+from pyrpipe.pyrpipe_utils import *
 
 class LogFormatter():
     def __init__(self):
@@ -32,13 +27,34 @@ class LogFormatter():
         elapsed_seconds = record.created - self.start_time
         hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
-        elapsedTime = timedelta(seconds = elapsed_seconds)        
         return "Time:{} \n{} \nDuration: {:02}:{:02}:{:02}".format(timeNow, record.getMessage(), int(hours), int(minutes), int(seconds) )
 
 class pyrpipeLogger():
-    def __init__(self,name,logfile,formatter,level):
+    def __init__(self):
         self.__name__="pyrpipeLogger"
-        self.logger=self.createLogger(name,logfile,formatter,level)
+        #loggers
+        timestamp=str(datetime.now()).split(".")[0].replace(" ","-").replace(":","_")
+        self.loggerBaseName=timestamp+"_pyrpipe."
+        self.logsDir=os.path.join(os.getcwd(),"pyrpipe_logs")
+        if not os.path.isdir(self.logsDir):
+            os.mkdir(self.logsDir)
+            
+        self.cmdLoggerPath=os.path.join(self.logsDir,self.loggerBaseName+"CMD.log")
+        self.envLoggerPath=os.path.join(self.logsDir,self.loggerBaseName+"ENV.log")
+        self.stdoutLoggerPath=os.path.join(self.logsDir,self.loggerBaseName+"OUT.log")
+        self.stderrLoggerPath=os.path.join(self.logsDir,self.loggerBaseName+"ERR.log")
+        
+        
+        
+        self.cmdLogger=self.createLogger("cmd",self.cmdLoggerPath,LogFormatter(),logging.DEBUG)
+        self.envLogger=self.createLogger("env",self.envLoggerPath,logging.Formatter("%(message)s"),logging.DEBUG)
+        self.stdoutLogger=self.createLogger("out",self.stdoutLoggerPath,LogFormatter(),logging.DEBUG)
+        self.stderrLogger=self.createLogger("err",self.stderrLoggerPath,LogFormatter(),logging.DEBUG)
+        
+        self.initCmdlog()
+        self.initOutlog()
+        self.initErrlog()
+        self.initEnvlog()
     
     def createLogger(self,name,logfile,formatter,level=logging.DEBUG):
         #Get different loggers
@@ -49,43 +65,51 @@ class pyrpipeLogger():
         logger.setLevel(level)
         logger.addHandler(handler)
         return logger
+    
+    def initCmdlog(self):
+        self.cmdLogger.debug("#START LOG")
+    def initOutlog(self):
+        self.stdoutLogger.debug("#START LOG")
+    def initErrlog(self):
+        self.stderrLogger.debug("#START LOG")
+    def initEnvlog(self):
+        self.envLogger.debug("#START LOG")      
+        #get current time
+        sesstime='Session information collected on {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M'))
+        #get os
+        osInfo=platform.platform()
+        #get python version
+        pyver='Python ' + sys.version.replace('\n', '')
+        #get cpu
+        cpu=str(cpu_count())+' logical CPU cores'
+
+        self.envLogger.debug(sesstime)
+        self.envLogger.debug(pyver)
+        self.envLogger.debug(osInfo)
+        self.envLogger.debug(cpu)
+        self.envLogger.debug("#SYS PATH")
+        self.envLogger.debug("sys.path:"+str(sys.path))
+        self.envLogger.debug("#SYS MODULES")
+        self.envLogger.debug("sys.modules:"+str(sys.modules.keys()))
+        self.envLogger.debug("#PROGRAMS")
+        #a list of logged programs
+        self.loggedPrograms=[]
         
-###create loggers
-        
-timestamp=str(datetime.now()).split(".")[0].replace(" ","-").replace(":","_")
 
-#create logs directory
-
-logsDir=os.path.join(os.getcwd(),"pyrpipe_logs")
-if not os.path.isdir(logsDir):
-    os.mkdir(logsDir)
-#log names
-cmdLogFname=os.path.join(logsDir,timestamp+"_pyrpipeCMD.log")
-
-cmdLogOb=pyrpipeLogger("cmd",cmdLogFname,LogFormatter(),logging.DEBUG)
-cmdLogOb.logger.debug("#START LOGNEW")
+###create logger
+pyrpipeLoggerObject=pyrpipeLogger()
+printYellow("Logs will be saved to {}*.log".format(pyrpipeLoggerObject.loggerBaseName))
     
-    
-    
-    
-    
-    
-    
-    
+"""
+All functions that interact with shell are defined here. 
+"""
     
 ##############Functions###########################
     
 
-def getCommandReturnValue(cmd):
-    result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
-    stdout,stderr = result.communicate()
-    return result.returncode
 
 def getCommandReturnStatus(cmd):
-    returnValue=getCommandReturnValue(cmd)
-    if returnValue==0:
-        return True
-    return False
+    return executeCommand(cmd)
 
 #prints stdout in real time. optimal for huge stdout and no stderr
 def executeCommandOld(cmd):
@@ -150,38 +174,36 @@ def executeCommand(cmd,verbose=False,quiet=False):
         exitCode=result.returncode
         
         ##Add to logs
+        
         fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
-        pl.commandLogger.debug(fullMessage)
+        pyrpipeLoggerObject.cmdLogger.debug(fullMessage)
         
         ##log stdout
-        pl.stdOutLogger.debug(logMessage+"\n"+stdout)
+        pyrpipeLoggerObject.stdoutLogger.debug(logMessage+"\n"+stdout)
         ##log stderr
-        pl.stdErrLogger.debug(logMessage+"\n"+stderr)
+        pyrpipeLoggerObject.stderrLogger.debug(logMessage+"\n"+stderr)
         
         ##get the program used and log its path
         thisProgram=cmd[0]
-        if thisProgram not in pl.loggedPrograms:
+        if thisProgram not in pyrpipeLoggerObject.loggedPrograms:
             ##get which thisProgram
-            pl.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
-            pl.loggedPrograms.append(thisProgram)
-            
+            pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+            pyrpipeLoggerObject.loggedPrograms.append(thisProgram)
+        
     
         if exitCode==0:
             return True
         return False
     
     except OSError as e:
-        print("Fatal Error occured"+str(e))
+        printBoldRed("Fatal Error occured"+str(e))
         return False
     except subprocess.CalledProcessError as e:
-        print("Fatal  Error occured:"+str(e))
+        printBoldRed("Fatal  Error occured:"+str(e))
         return False
     except:
-        print("Fatal Error occured")
+        printBoldRed("Fatal Error occured during execution")
         return False
-    
-    
-    
     
 #function to search files using find and return results as a list
 def findFiles(path,name,recursive):
@@ -243,7 +265,7 @@ def checkDep(depList):
     for s in depList:
         #printBlue("Checking "+s+"...")
         thisCmd=['which',s]
-        if(getCommandReturnValue(thisCmd)==0):
+        if(getCommandReturnStatus(thisCmd)):
             #printGreen ("Found "+s)
             pass
         else:
@@ -262,6 +284,14 @@ def deleteFileFromDisk(filePath):
     #if file doesn't exist return true
     return True
 
+def deleteMultipleFilesFromDisk(*args):
+    errorFlag=False
+    for filePath in args:
+        status=deleteFileFromDisk(filePath)
+        if not status:
+            errorFlag=True
+    
+    return not(errorFlag)
 
 def moveFile(source,destination):
     """
@@ -273,7 +303,9 @@ def moveFile(source,destination):
         return False
     return True
 
+
+
 if __name__ == "__main__": 
-    print ("Executed when invoked directly")
+    print ("Logger")
 
 
