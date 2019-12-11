@@ -60,17 +60,25 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     """
     with open(cmdLog) as f:
         data=f.read().splitlines()
-    #save log for each command
-    logs=[]
-    fullHTML=""
+    
+    #start html
+    fullHTML="<!DOCTYPE html>\n<html>\n<head>\n<title>"+templateFile+"</title>\n</head>\n<body>\n"
+    
     for l in data:
         if not l.startswith("#"):
             thisDict=json.loads(l)
-            fullHTML=fullHTML+template.render(thisDict)#return html
+            fullHTML=fullHTML+"\n"+template.render(thisDict)#return html
+            
+            
     
+    fullHTML=fullHTML+"\n</body>\n</html>"
     return fullHTML
     
-        
+
+def writeHtmlToPdf(htmlText,outFile):
+    if not outFile.endswith(".pdf"):
+        outFile=outFile+".pdf"
+    HTML(string=htmlText).write_pdf(outFile)
 
 
 """
@@ -153,7 +161,10 @@ if args.report:
     
     htmlReport=generateHTMLReport('basic.html',logFile,envLog)
     
-    print(htmlReport)
+    if vFlag:
+        print(htmlReport)
+    
+    writeHtmlToPdf(htmlReport,"rep")
     
     
     
