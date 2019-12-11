@@ -10,6 +10,7 @@ import datetime as dt
 import os
 #importing pyrpipe_engine here causes issues and stalling of log
 #from pyrpipe import pyrpipe_engine as pre
+#import pyrpipe
 
 def getTimestamp(shorten=False):
     
@@ -35,10 +36,12 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     Do not pickle logger. This causes problems when restoring session with python < 3.7
     Delete all logger instances. 
     del pre.pyrpipeLoggerObject
+    del pyrpipe.pyrpipe_engine.pyrpipeLoggerObject
+    """
     
+    """
     creating a logger class fixed this issue
     """ 
-    
     
     
     #save workspace

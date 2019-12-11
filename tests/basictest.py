@@ -6,7 +6,7 @@ Created on Mon Nov 25 15:53:26 2019
 @author: usingh
 """
 
-from pyrpipe import sra,mapping,assembly,qc,tools,pyrpipe_utils
+from pyrpipe import sra,mapping,assembly,qc,tools,pyrpipe_session
 
 
 #########define directories indices, reference gtf etc####
@@ -221,7 +221,7 @@ for key in dir():
 my_shelf.close()
 """
 
-pyrpipe_utils.savePyrpipeWorkspace(filename="sess",outDir=testDir)
+pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 
 

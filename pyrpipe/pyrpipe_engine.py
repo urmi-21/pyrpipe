@@ -23,10 +23,17 @@ class LogFormatter():
         self.start_time = time.time()
     
     def format(self, record):
+        
+               
         timeNow=str(datetime.now())
         elapsed_seconds = record.created - self.start_time
         hours, remainder = divmod(elapsed_seconds, 3600)
         minutes, seconds = divmod(remainder, 60)
+        
+        message=record.getMessage()
+        if message.startswith("#"):
+            return "{}\t{}".format(record.getMessage(),timeNow)
+        
         return "Time:{} \n{} \nDuration: {:02}:{:02}:{:02}".format(timeNow, record.getMessage(), int(hours), int(minutes), int(seconds) )
 
 class pyrpipeLogger():
@@ -109,10 +116,11 @@ All functions that interact with shell are defined here.
 
 
 def getCommandReturnStatus(cmd):
-    return executeCommand(cmd)
+    #not logging these commands
+    return executeCommand(cmd,logs=False)
 
 #prints stdout in real time. optimal for huge stdout and no stderr
-def executeCommandOld(cmd):
+def executeCommandRealtime(cmd):
     pl.logger.debug("Executing command:\n$ q"+" ".join(cmd)) 
     start_time = time.time()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
@@ -120,18 +128,14 @@ def executeCommandOld(cmd):
     for stdout_line in iter(popen.stdout.readline, ""):
             yield stdout_line 
     popen.stdout.close()
-    
-    
     return_code = popen.wait()
-    
     end_time = time.time()
     pl.logger.debug("Executing command:\n$ q"+str(end_time - start_time)) 
-    
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def executeCommand(cmd,verbose=False,quiet=False):
+def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
     
@@ -174,21 +178,21 @@ def executeCommand(cmd,verbose=False,quiet=False):
         exitCode=result.returncode
         
         ##Add to logs
+        if logs:
+            fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
+            pyrpipeLoggerObject.cmdLogger.debug(fullMessage)
         
-        fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
-        pyrpipeLoggerObject.cmdLogger.debug(fullMessage)
-        
-        ##log stdout
-        pyrpipeLoggerObject.stdoutLogger.debug(logMessage+"\n"+stdout)
-        ##log stderr
-        pyrpipeLoggerObject.stderrLogger.debug(logMessage+"\n"+stderr)
-        
-        ##get the program used and log its path
-        thisProgram=cmd[0]
-        if thisProgram not in pyrpipeLoggerObject.loggedPrograms:
-            ##get which thisProgram
-            pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
-            pyrpipeLoggerObject.loggedPrograms.append(thisProgram)
+            ##log stdout
+            pyrpipeLoggerObject.stdoutLogger.debug(logMessage+"\n"+stdout)
+            ##log stderr
+            pyrpipeLoggerObject.stderrLogger.debug(logMessage+"\n"+stderr)
+            
+            ##get the program used and log its path
+            thisProgram=cmd[0]
+            if thisProgram not in pyrpipeLoggerObject.loggedPrograms:
+                ##get which thisProgram
+                pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+                pyrpipeLoggerObject.loggedPrograms.append(thisProgram)
         
     
         if exitCode==0:
@@ -205,17 +209,7 @@ def executeCommand(cmd,verbose=False,quiet=False):
         printBoldRed("Fatal Error occured during execution")
         return False
     
-#function to search files using find and return results as a list
-def findFiles(path,name,recursive):
-    if recursive:
-        find_cmd=['find', path,'-type', 'f','-name',name]   
-    else:
-        find_cmd=['find', path,'-type', 'f','-maxdepth', '1','-name',name] 
-    #print ("Executing: "+ ' '.join(find_cmd))
-    #get output as string
-    out = subprocess.check_output(find_cmd,universal_newlines=True)
-    results=out.split()
-    return results
+
 
 
 #modyfied from https://www.biostars.org/p/139422/
@@ -276,6 +270,7 @@ def checkDep(depList):
     return True
 
 
+#TODO: Re-implement following using native python libraries and move to utils
 def deleteFileFromDisk(filePath):
     if checkFilesExists(filePath):
         rm_Cmd=['rm',filePath]
@@ -303,6 +298,18 @@ def moveFile(source,destination):
         return False
     return True
 
+#function to search files using find and return results as a list
+#use os.scandir
+def findFiles(path,name,recursive):
+    if recursive:
+        find_cmd=['find', path,'-type', 'f','-name',name]   
+    else:
+        find_cmd=['find', path,'-type', 'f','-maxdepth', '1','-name',name] 
+    #print ("Executing: "+ ' '.join(find_cmd))
+    #get output as string
+    out = subprocess.check_output(find_cmd,universal_newlines=True)
+    results=out.split()
+    return results
 
 
 if __name__ == "__main__": 
