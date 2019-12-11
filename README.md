@@ -12,7 +12,7 @@ pyrpipe can be used on local computers or on HPC environments to manage analysis
 
 
 ## Prerequisites
-* python 3.6 or higher
+* python 3.5 or higher
 * OS: Unix based
 
 Required third-party programs
