@@ -13,6 +13,8 @@ import json
 from pyrpipe import pyrpipe_utils as pu
 from jinja2 import Environment, BaseLoader
 from weasyprint import HTML
+from markdownify import markdownify as md
+
 try:
     import importlib.resources as pkg_resources
 except ImportError:
@@ -79,6 +81,11 @@ def writeHtmlToPdf(htmlText,outFile):
     if not outFile.endswith(".pdf"):
         outFile=outFile+".pdf"
     HTML(string=htmlText).write_pdf(outFile)
+    
+def writeHtmlToMarkdown(htmlText,outFile):
+    if not outFile.endswith(".md"):
+        outFile=outFile+".md"
+    print(md(htmlText))
 
 
 """
@@ -136,36 +143,13 @@ if vFlag:
 if args.report:
     print("Generating report")
     
-    #env = Environment(loader=FileSystemLoader('.'))
-    """
-    temp = pkg_resources.read_text(report_templates, 'simple.html')
-    template = Environment(loader=BaseLoader()).from_string(temp)
-    template_vars = {"title" : "Sales Funnel Report - National",
-                 "national_pivot_table": "RANSJKDAJKDSA"}
-    html_out = template.render(template_vars)
-    print(html_out)
-    HTML(string=html_out).write_pdf("report.pdf")
-    
-    temp = pkg_resources.read_text(report_templates, 'block.html')
-    template = Environment(loader=BaseLoader()).from_string(temp)
-    
-    fullH=""
-    
-    for i in range(1,10):
-        template_vars = {"title" : str(i)}
-        fullH=fullH+template.render(template_vars)
-    
-    print (fullH)
-    HTML(string=fullH).write_pdf("report2.pdf")
-    """
-    
     htmlReport=generateHTMLReport('basic.html',logFile,envLog)
     
     if vFlag:
         print(htmlReport)
     
     writeHtmlToPdf(htmlReport,"rep")
-    
+    writeHtmlToMarkdown(htmlReport,"rep")
     
     
 if args.shell:
