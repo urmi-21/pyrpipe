@@ -12,8 +12,8 @@ import argparse
 import json
 from pyrpipe import pyrpipe_utils as pu
 from jinja2 import Environment, BaseLoader
-from weasyprint import HTML
-from markdownify import markdownify as md
+from weasyprint import HTML,CSS
+#from markdownify import markdownify as md
 
 try:
     import importlib.resources as pkg_resources
@@ -63,8 +63,9 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     with open(cmdLog) as f:
         data=f.read().splitlines()
     
-    #start html
-    fullHTML="<!DOCTYPE html>\n<html>\n<head>\n<title>"+templateFile+"</title>\n</head>\n<body>\n"
+    #read head.html
+    fullHTML=pkg_resources.read_text(report_templates, 'head.html')
+    print(fullHTML)
     
     for l in data:
         if not l.startswith("#"):
@@ -80,12 +81,19 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
 def writeHtmlToPdf(htmlText,outFile):
     if not outFile.endswith(".pdf"):
         outFile=outFile+".pdf"
-    HTML(string=htmlText).write_pdf(outFile)
+   
+    #read css
+    cssFile = pkg_resources.read_text(report_templates, 'simple.css')
+    #HTML(string=htmlText).write_pdf(outFile)
+    #HTML(string=htmlText).write_pdf(outFile, stylesheets=[CSS('/home/usingh/work/urmi/hoap/pyrpipe/pyrpipe/report_templates/simple.css')])
+    HTML(string=htmlText).write_pdf(outFile, stylesheets=[CSS(string=cssFile)])
     
+#TODO: write markdown report
 def writeHtmlToMarkdown(htmlText,outFile):
-    if not outFile.endswith(".md"):
-        outFile=outFile+".md"
-    print(md(htmlText))
+    pass
+    #if not outFile.endswith(".md"):
+    #    outFile=outFile+".md"
+    #print(md(htmlText))
 
 
 """
@@ -143,7 +151,7 @@ if vFlag:
 if args.report:
     print("Generating report")
     
-    htmlReport=generateHTMLReport('basic.html',logFile,envLog)
+    htmlReport=generateHTMLReport('simpleDiv.html',logFile,envLog)
     
     if vFlag:
         print(htmlReport)
