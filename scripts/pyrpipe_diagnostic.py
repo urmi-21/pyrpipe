@@ -70,6 +70,11 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     for l in data:
         if not l.startswith("#"):
             thisDict=json.loads(l)
+            #add color to table
+            if thisDict['exitcode']=='0':
+                thisDict['color']="green"
+            else:
+                thisDict['color']="red"
             fullHTML=fullHTML+"\n"+template.render(thisDict)#return html
             
             
@@ -155,8 +160,9 @@ if args.report:
     htmlReport=generateHTMLReport('simpleDiv.html',logFile,envLog)
     
     if vFlag:
+        print(htmlReport)
         pass
-        #print(htmlReport)
+        
     
     writeHtmlToPdf(htmlReport,"rep")
     writeHtmlToMarkdown(htmlReport,"rep")
