@@ -65,7 +65,7 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     
     #read head.html
     fullHTML=pkg_resources.read_text(report_templates, 'head.html')
-    print(fullHTML)
+    #print(fullHTML)
     
     for l in data:
         if not l.startswith("#"):
@@ -87,6 +87,7 @@ def writeHtmlToPdf(htmlText,outFile):
     #HTML(string=htmlText).write_pdf(outFile)
     #HTML(string=htmlText).write_pdf(outFile, stylesheets=[CSS('/home/usingh/work/urmi/hoap/pyrpipe/pyrpipe/report_templates/simple.css')])
     HTML(string=htmlText).write_pdf(outFile, stylesheets=[CSS(string=cssFile)])
+    print("Report written to {}".format(outFile))
     
 #TODO: write markdown report
 def writeHtmlToMarkdown(htmlText,outFile):
@@ -154,7 +155,8 @@ if args.report:
     htmlReport=generateHTMLReport('simpleDiv.html',logFile,envLog)
     
     if vFlag:
-        print(htmlReport)
+        pass
+        #print(htmlReport)
     
     writeHtmlToPdf(htmlReport,"rep")
     writeHtmlToMarkdown(htmlReport,"rep")
