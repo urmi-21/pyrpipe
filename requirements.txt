@@ -1,4 +1,6 @@
+#for sessions
 dill
+#for reports
 jinja2
 weasyprint
 importlib_resources
