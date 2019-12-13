@@ -13,6 +13,7 @@ import json
 from pyrpipe import pyrpipe_utils as pu
 from jinja2 import Environment, BaseLoader
 from weasyprint import HTML,CSS
+from html import escape
 #from markdownify import markdownify as md
 
 try:
@@ -71,10 +72,14 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
         if not l.startswith("#"):
             thisDict=json.loads(l)
             #add color to table
-            if thisDict['exitcode']=='0':
-                thisDict['color']="green"
+            if int(thisDict['exitcode'])==0:
+                thisDict['statuscolor']="green"
             else:
-                thisDict['color']="red"
+                thisDict['statuscolor']="red"
+                
+            #escape all special html charecters
+            for k, v in thisDict.items():
+                thisDict[k] = escape(str(v))
             fullHTML=fullHTML+"\n"+template.render(thisDict)#return html
             
             

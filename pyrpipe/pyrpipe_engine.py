@@ -240,7 +240,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
         return False
     
     except OSError as e:
-        printBoldRed("OSError exception occured"+str(e))
+        printBoldRed("OSError exception occured.\n"+str(e))
         #log error
         timeDiff = time.time() - timeStart
         logDict={'cmd':logMessage,
@@ -248,12 +248,12 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':str(e)                 
+                 'stderr':"OSError exception occured.\n"+str(e)                 
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
     except subprocess.CalledProcessError as e:
-        printBoldRed("CalledProcessError exception occured:"+str(e))
+        printBoldRed("CalledProcessError exception occured.\n"+str(e))
         #log error
         timeDiff = time.time() - timeStart
         logDict={'cmd':logMessage,
@@ -261,12 +261,12 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':str(e)                 
+                 'stderr':"CalledProcessError exception occured.\n"+str(e)                 
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
     except:
-        printBoldRed("Unknown fatal error occured during execution."+str(sys.exc_info()[0]))
+        printBoldRed("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
         #log error
         timeDiff = time.time() - timeStart
         logDict={'cmd':logMessage,
@@ -274,7 +274,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':str(sys.exc_info()[0])
+                 'stderr':str("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
