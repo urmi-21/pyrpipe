@@ -142,7 +142,14 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
     
-
+def runLinuxCommand(cmd):
+    #not logging these commands
+    try:
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        stdout,stderr = result.communicate()
+        return(result.returncode,stdout,stderr)
+    except:
+        return(-1,"","Command failed to execute")
 
 def getCommandReturnStatus(cmd):
     #not logging these commands
@@ -220,7 +227,12 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
             thisProgram=cmd[0]
             if thisProgram not in pyrpipeLoggerObject.loggedPrograms:
                 ##get which thisProgram
-                pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+                #pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+                progDesc={'name':thisProgram,
+                          'version':getProgramVersion(thisProgram).strip(),
+                          'path':getProgramPath(thisProgram).strip()
+                          }
+                pyrpipeLoggerObject.envLogger.debug(json.dumps(progDesc))
                 pyrpipeLoggerObject.loggedPrograms.append(thisProgram)
             
             #create a dict
@@ -306,11 +318,28 @@ def isPairedSRA(pathToSraFile):
             raise Exception("Unexpected output from fast-dump");
     except subprocess.CalledProcessError as e:
         raise Exception("Error running fastq-dump");
-    
+
+
 def getProgramPath(programName):
+    """
+    Get path of installed program
+    """
     whichCmd=['which',programName]
     out = subprocess.check_output(whichCmd,universal_newlines=True)
     return out
+
+def getProgramVersion(programName):
+    """
+    Get path of installed program
+    """
+    versionCommands=['--version','-version','--ver','-ver','-v','--v']
+    for v in versionCommands:
+        cmd=[programName,v]
+        out=runLinuxCommand(cmd)
+        if out[0]==0:
+            return out[1].decode("utf-8")
+    
+    return ""
     
 def checkDep(depList):
     """Check whether specified programs exist in the environment.
