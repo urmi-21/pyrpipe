@@ -38,7 +38,6 @@ pre {
 
 table, th, td {
     border: 1px solid black;
-    background: gold;
 }
 
 .statustable{
@@ -47,3 +46,15 @@ table, th, td {
     border-collapse: collapse;
     width:100%;
 } 
+
+.programinfo{
+    border-collapse: collapse;
+}
+
+.sysInfotable{
+    border-collapse: collapse;
+}
+
+.sysmodules{
+    border-collapse: collapse;
+}

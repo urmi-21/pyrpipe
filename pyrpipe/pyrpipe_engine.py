@@ -212,7 +212,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
         else:
             stderr=""
         
-        timeDiff = time.time() - timeStart
+        timeDiff = round(time.time() - timeStart) #round to remove microsecond term
     
         if verbose:
             if stdout:
@@ -266,7 +266,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     except OSError as e:
         printBoldRed("OSError exception occured.\n"+str(e))
         #log error
-        timeDiff = time.time() - timeStart
+        timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
                  'exitcode':'-1',
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
@@ -279,7 +279,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     except subprocess.CalledProcessError as e:
         printBoldRed("CalledProcessError exception occured.\n"+str(e))
         #log error
-        timeDiff = time.time() - timeStart
+        timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
                  'exitcode':'-1',
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
@@ -292,7 +292,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     except:
         printBoldRed("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
         #log error
-        timeDiff = time.time() - timeStart
+        timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
                  'exitcode':'-1',
                  'runtime':str(dt.timedelta(seconds=timeDiff)),

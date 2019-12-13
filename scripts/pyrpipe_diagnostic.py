@@ -36,6 +36,56 @@ def getCommandsFromLog(inFile):
             commands.append(json.loads(l)["cmd"])
     return commands
 
+def generateEnvReportTable(sysInfo,progList):
+    """create html table to list environment
+    """
+    i=0
+    os=sysInfo['os']
+    now=sysInfo['now']
+    sysmodulesList=sysInfo['sysmodules'].strip('][').split(', ')
+    syspathList=sysInfo['syspath'].strip('][').split(', ')
+    python=sysInfo['python']
+    cpu=sysInfo['cpu']
+    
+    ##create system info table
+    tabStr='\n<h2>Environment Information</h2>'
+    #add program Info
+    tabStr+='\n<table class="programinfo" >'
+    tabStr+='<tr><th colspan="3">Programs</th></tr>'
+    tabStr+='\n<tr> <td>{}</td> <td>{}</td> <td>{}</td>  </tr>'.format("name","version","path")
+    for k, v in progList.items():
+        tabStr+='\n<tr> <td>{}</td> <td>{}</td> <td>{}</td>  </tr>'.format(v["name"],v["version"],v["path"])
+    tabStr+='\n</table>'    
+    tabStr+='\n<br><br>'
+    tabStr+='\n<table class="sysInfotable" >'
+    tabStr+='<tr><th colspan="2">System Information</th></tr>'
+    tabStr+='\n<tr>    <td>Time at collection</td> <td>{}</td>    </tr>'.format(now)
+    tabStr+='\n<tr>    <td>Python</td> <td>{}</td>    </tr>'.format(python)
+    tabStr+='\n<tr>    <td>Operating system</td> <td>{}</td>    </tr>'.format(os)
+    tabStr+='\n<tr>    <td>CPU</td> <td>{}</td>    </tr>'.format(cpu)
+    tabStr+='\n</table>'
+    tabStr+='\n<br><br>'
+    #add sys modules table
+    tabStr+='\n<table class="sysmodules" >'
+    tabStr+='<tr><th colspan="1">sys.modules</th></tr>'
+    for s in sysmodulesList:
+        tabStr+='\n<tr><td>{}</td></tr>'.format(s)
+    tabStr+='\n</table>'
+    tabStr+='\n<br><br>'
+    #add sys path table
+    tabStr+='\n<table class="syspath" >'
+    tabStr+='<tr><th colspan="1">sys.path</th></tr>'
+    for s in syspathList:
+        tabStr+='\n<tr><td>{}</td></tr>'.format(s)
+    tabStr+='\n</table>'
+    tabStr+='\n<br><br>'
+    
+            
+    
+    
+    return tabStr
+    
+    
 def generateHTMLReport(templateFile,cmdLog,envLog):
     
     #parse the env log
@@ -43,13 +93,15 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
         envdata=f.read().splitlines()
     
     sysInfo={}
-    progList=[]
+    progList={}
     for l in envdata:
         if not l.startswith("#"):
             if not sysInfo:
                 sysInfo=json.loads(l)
             else:
-                progList.append(json.loads(l))
+                thisProgram=json.loads(l)
+                progList[thisProgram['name']]=thisProgram
+                
                 
     print("SYSINFO:"+str(sysInfo))
     print("PROGLIST:"+str(progList))
@@ -92,15 +144,20 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
                 thisDict['statuscolor']="green"
             else:
                 thisDict['statuscolor']="red"
-                
+            
+            #program name
+            programname=thisDict['cmd'].split(" ")[0]
+            #add program version info
+            newDict={**thisDict,**progList[programname]}
             #escape all special html charecters
-            for k, v in thisDict.items():
-                thisDict[k] = escape(str(v))
-            fullHTML=fullHTML+"\n"+template.render(thisDict)#return html
+            for k, v in newDict.items():
+                newDict[k] = escape(str(v))
+            
+            fullHTML=fullHTML+"\n"+template.render(newDict)#return html
             
             
-    
-    fullHTML=fullHTML+"\n</body>\n</html>"
+    envTable=generateEnvReportTable(sysInfo,progList)
+    fullHTML=fullHTML+envTable+"\n</body>\n</html>"
     return fullHTML
     
 
