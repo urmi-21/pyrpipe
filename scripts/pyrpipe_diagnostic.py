@@ -49,10 +49,11 @@ def generateEnvReportTable(sysInfo,progList):
     
     ##create system info table
     tabStr='\n<h2>Environment Information</h2>'
+    tabStr+='\n <div class="envtabs">'
     #add program Info
     tabStr+='\n<table class="programinfo" >'
     tabStr+='<tr><th colspan="3">Programs</th></tr>'
-    tabStr+='\n<tr> <td>{}</td> <td>{}</td> <td>{}</td>  </tr>'.format("name","version","path")
+    tabStr+='\n<tr> <th>{}</th> <th>{}</th> <th>{}</th>  </tr>'.format("name","version","path")
     for k, v in progList.items():
         tabStr+='\n<tr> <td>{}</td> <td>{}</td> <td>{}</td>  </tr>'.format(v["name"],v["version"],v["path"])
     tabStr+='\n</table>'    
@@ -79,7 +80,7 @@ def generateEnvReportTable(sysInfo,progList):
         tabStr+='\n<tr><td>{}</td></tr>'.format(s)
     tabStr+='\n</table>'
     tabStr+='\n<br><br>'
-    
+    tabStr+='\n</div>'
             
     
     
@@ -103,8 +104,8 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
                 progList[thisProgram['name']]=thisProgram
                 
                 
-    print("SYSINFO:"+str(sysInfo))
-    print("PROGLIST:"+str(progList))
+    #print("SYSINFO:"+str(sysInfo))
+    #print("PROGLIST:"+str(progList))
     
     #read the template
     templateHTMLFile = pkg_resources.read_text(report_templates, templateFile)
@@ -134,7 +135,10 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     
     #read head.html
     fullHTML=pkg_resources.read_text(report_templates, 'head.html')
-    #print(fullHTML)
+    #add file name
+    fullHTML+='\n<h2> <em>pyrpipe</em> report</h2>'
+    fullHTML+='\n<stron>file name:{}</strong>'.format(cmdLog)
+    fullHTML+='\n<hr><br><br>\n'
     
     for l in data:
         if not l.startswith("#"):
@@ -242,8 +246,8 @@ if args.report:
         pass
         
     
-    writeHtmlToPdf(htmlReport,"rep")
-    writeHtmlToMarkdown(htmlReport,"rep")
+    writeHtmlToPdf(htmlReport,logFilename)
+    #writeHtmlToMarkdown(htmlReport,"rep")
     
     
 if args.shell:

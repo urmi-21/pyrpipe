@@ -7,7 +7,6 @@ and open the template in the editor.
     Created on : Dec 11, 2019, 8:11:42 PM
     Author     : usingh
 */
-
 pre {
     overflow-x: auto;
     white-space: pre-wrap;
@@ -16,45 +15,41 @@ pre {
     white-space: -o-pre-wrap;
     word-wrap: break-word;
 }
-
 .outer{
     background:appworkspace;
-    margin-left: 10%;
-    margin-right: 10%;
+    margin-left: 20px;
+    margin-right: 20px;
 }
 .codeblock{
     background: rgb(245,245,245);
     margin: auto;
 }
-
 .output{
     background: rgb(220,235,233);
 }
-
 .error{
     color: red;
     background: linen;
 }
-
 table, th, td {
     border: 1px solid black;
 }
-
 .statustable{
     margin: auto;
     border: 1px solid black;
     border-collapse: collapse;
     width:100%;
 } 
-
 .programinfo{
     border-collapse: collapse;
 }
-
 .sysInfotable{
     border-collapse: collapse;
 }
-
-.sysmodules{
+.sysmodules,.syspath{
     border-collapse: collapse;
+}
+.envtabs{
+    margin-left: 20px;
+    margin-right: 20px;
 }

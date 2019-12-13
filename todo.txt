@@ -1,7 +1,7 @@
 todo
-generate reports for each analysis
-refactor : allow modifications by class objects only
-streamline return values
+generate reports (pdf, md)
+diagnostic argument parser
+
 
 Add programs
 Star
@@ -11,4 +11,3 @@ portcullis
 mikado
 test bowtie2
 
-Save workspace
