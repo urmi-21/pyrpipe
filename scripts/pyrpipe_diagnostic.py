@@ -38,6 +38,9 @@ def getCommandsFromLog(inFile):
 
 def generateHTMLReport(templateFile,cmdLog,envLog):
     
+    #parse the env log
+    
+    
     #read the template
     templateHTMLFile = pkg_resources.read_text(report_templates, templateFile)
     #load template file

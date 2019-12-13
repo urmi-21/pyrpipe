@@ -109,16 +109,27 @@ class pyrpipeLogger():
         pass
         #self.stderrLogger.debug("#START LOG")
     def initEnvlog(self):
-        self.envLogger.debug("#START LOG")      
+        self.envLogger.debug("#START LOG")
+        
         #get current time
-        sesstime='Session information collected on {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M'))
+        #sesstime='Session information collected on {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M'))
         #get os
         osInfo=platform.platform()
         #get python version
         pyver='Python ' + sys.version.replace('\n', '')
         #get cpu
         cpu=str(cpu_count())+' logical CPU cores'
-
+        
+        envDesc={'now':str(datetime.now().strftime('%Y-%m-%d %H:%M')),
+                 'python':pyver,
+                 'os':osInfo,
+                 'cpu':cpu,
+                 'syspath':str(sys.path),
+                 'sysmodules':str(list(sys.modules.keys()))
+                 }
+        
+        self.envLogger.debug(json.dumps(envDesc))
+        """Old
         self.envLogger.debug(sesstime)
         self.envLogger.debug(pyver)
         self.envLogger.debug(osInfo)
@@ -127,6 +138,7 @@ class pyrpipeLogger():
         self.envLogger.debug("sys.path:"+str(sys.path))
         self.envLogger.debug("#SYS MODULES")
         self.envLogger.debug("sys.modules:"+str(sys.modules.keys()))
+        """
         self.envLogger.debug("#PROGRAMS")
         #a list of logged programs
         self.loggedPrograms=[]
