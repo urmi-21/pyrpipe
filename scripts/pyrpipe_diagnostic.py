@@ -39,7 +39,20 @@ def getCommandsFromLog(inFile):
 def generateHTMLReport(templateFile,cmdLog,envLog):
     
     #parse the env log
+    with open(envLog) as f:
+        envdata=f.read().splitlines()
     
+    sysInfo={}
+    progList=[]
+    for l in envdata:
+        if not l.startswith("#"):
+            if not sysInfo:
+                sysInfo=json.loads(l)
+            else:
+                progList.append(json.loads(l))
+                
+    print("SYSINFO:"+str(sysInfo))
+    print("PROGLIST:"+str(progList))
     
     #read the template
     templateHTMLFile = pkg_resources.read_text(report_templates, templateFile)
