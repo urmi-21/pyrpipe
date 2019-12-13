@@ -23,12 +23,12 @@ pre {
     margin-right: 10%;
 }
 .codeblock{
-    background: lightblue;
+    background: rgb(245,245,245);
     margin: auto;
 }
 
 .output{
-    background: aquamarine;
+    background: rgb(220,235,233);
 }
 
 .error{
