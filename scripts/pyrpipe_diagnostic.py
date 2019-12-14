@@ -140,14 +140,16 @@ def generateHTMLReport(templateFile,cmdLog,envLog):
     fullHTML+='\n<stron>file name:{}</strong>'.format(cmdLog)
     fullHTML+='\n<hr><br><br>\n'
     
+    failColor="rgb(208,28,139)"
+    passColor="rgb(77,172,38)" 
     for l in data:
         if not l.startswith("#"):
             thisDict=json.loads(l)
             #add color to table
             if int(thisDict['exitcode'])==0:
-                thisDict['statuscolor']="green"
+                thisDict['statuscolor']=passColor
             else:
-                thisDict['statuscolor']="red"
+                thisDict['statuscolor']=failColor
             
             #program name
             programname=thisDict['cmd'].split(" ")[0]
