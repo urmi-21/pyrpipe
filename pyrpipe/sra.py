@@ -108,7 +108,7 @@ class SRA:
                 
         cmdStatus=executeCommand(prefetch_Cmd)
         if not cmdStatus:
-            print("prefetch failed for:"+self.srrAccession)
+            printBoldRed("prefetch failed for:"+self.srrAccession)
             return False
         
         #store path to the downloaded sra file

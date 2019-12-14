@@ -18,7 +18,7 @@ class Aligner:
     def performAlignment(self):
         pass
 
-class Hisat2:
+class Hisat2(Aligner):
     def __init__(self,hisat2Index="",**kwargs):
         """HISAT2 constructor. Initialize hisat2's index and other parameters.
         Parameters
@@ -224,22 +224,67 @@ class Hisat2:
 
 
 
-class Star:
-    def __init__(self,starIndex):
+class Star(Aligner):
+    def __init__(self,starIndex="",**kwargs):
         """STAR constructor. Initialize star's index and other parameters.
         """
-        
-        
         super().__init__() 
         self.programName="star"
         
-        self.validArgsList=[]
-        self.depList=[self.programName]        
+          self.depList=[self.programName]        
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
+        self.validArgsList=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
+                            '--genomeDir','--genomeLoad','--genomeFastaFiles','--genomeChrBinNbits','--genomeSAindexNbases','--genomeSAsparseD','--genomeSuffixLengthMax','--genomeChainFiles','--genomeFileSizes',
+                            '--sjdbFileChrStartEnd','--sjdbGTFfile','--sjdbGTFchrPrefix','--sjdbGTFfeatureExon','--sjdbGTFtagExonParentTranscript','--sjdbGTFtagExonParentGene','--sjdbOverhang','--sjdbScore','--sjdbInsertSave',
+                            '--inputBAMfile','--readFilesIn','--readFilesCommand','--readMapNumber','--readMatesLengthsIn','--readNameSeparator','--clip3pNbases','--clip5pNbases','--clip3pAdapterSeq','--clip3pAdapterMMp','--clip3pAfterAdapterNbases',
+                            '--limitGenomeGenerateRAM','--limitIObufferSize','--limitOutSAMoneReadBytes','--limitOutSJoneRead','--limitOutSJcollapsed','--limitBAMsortRAM ','--limitSjdbInsertNsj','--outFileNamePrefix','--outTmpDir','--outTmpKeep',
+                            '--outStd','--outReadsUnmapped','--outQSconversionAdd','--outMultimapperOrder','--outSAMtype','--outSAMmode','--outSAMstrandField','--outSAMattributes','--outSAMattrIHstart','--outSAMunmapped','--outSAMorder',
+                            '--outSAMprimaryFlag','--outSAMreadID','--outSAMmapqUnique','--outSAMflagOR','--outSAMflagAND','--outSAMattrRGline','--outSAMheaderHD','--outSAMheaderPG','--outSAMheaderCommentFile','--outSAMfilter','--outSAMmultNmax',
+                            '--outBAMcompression','--outBAMsortingThreadN','--bamRemoveDuplicatesType','--bamRemoveDuplicatesMate2basesN','--outWigType','--outWigStrand','--outWigReferencesPrefix','--outWigNorm','--outFilterType',
+                            '--outFilterMultimapScoreRange','--outFilterMultimapNmax','--outFilterMismatchNmax','--outFilterMismatchNoverLmax','--outFilterMismatchNoverReadLmax','--outFilterScoreMin','--outFilterScoreMinOverLread',
+                            '--outFilterMatchNmin','--outFilterMatchNminOverLread','--outFilterIntronMotifs','--outSJfilterReads','--outSJfilterOverhangMin','--outSJfilterCountUniqueMin','--outSJfilterCountTotalMin','--outSJfilterDistToOtherSJmin',
+                            '--outSJfilterIntronMaxVsReadN','--scoreGap','--scoreGapNoncan','--scoreGapGCAG ','--scoreGapATAC','--scoreGenomicLengthLog2scale','--scoreDelOpen','--scoreDelBase','--scoreInsOpen','--scoreInsBase','--scoreStitchSJshift',
+                            '--seedSearchStartLmax','--seedSearchStartLmaxOverLread','--seedSearchLmax','--seedMultimapNmax','--seedPerReadNmax','--seedPerWindowNmax','--seedNoneLociPerWindow','--alignIntronMin','--alignIntronMax','--alignMatesGapMax',
+                            '--alignSJoverhangMin','--alignSJstitchMismatchNmax','--alignSJDBoverhangMin','--alignSplicedMateMapLmin','--alignSplicedMateMapLminOverLmate','--alignWindowsPerReadNmax','--alignTranscriptsPerWindowNmax','--alignTranscriptsPerReadNmax',
+                            '--alignEndsType','--alignEndsProtrude','--alignSoftClipAtReferenceEnds','--winAnchorMultimapNmax','--winBinNbits','--winAnchorDistNbins','--winFlankNbins','--winReadCoverageRelativeMin','--winReadCoverageBasesMin',
+                            '--chimOutType','--chimSegmentMin','--chimScoreMin','--chimScoreDropMax','--chimScoreSeparation','--chimScoreJunctionNonGTAG','--chimJunctionOverhangMin','--chimSegmentReadGapMax','--chimFilter','--chimMainSegmentMultNmax']
+                
+       
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #if index is passed, update the passed arguments
+        if len(starIndex)>0 and checkStarIndex(starIndex):
+            print("STAR index is: "+starIndex)
+            self.starIndex=starIndex
+            self.passedArgumentDict['--genomeDir']=self.starIndex
+        else:
+            print("No STAR index provided. Please build index now to generate an index using buildStarIndex()....")
             
+    
+    def buildStarIndex(self,indexPath,indexName,*args,**kwargs):
+         """Build a star index with given parameters and saves the new index to self.hisat2Index.
+        Parameters
+        ----------
+        arg1: string
+            Path where the index will be created
+        arg2: string
+            A name for the index
+        arg3: tuple
+            Path to reference input files
+        arg4: dict
+            Parameters for the star command
+        
+        Returns
+        -------
+        bool:
+            Returns the status of star
+        """
+        pass
+        
             
     def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
@@ -249,13 +294,56 @@ class Star:
         arg1: SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
         arg2: string
-            Suffix for the output sam file
+            Suffix for the output file
         arg3: dict
             Options to pass to hisat2.
         """
         
         pass
+    
+    def runStar(self,**kwargs):
+        """Wrapper for running star.
+        The self.starIndex index used.
+        
+        Parameters
+        ----------
+        arg1: dict
+            arguments to pass to star. This will override parametrs already existing in the self.passedArgumentList list but NOT replace all of them.
             
+        Returns
+        -------
+        bool:
+                Returns the status of star. True is passed, False if failed.
+        """
+        
+        #check for a valid index
+        if not self.checkstarIndex():
+            raise Exception("ERROR: Invalid star index. Please run build index to generate an index.")
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        star_Cmd=['star']
+        #add options
+        star_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        
+        #execute command
+        cmdStatus=executeCommand(star_Cmd)
+        if not cmdStatus:
+            print("star failed:"+" ".join(star_Cmd))
+     
+        #return status
+        return cmdStatus
+    
+    
+    def checkstarIndex(self):
+        if hasattr(self,'starIndex'):
+            return(checkStarIndex(self.starIndex))
+        else:
+            return False
+            
+
+
 
 class Bowtie2(Aligner):
     def __init__(self,bowtie2Index,**kwargs):
