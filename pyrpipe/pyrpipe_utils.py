@@ -295,6 +295,8 @@ def mkdir(dirPath):
     return True
 
 
+def getListUnion(*args):
+    return list(set().union(*args)) 
     
 
 if __name__ == "__main__":
