@@ -229,9 +229,9 @@ class Star(Aligner):
         """STAR constructor. Initialize star's index and other parameters.
         """
         super().__init__() 
-        self.programName="star"
+        self.programName="STAR"
         
-          self.depList=[self.programName]        
+        self.depList=[self.programName]        
         #check if hisat2 exists
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
@@ -265,8 +265,9 @@ class Star(Aligner):
             print("No STAR index provided. Please build index now to generate an index using buildStarIndex()....")
             
     
+    #STAR --runThreadN 8 --runMode genomeGenerate --genomeDir ./starIndex --genomeFastaFiles /home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa
     def buildStarIndex(self,indexPath,indexName,*args,**kwargs):
-         """Build a star index with given parameters and saves the new index to self.hisat2Index.
+        """Build a star index with given parameters and saves the new index to self.hisat2Index.
         Parameters
         ----------
         arg1: string
@@ -283,6 +284,8 @@ class Star(Aligner):
         bool:
             Returns the status of star
         """
+        
+        #create output dir if doesn;t exist
         pass
         
             
@@ -297,6 +300,11 @@ class Star(Aligner):
             Suffix for the output file
         arg3: dict
             Options to pass to hisat2.
+            
+        Returns
+        -------
+        string:
+            path to the output file
         """
         
         pass
@@ -323,14 +331,14 @@ class Star(Aligner):
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        star_Cmd=['star']
+        star_Cmd=['STAR']
         #add options
         star_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
         #execute command
         cmdStatus=executeCommand(star_Cmd)
         if not cmdStatus:
-            print("star failed:"+" ".join(star_Cmd))
+            print("STAR failed:"+" ".join(star_Cmd))
      
         #return status
         return cmdStatus

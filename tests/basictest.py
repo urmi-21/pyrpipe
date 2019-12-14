@@ -118,7 +118,7 @@ sraOb=sra.SRA('SRR5507495',testDir)
 #download sra
 sraOb.downloadSRAFile()
 #run fastqdump;delete sra when done
-sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
+sraOb.runFasterQDump(deleteSRA=False,**{"-f":"","-t":testDir})
 
 tgOb=qc.Trimgalore()
 
@@ -205,23 +205,7 @@ mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD
 
 
 #save work space
-"""
-import shelve
-filename='shelve.out'
-my_shelf = shelve.open(filename,'n') # 'n' for new
-
-for key in dir():
-    try:
-        my_shelf[key] = globals()[key]
-    except TypeError:
-        #
-        # __builtins__, my_shelf, and imported modules can not be shelved.
-        #
-        print('ERROR shelving: {0}'.format(key))
-my_shelf.close()
-"""
-
-pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
+#pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 
 

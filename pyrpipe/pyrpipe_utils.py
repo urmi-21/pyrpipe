@@ -119,6 +119,21 @@ def checkFilesExists(*args):
 def checkHisatIndex(index):
     return checkFilesExists(index+".1.ht2")
 
+def checkStarIndex(index):
+    if checkPathsExists(index):
+        filesTocheck=['chrLength.txt',
+                      'chrNameLength.txt',
+                      'chrName.txt',
+                      'chrStart.txt',
+                      'genomeParameters.txt',
+                      'Genome']
+        for f in filesTocheck:
+            if not checkFilesExists(os.path.join(index,f)):
+                return False
+        return True
+    
+    return False
+
 def checkBowtie2Index(index):
     return checkFilesExists(index+".1.bt2")
     
