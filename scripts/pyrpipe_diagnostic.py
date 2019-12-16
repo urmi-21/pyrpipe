@@ -183,7 +183,7 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
     sysInfo,progList=parseEnvLog(envLog)
     
     #get starttime #end time is calculated from log below
-    startTime=dt.datetime.strptime(sysInfo['now'],"%m/%d/%y %H:%M:%S")
+    startTime=dt.datetime.strptime(sysInfo['now'],"%y-%m-%d %H:%M:%S")
     #total progs used
     progNames=progList.keys()
     numPrograms=len(progNames)
@@ -247,7 +247,7 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
             
     #get start and runtime of last command
     lastDict=json.loads(data[-1])
-    lastST=dt.datetime.strptime(lastDict['starttime'],"%m/%d/%y %H:%M:%S")
+    lastST=dt.datetime.strptime(lastDict['starttime'],"%y-%m-%d %H:%M:%S")
     lastruntime= dt.datetime.strptime(lastDict['runtime'],"%H:%M:%S")
     deltaTime = dt.timedelta(hours=lastruntime.hour, minutes=lastruntime.minute, seconds=lastruntime.second)
     endTime=lastST+deltaTime

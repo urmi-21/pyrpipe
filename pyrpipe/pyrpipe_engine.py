@@ -120,7 +120,7 @@ class pyrpipeLogger():
         #get cpu
         cpu=str(cpu_count())+' logical CPU cores'
         
-        envDesc={'now':str(datetime.now().strftime('%Y-%m-%d %H:%M')),
+        envDesc={'now':str(datetime.now().strftime("%y-%m-%d %H:%M:%S")),
                  'python':pyver,
                  'os':osInfo,
                  'cpu':cpu,
@@ -198,7 +198,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     if not quiet:
         printBlue("$ "+logMessage)
     timeStart = time.time()
-    strStartTime=time.strftime("%m/%d/%y %H:%M:%S", time.localtime(time.time()))
+    strStartTime=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
