@@ -14,6 +14,7 @@ from pyrpipe import pyrpipe_utils as pu
 from jinja2 import Environment, BaseLoader
 from weasyprint import HTML,CSS
 from html import escape
+import datetime as dt
 #from markdownify import markdownify as md
 
 try:
@@ -173,20 +174,19 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
     #vars for generating summary
     startTime=""
     endTime=""
-    totalTime=""
     numCommands=0
     failedCommands=0
     passedCommands=0
-    totalPrograms=0
+    numPrograms=0
     progNames=[]
     #parse envLog
     sysInfo,progList=parseEnvLog(envLog)
     
     #get starttime #end time is calculated from log below
-    startTime=sysInfo['now']
+    startTime=dt.datetime.strptime(sysInfo['now'],"%m/%d/%y %H:%M:%S")
     #total progs used
     progNames=progList.keys()
-    totalPrograms=len(prognames)
+    numPrograms=len(progNames)
     
     #read the template
     templateHTMLFile = pkg_resources.read_text(report_templates, templateFile)
@@ -215,12 +215,13 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
         data=f.read().splitlines()
     
     #read head.html
-    fullHTML=pkg_resources.read_text(report_templates, 'head.html')
+    headHTML=pkg_resources.read_text(report_templates, 'head.html')
     #add file name
-    fullHTML+='\n<h2> <em>pyrpipe</em> report</h2>'
-    fullHTML+='\n<stron>file name:{}</strong>'.format(cmdLog)
-    fullHTML+='\n<hr><br><br>\n'
+    headHTML+='\n<h2> <em>pyrpipe</em> report</h2>'
+    headHTML+='\n<stron>file name:{}</strong>'.format(cmdLog)
+    headHTML+='\n<hr><br><br>\n'
     
+    fullHTML="\n<h2> Details </h2>"
     failColor="rgb(208,28,139)"
     passColor="rgb(77,172,38)" 
     for l in data:
@@ -246,22 +247,33 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
             
     #get start and runtime of last command
     lastDict=json.loads(data[-1])
-    lastST=lastDict['starttime']
-    lastET=lastDict['runtime']
-    endTime=0
+    lastST=dt.datetime.strptime(lastDict['starttime'],"%m/%d/%y %H:%M:%S")
+    lastruntime= dt.datetime.strptime(lastDict['runtime'],"%H:%M:%S")
+    deltaTime = dt.timedelta(hours=lastruntime.hour, minutes=lastruntime.minute, seconds=lastruntime.second)
+    endTime=lastST+deltaTime
     
     
             
     #generate summary
     summary='\n<h2> Summary </h2>'
-    summary+='\nTime start: {}     Time end: {}      Total time: {}'.format(startTime,startTime,startTime)
-    summary+='\nNum commands: {}'.format(numCommands)
+    summary+='\n<div class="summary">'
+    summary+='\n<code>Time start: {}     Time end: {}      Total time: {}</code>'.format(str(startTime),str(endTime), str(endTime-startTime))
+    summary+='\n<br><br>'
+    summary+='\n<span>Num commands: {}</span>'.format(numCommands)
+    summary+='\n<br><br>'
     summary+='\nNum failed commands: {}'.format(failedCommands)
+    summary+='\n<br><br>'
     summary+='\nNum passed commands: {}'.format(passedCommands)
+    summary+='\n<br><br>'
+    summary+='\nTotal programs: {}'.format(numPrograms)
+    summary+='\n<br><br>'
+    summary+='\nNum passed commands: {}'.format(",".join(progNames))
+    summary+='\n<br><br>'
+    summary+='\n</div>'
         
     envTable=generateEnvReportTable(sysInfo,progList)
-    fullHTML=fullHTML+envTable+"\n</body>\n</html>"
-    return fullHTML
+    headHTML=headHTML+summary+fullHTML+envTable+"\n</body>\n</html>"
+    return headHTML
     
 
 def writeHtmlToPdf(htmlText,outFile):

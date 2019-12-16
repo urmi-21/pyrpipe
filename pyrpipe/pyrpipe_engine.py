@@ -198,7 +198,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
     if not quiet:
         printBlue("$ "+logMessage)
     timeStart = time.time()
-    strStartTime=time.strftime("%H:%M:%S", time.localtime(time.time()))
+    strStartTime=time.strftime("%m/%d/%y %H:%M:%S", time.localtime(time.time()))
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
