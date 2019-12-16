@@ -15,7 +15,7 @@ from jinja2 import Environment, BaseLoader
 from weasyprint import HTML,CSS
 from html import escape
 import datetime as dt
-#from markdownify import markdownify as md
+
 
 try:
     import importlib.resources as pkg_resources
@@ -100,8 +100,6 @@ def generateEnvReportTable(sysInfo,progList):
     
     return tabStr
 
-def generatReportSummaryTable(sysInfo,progList):
-    pass
     
     
 def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
@@ -269,12 +267,19 @@ def writeHtml(htmlText,outFile):
     
     print("Report written to {}".format(outFile))
     
-#TODO: write markdown report
+
 def writeHtmlToMarkdown(htmlText,outFile):
     pass
-    #if not outFile.endswith(".md"):
-    #    outFile=outFile+".md"
-    #print(md(htmlText))
+    """if not outFile.endswith(".md"):
+        outFile=outFile+".md"
+    
+    f=open(outFile,'w')
+    f.write(mdText)
+    f.close()
+    
+    print("Report written to {}".format(outFile))
+    """
+    
 
 def getCommandsFromLog(inFile,filterList,coverage):
     with open(inFile) as f:
@@ -352,14 +357,14 @@ def report():
     outFile+='.'+args.e
     
     
-    if args.e in ['pdf','html']:
+    if args.e in ['pdf','html','md']:
         htmlReport=generateHTMLReport('simpleDiv.html',logFile,envLog,coverage=args.c)
         if args.e=='pdf':
             writeHtmlToPdf(htmlReport,outFile)
-        else:
+        elif args.e=='html':
             writeHtml(htmlReport,outFile)
-    elif args.e == 'md':
-        pass
+        elif args.e == 'md':
+            writeHtmlToMarkdown(htmlReport,outFile)
     else:
         pu.printBoldRed("unknown extension:"+args.e+". Exiting")
     
@@ -428,8 +433,10 @@ def benchmark():
     else:
         outFile=args.o
     outFile+='.'+args.e
+    pu.printGreen("TODO")
 
 
+##Start parsing
 subcommands=['report','bash','benchmark','all']
 parser = argparse.ArgumentParser(
             

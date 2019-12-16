@@ -174,7 +174,7 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 #merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
 #if not merged:
 #    print("Fail")
-
+"""
 bamList=[]
 sraObList=[]
 for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
@@ -188,10 +188,10 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
     #get sorted bam
     bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
     bamList.append(bam)
-    
+""" 
 
 #bam merge
-mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",*{"-f":""})
+#mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",*{"-f":""})
 
 #using pysam
 #import pysam
@@ -207,6 +207,8 @@ mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD
 #save work space
 #pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
+#test star
+star=mapping.Star()
 
 
 
