@@ -232,3 +232,9 @@ cl=assembly.Cufflinks()
 clout=cl.performAssembly(bam,**{"--num-threads":"28","--no-update-check":""})
 print(clout)
 
+#runribocode
+#rbc=tools.Ribocode()
+#rbc.runRibocode()
+
+
+

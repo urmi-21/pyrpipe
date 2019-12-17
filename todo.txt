@@ -6,10 +6,9 @@ full documentation
 
 add procs parametr for each class
 Add programs
-Star
-Cufflinks
-Ribocode
-portcullis
 mikado
+blast
+
+write unit tests
 test bowtie2
 

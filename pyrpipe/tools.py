@@ -428,7 +428,7 @@ class Mikado(RNASeqTools):
         #add options
         mikado_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
                 
-        print("Executing:"+" ".join(mergedArgsDict))
+        #print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
         status=executeCommand(mergedArgsDict)
@@ -458,7 +458,27 @@ class Ribocode(RNASeqTools):
         """Wrapper to run ribocode in one step
         """
         
-        pass
+        #check input
+        if not checkFilesExists(gtf,genome,bam):
+            printBoldRed("Please check input files for Ribocode")
+            return ""
+        
+        outDir=getFileDirectory(gtf)
+        outFile=os.path.join(outDir,outsuffix)
+        
+        newOpts={"-g":gtf,"f":genome,"-r":bam,"-l":l,-o:outFile}
+        
+        ribocode_Cmd=['RiboCode_onestep']
+        ribocode_Cmd.extend(parseUnixStyleArgs(self.validArgsList,newOpts))
+        
+        status=executeCommand(ribocode_Cmd)
+        if not status:
+            printBoldRed("ribocode failed")
+            return ""
+        
+        return outFile
+        
+        
         
         
         
