@@ -442,7 +442,23 @@ class Mikado(RNASeqTools):
         
         
         
+class Ribocode(RNASeqTools):
+    def __init__(self,**kwargs):
+        self.programName="RiboCode"
+        self.depList=[self.programName]
+        #check if program exists
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
+        self.validArgsList=[]        
+        self.passedArgumentDict=kwargs
+        
+        
+    def runRibocode(self,gtf,genome,bam,l="no",outsuffix="ribocode_out"):
+        """Wrapper to run ribocode in one step
+        """
+        
+        pass
         
         
         
