@@ -539,7 +539,5 @@ class Bowtie2(Aligner):
             return(checkBowtie2Index(self.bowtie2Index))
         else:
             return False
-        
-    
-    
+
     

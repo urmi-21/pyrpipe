@@ -44,7 +44,7 @@ class Stringtie(Assembly):
             self.passedArgumentDict['-G']=referenceGTF
         
     def performAssembly(self,inputBAM,outFileSuffix="_stringtie",overwrite=True,**kwargs):
-        """Function to run stringtie with an object of SRA class.
+        """Function to run stringtie using BAM file.
                 
         Parameters
         ----------
@@ -219,9 +219,45 @@ class Cufflinks(Assembly):
     
     
     def performAssembly(self,inputBAM,outFileSuffix="_cufflinks",overwrite=True,**kwargs):
+        """Function to run cufflinks with BAM file as input.
+                
+        Parameters
+        ----------
+        arg1: string
+            path to bam file
+        arg2: string
+            Suffix for the output gtf file
+        arg3: bool
+            Overwrite if output file already exists.
+        arg4: dict
+            Options to pass to stringtie. This will override the existing options self.passedArgumentDict (only replace existing arguments and not replace all the arguments).
+            
+        Returns
+        -------
+        string
+            path to output GTF file
+        
         """
+        
+        #create path to output file
+        fname=getFileBaseName(inputBAM)
+        outDir=getFileDirectory(inputBAM)
+        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        
         """
-        pass
+        Handle overwrite
+        """
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(outGtfFile):
+                print("The file "+outGtfFile+" already exists. Exiting..")
+                return outGtfFile
+            
+         #Add output file name and input bam
+        newOpts={"-o":outGtfFile,"--":(inputBAM,)}
+        mergedOpts={**kwargs,**newOpts}
+        
+        
     
     
     
