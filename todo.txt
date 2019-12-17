@@ -2,7 +2,9 @@ todo
 generate reports (pdf, md)
 diagnostic argument parser
 
+full documentation
 
+add procs parametr for each class
 Add programs
 Star
 Cufflinks

@@ -218,5 +218,10 @@ starOut=testDir+"/starout"
 
 star.performAlignment(sraOb)
 
+star2=mapping.Star(**starParams)
+starIndOut="/home/usingh/work/urmi/hoap/test/si2"
+inFasta="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa"
+sind=star2.buildStarIndex(starIndOut,inFasta,**{"--genomeSAindexNbases":"8","--outFileNamePrefix":testDir})
 
+print (sind)
 

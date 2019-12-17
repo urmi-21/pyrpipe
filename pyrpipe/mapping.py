@@ -266,28 +266,60 @@ class Star(Aligner):
             
     
     #STAR --runThreadN 8 --runMode genomeGenerate --genomeDir ./starIndex --genomeFastaFiles /home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa
-    def buildStarIndex(self,indexPath,indexName,*args,**kwargs):
-        """Build a star index with given parameters and saves the new index to self.hisat2Index.
+    def buildStarIndex(self,indexPath,*args,**kwargs):
+        """Build a star index with given parameters and saves the new index to self.starIndex.
         Parameters
         ----------
         arg1: string
             Path where the index will be created
-        arg2: string
-            A name for the index
-        arg3: tuple
+        
+        arg2: tuple
             Path to reference input files
-        arg4: dict
+        arg3: dict
             Parameters for the star command
         
         Returns
         -------
         bool:
-            Returns the status of star
+            Returns status of star command
         """
+        if len(args)<1:
+            printBoldRed("Please provide input fasta file to build STAR index")
+            return ""
         
-        #create output dir if doesn;t exist
-        pass
+        print("Building STAR index...")
         
+        #create path if doesnt exists
+        if not checkPathsExists(indexPath):
+            if not mkdir(indexPath):
+                raise Exception("Error creating STAR index. Exiting.")
+                return False
+        
+        #add runMode
+        newOpts={"--runMode":"genomeGenerate","--genomeDir":indexPath,"--genomeFastaFiles":" ".join(args)}
+        
+        mergedOpts={**kwargs,**newOpts}
+        
+        starbuild_Cmd=['STAR']
+        starbuild_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedOpts))
+        
+        #execute command
+        status=executeCommand(starbuild_Cmd)
+        
+        
+        if status:
+            print("Star build finished")
+            #check if sam file is present in the location directory of sraOb
+            if checkPathsExists(indexPath):
+                #update object's index
+                self.starIndex=indexPath
+                self.passedArgumentDict['--genomeDir']=self.starIndex
+                if self.checkstarIndex():
+                    return True
+        else:
+            return False
+        
+ 
             
     def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
@@ -326,11 +358,13 @@ class Star(Aligner):
         
         #call star
         status=self.runStar(**mergedOpts)
+                
         
         if status:
             print("Star finished")
             #check if sam file is present in the location directory of sraOb
             if checkPathsExists(outDir):
+                
                 return outDir
         else:
             return ""
