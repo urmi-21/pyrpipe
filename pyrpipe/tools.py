@@ -331,12 +331,46 @@ class Mikado(RNASeqTools):
     #--fasta /pylon5/mc5pl7p/usingh/lib/hisatIndex/ensembl_release98/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
     #--list smolGtfList
     
+    def searchGTFtolist(outFileName,searchPath=os.getcwd(),searchQuery="*.gtf",outDir=os.getcwd(),strand=False):
+        searchCmd=['find',searchPath,'-name',searchQuery]
+        st=getCommandReturnValue(searchCmd)
+        if st[0]==0:
+            output=st[1].decode("utf-8").split("\n")
+            
+        return createMikadoGTFlist(outFileName,*output,outDir=outDir,strand=strand)
+
+
+        
+    
+    def createMikadoGTFlist(outFileName,*args,outDir=os.getcwd(),strand=False):
+        """Create a file to be used by mikado configure
+        """
+        
+        outFilePath=os.path.join(outDir,outFileName+".yaml")
+        
+        
+        gtfs=[]
+        for l in args:
+            thisName=getFileBaseName(l)
+            if thisName:
+			    #print("\t".join([l,thisName,strand]))
+                gtfs.append("\t".join([l,thisName,strand]))
+        
+        f=open(outFilePath,"w")
+        f.write("\n".join(gtfs))
+        f.close()
+        
+        printGreen("Mikado list file written to:"+outFilePath)
+        return outFilePath
+                
+
+        
     def runMikadoFull(self):
         """Run whole mikado pipeline
         """
         pass
     
-    def runMikadoConfugire(self,listFile,genome,mode,scoring,junctions,outDir="",outFileName,**kwargs):
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outDir="",outFileName,**kwargs):
         """Wrapper to run mikado configure
         
         Parameters
@@ -524,7 +558,7 @@ class Ribocode(RNASeqTools):
         
         
         
-        
+
         
         
         
