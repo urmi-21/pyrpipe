@@ -258,7 +258,7 @@ class Cufflinks(Assembly):
         mergedOpts={**kwargs,**newOpts}
         
         #call cufflinks
-        status=self.runStringtie(**mergedOpts)
+        status=self.runCufflinks(**mergedOpts)
         
         if status:
             #move outDir/transcripts.gtf to outfile

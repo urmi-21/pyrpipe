@@ -226,5 +226,9 @@ sind=star2.buildStarIndex(starIndOut,inFasta,**{"--genomeSAindexNbases":"8","--o
 print (sind)
 
 #run cufflinks
+refGTF="/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/saccharomyces_cerevisiae_R64-2-1_20150113.gff"
 cl=assembly.Cufflinks()
+
+clout=cl.performAssembly(bam,**{"--num-threads":"28","--no-update-check":""})
+print(clout)
 
