@@ -153,6 +153,19 @@ All functions that interact with shell are defined here.
 """
     
 ##############Functions###########################
+
+def searchFilesLocally(searchPath,searchPattern):
+    """Find files and return as list
+    Use global paths for safety
+    """
+    
+    searchCmd=['find',searchPath,'-name',searchPattern]
+    st=runLinuxCommand(searchCmd)
+    output=[]
+    if st[0]==0:
+        output=st[1].decode("utf-8").split("\n")
+    return output
+    
     
 def runLinuxCommand(cmd):
     #not logging these commands
