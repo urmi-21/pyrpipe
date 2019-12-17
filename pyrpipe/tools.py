@@ -331,6 +331,50 @@ class Mikado(RNASeqTools):
     #--fasta /pylon5/mc5pl7p/usingh/lib/hisatIndex/ensembl_release98/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
     #--list smolGtfList
     
+    def runMikadoFull(self):
+        """Run whole mikado pipeline
+        """
+        pass
+    
+    def runMikadoConfugire(self,listFile,genome,mode,scoring,junctions,outDir="",outFileName,**kwargs):
+        """Wrapper to run mikado configure
+        
+        Parameters
+        ----------
+        
+        returns
+        -------
+        string
+            Path to the created configuration file
+        """
+        
+        #check all file exists
+        if not checkFilesExists(listFile,genome,junctions,scoring):
+            print("Please check mikado input")
+            return ""
+        
+        if not outDir:
+            outDir=os.getcwd()
+        outFilePath=os.path.join(outDir,outFileName+".yaml")
+        
+        newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--":(outFilePath,)}
+        
+        #merge with kwargs
+        mergedOpts={**kwargs,**newOpts}
+        
+        status=self.runMikado("configure",**mergedOpts)
+        
+        if not status:
+            print("Mikado configure failed for:"+gtfList)
+            return ""
+        
+        #check if bam file exists
+        if not checkFilesExists(outFilePath):
+            return ""
+        
+        return outFilePath
+        
+    
     def runMikadoPrepare(self,gtfList,referenceFasta,outDir="",**kwargs):
         """Wrapper to run mikado prepare
         """
@@ -350,7 +394,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("prepare",**mergedOpts)
         
         if not status:
-            print("Mikado prepare full failed for:"+gtfList)
+            print("Mikado prepare failed for:"+gtfList)
             return ""
         
         #check if bam file exists
@@ -379,7 +423,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("serialise",**mergedOpts)
         
         if not status:
-            print("Mikado serialise full failed for:"+transcriptsFasta)
+            print("Mikado serialise failed for:"+transcriptsFasta)
             return ""
         
         #check if bam file exists
@@ -407,7 +451,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("pick",**mergedOpts)
         
         if not status:
-            print("Mikado pick full failed for:"+inputGTF)
+            print("Mikado pick failed for:"+inputGTF)
             return ""
         
         #check if bam file exists

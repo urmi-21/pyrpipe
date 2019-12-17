@@ -168,6 +168,7 @@ def getCommandReturnStatus(cmd):
     return executeCommand(cmd,logs=False)
 
 #prints stdout in real time. optimal for huge stdout and no stderr
+#not used anymore
 def executeCommandRealtime(cmd):
     pl.logger.debug("Executing command:\n$ q"+" ".join(cmd)) 
     start_time = time.time()
