@@ -225,3 +225,6 @@ sind=star2.buildStarIndex(starIndOut,inFasta,**{"--genomeSAindexNbases":"8","--o
 
 print (sind)
 
+#run cufflinks
+cl=assembly.Cufflinks()
+

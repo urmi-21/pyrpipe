@@ -253,11 +253,21 @@ class Cufflinks(Assembly):
                 print("The file "+outGtfFile+" already exists. Exiting..")
                 return outGtfFile
             
-         #Add output file name and input bam
-        newOpts={"-o":outGtfFile,"--":(inputBAM,)}
+        #Add output file name and input bam
+        newOpts={"-o":outDir,"--":(inputBAM,)}
         mergedOpts={**kwargs,**newOpts}
         
+        #call cufflinks
+        status=self.runStringtie(**mergedOpts)
         
+        if status:
+            #move outDir/transcripts.gtf to outfile
+            moveFile(os.path.join(outDir,"transcripts.gtf"),outGtfFile)
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(outGtfFile):
+                return outGtfFile
+        else:
+            return ""
     
     
     
