@@ -291,6 +291,7 @@ class Star(Aligner):
             
     def performAlignment(self,sraOb,outSamSuffix="_star",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
+        All star output will be written to the sraOb directory by default.
         
         Parameters
         ----------
@@ -304,10 +305,37 @@ class Star(Aligner):
         Returns
         -------
         string:
-            path to the output file
+            path to the output dir
         """
+        outDir=sraOb.location
         
-        pass
+        #find layout and fq file paths
+        if sraOb.layout == 'PAIRED':
+            newOpts={"--readFilesIn":sraOb.localfastq1Path+" "+sraOb.localfastq2Path}
+        else:
+            newOpts={"--readFilesIn":sraOb.localfastqPath}
+        
+        #add out dir
+        newOpts["--outFileNamePrefix"]=outDir+"/"
+        
+        #add index
+        
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call star
+        status=self.runStar(**mergedOpts)
+        
+        if status:
+            print("Star finished")
+            #check if sam file is present in the location directory of sraOb
+            if checkPathsExists(outDir):
+                return outDir
+        else:
+            return ""
+        
+        
     
     def runStar(self,**kwargs):
         """Wrapper for running star.
@@ -337,6 +365,7 @@ class Star(Aligner):
         
         #execute command
         cmdStatus=executeCommand(star_Cmd)
+        
         if not cmdStatus:
             print("STAR failed:"+" ".join(star_Cmd))
      

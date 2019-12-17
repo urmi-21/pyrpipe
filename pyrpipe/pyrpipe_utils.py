@@ -253,7 +253,10 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
             popenArgs.append(key)
             #do not add emty parameters e.g. -q or -v
             if len(value)>0:
-                    popenArgs.append(value)
+                #if there are multiple values for a flag separated by space
+                popenArgs.extend(value.split(" "))
+                        
+                #popenArgs.append(value)
         elif key in specialArgList:
             appendAtEndArgs.extend(value)
         else:

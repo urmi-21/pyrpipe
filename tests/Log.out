@@ -1,0 +1,21 @@
+STAR version=2.7.3a
+STAR compilation time,server,dir=Tue Oct 8 14:26:19 EDT 2019 vega:/home/dobin/data/STAR/STARcode/STAR.master/source
+##### Command Line:
+STAR --genomeDir /home/usingh/work/urmi/hoap/test/yeaststarIndex
+##### Initial USER parameters from Command Line:
+###### All USER parameters from Command Line:
+genomeDir                     /home/usingh/work/urmi/hoap/test/yeaststarIndex     ~RE-DEFINED
+##### Finished reading parameters from all sources
+
+##### Final user re-defined parameters-----------------:
+genomeDir                         /home/usingh/work/urmi/hoap/test/yeaststarIndex
+
+-------------------------------
+##### Final effective command line:
+STAR   --genomeDir /home/usingh/work/urmi/hoap/test/yeaststarIndex
+----------------------------------------
+
+
+EXITING because of fatal input ERROR: could not open readFilesIn=Read1
+
+Dec 16 18:04:07 ...... FATAL ERROR, exiting

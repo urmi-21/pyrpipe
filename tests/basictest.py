@@ -208,7 +208,15 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
 #pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 #test star
-star=mapping.Star()
+starParams={"--outFilterType":"BySJout",
+            "--runThreadN":"8",
+            "--outSAMtype": "BAM SortedByCoordinate"
+            }
+star=mapping.Star(starIndex="/home/usingh/work/urmi/hoap/test/yeaststarIndex",**starParams)
+
+starOut=testDir+"/starout"
+
+star.performAlignment(sraOb,)
 
 
 
