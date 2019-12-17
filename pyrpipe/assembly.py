@@ -269,6 +269,39 @@ class Cufflinks(Assembly):
         else:
             return ""
     
+    def runCuff(self,command,**kwargs):
+        """Wrapper for running cuff* commands
+        
+        Parameters
+        ----------
+        command: string
+            the command name
+        arg2: dict
+            Options passed to cuff command
+        
+        Returns
+        -------
+        bool
+            return status of the command.
+        """
+        validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
+        if command in validCommands:
+            #override existing arguments
+            mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+            cuff_Cmd=[command]
+            #add options
+            cuff_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+                  
+            #start ececution
+            status=executeCommand(cuff_Cmd)
+            if not status:
+                printBoldRed("cufflinks failed")
+                #return status
+            return status
+        else:
+            printBoldRed("Unknown command {}"+command)
+            return False
     
     
     def runCufflinks(self,**kwargs):
