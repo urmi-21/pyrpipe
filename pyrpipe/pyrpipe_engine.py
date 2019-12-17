@@ -156,6 +156,8 @@ All functions that interact with shell are defined here.
     
 def runLinuxCommand(cmd):
     #not logging these commands
+    logMessage=" ".join(cmd)
+    printBlue("$ "+logMessage)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()

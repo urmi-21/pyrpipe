@@ -208,6 +208,7 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
 #pyrpipe_session.savePyrpipeWorkspace(filename="sess",outDir=testDir)
 
 #test star
+"""
 starParams={"--outFilterType":"BySJout",
             "--runThreadN":"8",
             "--outSAMtype": "BAM SortedByCoordinate"
@@ -231,10 +232,15 @@ cl=assembly.Cufflinks()
 
 clout=cl.performAssembly(bam,**{"--num-threads":"28","--no-update-check":""})
 print(clout)
-
+"""
 #runribocode
 #rbc=tools.Ribocode()
 #rbc.runRibocode()
 
+#test mikado
+mk=tools.Mikado()
+#find and save gtf list
+mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
+#run configure
 
 
