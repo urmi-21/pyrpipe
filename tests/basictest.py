@@ -216,7 +216,7 @@ star=mapping.Star(starIndex="/home/usingh/work/urmi/hoap/test/yeaststarIndex",**
 
 starOut=testDir+"/starout"
 
-star.performAlignment(sraOb,)
+star.performAlignment(sraOb)
 
 
 
