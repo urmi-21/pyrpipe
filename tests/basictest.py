@@ -264,7 +264,6 @@ bt=mikadoDir+"/uniprot_sprot_plants.fasta"
 orfs=mikadoDir+"/mikado_prepared.fasta.transdecoder.bed"
 xml=mikadoDir+"/mikado.blast.xml.gz"
 mk.runMikadoSerialise(config,blastTargets=bt,orfs= orfs, xml=xml)
-
 mk.runMikadoPick(config)
 #bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
 #bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",

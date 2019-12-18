@@ -563,8 +563,7 @@ class Ribocode(RNASeqTools):
         
 
         
-        
-        
+       
         
         
         
