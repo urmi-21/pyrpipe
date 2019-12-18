@@ -246,16 +246,19 @@ mk=tools.Mikado()
 #find and save gtf list
 #mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
 
-mikadoDir="/home/usingh/work/urmi/hoap/test/sample_data"
+mikadoDir="/home/usingh/work/urmi/hoap/test/mikadoTutorial"
 junc=mikadoDir+"/junctions.bed"
 ref=mikadoDir+"/chr5.fas"
 #Make sure the paths in list file are global.
 mklist=mikadoDir+"/list.txt"
 scoring=mikadoDir+"/plants.yaml"
-config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig",outDir=mikadoDir+"/pyr")
+config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig")
 print(config)
 
+#run mikado
+mk.runMikadoPrepare(config,outDir="/home/usingh/work/urmi/hoap/test/sample_data/mikadoPrepOut")
 
+mk.runMikadoSerialise(config,mikadoDir+"/mikadoPrepOut/mikado_prepared.fasta"+"",junc,mikadoDir+"/uniprot_sprot_plants.fasta",mikadoDir+"/mikado.bed",mikadoDir+"/mikado.blast.xml.gz",outDir=mikadoDir+"/serOut")
 
 
 #bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")

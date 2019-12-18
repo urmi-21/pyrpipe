@@ -412,18 +412,18 @@ class Mikado(RNASeqTools):
         return outFilePath
         
     
-    def runMikadoPrepare(self,gtfList,referenceFasta,outDir="",**kwargs):
+    def runMikadoPrepare(self,jsonconf, outDir="",**kwargs):
         """Wrapper to run mikado prepare
         """
         
         #check input files exist
-        if not checkFilesExists(gtfList,referenceFasta):
-            print("Please check the input to mikado.")
+        if not checkFilesExists(jsonconf):
+            print("Please check the input configuration to mikado.")
             return ""
         if not outDir:
             outDir=os.getcwd()
 
-        newOpts={"--fasta":referenceFasta,"--list":gtfList,"--output-dir":outDir}
+        newOpts={"--output-dir":outDir,"--json-conf":jsonconf}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -431,7 +431,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("prepare",**mergedOpts)
         
         if not status:
-            print("Mikado prepare failed for:"+gtfList)
+            print("Mikado prepare failed for:"+jsonconf)
             return ""
         
         #check if bam file exists
@@ -442,17 +442,17 @@ class Mikado(RNASeqTools):
         
         
         
-    def runMikadoSerialise(self,transcriptsFasta,junctions,blastTargets,orfs,xml,outDir="",**kwargs):
+    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,outDir="",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
-        if not checkFilesExists(junctions,blastTargets,orfs,xml):
+        if not checkFilesExists(blastTargets,orfs,xml):
             print("Please check the input to mikado.")
             return ""
         if not outDir:
             outDir=os.getcwd()
         
-        newOpts={"--transcripts":transcriptsFasta,"--junctions":junctions,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":outDir}
+        newOpts={"--json-conf":jsonconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":outDir}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -460,7 +460,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("serialise",**mergedOpts)
         
         if not status:
-            print("Mikado serialise failed for:"+transcriptsFasta)
+            print("Mikado serialise failed for:"+jsonconf)
             return ""
         
         #check if bam file exists
@@ -470,7 +470,7 @@ class Mikado(RNASeqTools):
         return outDir
         
         
-    def runMikadoPick(self,inputGTF,referenceFasta,scoringFile,outDir="",**kwargs):
+    def runMikadoPick(self,jsonconf,outDir="",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
@@ -480,7 +480,7 @@ class Mikado(RNASeqTools):
         if not outDir:
             outDir=os.getcwd()
         
-        newOpts={"--":(inputGTF,),"--fasta":junctions,"--scoring-file":scoringFile,"--output-dir":outDir}
+        newOpts={"--json-conf":jsonconf}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -488,7 +488,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("pick",**mergedOpts)
         
         if not status:
-            print("Mikado pick failed for:"+inputGTF)
+            print("Mikado pick failed for:"+jsonconf)
             return ""
         
         #check if bam file exists
