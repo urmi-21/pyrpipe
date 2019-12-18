@@ -474,7 +474,7 @@ class Mikado(RNASeqTools):
         """Wrapper to run mikado pick
         """
         #check input files exist
-        if not checkFilesExists(referenceFasta,scoringFile):
+        if not checkFilesExists(jsonconf):
             print("Please check the input to mikado.")
             return ""
         if not outDir:

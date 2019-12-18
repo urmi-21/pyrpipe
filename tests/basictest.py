@@ -252,15 +252,20 @@ ref=mikadoDir+"/chr5.fas"
 #Make sure the paths in list file are global.
 mklist=mikadoDir+"/list.txt"
 scoring=mikadoDir+"/plants.yaml"
+
 config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig")
 print(config)
 
 #run mikado
-mk.runMikadoPrepare(config,outDir="/home/usingh/work/urmi/hoap/test/sample_data/mikadoPrepOut")
-
-mk.runMikadoSerialise(config,mikadoDir+"/mikadoPrepOut/mikado_prepared.fasta"+"",junc,mikadoDir+"/uniprot_sprot_plants.fasta",mikadoDir+"/mikado.bed",mikadoDir+"/mikado.blast.xml.gz",outDir=mikadoDir+"/serOut")
+mk.runMikadoPrepare(config)
 
 
+bt=mikadoDir+"/uniprot_sprot_plants.fasta"
+orfs=mikadoDir+"/mikado_prepared.fasta.transdecoder.bed"
+xml=mikadoDir+"/mikado.blast.xml.gz"
+mk.runMikadoSerialise(config,blastTargets=bt,orfs= orfs, xml=xml)
+
+mk.runMikadoPick(config)
 #bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
 #bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
          #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
