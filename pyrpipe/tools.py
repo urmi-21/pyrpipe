@@ -370,9 +370,9 @@ class Mikado(RNASeqTools):
         """
         pass
     
-    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outFileName,outDir="",**kwargs):
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outFileName,outDir=os.getcwd(),**kwargs):
         """Wrapper to run mikado configure
-        
+        Make sure the paths in list file are global.
         Parameters
         ----------
         
@@ -387,8 +387,11 @@ class Mikado(RNASeqTools):
             print("Please check mikado input")
             return ""
         
-        if not outDir:
-            outDir=os.getcwd()
+        #create out dir
+        if not checkPathsExists(outDir):
+            if not mkdir(outDir):
+                raise Exception("Exception in mikado configure.")
+            
         outFilePath=os.path.join(outDir,outFileName+".yaml")
         
         newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--":(outFilePath,)}
@@ -399,7 +402,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("configure",**mergedOpts)
         
         if not status:
-            print("Mikado configure failed for:"+gtfList)
+            printBoldRed("Mikado configure failed.\nPlease make sure the paths in list file are global.")
             return ""
         
         #check if bam file exists
@@ -509,7 +512,7 @@ class Mikado(RNASeqTools):
         #print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
-        status=executeCommand(mergedArgsDict)
+        status=executeCommand(mikado_Cmd)
         if not status:
             printBoldRed("mikado failed")
         #return status

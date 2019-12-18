@@ -237,6 +237,7 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
                 printBoldRed("STDERR:\n"+stderr)
         if not quiet:
             printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+            
                 
         exitCode=result.returncode
         

@@ -240,7 +240,7 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
     
     #empty list supplied consider all armunets valid
     if len(validArgsList)<1:
-        validArgsList=passedArgs.keys()
+        validArgsList=list(passedArgs.keys())
         #above command will also add specialArgs, remove those
         for x in specialArgList:
             if x in validArgsList:

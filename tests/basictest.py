@@ -244,21 +244,33 @@ print(clout)
 atRef="/home/usingh/work/urmi/hoap/test/athalData/ref/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa"
 mk=tools.Mikado()
 #find and save gtf list
-mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
+#mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
+
+mikadoDir="/home/usingh/work/urmi/hoap/test/sample_data"
+junc=mikadoDir+"/junctions.bed"
+ref=mikadoDir+"/chr5.fas"
+#Make sure the paths in list file are global.
+mklist=mikadoDir+"/list.txt"
+scoring=mikadoDir+"/plants.yaml"
+config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig",outDir=mikadoDir+"/pyr")
+print(config)
+
+
+
 
 #bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
-bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
-         "/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
-         "/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
-         ]
+#bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
+         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
+         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
+         #]
 
-mergedBam=samOb.mergeBamFiles(*bamList,outPath="/home/usingh/work/urmi/hoap/test/athalData/sraData/",outFileName="atMerged",*{"-f":""})
+#mergedBam=samOb.mergeBamFiles(*bamList,outPath="/home/usingh/work/urmi/hoap/test/athalData/sraData/",outFileName="atMerged",*{"-f":""})
 #run portculis
-pob=tools.Portcullis()
-portOut=pob.runPortcullisFull(atRef,mergedBam,outDir=testDir+"/home/usingh/work/urmi/hoap/test/athalData/sraData/portOut")
+#pob=tools.Portcullis()
+#portOut=pob.runPortcullisFull(atRef,mergedBam,outDir=testDir+"/home/usingh/work/urmi/hoap/test/athalData/sraData/portOut")
 
 #run configure
 
 #atJunc=""
-#mk.runMikadoConfigure(mklist,atref,"permissive","plants.yaml",atJunc,"atConfig",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
+#
 
