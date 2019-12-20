@@ -435,7 +435,7 @@ def benchmark():
     outFile+='.'+args.e
     pu.printGreen("TODO")
     
-def benchmark():
+def multiqc():
     print("Generating html report with multiqc")
     parser = argparse.ArgumentParser(
    
