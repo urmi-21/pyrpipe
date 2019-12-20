@@ -199,16 +199,23 @@ def executeCommandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def executeCommand(cmd,verbose=False,quiet=False,logs=True):
+def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
     
     Parameters
     ----------
     cmd: list
-        command to execute in a list
-    verbose
+        command to execute via popen in a list
+    verbose: bool
         whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
+    quiet: bool
+        Absolutely no output on screen
+    logs: bool
+        Log the execution to file
+    objectID: string
+        An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
+        
     """
     logMessage=" ".join(cmd)
     if not quiet:
@@ -270,7 +277,8 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':stdout,
-                 'stderr':stderr                 
+                 'stderr':stderr,
+                 'objectid':objectId
                 }
             pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
             

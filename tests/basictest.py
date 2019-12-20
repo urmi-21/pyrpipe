@@ -239,7 +239,7 @@ print(clout)
 
 
 
-
+"""
 #test mikado
 atRef="/home/usingh/work/urmi/hoap/test/athalData/ref/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa"
 mk=tools.Mikado()
@@ -257,6 +257,7 @@ config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig")
 print(config)
 
 #run mikado
+
 mk.runMikadoPrepare(config)
 
 
@@ -270,7 +271,7 @@ mk.runMikadoPick(config)
          #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
          #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
          #]
-
+"""
 #mergedBam=samOb.mergeBamFiles(*bamList,outPath="/home/usingh/work/urmi/hoap/test/athalData/sraData/",outFileName="atMerged",*{"-f":""})
 #run portculis
 #pob=tools.Portcullis()
