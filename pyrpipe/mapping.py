@@ -418,7 +418,7 @@ class Star(Aligner):
 
 class Bowtie2(Aligner):
     def __init__(self,bowtie2Index,**kwargs):
-        """Bowtie2 constructor. Initialize star's index and other parameters.
+        """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
         
         super().__init__() 
@@ -540,4 +540,51 @@ class Bowtie2(Aligner):
         else:
             return False
 
-    
+#TODO
+class Kallisto(Aligner):
+    """Kallisto constructor. Initialize kallisto parameters.
+        """       
+        
+        super().__init__() 
+        self.programName="kallisto"
+        self.depList=[self.programName]        
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        self.validArgsList=[]
+        
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #if index is passed, update the passed arguments
+        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
+            print("Bowtie2 index is: "+bowtie2Index)
+            self.bowtie2Index=bowtie2Index
+            self.passedArgumentDict['-x']=self.bowtie2Index
+        else:
+            print("No Bowtie2 index provided. Please build index now to generate an index...")
+            
+            
+            
+class Salmon(Aligner):
+    """Salmon constructor. Initialize kallisto parameters.
+        """       
+        
+        super().__init__() 
+        self.programName="salmon"
+        self.depList=[self.programName]        
+        if not checkDep(self.depList):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        self.validArgsList=[]
+        
+        #initialize the passed arguments
+        self.passedArgumentDict=kwargs
+        
+        #if index is passed, update the passed arguments
+        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
+            print("Bowtie2 index is: "+bowtie2Index)
+            self.bowtie2Index=bowtie2Index
+            self.passedArgumentDict['-x']=self.bowtie2Index
+        else:
+            print("No Bowtie2 index provided. Please build index now to generate an index...")
