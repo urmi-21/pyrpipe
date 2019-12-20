@@ -15,6 +15,7 @@ from jinja2 import Environment, BaseLoader
 from weasyprint import HTML,CSS
 from html import escape
 import datetime as dt
+import multiqc as mc
 
 
 try:
@@ -303,6 +304,31 @@ def getCommandsFromLog(inFile,filterList,coverage):
             
     return commands
 
+def getStdoutFromLog(inFile,filterList,coverage):
+    with open(inFile) as f:
+        data=f.read().splitlines()
+    stdout=[]
+    for l in data:
+        if not l.startswith("#"):
+            thisLog=json.loads(l)
+            #filter program
+            thisName=thisLog["stdout"].split(' ')[0]
+            if filterList and thisName in filterList:
+                continue
+            status=int(thisLog['exitcode'])
+            #skip passed
+            if coverage=='i' and status==0:
+                continue
+            #skip failed
+            if coverage=='p' and status!=0:
+                continue
+            
+            stdout.append(thisLog["stdout"])
+            
+    return stdout
+
+
+
 def generateBashScript(logFile,outFile,filterList,coverage='a'):
     commands=getCommandsFromLog(logFile,filterList,coverage)
     if not outFile.endswith(".sh"):
@@ -326,6 +352,22 @@ def checkEnvLog(logFile):
         sys.exit(1)
     return envLog
 
+def generateMultiqcReport(logFile,filterList,tempDir,outFile="",coverage='a',verbose=False):
+    #dump stdout from logs to temp directory
+    stdout=getStdoutFromLog(logFile,filterList,coverage)
+    i=0
+    for o in stdout:
+        thisName="tmp"+str(i)
+        i+=1
+        tempFile=os.path.join(tempDir,thisName)
+        print("opening:"+tempFile)
+        f=open(tempFile,"w")
+        f.write(o)
+        print(o)
+        f.close()
+    
+    #run multiqc
+    mc.run(tempDir)
 
 def report():
     
@@ -370,11 +412,11 @@ def report():
     
     
     
-def bash():
+def shell():
     print("Generating bash script")
     parser = argparse.ArgumentParser(
    
-            description='pyrpipe diagnostic utility\nGenerate bash script.',
+            description='pyrpipe diagnostic utility\nGenerate shell script.',
             
             usage='''pyrpipe_diagnostic report [<args>] <logfile>
                     
@@ -445,6 +487,7 @@ def multiqc():
                     
                     ''')    
     parser.add_argument('-o', help='out file \ndefault: <logfile_multiqc.html>',action="store")
+    parser.add_argument('-c',help='Dump command options [(a)ll,fa(i)l,(p)ass]\ndefault: a',default='a',action="store")
     parser.add_argument('-v',help='verbose',action="store_true")
     parser.add_argument('-f',help='Filter by programs. Provide a comma-separated list e.g., prefetch,STAR,bowtie2 \ndefault None')
     parser.add_argument('-t',help='Temporary directory. \ndefault ./tmp',action="store")
@@ -452,7 +495,7 @@ def multiqc():
     args = parser.parse_args(sys.argv[2:])
     
     logFile=args.logfile
-    envLog=checkEnvLog(logFile)    
+    
     #parse args
     vFlag=args.v
     if vFlag:
@@ -462,13 +505,31 @@ def multiqc():
         outFile=pu.getFileBaseName(args.logfile)
     else:
         outFile=args.o
-    outFile+='.'+args.e
-    pu.printGreen("TODO")
+    outFile+='.html'
+    
+    filters=[]
+    if args.f is not None:
+        filters= args.f.split(',')
+    
+    #create temp dir
+    tempDir=""
+    if args.t is not None:
+        tempDir= args.t
+    else:
+        tempDir=os.path.join(os.getcwd(),"tmp")
+    #create tmp dir
+    if not pu.checkPathsExists(tempDir):
+        pu.mkdir(tempDir)
+        
+    
     #run multiqc
+    
+    
+    generateMultiqcReport(logFile,filters,tempDir,outFile=outFile,coverage=args.c,verbose=args.v)
 
 
 ##Start parsing
-subcommands=['report','bash','benchmark','multiqc','all']
+subcommands=['report','shell','benchmark','multiqc','all']
 parser = argparse.ArgumentParser(
             
             description='pyrpipe diagnostic utility',
@@ -493,8 +554,8 @@ if args.command not in subcommands:
 
 if args.command == 'report':
     report()
-elif args.command == 'bash':
-    bash()
+elif args.command == 'shell':
+    shell()
 elif args.command == 'benchmark':
     benchmark()
 elif args.command == 'multiqc':
