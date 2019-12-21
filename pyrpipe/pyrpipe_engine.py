@@ -264,16 +264,15 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command
             pyrpipeLoggerObject.stderrLogger.debug(stderr)
             """
             ##get the program used and log its path
-            thisProgram=cmd[0]
-            if thisProgram not in pyrpipeLoggerObject.loggedPrograms:
+            if command_name not in pyrpipeLoggerObject.loggedPrograms:
                 ##get which thisProgram
                 #pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
-                progDesc={'name':thisProgram,
-                          'version':getProgramVersion(thisProgram).strip(),
-                          'path':getProgramPath(thisProgram).strip()
+                progDesc={'name':command_name,
+                          'version':getProgramVersion(command_name).strip(),
+                          'path':getProgramPath(command_name).strip()
                           }
                 pyrpipeLoggerObject.envLogger.debug(json.dumps(progDesc))
-                pyrpipeLoggerObject.loggedPrograms.append(thisProgram)
+                pyrpipeLoggerObject.loggedPrograms.append(command_name)
             
             #create a dict
             logDict={'cmd':logMessage,
