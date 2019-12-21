@@ -91,7 +91,7 @@ class Stringtie(Assembly):
         else:
             return ""
         
-    def performStringtieMerge(self,*args,outFileSuffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def performStringtieMerge(self,*args,outFileSuffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
         Parameters
         ----------
@@ -126,7 +126,7 @@ class Stringtie(Assembly):
         mergedOpts={**kwargs,**newOpts}
         
         #call stringtie
-        status=self.runStringtie(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
+        status=self.runStringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -139,7 +139,7 @@ class Stringtie(Assembly):
         
             
     
-    def runStringtie(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runStringtie(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running stringtie
         
         Parameters
@@ -162,7 +162,7 @@ class Stringtie(Assembly):
         
                 
         #start ececution
-        status=executeCommand(stie_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        status=executeCommand(stie_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
             printBoldRed("stringtie failed")
         
@@ -269,7 +269,7 @@ class Cufflinks(Assembly):
         else:
             return ""
     
-    def runCuffCommand(self,command,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runCuffCommand(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cuff* commands
         
         Parameters
@@ -294,7 +294,7 @@ class Cufflinks(Assembly):
             cuff_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
                   
             #start ececution
-            status=executeCommand(cuff_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+            status=executeCommand(cuff_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
             if not status:
                 printBoldRed("cufflinks failed")
                 #return status
@@ -304,7 +304,7 @@ class Cufflinks(Assembly):
             return False
     
     
-    def runCufflinks(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runCufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cufflinks
         
         Parameters
@@ -327,7 +327,7 @@ class Cufflinks(Assembly):
         
         
         #start ececution
-        status=executeCommand(cufflinks_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        status=executeCommand(cufflinks_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
             printBoldRed("cufflinks failed")
         #return status

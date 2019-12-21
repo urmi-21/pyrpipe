@@ -177,21 +177,21 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 
 bamList=[]
 sraObList=[]
-for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
+for s in ['SRR5507495','SRR5507442','SRR5507362']:
     sraOb=sra.SRA(s,testDir)
     #download sra
     sraOb.downloadSRAFile()
     #run fastqdump;delete sra when done
     sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
     sraObList.append(sraOb)
-    sam=hs.performAlignment(sraOb,objectId=s,**{"--dta-cufflinks":"","-p":"8"})
+    sam=hs.performAlignment(sraOb,objectid=s,**{"--dta-cufflinks":"","-p":"8"})
     #get sorted bam
-    bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True,objectId=s)
+    bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True,objectid=s)
     bamList.append(bam)
 
 
 #bam merge
-mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",objectId="ALL", *{"-f":""})
+mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",objectid="ALL", *{"-f":""})
 
 #using pysam
 #import pysam

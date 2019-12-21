@@ -106,7 +106,7 @@ class SRA:
         prefetch_Cmd.extend(['-O',self.location])
         prefetch_Cmd.append(self.srrAccession)
                 
-        cmdStatus=executeCommand(prefetch_Cmd,objectId=self.srrAccession)
+        cmdStatus=executeCommand(prefetch_Cmd,objectid=self.srrAccession)
         if not cmdStatus:
             printBoldRed("prefetch failed for:"+self.srrAccession)
             return False
@@ -224,7 +224,7 @@ class SRA:
         fstrqd_Cmd.append(self.localSRAFilePath)
         
         #execute command
-        cmdStatus=executeCommand(fstrqd_Cmd,objectId=self.srrAccession)
+        cmdStatus=executeCommand(fstrqd_Cmd,objectid=self.srrAccession)
         if not cmdStatus:
             print("prefetch failed for:"+self.srrAccession)
             return False

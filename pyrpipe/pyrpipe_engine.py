@@ -199,7 +199,7 @@ def executeCommandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
+def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
     
@@ -213,10 +213,14 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
         Absolutely no output on screen
     logs: bool
         Log the execution to file
-    objectID: string
+    objectid: string
         An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
+    command_name: string
+        Name of command to be save in log. If empty it is determined as the first element of the cmd list.
         
     """
+    if not command_name:
+        command_name=cmd[0]
     logMessage=" ".join(cmd)
     if not quiet:
         printBlue("$ "+logMessage)
@@ -278,7 +282,8 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
                  'starttime':str(strStartTime),
                  'stdout':stdout,
                  'stderr':stderr,
-                 'objectid':objectId
+                 'objectid':objectid,
+                 'commandname':command_name
                 }
             pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
             
@@ -297,7 +302,9 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':"OSError exception occured.\n"+str(e)                 
+                 'stderr':"OSError exception occured.\n"+str(e),
+                 'objectid':objectid,
+                 'commandname':command_name                 
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
@@ -310,7 +317,9 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':"CalledProcessError exception occured.\n"+str(e)                 
+                 'stderr':"CalledProcessError exception occured.\n"+str(e),
+                 'objectid':objectid,
+                 'commandname':command_name                 
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
@@ -323,7 +332,9 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectId="NA"):
                  'runtime':str(dt.timedelta(seconds=timeDiff)),
                  'starttime':str(strStartTime),
                  'stdout':"",
-                 'stderr':str("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
+                 'stderr':str("Fatal error occured during execution.\n"+str(sys.exc_info()[0])),
+                 'objectid':objectid,
+                 'commandname':command_name
                 }
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False

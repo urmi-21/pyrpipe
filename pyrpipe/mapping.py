@@ -66,7 +66,7 @@ class Hisat2(Aligner):
         
         
             
-    def buildHisat2Index(self,indexPath,indexName,*args,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def buildHisat2Index(self,indexPath,indexName,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
         Parameters
         ----------
@@ -112,7 +112,7 @@ class Hisat2(Aligner):
         #print("Executing:"+str(" ".join(hisat2Build_Cmd)))
         
         #start ececution
-        status=executeCommand(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        status=executeCommand(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
             printBoldRed("hisatBuild failed")
             return False
@@ -130,7 +130,7 @@ class Hisat2(Aligner):
         return True
         
         
-    def performAlignment(self,sraOb,outSamSuffix="_hisat2",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def performAlignment(self,sraOb,outSamSuffix="_hisat2",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
         
         Parameters
@@ -167,7 +167,7 @@ class Hisat2(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call runHisat2
-        status=self.runHisat2(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
+        status=self.runHisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -177,7 +177,7 @@ class Hisat2(Aligner):
             return ""
             
         
-    def runHisat2(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runHisat2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running hisat2.
         Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
         All output will be written to SRA.location by default.
@@ -205,7 +205,7 @@ class Hisat2(Aligner):
         hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
         #execute command
-        cmdStatus=executeCommand(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        cmdStatus=executeCommand(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not cmdStatus:
             print("hisat2 failed:"+" ".join(hisat2_Cmd))
      
@@ -266,7 +266,7 @@ class Star(Aligner):
             
     
     #STAR --runThreadN 8 --runMode genomeGenerate --genomeDir ./starIndex --genomeFastaFiles /home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa
-    def buildStarIndex(self,indexPath,*args,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def buildStarIndex(self,indexPath,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a star index with given parameters and saves the new index to self.starIndex.
         Parameters
         ----------
@@ -304,7 +304,7 @@ class Star(Aligner):
         starbuild_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedOpts))
         
         #execute command
-        status=executeCommand(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        status=executeCommand(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
         
         if status:
@@ -321,7 +321,7 @@ class Star(Aligner):
         
  
             
-    def performAlignment(self,sraOb,outSamSuffix="_star",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def performAlignment(self,sraOb,outSamSuffix="_star",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
         All star output will be written to the sraOb directory by default.
         
@@ -357,7 +357,7 @@ class Star(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call star
-        status=self.runStar(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
+        status=self.runStar(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
                 
         
         if status:
@@ -371,7 +371,7 @@ class Star(Aligner):
         
         
     
-    def runStar(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runStar(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running star.
         The self.starIndex index used.
         
@@ -398,7 +398,7 @@ class Star(Aligner):
         star_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
         
         #execute command
-        cmdStatus=executeCommand(star_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        cmdStatus=executeCommand(star_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
         if not cmdStatus:
             print("STAR failed:"+" ".join(star_Cmd))
@@ -455,7 +455,7 @@ class Bowtie2(Aligner):
         
     
     
-    def performAlignment(self,sraOb,outSamSuffix="_bt2",overwrite=True,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def performAlignment(self,sraOb,outSamSuffix="_bt2",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using self object and the provided sraOb.
         
         Parameters
@@ -490,7 +490,7 @@ class Bowtie2(Aligner):
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
+        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -502,7 +502,7 @@ class Bowtie2(Aligner):
         
         
     
-    def runBowTie2(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
+    def runBowTie2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running bowtie2.
         
         ----------
@@ -528,7 +528,7 @@ class Bowtie2(Aligner):
         #print("Executing:"+" ".join(bowtie2_Cmd))
         
         #start ececution
-        status=executeCommand(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
+        status=executeCommand(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
             printBoldRed("bowtie2 failed")
         return status
