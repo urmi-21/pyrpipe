@@ -29,7 +29,7 @@ class Samtools(RNASeqTools):
         
         
         
-    def samToBam(self,samFile,outFileSuffix="",deleteSam=False,**kwargs):
+    def samToBam(self,samFile,outFileSuffix="",deleteSam=False,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Convert sam file to a bam file. 
         Output bam file will have same name as input sam.
         
@@ -47,7 +47,7 @@ class Samtools(RNASeqTools):
         newOpts={"--":(samFile,),"-o":outBamFile,"-b":""}
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("view",**mergedOpts)
+        status=self.runSamtools("view",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
                 
         if not status:
             print("Sam to bam failed for:"+samFile)
@@ -69,7 +69,7 @@ class Samtools(RNASeqTools):
         
         
     #sort bam file.output will be bamFile_sorted.bam
-    def sortBam(self,bamFile,outFileSuffix="",deleteOriginalBam=False,**kwargs):
+    def sortBam(self,bamFile,outFileSuffix="",deleteOriginalBam=False,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         
         Returns
@@ -87,7 +87,7 @@ class Samtools(RNASeqTools):
         newOpts={"--":(bamFile,),"-o":outSortedBamFile}
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("sort",**mergedOpts)
+        status=self.runSamtools("sort",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("Bam sort failed for:"+bamFile)
@@ -127,7 +127,7 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def mergeBamFiles(self,*args,outFileName="merged",outPath="",deleteOriginalBamFiles=False,**kwargs):
+    def mergeBamFiles(self,*args,outFileName="merged",outPath="",deleteOriginalBamFiles=False,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Merge multiple bam files into a single file
         
         Parameters
@@ -160,7 +160,7 @@ class Samtools(RNASeqTools):
         
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("merge",**mergedOpts)
+        status=self.runSamtools("merge",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("Bam merge failed for:"+outMergedFile)
@@ -180,7 +180,7 @@ class Samtools(RNASeqTools):
         
         
         
-    def runSamtools(self,subCommand,**kwargs):
+    def runSamtools(self,subCommand,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """A wrapper to run samtools.
         
         Parameters
@@ -204,7 +204,7 @@ class Samtools(RNASeqTools):
         samtools_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
                 
         #start ececution
-        status=executeCommand(samtools_Cmd)
+        status=executeCommand(samtools_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("samtools failed")
         
@@ -232,7 +232,7 @@ class Portcullis(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
-    def runPortcullisFull(self,referenceFasta,bamFile,outDir="",deleteOriginalBamFile=False,**kwargs):
+    def runPortcullisFull(self,referenceFasta,bamFile,outDir="",deleteOriginalBamFile=False,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """
         run portculis full
         
@@ -259,7 +259,7 @@ class Portcullis(RNASeqTools):
                   
         mergedOpts={**mergedOpts,**{"-o":outDir}}
         
-        status=self.runPortcullis("full",**mergedOpts)
+        status=self.runPortcullis("full",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("portcullis full failed for:"+bamFile)
@@ -275,7 +275,7 @@ class Portcullis(RNASeqTools):
         
         return outDir
     
-    def runPortcullis(self,subCommand,**kwargs):
+    def runPortcullis(self,subCommand,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """
         Wrapper to run portcullis.
         
@@ -304,7 +304,7 @@ class Portcullis(RNASeqTools):
         
         
         #start ececution
-        status=executeCommand(portcullis_Cmd)
+        status=executeCommand(portcullis_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("portcullis failed")
                 
@@ -370,7 +370,7 @@ class Mikado(RNASeqTools):
         """
         pass
     
-    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outFileName,outDir=os.getcwd(),**kwargs):
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outFileName,outDir=os.getcwd(),verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run mikado configure
         Make sure the paths in list file are global.
         Parameters
@@ -399,7 +399,7 @@ class Mikado(RNASeqTools):
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runMikado("configure",**mergedOpts)
+        status=self.runMikado("configure",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             printBoldRed("Mikado configure failed.\nPlease make sure the paths in list file are global.")
@@ -412,7 +412,7 @@ class Mikado(RNASeqTools):
         return outFilePath
         
     
-    def runMikadoPrepare(self,jsonconf, outDir="",**kwargs):
+    def runMikadoPrepare(self,jsonconf, outDir="",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run mikado prepare
         """
         
@@ -428,7 +428,7 @@ class Mikado(RNASeqTools):
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runMikado("prepare",**mergedOpts)
+        status=self.runMikado("prepare",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("Mikado prepare failed for:"+jsonconf)
@@ -442,7 +442,7 @@ class Mikado(RNASeqTools):
         
         
         
-    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,outDir="",**kwargs):
+    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,outDir="",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
@@ -457,7 +457,7 @@ class Mikado(RNASeqTools):
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runMikado("serialise",**mergedOpts)
+        status=self.runMikado("serialise",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("Mikado serialise failed for:"+jsonconf)
@@ -470,7 +470,7 @@ class Mikado(RNASeqTools):
         return outDir
         
         
-    def runMikadoPick(self,jsonconf,outDir="",**kwargs):
+    def runMikadoPick(self,jsonconf,outDir="",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
@@ -485,7 +485,7 @@ class Mikado(RNASeqTools):
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runMikado("pick",**mergedOpts)
+        status=self.runMikado("pick",verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
         
         if not status:
             print("Mikado pick failed for:"+jsonconf)
@@ -498,7 +498,7 @@ class Mikado(RNASeqTools):
         return outDir
         
         
-    def runMikado(self,subCommand,**kwargs):
+    def runMikado(self,subCommand,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run mikado
         """
         
@@ -512,7 +512,7 @@ class Mikado(RNASeqTools):
         #print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
-        status=executeCommand(mikado_Cmd)
+        status=executeCommand(mikado_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("mikado failed")
         #return status
@@ -535,7 +535,7 @@ class Ribocode(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
-    def runRibocode(self,gtf,genome,bam,l="no",outsuffix="ribocode_out"):
+    def runRibocode(self,gtf,genome,bam,l="no",outsuffix="ribocode_out",verbose=False,quiet=False,logs=True,objectId="NA"):
         """Wrapper to run ribocode in one step
         """
         
@@ -552,7 +552,7 @@ class Ribocode(RNASeqTools):
         ribocode_Cmd=['RiboCode_onestep']
         ribocode_Cmd.extend(parseUnixStyleArgs(self.validArgsList,newOpts))
         
-        status=executeCommand(ribocode_Cmd)
+        status=executeCommand(ribocode_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("ribocode failed")
             return ""

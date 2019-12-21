@@ -59,7 +59,7 @@ class SRA:
             return self.srrAccession
     
   
-    def downloadSRAFile(self,**kwargs):
+    def downloadSRAFile(self,verbose=False,quiet=False,logs=True,**kwargs):
         """This function downloads .sra file from NCBI SRA servers using the prefetch command.
 
         NCBI sra-toolkit 2.9 or higher must be installed on the system in order to use prefetch. 
@@ -106,7 +106,7 @@ class SRA:
         prefetch_Cmd.extend(['-O',self.location])
         prefetch_Cmd.append(self.srrAccession)
                 
-        cmdStatus=executeCommand(prefetch_Cmd)
+        cmdStatus=executeCommand(prefetch_Cmd,objectId=self.srrAccession)
         if not cmdStatus:
             printBoldRed("prefetch failed for:"+self.srrAccession)
             return False
@@ -165,7 +165,7 @@ class SRA:
             else:            
                 return False
     
-    def runFasterQDump(self,deleteSRA=False,**kwargs):
+    def runFasterQDump(self,deleteSRA=False,verbose=False,quiet=False,logs=True,**kwargs):
         """Execute fasterq-dump to convert .sra file to fastq files.
         The fastq files will be stored in the same directory as the sra file. All fastq files should be consistently named
         using the extension .fastq
@@ -224,7 +224,7 @@ class SRA:
         fstrqd_Cmd.append(self.localSRAFilePath)
         
         #execute command
-        cmdStatus=executeCommand(fstrqd_Cmd)
+        cmdStatus=executeCommand(fstrqd_Cmd,objectId=self.srrAccession)
         if not cmdStatus:
             print("prefetch failed for:"+self.srrAccession)
             return False
