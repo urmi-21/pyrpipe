@@ -369,6 +369,8 @@ def generateMultiqcReport(logFile,filterList,tempDir,outFile="",coverage='a',ver
     #run multiqc
     mc.run(tempDir)
 
+
+
 def report():
     
     parser = argparse.ArgumentParser(
@@ -476,6 +478,7 @@ def benchmark():
         outFile=args.o
     outFile+='.'+args.e
     pu.printGreen("TODO")
+
     
 def multiqc():
     print("Generating html report with multiqc")
