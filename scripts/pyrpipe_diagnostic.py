@@ -16,6 +16,7 @@ from weasyprint import HTML,CSS
 from html import escape
 import datetime as dt
 import multiqc as mc
+from pyrpipe import benchmark
 
 
 try:
