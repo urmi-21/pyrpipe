@@ -45,7 +45,7 @@ class Trimgalore(RNASeqQC):
         
         
             
-    def performQC(self,sraOb,outFileSuffix="_trimgalore",**kwargs):
+    def performQC(self,sraOb,outFileSuffix="_trimgalore",verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Function to perform qc using trimgalore.
         The function performQC() is consistent for all QC classess.
         
@@ -74,7 +74,7 @@ class Trimgalore(RNASeqQC):
             newOpts={"--paired":"","--":(fq1,fq2),"-o":outDir}
             mergedOpts={**kwargs,**newOpts}
             #run trimgalore
-            self.runTrimGalore(**mergedOpts)
+            self.runTrimGalore(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
             """
             running trim galore will create two files named <input>_val_1.fq and <input>_val_2.fq
             move these files to the specified out files
@@ -98,7 +98,7 @@ class Trimgalore(RNASeqQC):
             #run trimgalore
             mergedOpts={**kwargs,**newOpts}
             
-            self.runTrimGalore(**mergedOpts)
+            self.runTrimGalore(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts)
             """
             running trim galore will create one file named <input>_trimmed.fq
             move these files to the specified out files
@@ -114,7 +114,7 @@ class Trimgalore(RNASeqQC):
         
         
             
-    def runTrimGalore(self,**kwargs):
+    def runTrimGalore(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper for running trimgalore
         
         Parameters
@@ -132,7 +132,7 @@ class Trimgalore(RNASeqQC):
         
         
         #start ececution
-        status=executeCommand(trimGalore_Cmd)
+        status=executeCommand(trimGalore_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("trimgalore failed")
         
@@ -183,7 +183,7 @@ class BBmap(RNASeqQC):
             
             
             
-    def performQC(self,sraOb,outFileSuffix="_bbduk",overwrite=True,**kwargs):
+    def performQC(self,sraOb,outFileSuffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Run bbduk on fastq files specified by the sraOb
         
         Parameters
@@ -215,7 +215,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(**mergedOpts):
+            if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts):
                 if checkFilesExists(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
             return("",)
@@ -231,7 +231,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(**mergedOpts):
+            if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts):
                 if checkFilesExists(outFilePath):
                     return(outFilePath,)
             return("",)
@@ -240,7 +240,7 @@ class BBmap(RNASeqQC):
     
     
     
-    def runBBduk(self,**kwargs):
+    def runBBduk(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Wrapper to run bbduk.sh
         """
         #override existing arguments
@@ -254,7 +254,7 @@ class BBmap(RNASeqQC):
         
         
         #start ececution
-        status=executeCommand(bbduk_Cmd)
+        status=executeCommand(bbduk_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("bbduk failed")
         #return status
@@ -269,7 +269,7 @@ class BBmap(RNASeqQC):
     bbsplit.sh in1=reads1.fq in2=reads2.fq ref=path_to_ref outu1=clean1.fq outu2=clean2.fq
     """
     
-    def performCleaning(self,sraOb,bbsplitIndex,outFileSuffix="_bbsplit",overwrite=True,**kwargs):
+    def performCleaning(self,sraOb,bbsplitIndex,outFileSuffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         
@@ -309,7 +309,7 @@ class BBmap(RNASeqQC):
                 newOpts={"ref_x":bbsplitIndex,"path":getFileDirectory(bbsplitIndex)}
                 mergedOpts={**kwargs,**newOpts}
                 #run bbduk
-                if not self.runBBsplit(**mergedOpts):
+                if not self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts):
                     print("Error creating bbsplit index.")
                     return ("",)
                 if not checkPathsExists(indexPath):
@@ -337,7 +337,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBsplit(**mergedOpts):
+            if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts):
                 if checkFilesExists(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
             return("",)
@@ -353,7 +353,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBsplit(**mergedOpts):
+            if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**mergedOpts):
                 if checkFilesExists(outFilePath):
                     return(outFilePath,)
             
@@ -361,7 +361,7 @@ class BBmap(RNASeqQC):
     
     
     
-    def runBBsplit(self,**kwargs):
+    def runBBsplit(self,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """wrapper to run bbsplit
         """
         
@@ -382,7 +382,7 @@ class BBmap(RNASeqQC):
         
         
         #start ececution
-        status=executeCommand(bbsp_Cmd)
+        status=executeCommand(bbsp_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId)
         if not status:
             printBoldRed("bbsplit failed")
         #return status
