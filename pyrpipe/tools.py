@@ -104,7 +104,7 @@ class Samtools(RNASeqTools):
         #return path to file
         return outSortedBamFile
     
-    def samToSortedBam(self,samFile,outFileSuffix="",deleteSam=False,deleteOriginalBam=False,**kwargs):
+    def samToSortedBam(self,samFile,outFileSuffix="",deleteSam=False,deleteOriginalBam=False,verbose=False,quiet=False,logs=True,objectId="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
         
         Returns
@@ -113,13 +113,13 @@ class Samtools(RNASeqTools):
                 Returns path to the sorted bam file. Returns empty string if operation failed.
         """
         
-        sam2BamFile=self.samToBam(samFile,deleteSam=deleteSam,**kwargs)
+        sam2BamFile=self.samToBam(samFile,deleteSam=deleteSam,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**kwargs)
         
         if not sam2BamFile:
             return ""
             
 
-        bamSorted=self.sortBam(sam2BamFile,outFileSuffix,deleteOriginalBam,**kwargs)
+        bamSorted=self.sortBam(sam2BamFile,outFileSuffix,deleteOriginalBam,verbose=verbose,quiet=quiet,logs=logs,objectId=objectId,**kwargs)
         
         if not bamSorted:
             return ""

@@ -174,7 +174,7 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 #merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
 #if not merged:
 #    print("Fail")
-"""
+
 bamList=[]
 sraObList=[]
 for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
@@ -184,14 +184,14 @@ for s in ['SRR1583780','SRR5507495','SRR5507442','SRR5507362']:
     #run fastqdump;delete sra when done
     sraOb.runFasterQDump(deleteSRA=True,**{"-f":"","-t":testDir})
     sraObList.append(sraOb)
-    sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
+    sam=hs.performAlignment(sraOb,objectId=s,**{"--dta-cufflinks":"","-p":"8"})
     #get sorted bam
-    bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
+    bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True,objectId=s)
     bamList.append(bam)
-""" 
+
 
 #bam merge
-#mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",*{"-f":""})
+mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",objectId="ALL", *{"-f":""})
 
 #using pysam
 #import pysam
