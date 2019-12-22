@@ -9,6 +9,9 @@ Created on Sat Dec 21 16:58:13 2019
 from pyrpipe import pyrpipe_utils as pu
 import datetime as dt
 import json
+import seaborn as sns
+import pandas as pd
+
 class benchmark:
     def __init__(self,logFile,envLog):
         
@@ -86,7 +89,30 @@ class benchmark:
         print(self.runtimes_by_prog)
         print(self.runtimes_by_object)
                                    
+    def get_time_perobject(self,func="sum"):
+        result=pd.DataFrame()
+        for k in self.runtimes_by_object:
             
+            v=self.runtimes_by_object[k]
+            
+            for prog in v:
+                runtimes=v[prog]
+                if func == "mean":
+                    v[prog]=[sum(runtimes)/len(runtimes)]
+                else:
+                    v[prog]=[sum(runtimes)]
+            #add current id
+            v['id']=k
+            #apply selected func
+            result=result.append(pd.DataFrame.from_dict(v),sort=False)
+            
+        return result
+        
+    def plot_time_perobject(self):
+        self.get_time_perobject()
+        sns.set_context('paper')
+        pass
+        
 
             
             
@@ -97,7 +123,7 @@ if __name__ == "__main__":
     l="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipe.log"
     e="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipeENV.log"
     ob=benchmark(l,e)
-            
+    print(ob.get_time_perobject())
 
 
 
