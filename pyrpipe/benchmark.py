@@ -120,6 +120,9 @@ class benchmark:
         
     def plot_time_perobject(self):
         data=self.get_time_perobject()
+        #remove rows with no object id
+        data=data[data['id']!='NA']
+        
         sns.set_context('paper')
         f, ax = plt.subplots(figsize = (6,15))
         
