@@ -11,6 +11,9 @@ import datetime as dt
 import json
 import seaborn as sns
 import pandas as pd
+import copy 
+import matplotlib.pyplot as plt
+
 
 class benchmark:
     def __init__(self,logFile,envLog):
@@ -86,36 +89,58 @@ class benchmark:
                 else:
                     self.runtimes_by_object[objectid]={programname:[runtime]}
                 
-        print(self.runtimes_by_prog)
-        print(self.runtimes_by_object)
+        #print(self.runtimes_by_prog)
+        #print(self.runtimes_by_object)
                                    
     def get_time_perobject(self,func="sum"):
         result=pd.DataFrame()
         for k in self.runtimes_by_object:
             
-            v=self.runtimes_by_object[k]
+            v=copy.deepcopy(self.runtimes_by_object[k]) #don't change the self.runtimes_by_object
             
+            totaltime=0
             for prog in v:
-                runtimes=v[prog]
+                runtimes=v[prog]                
                 if func == "mean":
-                    v[prog]=[sum(runtimes)/len(runtimes)]
-                else:
-                    v[prog]=[sum(runtimes)]
+                    valtoput=sum(runtimes)/len(runtimes)
+                    totaltime+=valtoput
+                    v[prog]=[valtoput]
+                else:                    
+                    valtoput=sum(runtimes)
+                    totaltime+=valtoput
+                    v[prog]=[valtoput]
+                    
             #add current id
             v['id']=k
-            #apply selected func
+            v['total']=totaltime
+            
             result=result.append(pd.DataFrame.from_dict(v),sort=False)
             
         return result
         
     def plot_time_perobject(self):
-        self.get_time_perobject()
+        data=self.get_time_perobject()
         sns.set_context('paper')
-        pass
+        f, ax = plt.subplots(figsize = (6,15))
         
+        sns.set_color_codes('bright')
+        sns.barplot(x = 'total', y = 'id', data = data, label = 'Total', color = 'black', edgecolor = 'w')
+        
+        
+        #sns.set_color_codes('muted')
+        
+        #for each col
+        current_palette = sns.color_palette("colorblind")
+        i=0
+        for col in data.columns:
+            if col in ['id','total']:
+                continue
+            sns.barplot(x = col, y = 'id', data = data,label = col, color = current_palette[i], edgecolor = 'w',)
+            i+=1
 
-            
-            
+        ax.legend(ncol = 2, loc = 'lower right')
+        sns.despine(left = True, bottom = True)
+        plt.show()
             
             
 if __name__ == "__main__":
@@ -123,7 +148,8 @@ if __name__ == "__main__":
     l="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipe.log"
     e="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipeENV.log"
     ob=benchmark(l,e)
-    print(ob.get_time_perobject())
+    d=(ob.get_time_perobject())
+    ob.plot_time_perobject()
 
 
 
