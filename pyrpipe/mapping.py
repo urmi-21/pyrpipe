@@ -544,7 +544,7 @@ class Bowtie2(Aligner):
 class Kallisto(Aligner):
     """Kallisto constructor. Initialize kallisto parameters.
         """       
-    def __init__(self,**kwargs):
+    def __init__(self,kallisto_index,**kwargs):
         super().__init__() 
         self.programName="kallisto"
         self.depList=[self.programName]        
@@ -557,19 +557,59 @@ class Kallisto(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
-            print("Bowtie2 index is: "+bowtie2Index)
-            self.bowtie2Index=bowtie2Index
-            self.passedArgumentDict['-x']=self.bowtie2Index
+        if len(kallisto_index)>0 and checkKallistoIndex(kallisto_index):
+            print("kallisto index is: "+kallisto_index)
+            self.kallisto_index=kallisto_index
+            self.passedArgumentDict['-i']=self.kallisto_index
         else:
             print("No Bowtie2 index provided. Please build index now to generate an index...")
             
+    def build_kallisto_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """
+        build kallisto index
+        """
+        pass
+    
+    def run_kallisto_quant(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """
+        run kallisto quant
+        """
+        pass
+    def run_kallisto(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running kallisto.
+        
+        ----------
+        arg1: dict
+            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+            
+        Returns
+        -------
+        bool:
+                Returns the status of bowtie2. True is passed, False if failed.
+        """
+        
+        #check for a valid index
+        if subcommand!="index":
+            if not self.checkIndex():
+                raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
+        
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+            
+        kallisto_Cmd=['kallisto',subcommand]
+        kallisto_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        
+        #start ececution
+        status=executeCommand(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
+        if not status:
+            printBoldRed("kallisto failed")
+        return status       
             
             
 class Salmon(Aligner):
     """Salmon constructor. Initialize kallisto parameters.
         """       
-    def __init__(self,**kwargs):    
+    def __init__(self,salmon_index,**kwargs):    
         super().__init__() 
         self.programName="salmon"
         self.depList=[self.programName]        
@@ -582,9 +622,13 @@ class Salmon(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
-            print("Bowtie2 index is: "+bowtie2Index)
-            self.bowtie2Index=bowtie2Index
-            self.passedArgumentDict['-x']=self.bowtie2Index
+        if len(salmon_index)>0 and check_salmon_index(salmon_index):
+            print("salmon index is: "+salmon_index)
+            self.salmon_index=salmon_index
+            self.passedArgumentDict['-i']=self.salmon_index
         else:
-            print("No Bowtie2 index provided. Please build index now to generate an index...")
+            print("No salmon index provided. Please build index now to generate an index...")
+            
+            
+            
+            
