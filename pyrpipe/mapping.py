@@ -631,4 +631,48 @@ class Salmon(Aligner):
             
             
             
+    def build_salmon_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """
+        build salmon index
+        """
+        pass
+    
+    def run_salmon_quant(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """
+        run salmon quant
+        """
+        pass
+    def run_salmon(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running kallisto.
+        
+        ----------
+        arg1: dict
+            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
+        Returns
+        -------
+        bool:
+                Returns the status of bowtie2. True is passed, False if failed.
+        """
+        
+        #check for a valid index
+        if subcommand!="index":
+            if not self.checkIndex():
+                raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
+        
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+            
+        salmon_Cmd=['salmon',subcommand]
+        salmon_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        
+        #start ececution
+        status=executeCommand(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
+        if not status:
+            printBoldRed("kallisto failed")
+        return status 
+
+
+
+
+         
