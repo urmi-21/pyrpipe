@@ -669,7 +669,7 @@ class Salmon(Aligner):
         #start ececution
         status=executeCommand(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
         if not status:
-            printBoldRed("kallisto failed")
+            printBoldRed("salmon failed")
         return status 
 
 
