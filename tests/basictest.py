@@ -282,3 +282,5 @@ mk.runMikadoPick(config)
 #atJunc=""
 #
 
+#run salmon
+
