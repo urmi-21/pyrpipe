@@ -757,9 +757,9 @@ class Salmon(Aligner):
                 self.passedArgumentDict['-i']=self.salmon_index
                 printGreen("salmon index is:"+self.salmon_index)
                 return True
-        else:
-            printBoldRed("Failed to create salmon index")
-            return False
+        
+        printBoldRed("Failed to create salmon index")
+        return False
         
         
     
