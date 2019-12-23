@@ -286,6 +286,8 @@ mk.runMikadoPick(config)
 slm=mapping.Salmon(salmon_index="")
 slm.build_salmon_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="salInd",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta")
 
+sout=slm.run_salmon_quant(sraOb,objectid=sraOb.srrAccession)
+print(sout)
 
 
 

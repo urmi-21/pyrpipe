@@ -119,6 +119,13 @@ def checkFilesExists(*args):
 def checkHisatIndex(index):
     return checkFilesExists(index+".1.ht2")
 
+def checkSalmonIndex(index):
+    if not checkPathsExists(index):
+        return False
+    if not checkFilesExists(os.path.join(index,"info.json")):
+        return False
+    return True
+
 def checkStarIndex(index):
     if checkPathsExists(index):
         filesTocheck=['chrLength.txt',

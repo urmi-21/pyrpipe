@@ -659,11 +659,42 @@ class Salmon(Aligner):
         
         
     
-    def run_salmon_quant(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_salmon_quant(self,sraOb,outDir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run salmon quant
+        
+        Returns
+        -------
+        string
+            Path to salmon out directory
         """
-        pass
+        
+        if not outDir:
+            outDir=os.path.join(sraOb.location,"salmon_out")
+        
+        
+        
+        if sraOb.layout == 'PAIRED':
+            newOpts={"-o":outDir,"-l":libType,"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path}
+        else:
+            newOpts={"-o":outDir,"-l":libType,"-r":sraOb.localfastqPath}
+        
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call salmon
+        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(os.path.join(outDir,"quant.sf")):
+                return outDir
+        else:
+            return ""
+        
+        
+        
     def run_salmon(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running kallisto.
         
@@ -694,7 +725,8 @@ class Salmon(Aligner):
             printBoldRed("salmon failed")
         return status 
 
-
+    def checkIndex(self):
+        return checkSalmonIndex(self.salmon_index)
 
 
          
