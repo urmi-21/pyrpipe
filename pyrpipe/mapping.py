@@ -636,7 +636,7 @@ class Salmon(Aligner):
         build salmon index
         """
         #create out dir
-        if not checkPathsExists(indexPath):
+        if not checkPathsExists(index_path):
             if not mkdir(indexPath):
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
@@ -649,7 +649,7 @@ class Salmon(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(os.path.join(indexOut,info.json)):
+            if checkFilesExists(os.path.join(indexOut,"info.json")):
                 self.salmon_index=indexOut
                 self.passedArgumentDict['-i']=self.salmon_index
                 printGreen("salmon index is:"+self.salmon_index)

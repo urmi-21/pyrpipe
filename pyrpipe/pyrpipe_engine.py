@@ -167,10 +167,13 @@ def searchFilesLocally(searchPath,searchPattern):
     return output
     
     
-def runLinuxCommand(cmd):
+def runLinuxCommand(cmd,verbose=False):
+    """Run shell commands. These are not logged.
+    """
     #not logging these commands
     logMessage=" ".join(cmd)
-    printBlue("$ "+logMessage)
+    if verbose:
+        printBlue("$ "+logMessage)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
@@ -180,7 +183,10 @@ def runLinuxCommand(cmd):
 
 def getCommandReturnStatus(cmd):
     #not logging these commands
-    return executeCommand(cmd,logs=False)
+    status=runLinuxCommand(cmd)
+    if status[0]==0:
+        return True
+    return False
 
 #prints stdout in real time. optimal for huge stdout and no stderr
 #not used anymore
@@ -218,6 +224,10 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command
     command_name: string
         Name of command to be save in log. If empty it is determined as the first element of the cmd list.
         
+    Returns
+    -------
+    bool
+        Return status
     """
     if not command_name:
         command_name=cmd[0]
@@ -266,10 +276,11 @@ def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command
             ##get the program used and log its path
             if command_name not in pyrpipeLoggerObject.loggedPrograms:
                 ##get which thisProgram
-                #pyrpipeLoggerObject.envLogger.debug(thisProgram+":"+getProgramPath(thisProgram).strip())
+                #if subcommands are present use parent command
+                parent_command=cmd[0]
                 progDesc={'name':command_name,
-                          'version':getProgramVersion(command_name).strip(),
-                          'path':getProgramPath(command_name).strip()
+                          'version':getProgramVersion(parent_command).strip(),
+                          'path':getProgramPath(parent_command).strip()
                           }
                 pyrpipeLoggerObject.envLogger.debug(json.dumps(progDesc))
                 pyrpipeLoggerObject.loggedPrograms.append(command_name)

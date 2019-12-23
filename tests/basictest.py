@@ -174,7 +174,7 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 #merged=st.performStringtieMerge(g1,g1,outFileSuffix="_stOUT",overwrite=True)
 #if not merged:
 #    print("Fail")
-
+"""
 bamList=[]
 sraObList=[]
 for s in ['SRR5507495','SRR5507442','SRR5507362']:
@@ -192,7 +192,7 @@ for s in ['SRR5507495','SRR5507442','SRR5507362']:
 
 #bam merge
 mergedBam=samOb.mergeBamFiles(*bamList,outPath=testDir,outFileName="myMergedXXDD",objectid="ALL", *{"-f":""})
-
+"""
 #using pysam
 #import pysam
 #pysam.merge("-@","8","myMerge",*bamList,"-f")
@@ -283,7 +283,7 @@ mk.runMikadoPick(config)
 #
 
 #run salmon
-slm=mapping.Salmon()
+slm=mapping.Salmon(salmon_index="")
 slm.build_salmon_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="salInd",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta")
 
 
