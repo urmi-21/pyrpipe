@@ -562,19 +562,70 @@ class Kallisto(Aligner):
             self.kallisto_index=kallisto_index
             self.passedArgumentDict['-i']=self.kallisto_index
         else:
-            print("No Bowtie2 index provided. Please build index now to generate an index...")
+            print("No kallisto index provided. Please use build_index() now to generate an index...")
             
-    def build_kallisto_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_kallisto_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         build kallisto index
         """
-        pass
+        #create out dir
+        if not checkPathsExists(index_path):
+            if not mkdir(indexPath):
+                print("ERROR in building kallisto index. Failed to create index directory.")
+                return False
+        indexOut=os.path.join(index_path,index_name)
+        newOpts={"--":(fasta,),"-i":indexOut}
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call salmon
+        status=self.run_kallisto("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(indexOut):
+                self.kallisto_index=indexOut
+                self.passedArgumentDict['-i']=self.kallisto_index
+                printGreen("kallisto_index is:"+self.kallisto_index)
+                return True
+        else:
+            return False
     
-    def run_kallisto_quant(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_kallisto_quant(self,sraOb,outDir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run kallisto quant
+        
+        Returns
+        -------
+        string
+            Path to salmon out directory
         """
-        pass
+        
+        if not outDir:
+            outDir=os.path.join(sraOb.location,"salmon_out")
+        
+        
+        
+        if sraOb.layout == 'PAIRED':
+            newOpts={"-o":outDir,"--":(sraOb.localfastq1Path,sraOb.localfastq2Path)}
+        else:
+            newOpts={"-o":outDir,"--single":"", "--":(sraOb.localfastqPath,)}
+        
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call salmon
+        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(os.path.join(outDir,"quant.sf")):
+                return outDir
+        else:
+            return ""
+        
+    
+    
     def run_kallisto(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running kallisto.
         
@@ -604,7 +655,9 @@ class Kallisto(Aligner):
         if not status:
             printBoldRed("kallisto failed")
         return status       
-            
+    
+    def checkIndex(self):
+        return checkFilesExists(self.kallisto_index)
             
 class Salmon(Aligner):
     """Salmon constructor. Initialize kallisto parameters.

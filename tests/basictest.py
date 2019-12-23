@@ -289,5 +289,8 @@ slm.build_salmon_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index
 sout=slm.run_salmon_quant(sraOb,objectid=sraOb.srrAccession)
 print(sout)
 
-
-
+#run kallisto
+kl=mapping.Kallisto(kallisto_index="")
+kl.build_kallisto_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="kInd2",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta")
+sout=kl.run_kallisto_quant(sraOb,objectid=sraOb.srrAccession)
+print(sout)
