@@ -828,7 +828,7 @@ class Salmon(Aligner):
         #check for a valid index
         if subcommand!="index":
             if not self.checkIndex():
-                raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
+                raise Exception("ERROR: Invalid salmon index. Please run build index to generate an index.")
         
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
