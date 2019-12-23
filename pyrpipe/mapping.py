@@ -581,11 +581,18 @@ class Kallisto(Aligner):
         """
         build kallisto index
         """
+        
+        #check input
+        if not checkFilesExists(fasta):
+            printBoldRed("{} does not exist. Exiting".format(fasta))
+            return False
+        
         #create out dir
         if not checkPathsExists(index_path):
             if not mkdir(indexPath):
                 print("ERROR in building kallisto index. Failed to create index directory.")
                 return False
+            
         indexOut=os.path.join(index_path,index_name)
         newOpts={"--":(fasta,),"-i":indexOut}
         mergedOpts={**kwargs,**newOpts}
@@ -738,6 +745,11 @@ class Salmon(Aligner):
         """
         build salmon index
         """
+        
+        #check input
+        if not checkFilesExists(fasta):
+            printBoldRed("{} does not exist. Exiting".format(fasta))
+            return False
         #create out dir
         if not checkPathsExists(index_path):
             if not mkdir(indexPath):
@@ -752,7 +764,8 @@ class Salmon(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(os.path.join(indexOut,"info.json")):
+            #if checkFilesExists(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
+            if checkPathsExists(indexOut):
                 self.salmon_index=indexOut
                 self.passedArgumentDict['-i']=self.salmon_index
                 printGreen("salmon index is:"+self.salmon_index)
