@@ -540,7 +540,7 @@ class Bowtie2(Aligner):
         else:
             return False
 
-#TODO
+
 class Kallisto(Aligner):
     """Kallisto constructor. Initialize kallisto parameters.
         """       
@@ -551,13 +551,26 @@ class Kallisto(Aligner):
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=[]
+        
+        ##kallisto index
+        self.validArgsIndex=['-i','--index','-k','--kmer-size','--make-unique']
+        ##kallisto quant
+        self.validArgsQuant=['-i','--index','-o','--output-dir','--bias','-b','--bootstrap-samples',
+                             '--seed','--plaintext','--fusion','--single','--fr-stranded','--rf-stranded',
+                             '-l','--fragment-length','-s','--sd','-t','--threads','--pseudobam']
+        ##kallisto pseudo
+        self.validArgsPseudo=['-i','--index','-o','--output-dir','-u','--umi','-b','--batch',
+                              '--single','-l','--fragment-length','-s','--sd','-t','--threads','--pseudobam']
+            ##kallisto h5dump
+        self.validArgsh5dump=['-o','--output-dir']
+        
+        self.validArgsList=getListUnion(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(kallisto_index)>0 and checkKallistoIndex(kallisto_index):
+        if len(kallisto_index)>0 and checkFilesExists(kallisto_index):
             print("kallisto index is: "+kallisto_index)
             self.kallisto_index=kallisto_index
             self.passedArgumentDict['-i']=self.kallisto_index
@@ -659,9 +672,11 @@ class Kallisto(Aligner):
     def checkIndex(self):
         return checkFilesExists(self.kallisto_index)
             
+
+
 class Salmon(Aligner):
     """Salmon constructor. Initialize kallisto parameters.
-        """       
+    """       
     def __init__(self,salmon_index,**kwargs):    
         super().__init__() 
         self.programName="salmon"
@@ -669,7 +684,41 @@ class Salmon(Aligner):
         if not checkDep(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=[]
+        
+        ##salmon index
+        self.validArgsIndex=['-v','--version','-h','--help','-t','--transcripts','-k','--kmerLen','-i',
+                             '--index','--gencode','--keepDuplicates','-p','--threads','--perfectHash',
+                             '--type','-s','--sasamp']
+        ##salmon quant read
+        self.validArgsQuantReads=['--help-reads','-i','--index','-l','--libType','-r','--unmatedReads',
+                                  '-1','--mates1','-2','--mates2','-o','--output','--discardOrphansQuasi',
+                                  '--allowOrphansFMD','--seqBias','--gcBias','-p','--threads','--incompatPrior',
+                                  '-g','--geneMap','-z','--writeMappings','--meta','--alternativeInitMode',
+                                  '--auxDir','-c','--consistentHits','--dumpEq','-d','--dumpEqWeights',
+                                  '--fasterMapping','--minAssignedFrags','--reduceGCMemory','--biasSpeedSamp',
+                                  '--strictIntersect','--fldMax','--fldMean','--fldSD','-f','--forgettingFactor',
+                                  '-m','--maxOcc','--initUniform','-w','--maxReadOcc','--noLengthCorrection',
+                                  '--noEffectiveLengthCorrection','--noFragLengthDist','--noBiasLengthThreshold',
+                                  '--numBiasSamples','--numAuxModelSamples','--numPreAuxModelSamples','--useVBOpt',
+                                  '--rangeFactorizationBins','--numGibbsSamples','--numBootstraps','--thinningFactor',
+                                  '-q','--perTranscriptPrior','--vbPrior','--writeOrphanLinks','--writeUnmappedNames',
+                                  '-x','--quasiCoverage']
+        ##salmon quant alignment
+        self.validArgsQuantAlign=['--help-alignment','-l','--libType','-a','--alignments','-t','--targets','-p',
+                                  '--threads','--seqBias','--gcBias','--incompatPrior','--useErrorModel',
+                                  '-o','--output','--meta','-g','--geneMap','--alternativeInitMode','--auxDir'
+                                  ,'--noBiasLengthThreshold','--dumpEq','-d','--dumpEqWeights','--fldMax',
+                                  '--fldMean','--fldSD','-f','--forgettingFactor','--minAssignedFrags',
+                                  '--gencode','--reduceGCMemory','--biasSpeedSamp','--mappingCacheMemoryLimit',
+                                  '-w','--maxReadOcc','--noEffectiveLengthCorrection','--noFragLengthDist',
+                                  '-v','--useVBOpt','--rangeFactorizationBins','--perTranscriptPrior','--vbPrior',
+                                  '--numErrorBins','--numBiasSamples','--numPreAuxModelSamples','--numAuxModelSamples',
+                                  '-s','--sampleOut','-u','--sampleUnaligned','--numGibbsSamples','--numBootstraps',
+                                  '--thinningFactor']
+        ##salmon quantmerge
+        self.validArgsQuantMerge=['--quants','--names','-c','--column','-o','--output']
+
+        self.validArgsList=getListUnion(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
