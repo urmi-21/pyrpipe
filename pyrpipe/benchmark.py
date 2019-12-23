@@ -13,11 +13,13 @@ import seaborn as sns
 import pandas as pd
 import copy 
 import matplotlib.pyplot as plt
-
+import os
 
 class benchmark:
-    def __init__(self,logFile,envLog):
+    def __init__(self,logFile,envLog,outDir=os.getcwd()):
         """Describe...
+        
+        
         
         """
         
@@ -27,9 +29,15 @@ class benchmark:
         self.envLpg=envLog
         self.runtimes_by_prog={}
         self.runtimes_by_object={}
-        
         #init
         self.parseLogs()
+        
+        #outdir
+        self.benchmarksDir=os.path.join(outDir,'benchmark_reports')
+        if not pu.checkPathsExists(self.benchmarksDir):
+            if not pu.mkdir(self.benchmarksDir):
+                raise Exception("Error running benchmarks. Can not create output directory {}".format(self.benchmarksDir))
+            
         
         
     def parse_runtime(self,timestring):
@@ -56,6 +64,11 @@ class benchmark:
         """Parse the input logs.
         For each command create a dict with runtimes as list and program name as key
         For each object id in input log create a dict.
+        The followind dicts are created:
+        
+        runtimes_by_prog contains runtimes for each program. program is the key and the runtimes are in a list in order as they apprear in the log file.
+        
+        runtimes_by_object is nested a dict containing runtimes for each object by each program. e.g. {'ob1':{'prog1':[1,2,3],'prog2':[1,2,3]}, 'ob2':{'prog1':[12,22,13],'prog2':[1,2,3]} }
         """
         
         
@@ -151,6 +164,10 @@ class benchmark:
         ax.legend(ncol = 2, loc = 'lower right')
         sns.despine(left = True, bottom = True)
         plt.show()
+        
+        #write data to outdir
+        outfile=os.path.join(self.benchmarksDir,'time_per_object.csv')
+        data.to_csv(outfile)
     
     
     def get_time_perprogram(self):
@@ -170,9 +187,20 @@ class benchmark:
         
     def plot_time_perprogram(self):
         data=self.get_time_perprogram()
-        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'w')
+        sns.set_color_codes('bright')
         
+        #plot total time
+        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'w')
+        #plot mean time
         sns.barplot(x = 'average', y = 'program', data = data, label = 'Total', color = 'red', edgecolor = 'w')
+        
+        #make pie charts
+        current_palette = sns.color_palette("colorblind")
+        plt.pie(data['total'], colors=current_palette, labels= data['program'],counterclock=False, shadow=True)
+        
+        #write data to outdir
+        outfile=os.path.join(self.benchmarksDir,'time_per_program.csv')
+        data.to_csv(outfile)
         
         
             
@@ -181,7 +209,7 @@ if __name__ == "__main__":
     print("testing")
     l="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipe.log"
     e="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipeENV.log"
-    ob=benchmark(l,e)
+    ob=benchmark(l,e,outDir="/home/usingh/work/urmi/hoap/test/bmtest")
     d=(ob.get_time_perobject())
     ob.plot_time_perobject()
 

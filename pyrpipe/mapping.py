@@ -601,6 +601,7 @@ class Kallisto(Aligner):
                 printGreen("kallisto_index is:"+self.kallisto_index)
                 return True
         else:
+            printBoldRed("Failed to create kallisto index")
             return False
     
     def run_kallisto_quant(self,sraOb,outDir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
@@ -757,6 +758,7 @@ class Salmon(Aligner):
                 printGreen("salmon index is:"+self.salmon_index)
                 return True
         else:
+            printBoldRed("Failed to create salmon index")
             return False
         
         
@@ -828,7 +830,9 @@ class Salmon(Aligner):
         return status 
 
     def checkIndex(self):
-        return checkSalmonIndex(self.salmon_index)
+        if hasattr(self,'salmon_index'):
+            return checkSalmonIndex(self.salmon_index)
+        return False
 
 
          
