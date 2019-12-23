@@ -17,12 +17,20 @@ import matplotlib.pyplot as plt
 
 class benchmark:
     def __init__(self,logFile,envLog):
+        """Describe...
+        
+        """
         
         if not pu.checkFilesExists(logFile,envLog):
             raise Exception("Please check input for benchmark report. {} {}".format(logFile,envLog))
         self.logFile=logFile
         self.envLpg=envLog
+        self.runtimes_by_prog={}
+        self.runtimes_by_object={}
+        
+        #init
         self.parseLogs()
+        
         
     def parse_runtime(self,timestring):
         """
@@ -50,8 +58,7 @@ class benchmark:
         For each object id in input log create a dict.
         """
         
-        self.runtimes_by_prog={}
-        self.runtimes_by_object={}
+        
         
         with open(self.logFile) as f:
             data=f.read().splitlines()
@@ -144,6 +151,30 @@ class benchmark:
         ax.legend(ncol = 2, loc = 'lower right')
         sns.despine(left = True, bottom = True)
         plt.show()
+    
+    
+    def get_time_perprogram(self):
+        """Returns a dataframe with program execution times
+        """
+        result=pd.DataFrame()
+        for k in self.runtimes_by_prog:
+            v=self.runtimes_by_prog[k]
+            total=sum(v)
+            mean=sum(v)/len(v)
+            row={'program':k,'total':[total],'average':[mean]}
+            #add row to dataframe
+            result=result.append(pd.DataFrame.from_dict(row),sort=False)
+        return result
+            
+        
+        
+    def plot_time_perprogram(self):
+        data=self.get_time_perprogram()
+        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'w')
+        
+        sns.barplot(x = 'average', y = 'program', data = data, label = 'Total', color = 'red', edgecolor = 'w')
+        
+        
             
             
 if __name__ == "__main__":
@@ -154,7 +185,8 @@ if __name__ == "__main__":
     d=(ob.get_time_perobject())
     ob.plot_time_perobject()
 
-
+    d2=ob.get_time_perprogram()
+    ob.plot_time_perprogram()
 
 
 
