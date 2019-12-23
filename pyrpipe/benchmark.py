@@ -13,6 +13,7 @@ import seaborn as sns
 import pandas as pd
 import copy 
 import matplotlib.pyplot as plt
+
 import os
 
 class benchmark:
@@ -30,8 +31,9 @@ class benchmark:
         self.runtimes_by_prog={}
         self.runtimes_by_object={}
         #init
+        pu.printBlue("parsing log...")
         self.parseLogs()
-        
+        pu.printBlue("done.")
         #outdir
         self.benchmarksDir=os.path.join(outDir,'benchmark_reports')
         if not pu.checkPathsExists(self.benchmarksDir):
@@ -89,7 +91,11 @@ class benchmark:
                     continue
                              
                 #store runtimes by programname
-                programname=thisDict['commandname']
+                try:
+                    programname=thisDict['commandname']
+                except KeyError:
+                    #for older logs
+                    programname=thisDict['cmd'].split(" ")[0]
                 runtime=self.parse_runtime(thisDict['runtime'])
                 #add to dict
                 if programname in self.runtimes_by_prog:
@@ -98,7 +104,10 @@ class benchmark:
                     self.runtimes_by_prog[programname]=[runtime]
                     
                 #store runtimes by object id
-                objectid=thisDict['objectid']
+                try:
+                    objectid=thisDict['objectid']
+                except KeyError:
+                    objectid='SRR'+str(numCommands%50)
                 
                 if objectid in self.runtimes_by_object:
                     #if the object is used with same program extend the list
@@ -142,9 +151,9 @@ class benchmark:
         data=self.get_time_perobject()
         #remove rows with no object id
         data=data[data['id']!='NA']
-        
-        sns.set_context('paper')
-        f, ax = plt.subplots(figsize = (6,15))
+        total_rows=data.shape[0]
+        sns.set_context('poster')
+        f, ax = plt.subplots(figsize = (total_rows/4,total_rows/2))
         
         sns.set_color_codes('bright')
         sns.barplot(x = 'total', y = 'id', data = data, label = 'Total', color = 'black', edgecolor = 'w')
@@ -161,9 +170,16 @@ class benchmark:
             sns.barplot(x = col, y = 'id', data = data,label = col, color = current_palette[i], edgecolor = 'w',)
             i+=1
 
-        ax.legend(ncol = 2, loc = 'lower right')
+        #add legend
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        #ax.legend(ncol = 2, loc = 'upper right')
         sns.despine(left = True, bottom = True)
-        plt.show()
+        ax.set(xlabel='runtime (sec.)')
+        #plt.show()
+        
+        #save plot
+        plotfile=os.path.join(self.benchmarksDir,'time_per_object.png')
+        plt.savefig(plotfile,bbox_inches='tight')
         
         #write data to outdir
         outfile=os.path.join(self.benchmarksDir,'time_per_object.csv')
@@ -187,16 +203,38 @@ class benchmark:
         
     def plot_time_perprogram(self):
         data=self.get_time_perprogram()
+        sns.set_context('poster')
+        f, ax = plt.subplots()
+        
         sns.set_color_codes('bright')
         
         #plot total time
-        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'w')
+        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'black')
         #plot mean time
-        sns.barplot(x = 'average', y = 'program', data = data, label = 'Total', color = 'red', edgecolor = 'w')
+        sns.barplot(x = 'average', y = 'program', data = data, label = 'Avg.', color = 'red', edgecolor = 'red')
+        
+        #save the barplot
+        #add legend
+        plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        #ax.legend(ncol = 2, loc = 'upper left')
+        sns.despine(left = True, bottom = True)
+        ax.set(xlabel='runtime (sec.)')
+        #save plot
+        plotfile=os.path.join(self.benchmarksDir,'time_per_program.png')
+        plt.savefig(plotfile,bbox_inches='tight')
+        
+        #clear plot
+        plt.clf()
+        
         
         #make pie charts
         current_palette = sns.color_palette("colorblind")
         plt.pie(data['total'], colors=current_palette, labels= data['program'],counterclock=False, shadow=True)
+        #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        
+        #save plot
+        plotfile=os.path.join(self.benchmarksDir,'program_summary.png')
+        plt.savefig(plotfile,bbox_inches='tight')
         
         #write data to outdir
         outfile=os.path.join(self.benchmarksDir,'time_per_program.csv')
@@ -207,8 +245,8 @@ class benchmark:
             
 if __name__ == "__main__":
     print("testing")
-    l="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipe.log"
-    e="/home/usingh/work/urmi/hoap/pyrpipe/tests/pyrpipe_logs/2019-12-21-16_38_08_pyrpipeENV.log"
+    l="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipe.log"
+    e="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipeENV.log"
     ob=benchmark(l,e,outDir="/home/usingh/work/urmi/hoap/test/bmtest")
     d=(ob.get_time_perobject())
     ob.plot_time_perobject()

@@ -611,7 +611,7 @@ class Kallisto(Aligner):
             printBoldRed("Failed to create kallisto index")
             return False
     
-    def run_kallisto_quant(self,sraOb,outDir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_kallisto_quant(self,sraOb,outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run kallisto quant
         
@@ -622,7 +622,7 @@ class Kallisto(Aligner):
         """
         
         if not outDir:
-            outDir=os.path.join(sraOb.location,"salmon_out")
+            outDir=os.path.join(sraOb.location,"kallisto_out")
         
         
         
@@ -640,10 +640,11 @@ class Kallisto(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(os.path.join(outDir,"quant.sf")):
+            if checkFilesExists(os.path.join(outDir,"abundance.tsv")):
                 return outDir
-        else:
-            return ""
+        
+        printBoldRed("kallisto quant failed")
+        return ""
         
     
     
@@ -807,8 +808,9 @@ class Salmon(Aligner):
             #check if sam file is present in the location directory of sraOb
             if checkFilesExists(os.path.join(outDir,"quant.sf")):
                 return outDir
-        else:
-            return ""
+        
+        printBoldRed("salmon quant failed")
+        return ""
         
         
         
