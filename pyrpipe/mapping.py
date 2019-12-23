@@ -631,11 +631,33 @@ class Salmon(Aligner):
             
             
             
-    def build_salmon_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_salmon_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         build salmon index
         """
-        pass
+        #create out dir
+        if not checkPathsExists(indexPath):
+            if not mkdir(indexPath):
+                print("ERROR in building hisat2 index. Failed to create index directory.")
+                return False
+        indexOut=os.path.join(index_path,index_name)
+        newOpts={"-t":fasta,"-i":indexOut}
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call salmon
+        status=self.run_salmon("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if checkFilesExists(os.path.join(indexOut,info.json)):
+                self.salmon_index=indexOut
+                self.passedArgumentDict['-i']=self.salmon_index
+                printGreen("salmon index is:"+self.salmon_index)
+                return True
+        else:
+            return False
+        
+        
     
     def run_salmon_quant(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """

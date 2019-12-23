@@ -283,4 +283,9 @@ mk.runMikadoPick(config)
 #
 
 #run salmon
+slm=mapping.Salmon()
+slm.build_salmon_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="salInd",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta")
+
+
+
 
