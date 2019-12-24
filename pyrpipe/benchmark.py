@@ -278,7 +278,7 @@ class benchmark:
         sns.set_context('poster')
         f, ax = plt.subplots(figsize=(10, numprog*2))
         current_palette = sns.color_palette("colorblind")
-        plt.pie(data['total'], colors=current_palette, labels= data['program'],counterclock=False, shadow=False)
+        plt.pie(data['total'], colors=current_palette, labels= data['program'],counterclock=False, shadow=False,autopct='%1.1f%%')
         f.suptitle('Summary of total runtimes', fontsize=26)
         
         #save plot
