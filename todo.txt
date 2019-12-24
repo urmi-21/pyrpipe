@@ -14,3 +14,4 @@ test bowtie2
 
 add multiqc reports
 combine logs
+remove objectid param from functions depending on sraob e,g. performAssembly()
