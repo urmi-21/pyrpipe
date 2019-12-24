@@ -1,0 +1,4 @@
+Sample	paired_total	paired_aligned_discord_one	paired_aligned_mate_multi	paired_aligned_mate_multi_halved	paired_aligned_mate_one_halved	paired_aligned_mate_none_halved	paired_aligned_mate_one	total_reads	paired_aligned_one	paired_aligned_none	paired_aligned_mate_none	paired_aligned_multi	overall_alignment_rate
+SRR971778_hisat2	5432321	16819	5965	2982.5	58333.0	572579.5	116666	5432321	4600911	650714	1145159	180696	89.46
+SRR976159_hisat2	4728806	39783	5028	2514.0	75455.5	97204.5	150911	4728806	4401400	214957	194409	112449	97.94
+SRR978411_hisat2	4200625	39649	5192	2596.0	68874.5	91692.5	137749	4200625	3890411	202812	183385	107402	97.82

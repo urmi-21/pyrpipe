@@ -1,0 +1,4 @@
+Module	Section	Sample Name	Source
+Bowtie 2 / HiSAT2	all_sections	SRR971778_hisat2	/home/usingh/work/urmi/hoap/pyrpipe/examples/Athaliana_transcript_assembly/tmp/SRR971778_hisat2.txt
+Bowtie 2 / HiSAT2	all_sections	SRR976159_hisat2	/home/usingh/work/urmi/hoap/pyrpipe/examples/Athaliana_transcript_assembly/tmp/SRR976159_hisat2.txt
+Bowtie 2 / HiSAT2	all_sections	SRR978411_hisat2	/home/usingh/work/urmi/hoap/pyrpipe/examples/Athaliana_transcript_assembly/tmp/SRR978411_hisat2.txt
