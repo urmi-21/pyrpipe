@@ -127,7 +127,7 @@ pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
 bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
 bbdOb=qc.BBmap(**bbdOpts)
 
-#sraOb.performFastqQC(bbdOb)
+sraOb.performFastqQC(bbdOb)
 #status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
 
 #print(status)
