@@ -165,8 +165,8 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 #bt2.performAlignment(sraOb)
 
 #run stringtie
-#st=assembly.Stringtie()
-#g1=st.performAssembly(bam)
+st=assembly.Stringtie()
+g1=st.performAssembly(bam,objectid="myob")
 
 
 #gtfs=(g1,)

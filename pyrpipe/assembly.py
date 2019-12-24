@@ -43,7 +43,7 @@ class Stringtie(Assembly):
             self.referenceGTF=referenceGTF
             self.passedArgumentDict['-G']=referenceGTF
         
-    def performAssembly(self,inputBAM,outFileSuffix="_stringtie",overwrite=True,**kwargs):
+    def performAssembly(self,inputBAM,outFileSuffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie using BAM file.
                 
         Parameters
@@ -82,7 +82,7 @@ class Stringtie(Assembly):
         mergedOpts={**kwargs,**newOpts}
         
         #call stringtie
-        status=self.runStringtie(**mergedOpts)
+        status=self.runStringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
