@@ -198,8 +198,24 @@ class benchmark:
             #add row to dataframe
             result=result.append(pd.DataFrame.from_dict(row),sort=False)
         return result
-            
+    
+    def get_programtime_boxdata(self):
+        """Return dataframe to make box plot of program times
+        """
+        box_data=pd.DataFrame({ key:pd.Series(value) for key, value in self.runtimes_by_prog.items() })
+        return box_data
         
+        """
+        ndf=pd.DataFrame(columns=['data','name'])
+        for i in range(box_data.shape[1]):
+            to_append=list(box_data.iloc[:,i])
+            col_name=box_data.columns[i]
+            col_list=[col_name for x in to_append]
+            for j in range(len(to_append)):
+                ndf=ndf.append({'data':to_append[j],'name':col_list[j]},ignore_index=True )
+        
+        return ndf
+        """
         
     def plot_time_perprogram(self):
         data=self.get_time_perprogram()
@@ -223,11 +239,43 @@ class benchmark:
         plotfile=os.path.join(self.benchmarksDir,'time_per_program.png')
         plt.savefig(plotfile,bbox_inches='tight')
         
+        
         #clear plot
+        plt.clf()
+        #make boxplots
+        sns.set_color_codes('bright')
+        sns.set_context('poster')
+        box_data=self.get_programtime_boxdata()
+        numprog=len(self.runtimes_by_prog.keys())
+        #sns.set(style="ticks")
+        # Initialize the figure with a logarithmic x axis
+        f, ax = plt.subplots(figsize=(20, numprog*3))
+        #ax.set_xscale("log")
+        
+        #sns.boxplot(x="data", y="name", data=box_data,orient="h")
+        sns.boxplot( data=box_data,orient="h")
+        
+        # Add in points to show each observation
+        #sns.swarmplot(x="data", y="name", data=box_data,size=2, color=".3", linewidth=0)
+        
+        # Tweak the visual presentation
+        ax.xaxis.grid(True)
+        ax.set(ylabel="")
+        ax.set(xlabel="runtime (sec.)")
+        sns.despine(trim=True, left=True)
+        #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
+        
+        #save to file
+        plotfile=os.path.join(self.benchmarksDir,'program_boxplots.png')
+        plt.savefig(plotfile,bbox_inches='tight')
+        plt.show()
+        #clear plot
+        
         plt.clf()
         
         
         #make pie charts
+        f, ax = plt.subplots(figsize=(10, numprog*2))
         current_palette = sns.color_palette("colorblind")
         plt.pie(data['total'], colors=current_palette, labels= data['program'],counterclock=False, shadow=True)
         #plt.legend(bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
