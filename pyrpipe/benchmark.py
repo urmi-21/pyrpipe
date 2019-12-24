@@ -151,6 +151,20 @@ class benchmark:
         data=self.get_time_perobject()
         #remove rows with no object id
         data=data[data['id']!='NA']
+        cols=list(data.columns)
+        id_col=cols.index('id')
+        #swap id with 0
+        temp=cols[0]
+        cols[0]='id'
+        cols[id_col]=temp
+        total_col=cols.index('total')
+        #swap id with last
+        temp=cols[-1]
+        cols[-1]='total'
+        cols[total_col]=temp
+        
+        data=data[cols]
+        
         total_rows=data.shape[0]
         sns.set_context('poster')
         f, ax = plt.subplots(figsize = (total_rows/4,total_rows/2))
@@ -159,7 +173,7 @@ class benchmark:
         sns.barplot(x = 'total', y = 'id', data = data, label = 'Total', color = 'black', edgecolor = 'w')
         
         
-        #sns.set_color_codes('muted')
+        
         
         #for each col
         current_palette = sns.color_palette("colorblind")
@@ -183,7 +197,7 @@ class benchmark:
         
         #write data to outdir
         outfile=os.path.join(self.benchmarksDir,'time_per_object.csv')
-        data.to_csv(outfile)
+        data.to_csv(outfile, index=False)
     
     
     def get_time_perprogram(self):
@@ -287,7 +301,11 @@ class benchmark:
         
         #write data to outdir
         outfile=os.path.join(self.benchmarksDir,'time_per_program.csv')
-        data.to_csv(outfile)
+        data.to_csv(outfile, index=False)
+        #save boxplot data
+        box_data=pd.DataFrame({ key:pd.Series(value) for key, value in self.runtimes_by_prog.items() })
+        outfile=os.path.join(self.benchmarksDir,'program_box_data.csv')
+        box_data.to_csv(outfile, index=False)
         
         
             
