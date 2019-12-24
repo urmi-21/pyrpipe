@@ -16,7 +16,7 @@ import matplotlib.pyplot as plt
 
 import os
 
-class benchmark:
+class Benchmark:
     def __init__(self,logFile,envLog,outDir=os.getcwd()):
         """Describe...
         
@@ -236,12 +236,12 @@ class benchmark:
         sns.set_context('poster')
         f, ax = plt.subplots()
         
-        sns.set_color_codes('bright')
+        current_palette = sns.color_palette("colorblind")
         
         #plot total time
-        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = 'black', edgecolor = 'black')
+        sns.barplot(x = 'total', y = 'program', data = data, label = 'Total', color = current_palette[4])
         #plot mean time
-        sns.barplot(x = 'average', y = 'program', data = data, label = 'Avg.', color = 'red', edgecolor = 'red')
+        sns.barplot(x = 'average', y = 'program', data = data, label = 'Avg.', color = current_palette[2])
         
         #save the barplot
         #add legend
@@ -281,7 +281,7 @@ class benchmark:
         #save to file
         plotfile=os.path.join(self.benchmarksDir,'program_boxplots.png')
         plt.savefig(plotfile,bbox_inches='tight')
-        plt.show()
+        #plt.show()
         #clear plot
         
         plt.clf()
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     print("testing")
     l="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipe.log"
     e="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipeENV.log"
-    ob=benchmark(l,e,outDir="/home/usingh/work/urmi/hoap/test/bmtest")
+    ob=Benchmark(l,e,outDir="/home/usingh/work/urmi/hoap/test/bmtest")
     d=(ob.get_time_perobject())
     ob.plot_time_perobject()
 

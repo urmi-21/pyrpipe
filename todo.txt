@@ -13,3 +13,4 @@ write unit tests
 test bowtie2
 
 add multiqc reports
+combine logs
