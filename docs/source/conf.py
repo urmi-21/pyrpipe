@@ -12,6 +12,11 @@
 #
 import os
 import sys
+
+#import sphinx_glpi_theme
+#html_theme = "glpi"
+#html_theme_path = [sphinx_glpi_theme.get_html_themes_path()]
+
 sys.path.insert(0, os.path.abspath('../pyrpipe'))
 sys.setrecursionlimit(1500)
 
