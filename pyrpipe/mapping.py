@@ -167,7 +167,7 @@ class Hisat2(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call runHisat2
-        status=self.runHisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.runHisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -357,7 +357,7 @@ class Star(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call star
-        status=self.runStar(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.runStar(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
                 
         
         if status:
@@ -490,7 +490,7 @@ class Bowtie2(Aligner):
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -636,7 +636,7 @@ class Kallisto(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -802,7 +802,7 @@ class Salmon(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
