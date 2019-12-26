@@ -9,5 +9,5 @@ Created on Wed Nov 27 13:35:31 2019
 class testSpecs:
     def __init__(self):
         self.srr='SRR1583780' #paired end Saccharomyces cerevisiae; RNA-Seq
-        self.testDir="testDir"
+        self.testDir="tests/testfiles"
         
