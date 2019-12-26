@@ -85,7 +85,7 @@ class Trimgalore(RNASeqQC):
             mv1=moveFile(oldFile1,outFile1)
             mv2=moveFile(oldFile2,outFile2)
             
-            if not checkFilesExists(outFile1,outFile2):
+            if not check_files_exist(outFile1,outFile2):
                 print("Trimgalore failed")
                 return ("",)
             return outFile1,outFile2
@@ -107,7 +107,7 @@ class Trimgalore(RNASeqQC):
             
             mv=moveFile(oldFile,outFile)
             
-            if not checkFilesExists(outFile):
+            if not check_files_exist(outFile):
                 print("Trimgalore failed")
                 return ("",)
             return (outFile,)
@@ -128,13 +128,13 @@ class Trimgalore(RNASeqQC):
         
         #create command to run
         trimGalore_Cmd=['trim_galore']
-        trimGalore_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        trimGalore_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
         
         
         #start ececution
         status=executeCommand(trimGalore_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("trimgalore failed")
+            print_boldred("trimgalore failed")
         
         #return status
         return status
@@ -216,7 +216,7 @@ class BBmap(RNASeqQC):
             
             #run bbduk
             if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if checkFilesExists(outFile1Path,outFile2Path):
+                if check_files_exist(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
             return("",)
             
@@ -232,7 +232,7 @@ class BBmap(RNASeqQC):
             
             #run bbduk
             if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if checkFilesExists(outFilePath):
+                if check_files_exist(outFilePath):
                     return(outFilePath,)
             return("",)
                     
@@ -256,7 +256,7 @@ class BBmap(RNASeqQC):
         #start ececution
         status=executeCommand(bbduk_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("bbduk failed")
+            print_boldred("bbduk failed")
         #return status
         return status
     
@@ -296,7 +296,7 @@ class BBmap(RNASeqQC):
         if not checkPathsExists(bbsplitIndex):
             #index folder doesn't exist
             #check if input is path to fasta
-            if not checkFilesExists(bbsplitIndex):
+            if not check_files_exist(bbsplitIndex):
                 print("Error: Please check bbsplit index")
                 return ("",)
             #check if index folder "ref" exists in this directory
@@ -338,7 +338,7 @@ class BBmap(RNASeqQC):
             
             #run bbduk
             if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if checkFilesExists(outFile1Path,outFile2Path):
+                if check_files_exist(outFile1Path,outFile2Path):
                     return(outFile1Path,outFile2Path)
             return("",)
             
@@ -354,7 +354,7 @@ class BBmap(RNASeqQC):
             
             #run bbduk
             if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if checkFilesExists(outFilePath):
+                if check_files_exist(outFilePath):
                     return(outFilePath,)
             
             return("",)
@@ -384,7 +384,7 @@ class BBmap(RNASeqQC):
         #start ececution
         status=executeCommand(bbsp_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("bbsplit failed")
+            print_boldred("bbsplit failed")
         #return status
         return status
     

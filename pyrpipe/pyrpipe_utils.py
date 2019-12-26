@@ -26,288 +26,408 @@ class bcolors:
     UNDERLINE = '\033[4m'
 
 def print_boldred(text):
+    """Print in bold red font
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
     print (bcolors.FAIL + bcolors.BOLD+ text + bcolors.ENDC)
 
-def printGreen(text):
+def print_green(text):
+    """Print in green font
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
     print (bcolors.OKGREEN + text + bcolors.ENDC)
 
-def printBlue(text):
+def print_blue(text):
+    """Print in blue font
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
     print (bcolors.OKBLUE + text + bcolors.ENDC) 
 
-def printInfoMessage(text):
+def print_magenta(text):
+    """Print in magenta font
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
     print (bcolors.LightMagenta + text + bcolors.ENDC) 
-def printYellow(text):
+    
+def print_info(text):
+    """Print an info message
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
+    print_magenta(text)
+    
+def print_yellow(text):
+    """Print in yellow font
+    Parameters
+    ----------
+    text(str): text to print
+    Returns
+    --------
+    None
+    """
     print (bcolors.LightYellow + text + bcolors.ENDC) 
 
 ######End color functions###################
 
-def getTimestamp(shorten=False):
+def get_time_stamp(shorten=False):
+    """Function to return current timestamp.
+    Parameters
+    ----------
+    shorten(bool): return short version without space, dash and colons
+    Returns
+    string: timestamp as string
+    --------
+    """
     
     timestamp=str(dt.datetime.now()).split(".")[0].replace(" ","-")
     if shorten:
         timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
     return timestamp
     
-"""
-moved to session.py
-def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
-    #Save current workspace using dill.
-    
-    #timestamp format YYYYMMDDHHMISE
-    timestamp=getTimestamp(True)
-    
-    
-    if not outDir:        
-        outDir=os.getcwd()
-    
-    outFile=os.path.join(outDir,filename)
-    outFile=outFile+"_"+timestamp+".pyrpipe"
-    
-    #save workspace
-    dill.dump_session(outFile)
-    print("Session saved to: "+outFile)
 
-
-def restorePyrpipeWorkspace(file):
-    if not check_files_exist(file):
-        print(file+" doesn't exist")
-        return False
-    #load the session
-    dill.load_session(file)
-    print("Session restored.")
-    return True
-"""
-
-
-
-
-def getSRADownloadPath(srrID):
-    if len(srrID) <6:
+def get_sra_ftppath(srrid):
+    """Return an ftp address to download sra files
+    """
+    if len(srrid) <6:
         return None
     
-    parentPath="anonftp@ftp.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/"
-    parentPath=parentPath+srrID[0:3]+"/"+srrID[0:6]+"/"+srrID+"/"+srrID+".sra"
+    parent_path="anonftp@ftp.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/"
+    parent_path=parent_path+srrid[0:3]+"/"+srrid[0:6]+"/"+srrid+"/"+srrid+".sra"
     
-    return parentPath
+    return parent_path
     
 
 
-def checkPathsExists(*args):
+def check_paths_exist(*args):
+    """Function to check if a directory exists.
+    
+    Parametrs
+    ---------
+    args(tuple): a list of paths to check
+    
+    Returns
+    -------
+    bool: return true only if all paths exist
     """
-    check if a directory exists
-    """
-    failFlag=False
+    fail_flag=False
     for path in args:
         if not (os.path.exists(path) and os.path.isdir(path)):
-            failFlag=True
-    if failFlag==True:
+            fail_flag=True
+    if fail_flag==True:
         return False
     return True
 
 
 def check_files_exist(*args):
-    failFlag=False
+    """Function to check if files exist.
+    
+    Parametrs
+    ---------
+    args(tuple): a list of paths to check
+    
+    Returns
+    -------
+    bool: return true only if all files exist
+    """
+    fail_flag=False
     for path in args:
         if not os.path.isfile(path):
             #print_boldred("File not found: "+path)
-            failFlag=True
+            fail_flag=True
     
-    if failFlag:
+    if fail_flag:
         return False
     return True
 
-def checkHisatIndex(index):
+def check_hisatindex(index):
+    """Function to check if hisat2 index is valid and exists.
+    Parameters
+    ----------
+    index(str): Path to the index 
+    
+    Returns
+    -------
+    bool: Return true if index is valid
+    """
     return check_files_exist(index+".1.ht2")
 
-def checkSalmonIndex(index):
-    if not checkPathsExists(index):
+def check_salmonindex(index):
+    """Function to check if salmon index is valid and exists.
+    Parameters
+    ----------
+    index(str): Path to the index 
+    
+    Returns
+    -------
+    bool: Return true if index is valid
+    """
+    if not check_paths_exist(index):
         return False
     return True
 
-def checkStarIndex(index):
-    if checkPathsExists(index):
-        filesTocheck=['chrLength.txt',
+def check_starindex(index):
+    """Function to check if star index is valid and exists.
+    Parameters
+    ----------
+    index(str): Path to the index 
+    
+    Returns
+    -------
+    bool: Return true if index is valid
+    """
+    if check_paths_exist(index):
+        files_to_check=['chrLength.txt',
                       'chrNameLength.txt',
                       'chrName.txt',
                       'chrStart.txt',
                       'genomeParameters.txt',
                       'Genome']
-        for f in filesTocheck:
+        for f in files_to_check:
             if not check_files_exist(os.path.join(index,f)):
                 return False
         return True
     
     return False
 
-def checkBowtie2Index(index):
+def check_bowtie2index(index):
+    """Function to check if bowtie2 index is valid and exists.
+    Parameters
+    ----------
+    index(str): Path to the index 
+    
+    Returns
+    -------
+    bool: Return true if index is valid
+    """
     return check_files_exist(index+".1.bt2")
     
 
-def bytetoReadable(sizeInBytes):
+def byte_to_readable(size_bytes):
+    """Function to convert bytes to human readable format (MB,GB ...)
+    Parameters
+    ----------
+    size_bytes(float): size in bytes
+    
+    Returns
+    -------
+    str: Return size in human readable format
     """
-    function to convert bytes to human readable format (MB,GB ...)
-    """
+    
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
-        if sizeInBytes < 1024.0:
-            return "%3.1f %s" % (sizeInBytes, x)
-        sizeInBytes /= 1024.0
+        if size_bytes < 1024.0:
+            return "%3.1f %s" % (size_bytes, x)
+        size_bytes /= 1024.0
 
 
-def getFileSize(file_path):
-    """
-    Return File size in human readable format
+def get_file_size(file_path):
+    """Returns file size in human readable format
+    Parameters
+    ----------
+    file_path(str): Path to file
+    Returns
+    -------
+    string: Return size in human readable format
     """
     
     if (check_files_exist(file_path)):
         file_info = os.stat(file_path)
-        return bytetoReadable(file_info.st_size)
+        return byte_to_readable(file_info.st_size)
     
 
 #TODO: override in case of empty list
-def parseJavaStyleArgs(validArgsList,passedArgs):
+def parse_java_args(valid_args_list,passed_args):
     """
-    Function creates arguments to pass to unix systems through popen
+    Function creates arguments to pass to java programs
     Parameters
     ----------
-    arg1 : list
-        list of valid arguments. Invalid arguments will be ignored
-    arg2: keyword value argument list to be parsed
+    valid_args_list (list): list of valid arguments. Invalid arguments will be ignored
+    passed_args (*dict): keyword value argument list to be parsed
         
     Returns
     -------
-        list
-            a list with command line arguments to be used with popen
-
-        Examples
-        --------
-        >>> parseJavaStyleArgs(['A','B','-C'], {"A": "3", "B": "22","-C":""})
+    list: a list with command line arguments to be used with subprocess.popen
+    Examples
+    --------
+    >>> parse_java_args(['A','B','-C'], {"A": "3", "B": "22","-C":""})
         ['A=3', 'B=22', '-C']
     """
-    popenArgs=[]
-    specialArgList=["--"]
-    appendAtEndArgs=[]
+    popen_args=[]
+    special_args=["--"]
+    positional_args=[]
     
     #empty list supplied consider all armunets valid
-    if len(validArgsList)<1:
-        validArgsList=passedArgs.keys()
+    if len(valid_args_list)<1:
+        valid_args_list=passed_args.keys()
         #above command will also add specialArgs, remove those
-        for x in specialArgList:
-            if x in validArgsList:
-                validArgsList.remove(x)
+        for x in special_args:
+            if x in valid_args_list:
+                valid_args_list.remove(x)
     
-    for key, value in passedArgs.items():
+    for key, value in passed_args.items():
         #check if key is a valid argument
-        if key in validArgsList:
+        if key in valid_args_list:
             #do not add emty parameters e.g. -q or -v
             if len(value)>0:
-                popenArgs.append(key+"="+value)
+                popen_args.append(key+"="+value)
             else:
-                popenArgs.append(key)
-        elif key in specialArgList:
-            appendAtEndArgs.extend(value)
+                popen_args.append(key)
+        elif key in special_args:
+            positional_args.extend(value)
         
         else:
             print("Unknown argument {0} {1}. ignoring...".format(key, value))
-    popenArgs.extend(appendAtEndArgs)
-    return popenArgs
+    popen_args.extend(positional_args)
+    return popen_args
     
     
-def parse_unix_style_args(validArgsList,passedArgs):
-    """
-    Function creates arguments to pass to unix systems through popen
+def parse_unix_args(valid_args_list,passed_args):
+    """Function creates command line arguments to pass to unix programs
     Parameters
     ----------
-    arg1 : list
-        list of valid arguments. Invalid arguments will be ignored
-    arg2: keyword value argument list to be parsed
+    valid_args_list (list): list of valid arguments. Invalid arguments will be ignored
+    passed_args (*dict): keyword value argument list to be parsed
         
     Returns
     -------
-        list
-            a list with command line arguments to be used with popen
-
-        Examples
-        --------
-        >>> parse_unix_style_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
+    list: a list with command line arguments to be used with subprocess.popen
+    Examples
+    --------
+    >>> parse_unix_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
         Unknown argument Attr2 XX. ignoring...
         ['-O', './test', 'IN1', 'IN2']
     """
     
         
     
-    popenArgs=[]
+    popen_args=[]
     """
     Define some special arguments.
     -- to pass input which don't follow any flag e.g. mypro.sh input1 input2
     """
-    specialArgList=["--"]
-    appendAtEndArgs=[]
+    special_args=["--"]
+    positional_args=[]
     
     #empty list supplied consider all armunets valid
-    if len(validArgsList)<1:
-        validArgsList=list(passedArgs.keys())
+    if len(valid_args_list)<1:
+        valid_args_list=list(passed_args.keys())
         #above command will also add specialArgs, remove those
-        for x in specialArgList:
-            if x in validArgsList:
-                validArgsList.remove(x)
+        for x in special_args:
+            if x in valid_args_list:
+                valid_args_list.remove(x)
         
         
-    for key, value in passedArgs.items():
+    for key, value in passed_args.items():
         #check if key is a valid argument
-        if key in validArgsList:
-            popenArgs.append(key)
+        if key in valid_args_list:
+            popen_args.append(key)
             #do not add emty parameters e.g. -q or -v
             if len(value)>0:
                 #if there are multiple values for a flag separated by space
-                popenArgs.extend(value.split(" "))
+                popen_args.extend(value.split(" "))
                         
-                #popenArgs.append(value)
-        elif key in specialArgList:
-            appendAtEndArgs.extend(value)
+                #popen_args.append(value)
+        elif key in special_args:
+            positional_args.extend(value)
         else:
             print("Unknown argument {0} {1}. ignoring...".format(key, value))
-    popenArgs.extend(appendAtEndArgs)
-    return popenArgs
+    popen_args.extend(positional_args)
+    return popen_args
     
 
 
 
 
-def get_file_directory(filePath):
-    return os.path.split(filePath)[0]
-
-def getFileName(filePath):
-    return os.path.split(filePath)[1]
-
-def getFileExtension(filePath):
-    return os.path.splitext(filePath)[1]
-
-def get_file_basename(filePath):
-    """return file name without the extension
-    arg1:
-        file path or file name
+def get_file_directory(file_path):
+    """Returns directory of a file
+    Parameters
+    ----------
+    file_path(str): Path to file
+    Returns
+    -------
+    string: directory os file_path
     """
-    return os.path.splitext(getFileName(filePath))[0]
+    return os.path.split(file_path)[0]
+
+def get_filename(file_path):
+    """Returns filename with extension
+    Parameters
+    ----------
+    file_path(str): Path to file
+    Returns
+    -------
+    string: filename
+    """
+    return os.path.split(file_path)[1]
+
+def get_fileext(file_path):
+    """Returns file extension
+    Parameters
+    ----------
+    file_path(str): Path to file
+    Returns
+    -------
+    string: file extension
+    """
+    return os.path.splitext(file_path)[1]
+
+def get_file_basename(file_path):
+    """Returns file basename without extension
+    Parameters
+    ----------
+    file_path(str): Path to file
+    Returns
+    -------
+    string: file basename without extension
+    """
+    return os.path.splitext(get_filename(file_path))[0]
     
 
 
 
-def mkdir(dirPath):
+def mkdir(dir_path):
     """Create a directory
+    Returns
+    bool: true is directory created
     """
-    print("creating Dir:"+dirPath)
+    print("creating Dir:"+dir_path)
     try:
-        os.mkdir(dirPath)
+        os.mkdir(dir_path)
     except OSError:
         return False
     return True
 
 
-def getListUnion(*args):
+def get_union(*args):
+    """Find and return unioin of multiple input lists.
+    """
     return list(set().union(*args)) 
     
 
 if __name__ == "__main__":
     print("main")
     #print(parse_unix_style_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
-    print(parseJavaStyleArgs(['A','B','-C'], {"A": "3", "B": "22","-C":"","--":("-Xmx2g","-da",)}))
+    print(parse_java_args(['A','B','-C'], {"A": "3", "B": "22","-C":"","--":("-Xmx2g","-da",)}))

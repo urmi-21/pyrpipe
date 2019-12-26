@@ -104,7 +104,7 @@ class Hisat2(Aligner):
         
         hisat2Build_Cmd=['hisat2-build']
         #add options
-        hisat2Build_Cmd.extend(parseUnixStyleArgs(hisat2BuildValidArgsList,kwargs))
+        hisat2Build_Cmd.extend(parse_unix_args(hisat2BuildValidArgsList,kwargs))
         #add input files
         hisat2Build_Cmd.append(str(",".join(args)))
         #add dir/basenae
@@ -114,12 +114,12 @@ class Hisat2(Aligner):
         #start ececution
         status=executeCommand(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("hisatBuild failed")
+            print_boldred("hisatBuild failed")
             return False
         
         #check if sam file is present in the location directory of sraOb
         if not checkHisatIndex(os.path.join(indexPath,indexName)):
-            printBoldRed("hisatBuild failed")
+            print_boldred("hisatBuild failed")
             return False
         
         #set the index path
@@ -171,7 +171,7 @@ class Hisat2(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(outSamFile):
+            if check_files_exist(outSamFile):
                 return outSamFile
         else:
             return ""
@@ -202,7 +202,7 @@ class Hisat2(Aligner):
        
         hisat2_Cmd=['hisat2']
         #add options
-        hisat2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        hisat2_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))        
         
         #execute command
         cmdStatus=executeCommand(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -284,7 +284,7 @@ class Star(Aligner):
             Returns status of star command
         """
         if len(args)<1:
-            printBoldRed("Please provide input fasta file to build STAR index")
+            print_boldred("Please provide input fasta file to build STAR index")
             return ""
         
         print("Building STAR index...")
@@ -301,7 +301,7 @@ class Star(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         starbuild_Cmd=['STAR']
-        starbuild_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedOpts))
+        starbuild_Cmd.extend(parse_unix_args(self.validArgsList,mergedOpts))
         
         #execute command
         status=executeCommand(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -395,7 +395,7 @@ class Star(Aligner):
        
         star_Cmd=['STAR']
         #add options
-        star_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        star_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))        
         
         #execute command
         cmdStatus=executeCommand(star_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -494,7 +494,7 @@ class Bowtie2(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(outFile):
+            if check_files_exist(outFile):
                 return outFile
         else:
             return ""
@@ -523,14 +523,14 @@ class Bowtie2(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         bowtie2_Cmd=['bowtie2']
-        bowtie2_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        bowtie2_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
         
         #print("Executing:"+" ".join(bowtie2_Cmd))
         
         #start ececution
         status=executeCommand(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("bowtie2 failed")
+            print_boldred("bowtie2 failed")
         return status
     
     
@@ -570,7 +570,7 @@ class Kallisto(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(kallisto_index)>0 and checkFilesExists(kallisto_index):
+        if len(kallisto_index)>0 and check_files_exist(kallisto_index):
             print("kallisto index is: "+kallisto_index)
             self.kallisto_index=kallisto_index
             self.passedArgumentDict['-i']=self.kallisto_index
@@ -583,8 +583,8 @@ class Kallisto(Aligner):
         """
         
         #check input
-        if not checkFilesExists(fasta):
-            printBoldRed("{} does not exist. Exiting".format(fasta))
+        if not check_files_exist(fasta):
+            print_boldred("{} does not exist. Exiting".format(fasta))
             return False
         
         #create out dir
@@ -602,13 +602,13 @@ class Kallisto(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(indexOut):
+            if check_files_exist(indexOut):
                 self.kallisto_index=indexOut
                 self.passedArgumentDict['-i']=self.kallisto_index
-                printGreen("kallisto_index is:"+self.kallisto_index)
+                print_green("kallisto_index is:"+self.kallisto_index)
                 return True
         else:
-            printBoldRed("Failed to create kallisto index")
+            print_boldred("Failed to create kallisto index")
             return False
     
     def run_kallisto_quant(self,sraOb,outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
@@ -640,10 +640,10 @@ class Kallisto(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(os.path.join(outDir,"abundance.tsv")):
+            if check_files_exist(os.path.join(outDir,"abundance.tsv")):
                 return outDir
         
-        printBoldRed("kallisto quant failed")
+        print_boldred("kallisto quant failed")
         return ""
         
     
@@ -670,16 +670,16 @@ class Kallisto(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         kallisto_Cmd=['kallisto',subcommand]
-        kallisto_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        kallisto_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
         
         #start ececution
         status=executeCommand(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
         if not status:
-            printBoldRed("kallisto failed")
+            print_boldred("kallisto failed")
         return status       
     
     def checkIndex(self):
-        return checkFilesExists(self.kallisto_index)
+        return check_files_exist(self.kallisto_index)
             
 
 
@@ -748,8 +748,8 @@ class Salmon(Aligner):
         """
         
         #check input
-        if not checkFilesExists(fasta):
-            printBoldRed("{} does not exist. Exiting".format(fasta))
+        if not check_files_exist(fasta):
+            print_boldred("{} does not exist. Exiting".format(fasta))
             return False
         #create out dir
         if not checkPathsExists(index_path):
@@ -765,14 +765,14 @@ class Salmon(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            #if checkFilesExists(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
+            #if check_files_exist(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
             if checkPathsExists(indexOut):
                 self.salmon_index=indexOut
                 self.passedArgumentDict['-i']=self.salmon_index
-                printGreen("salmon index is:"+self.salmon_index)
+                print_green("salmon index is:"+self.salmon_index)
                 return True
         
-        printBoldRed("Failed to create salmon index")
+        print_boldred("Failed to create salmon index")
         return False
         
         
@@ -806,10 +806,10 @@ class Salmon(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(os.path.join(outDir,"quant.sf")):
+            if check_files_exist(os.path.join(outDir,"quant.sf")):
                 return outDir
         
-        printBoldRed("salmon quant failed")
+        print_boldred("salmon quant failed")
         return ""
         
         
@@ -836,12 +836,12 @@ class Salmon(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         salmon_Cmd=['salmon',subcommand]
-        salmon_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        salmon_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
         
         #start ececution
         status=executeCommand(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
         if not status:
-            printBoldRed("salmon failed")
+            print_boldred("salmon failed")
         return status 
 
     def checkIndex(self):

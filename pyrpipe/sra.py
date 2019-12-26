@@ -33,7 +33,7 @@ class SRA:
             raise Exception("ERROR: Please install missing programs.")
         
         
-        printInfoMessage("Creating SRA: "+srrAccession)
+        print_info("Creating SRA: "+srrAccession)
         self.srrAccession=srrAccession
         #append the SRR accession to the location
         self.location=os.path.join(location,self.srrAccession)
@@ -84,7 +84,7 @@ class SRA:
         True
         """
         
-        printInfoMessage("Downloading "+self.srrAccession+" ...")
+        print_info("Downloading "+self.srrAccession+" ...")
         
         #scan for prefetch arguments
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
@@ -102,25 +102,25 @@ class SRA:
             
 
         prefetch_Cmd=['prefetch']
-        prefetch_Cmd.extend(parseUnixStyleArgs(prefetchArgsList,kwargs))
+        prefetch_Cmd.extend(parse_unix_args(prefetchArgsList,kwargs))
         prefetch_Cmd.extend(['-O',self.location])
         prefetch_Cmd.append(self.srrAccession)
                 
-        cmdStatus=executeCommand(prefetch_Cmd,objectid=self.srrAccession)
+        cmdStatus=execute_command(prefetch_Cmd,objectid=self.srrAccession)
         if not cmdStatus:
-            printBoldRed("prefetch failed for:"+self.srrAccession)
+            print_boldred("prefetch failed for:"+self.srrAccession)
             return False
         
         #store path to the downloaded sra file
         self.localSRAFilePath=os.path.join(self.location,self.srrAccession+".sra")
         #validate path exists
-        if not checkFilesExists(self.localSRAFilePath):
-            printBoldRed("Error downloading file. File "+self.localSRAFilePath+" does not exist!!!")
+        if not check_files_exist(self.localSRAFilePath):
+            print_boldred("Error downloading file. File "+self.localSRAFilePath+" does not exist!!!")
             return False
         
-        print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(getFileSize(self.localSRAFilePath)))
+        print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(get_file_size(self.localSRAFilePath)))
         #save file .sra file size
-        self.sraFileSize=getFileSize(self.localSRAFilePath)
+        self.sraFileSize=get_file_size(self.localSRAFilePath)
         #test if file is paired or single end
         if isPairedSRA(self.localSRAFilePath):
             self.layout="PAIRED"
@@ -146,13 +146,13 @@ class SRA:
         if self.layout=='PAIRED':
             errorFlag=False
             if hasattr(self,'localfastq1Path'):
-                if not checkFilesExists(self.localfastq1Path):
+                if not check_files_exist(self.localfastq1Path):
                     return False
             else:
                 return False
             
             if hasattr(self,'localfastq2Path'):
-                if not checkFilesExists(self.localfastq2Path):
+                if not check_files_exist(self.localfastq2Path):
                     return False
             else:
                 return False
@@ -161,7 +161,7 @@ class SRA:
             
         else:
             if hasattr(self,'localfastqPath'):
-                return checkFilesExists(self.localfastqPath)
+                return check_files_exist(self.localfastqPath)
             else:            
                 return False
     
@@ -216,7 +216,7 @@ class SRA:
         #execute command
         
         fstrqd_Cmd=['fasterq-dump']
-        fstrqd_Cmd.extend(parseUnixStyleArgs(fasterqdumpArgsList,kwargs))
+        fstrqd_Cmd.extend(parse_unix_args(fasterqdumpArgsList,kwargs))
         #add location
         fstrqd_Cmd.extend(['-O',self.location])
         #add output filename. output will be <srrAccession>.fastq or <srrAccession>_1.fastq and <srrAccession>_2.fastq
@@ -224,7 +224,7 @@ class SRA:
         fstrqd_Cmd.append(self.localSRAFilePath)
         
         #execute command
-        cmdStatus=executeCommand(fstrqd_Cmd,objectid=self.srrAccession)
+        cmdStatus=execute_command(fstrqd_Cmd,objectid=self.srrAccession)
         if not cmdStatus:
             print("prefetch failed for:"+self.srrAccession)
             return False
@@ -234,16 +234,16 @@ class SRA:
         if(self.layout=="SINGLE"):
             self.localfastqPath=os.path.join(self.location,self.srrAccession+".fastq")
             
-            if not checkFilesExists(self.localfastqPath):
-                printBoldRed("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
+            if not check_files_exist(self.localfastqPath):
+                print_boldred("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
                 return False
             
         else:
             self.localfastq1Path=os.path.join(self.location,self.srrAccession+"_1.fastq")
             self.localfastq2Path=os.path.join(self.location,self.srrAccession+"_2.fastq")
             
-            if not checkFilesExists(self.localfastq1Path,self.localfastq2Path):
-                printBoldRed("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
+            if not check_files_exist(self.localfastq1Path,self.localfastq2Path):
+                print_boldred("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
                 return False
             
         #delete sra file if specified

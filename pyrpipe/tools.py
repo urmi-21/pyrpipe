@@ -54,7 +54,7 @@ class Samtools(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkFilesExists(outBamFile):
+        if not check_files_exist(outBamFile):
             return ""
         
         #deletesamfile
@@ -94,7 +94,7 @@ class Samtools(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkFilesExists(outSortedBamFile):
+        if not check_files_exist(outSortedBamFile):
             return ""
 
         if deleteOriginalBam:
@@ -167,7 +167,7 @@ class Samtools(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkFilesExists(outMergedFile):
+        if not check_files_exist(outMergedFile):
             return ""
         
 
@@ -201,12 +201,12 @@ class Samtools(RNASeqTools):
        
         samtools_Cmd=['samtools',subCommand]
         #add options
-        samtools_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        samtools_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
                 
         #start ececution
         status=executeCommand(samtools_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("samtools failed")
+            print_boldred("samtools failed")
         
         #return status
         return status
@@ -246,7 +246,7 @@ class Portcullis(RNASeqTools):
             Path to the out put dir. current directory is not given.
         """
         
-        if not checkFilesExists(referenceFasta,bamFile):
+        if not check_files_exist(referenceFasta,bamFile):
             print ("Please check input for portcullis.")
             return ""
         
@@ -298,7 +298,7 @@ class Portcullis(RNASeqTools):
        
         portcullis_Cmd=['portcullis',subCommand]
         #add options
-        portcullis_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        portcullis_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
                 
         print("Executing:"+" ".join(portcullis_Cmd))
         
@@ -306,7 +306,7 @@ class Portcullis(RNASeqTools):
         #start ececution
         status=executeCommand(portcullis_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("portcullis failed")
+            print_boldred("portcullis failed")
                 
         #return status
         return status
@@ -360,7 +360,7 @@ class Mikado(RNASeqTools):
         f.write("\n".join(gtfs))
         f.close()
         
-        printGreen("Mikado list file written to:"+outFilePath)
+        print_green("Mikado list file written to:"+outFilePath)
         return outFilePath
                 
 
@@ -383,7 +383,7 @@ class Mikado(RNASeqTools):
         """
         
         #check all file exists
-        if not checkFilesExists(listFile,genome,junctions,scoring):
+        if not check_files_exist(listFile,genome,junctions,scoring):
             print("Please check mikado input")
             return ""
         
@@ -402,11 +402,11 @@ class Mikado(RNASeqTools):
         status=self.runMikado("configure",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            printBoldRed("Mikado configure failed.\nPlease make sure the paths in list file are global.")
+            print_boldred("Mikado configure failed.\nPlease make sure the paths in list file are global.")
             return ""
         
         #check if bam file exists
-        if not checkFilesExists(outFilePath):
+        if not check_files_exist(outFilePath):
             return ""
         
         return outFilePath
@@ -417,7 +417,7 @@ class Mikado(RNASeqTools):
         """
         
         #check input files exist
-        if not checkFilesExists(jsonconf):
+        if not check_files_exist(jsonconf):
             print("Please check the input configuration to mikado.")
             return ""
         if not outDir:
@@ -446,7 +446,7 @@ class Mikado(RNASeqTools):
         """Wrapper to run mikado serialise
         """
         #check input files exist
-        if not checkFilesExists(blastTargets,orfs,xml):
+        if not check_files_exist(blastTargets,orfs,xml):
             print("Please check the input to mikado.")
             return ""
         if not outDir:
@@ -474,7 +474,7 @@ class Mikado(RNASeqTools):
         """Wrapper to run mikado pick
         """
         #check input files exist
-        if not checkFilesExists(jsonconf):
+        if not check_files_exist(jsonconf):
             print("Please check the input to mikado.")
             return ""
         if not outDir:
@@ -507,14 +507,14 @@ class Mikado(RNASeqTools):
        
         mikado_Cmd=['mikado',subCommand]
         #add options
-        mikado_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))
+        mikado_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
         status=executeCommand(mikado_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("mikado failed")
+            print_boldred("mikado failed")
         #return status
         return status
         
@@ -540,8 +540,8 @@ class Ribocode(RNASeqTools):
         """
         
         #check input
-        if not checkFilesExists(gtf,genome,bam):
-            printBoldRed("Please check input files for Ribocode")
+        if not check_files_exist(gtf,genome,bam):
+            print_boldred("Please check input files for Ribocode")
             return ""
         
         outDir=getFileDirectory(gtf)
@@ -550,11 +550,11 @@ class Ribocode(RNASeqTools):
         newOpts={"-g":gtf,"f":genome,"-r":bam,"-l":l,-o:outFile}
         
         ribocode_Cmd=['RiboCode_onestep']
-        ribocode_Cmd.extend(parseUnixStyleArgs(self.validArgsList,newOpts))
+        ribocode_Cmd.extend(parse_unix_args(self.validArgsList,newOpts))
         
         status=executeCommand(ribocode_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("ribocode failed")
+            print_boldred("ribocode failed")
             return ""
         
         return outFile

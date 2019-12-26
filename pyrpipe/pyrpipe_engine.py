@@ -146,7 +146,7 @@ class pyrpipeLogger():
 
 ###create logger
 pyrpipeLoggerObject=pyrpipeLogger()
-printYellow("Logs will be saved to {}.log".format(pyrpipeLoggerObject.loggerBaseName))
+print_yellow("Logs will be saved to {}.log".format(pyrpipeLoggerObject.loggerBaseName))
     
 """
 All functions that interact with shell are defined here. 
@@ -173,7 +173,7 @@ def runLinuxCommand(cmd,verbose=False):
     #not logging these commands
     logMessage=" ".join(cmd)
     if verbose:
-        printBlue("$ "+logMessage)
+        print_blue("$ "+logMessage)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
@@ -233,7 +233,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         command_name=cmd[0]
     logMessage=" ".join(cmd)
     if not quiet:
-        printBlue("$ "+logMessage)
+        print_blue("$ "+logMessage)
     timeStart = time.time()
     strStartTime=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     try:
@@ -253,11 +253,11 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
     
         if verbose:
             if stdout:
-                printBlue("STDOUT:\n"+stdout)
+                print_blue("STDOUT:\n"+stdout)
             if stderr:
-                printBoldRed("STDERR:\n"+stderr)
+                print_boldred("STDERR:\n"+stderr)
         if not quiet:
-            printGreen("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+            print_green("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
             
                 
         exitCode=result.returncode
@@ -304,7 +304,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         return False
     
     except OSError as e:
-        printBoldRed("OSError exception occured.\n"+str(e))
+        print_boldred("OSError exception occured.\n"+str(e))
         #log error
         timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
@@ -319,7 +319,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
     except subprocess.CalledProcessError as e:
-        printBoldRed("CalledProcessError exception occured.\n"+str(e))
+        print_boldred("CalledProcessError exception occured.\n"+str(e))
         #log error
         timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
@@ -334,7 +334,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         pyrpipeLoggerObject.cmdLogger.debug(json.dumps(logDict))
         return False
     except:
-        printBoldRed("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
+        print_boldred("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
         #log error
         timeDiff = round(time.time() - timeStart)
         logDict={'cmd':logMessage,
@@ -361,7 +361,7 @@ def isPairedSRA(pathToSraFile):
     arg1: string
         the path ro sra file
     """
-    if not checkFilesExists(pathToSraFile):
+    if not check_files_exist(pathToSraFile):
         raise Exception("Error checking layout. {0} doesn't exist".format(pathToSraFile));
     
     try:
@@ -414,13 +414,13 @@ def checkDep(depList):
     """
     errorFlag=False
     for s in depList:
-        #printBlue("Checking "+s+"...")
+        #print_blue("Checking "+s+"...")
         thisCmd=['which',s]
         if(getCommandReturnStatus(thisCmd)):
-            #printGreen ("Found "+s)
+            #print_green ("Found "+s)
             pass
         else:
-            printBoldRed ("Can not find "+s)
+            print_boldred ("Can not find "+s)
             errorFlag=True
     if errorFlag:
         return False
@@ -429,7 +429,7 @@ def checkDep(depList):
 
 #TODO: Re-implement following using native python libraries and move to utils
 def deleteFileFromDisk(filePath):
-    if checkFilesExists(filePath):
+    if check_files_exist(filePath):
         rm_Cmd=['rm',filePath]
         rv= getCommandReturnStatus(rm_Cmd)
         return rv
