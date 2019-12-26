@@ -10,12 +10,21 @@ from pyrpipe.pyrpipe_utils import *
 from pyrpipe.pyrpipe_engine import *
 
 class Assembly:
-    """This class represents a parent class for all programs which can perfrom transcripts assembly.
+    """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
     """
     def __init__(self):
         self.category="Assembler"
-    def performAssembly():
-        """Function to perform assembly.
+    def perform_assembly(bam_file):
+        """Function to perform assembly using a bam file as input. Inherited by all children.
+        
+        Parameters
+        ----------
+        bam_file (string): Path to the bam file.
+        
+        
+        Returns
+        --------
+        string: path to output GTF or output directory depending on the specific assembly program.
         """
         pass
 
@@ -31,7 +40,7 @@ class Stringtie(Assembly):
             Options passed to stringtie. Some of these could be overridden later when calling functions of this class.
             Format to pass the arguments:
         """
-    def __init__(self,referenceGTF="",**kwargs):
+    def __init__(self,reference_gtf="",**kwargs):
         
         super().__init__()
         self.programName="stringtie"
