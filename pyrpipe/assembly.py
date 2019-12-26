@@ -20,16 +20,19 @@ class Assembly:
         pass
 
 class Stringtie(Assembly):
-    def __init__(self,referenceGTF="",**kwargs):
-        """This class represents Stringtie program for transcript assembly.
+    """This class represents Stringtie program for transcript assembly.
         
         Parameters
         ----------
-        arg1: string
-            Path to the reference gtf file.
+        referenceGTF: string
+            Path to the reference gtf file. If a valid gtf file is provided the option -G will be set to the gtf file. This can't
+            be overriden later when calling functions of this class.
         arg2: dict
-            Options passed to stringtie. These could be overridden later when executing stringtie.
+            Options passed to stringtie. Some of these could be overridden later when calling functions of this class.
+            Format to pass the arguments:
         """
+    def __init__(self,referenceGTF="",**kwargs):
+        
         super().__init__()
         self.programName="stringtie"
         #check if stringtie exists
