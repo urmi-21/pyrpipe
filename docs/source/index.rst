@@ -1,28 +1,48 @@
-.. pyrpipe documentation master file, created by
-   sphinx-quickstart on Tue Dec 24 17:05:32 2019.
-   You can adapt this file completely to your liking, but it should at least
-   contain the root `toctree` directive.
+pyrpipe: python RNA-Seq pipelines
+==================================
 
-Welcome to pyrpipe's documentation!
-===================================
+:Author: Urminder Singh
+:Date: |today|
+:Version: |version|
+
+*****
+Introduction
+*****
+pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs. 
+pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
+
+To install the latest release, type::
+
+	git clone https://github.com/urmi-21/pyrpipe.git
+	pip install -r pyrpipe/requirements.txt
+	pip install -e path_to/pyrpipe
+
+See the :ref:`Installation notes <installation>` for details.
+
+Contents
+--------
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
 
-pyrpipe main
-===================
-.. automodule:: pyrpipe
-   :members:
-
-pyrpipe SRA
-=====================
-.. automodule:: pyrpipe.sra
-   :members:
+   api.rst
+   usage.rst
+   installation.rst
+   faq.rst
+   developer.rst
+   release.rst
+   benchmarking.rst
+   glossary.rst
 
 Indices and tables
-==================
+------------------
+
+Contents:
 
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
+
+References
+----------
+
