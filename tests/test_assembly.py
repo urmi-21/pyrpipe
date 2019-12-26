@@ -19,7 +19,6 @@ from testingEnvironment import testSpecs
 import os
 
 testVars=testSpecs()
-testVars.testDir=os.path.join(os.getcwd(),"testDir")
 
 def test_assembly():
     srrID=testVars.srr
