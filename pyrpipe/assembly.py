@@ -10,14 +10,18 @@ from pyrpipe.pyrpipe_utils import *
 from pyrpipe.pyrpipe_engine import *
 
 class Assembly:
+    """This class represents a parent class for all programs which can perfrom transcripts assembly.
+    """
     def __init__(self):
         self.category="Assembler"
     def performAssembly():
+        """Function to perform assembly.
+        """
         pass
 
 class Stringtie(Assembly):
     def __init__(self,referenceGTF="",**kwargs):
-        """Stringtie constructor. Initialize stringtie parameters.
+        """This class represents Stringtie program for transcript assembly.
         
         Parameters
         ----------
