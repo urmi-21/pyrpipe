@@ -33,7 +33,7 @@ class Stringtie(Assembly):
         
         Parameters
         ----------
-        referenceGTF: string
+        reference_gtf: string
             Path to the reference gtf file. If a valid gtf file is provided the option -G will be set to the gtf file. This can't
             be overriden later when calling functions of this class.
         arg2: dict
@@ -43,82 +43,89 @@ class Stringtie(Assembly):
     def __init__(self,reference_gtf="",**kwargs):
         
         super().__init__()
-        self.programName="stringtie"
+        self.program_name="stringtie"
         #check if stringtie exists
-        if not checkDep([self.programName]):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-        self.validArgsList=['-G','--version','--conservative','--rf','--fr','-o','-l',
+        if not checkDep([self.program_name]):
+            raise Exception("ERROR: "+ self.program_name+" not found.")
+        self.valid_args_list=['-G','--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
                             '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
         
         #keep the passed arguments
-        self.passedArgumentDict=kwargs
+        self.passed_args_dict=kwargs
         
         #check the reference GTF
-        if len(referenceGTF)>0 and checkFilesExists(referenceGTF):
-            self.referenceGTF=referenceGTF
-            self.passedArgumentDict['-G']=referenceGTF
+        if len(reference_gtf)>0 and check_files_exist(reference_gtf):
+            self.reference_gtf=reference_gtf
+            self.passed_args_dict['-G']=reference_gtf
         
-    def performAssembly(self,inputBAM,outFileSuffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to run stringtie using BAM file.
+    def perform_assembly(self,bam_file,out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Function to run stringtie using a bam file. Manages the outout file names and returns it.
                 
         Parameters
         ----------
-        arg1: string
-            path to bam file
-        arg2: string
-            Suffix for the output gtf file
-        arg3: bool
-            Overwrite if output file already exists.
-        arg4: dict
-            Options to pass to stringtie. This will override the existing options self.passedArgumentDict (only replace existing arguments and not replace all the arguments).
+        bam_file (string): path to the bam file
+        out_suffix (string): Suffix for the output gtf file
+        overwrite (bool): Overwrite if output file already exists.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
         Returns
         -------
-        string
-            path to output GTF file
+        string: path to output GTF file
         """
         
         #create path to output file
-        fname=getFileBaseName(inputBAM)
-        outDir=getFileDirectory(inputBAM)
-        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        fname=get_file_basename(bam_file)
+        out_dir=get_file_directory(bam_file)
+        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         """
         Handle overwrite
         """
         if not overwrite:
             #check if file exists. return if yes
-            if os.path.isfile(outGtfFile):
-                print("The file "+outGtfFile+" already exists. Exiting..")
-                return outGtfFile
+            if os.path.isfile(out_gtf_file):
+                print("The file "+out_gtf_file+" already exists. Exiting..")
+                return out_gtf_file
         
         #Add output file name and input bam
-        newOpts={"-o":outGtfFile,"--":(inputBAM,)}
-        mergedOpts={**kwargs,**newOpts}
+        new_opts={"-o":out_gtf_file,"--":(bam_file,)}
+        merged_opts={**kwargs,**new_opts}
         
         #call stringtie
-        status=self.runStringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(outGtfFile):
-                return outGtfFile
+            if check_files_exist(out_gtf_file):
+                return out_gtf_file
         else:
             return ""
         
-    def performStringtieMerge(self,*args,outFileSuffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def performStringtieMerge(self,*args,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
         Parameters
         ----------
-        arg1: string
-            Suffix for output gtf file name
+        args (tuple): path to gtf files to merge
+        out_suffix (string): Suffix for output gtf file name
         arg2: tuple
             input Gtf files
-        arg3: bool
-            Overwrite if output file already exists.
-        arg4: dict
-            options to pass to stringtie
+        overwrite (bool): Overwrite if output file already exists.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            
+        Returns
+        -------
+        string: path to the merged GTF file
         """
         
         if len(args) < 1:
@@ -126,28 +133,28 @@ class Stringtie(Assembly):
             return ""
         
         #create path to output sam file
-        fname=getFileBaseName(args[0])
-        outDir=getFileDirectory(args[0])
-        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        fname=get_file_basename(args[0])
+        out_dir=get_file_directory(args[0])
+        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         if not overwrite:
             #check if file exists. return if yes
-            if os.path.isfile(outGtfFile):
-                print("The file "+outGtfFile+" already exists. Exiting..")
-                return outGtfFile
+            if os.path.isfile(out_gtf_file):
+                print("The file "+out_gtf_file+" already exists. Exiting..")
+                return out_gtf_file
         
         #Add merge flag, output file name and input bam
-        newOpts={"--merge":"","-o":outGtfFile,"--":args}
+        new_opts={"--merge":"","-o":out_gtf_file,"--":args}
         
-        mergedOpts={**kwargs,**newOpts}
+        merged_opts={**kwargs,**new_opts}
         
         #call stringtie
-        status=self.runStringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(outGtfFile):
-                return outGtfFile
+            if check_files_exist(out_gtf_file):
+                return out_gtf_file
         else:
             return ""
         
@@ -155,32 +162,35 @@ class Stringtie(Assembly):
         
             
     
-    def runStringtie(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running stringtie
+    def run_stringtie(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running stringtie. This can be used to run stringtie without using perform_assembly() function.
         
         Parameters
         ----------
-        arg1: dict
-            Options passed to stringtie
-        
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            
         Returns
         -------
-        bool
-            status of stringtie command.
+        bool: status of stringtie command.
         """
             
         #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        merged_args_dict={**self.passed_args_dict,**kwargs}
        
-        stie_Cmd=['stringtie']
+        stie_cmd=['stringtie']
         #add options
-        stie_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        stie_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
         
                 
         #start ececution
-        status=executeCommand(stie_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=execute_command(stie_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("stringtie failed")
+            print_boldred("stringtie failed")
         
         #return status
         return status
@@ -188,7 +198,7 @@ class Stringtie(Assembly):
     
     
 class Cufflinks(Assembly):
-    def __init__(self,referenceGTF="",**kwargs):
+    def __init__(self,reference_gtf="",**kwargs):
         """Stringtie constructor. Initialize stringtie parameters.
         
         Parameters
@@ -199,10 +209,10 @@ class Cufflinks(Assembly):
             Options passed to stringtie. These could be overridden later when executing cufflinks.
         """
         super().__init__()
-        self.programName="cufflinks"
+        self.program_name="cufflinks"
         #check if stringtie exists
-        if not checkDep([self.programName]):
-            raise Exception("ERROR: "+ self.programName+" not found.")
+        if not checkDep([self.program_name]):
+            raise Exception("ERROR: "+ self.program_name+" not found.")
             
         
         
@@ -223,18 +233,18 @@ class Cufflinks(Assembly):
         self.cuffnormArgsList=['-o','--output-dir','-L','--labels','--norm-standards-file','-p','--num-threads','--library-type','--library-norm-method','--output-format','--compatible-hits-norm','--total-hits-norm','-v','--verbose','-q','--quiet','--seed','--no-update-check']
         self.cuffmergeArgsList=['h','--help','-o','-g','–-ref-gtf','-p','–-num-threads','-s','-–ref-sequence']
         
-        self.validArgsList=getListUnion(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
+        self.valid_args_list=getListUnion(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
         
         #keep the passed arguments
-        self.passedArgumentDict=kwargs
+        self.passed_args_dict=kwargs
         
         #check the reference GTF
-        if len(referenceGTF)>0 and checkFilesExists(referenceGTF):
-            self.referenceGTF=referenceGTF
-            self.passedArgumentDict['-g']=referenceGTF
+        if len(reference_gtf)>0 and check_files_exist(reference_gtf):
+            self.reference_gtf=reference_gtf
+            self.passed_args_dict['-g']=reference_gtf
     
     
-    def performAssembly(self,inputBAM,outFileSuffix="_cufflinks",overwrite=True,**kwargs):
+    def perform_assembly(self,bam_file,out_suffix="_cufflinks",overwrite=True,**kwargs):
         """Function to run cufflinks with BAM file as input.
                 
         Parameters
@@ -246,7 +256,7 @@ class Cufflinks(Assembly):
         arg3: bool
             Overwrite if output file already exists.
         arg4: dict
-            Options to pass to stringtie. This will override the existing options self.passedArgumentDict (only replace existing arguments and not replace all the arguments).
+            Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
         Returns
         -------
@@ -256,32 +266,32 @@ class Cufflinks(Assembly):
         """
         
         #create path to output file
-        fname=getFileBaseName(inputBAM)
-        outDir=getFileDirectory(inputBAM)
-        outGtfFile=os.path.join(outDir,fname+outFileSuffix+".gtf")
+        fname=get_file_basename(bam_file)
+        out_dir=get_file_directory(bam_file)
+        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         """
         Handle overwrite
         """
         if not overwrite:
             #check if file exists. return if yes
-            if os.path.isfile(outGtfFile):
-                print("The file "+outGtfFile+" already exists. Exiting..")
-                return outGtfFile
+            if os.path.isfile(out_gtf_file):
+                print("The file "+out_gtf_file+" already exists. Exiting..")
+                return out_gtf_file
             
         #Add output file name and input bam
-        newOpts={"-o":outDir,"--":(inputBAM,)}
-        mergedOpts={**kwargs,**newOpts}
+        new_opts={"-o":out_dir,"--":(bam_file,)}
+        merged_opts={**kwargs,**new_opts}
         
         #call cufflinks
-        status=self.runCufflinks(**mergedOpts)
+        status=self.runCufflinks(**merged_opts)
         
         if status:
-            #move outDir/transcripts.gtf to outfile
-            moveFile(os.path.join(outDir,"transcripts.gtf"),outGtfFile)
+            #move out_dir/transcripts.gtf to outfile
+            moveFile(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
             #check if sam file is present in the location directory of sraOb
-            if checkFilesExists(outGtfFile):
-                return outGtfFile
+            if check_files_exist(out_gtf_file):
+                return out_gtf_file
         else:
             return ""
     
@@ -303,20 +313,20 @@ class Cufflinks(Assembly):
         validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
         if command in validCommands:
             #override existing arguments
-            mergedArgsDict={**self.passedArgumentDict,**kwargs}
+            merged_args_dict={**self.passed_args_dict,**kwargs}
        
-            cuff_Cmd=[command]
+            cuff_cmd=[command]
             #add options
-            cuff_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+            cuff_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
                   
             #start ececution
-            status=executeCommand(cuff_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+            status=execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
             if not status:
-                printBoldRed("cufflinks failed")
+                print_boldred("cufflinks failed")
                 #return status
             return status
         else:
-            printBoldRed("Unknown command {}"+command)
+            print_boldred("Unknown command {}"+command)
             return False
     
     
@@ -335,16 +345,16 @@ class Cufflinks(Assembly):
         """
             
         #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        merged_args_dict={**self.passed_args_dict,**kwargs}
        
-        cufflinks_Cmd=['cufflinks']
+        cufflinks_cmd=['cufflinks']
         #add options
-        cufflinks_Cmd.extend(parseUnixStyleArgs(self.validArgsList,mergedArgsDict))        
+        cufflinks_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
         
         
         #start ececution
-        status=executeCommand(cufflinks_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            printBoldRed("cufflinks failed")
+            print_boldred("cufflinks failed")
         #return status
         return status

@@ -190,7 +190,7 @@ def getCommandReturnStatus(cmd):
 
 #prints stdout in real time. optimal for huge stdout and no stderr
 #not used anymore
-def executeCommandRealtime(cmd):
+def execute_commandRealtime(cmd):
     pl.logger.debug("Executing command:\n$ q"+" ".join(cmd)) 
     start_time = time.time()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
@@ -205,7 +205,7 @@ def executeCommandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def executeCommand(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
+def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
     """
     Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
     

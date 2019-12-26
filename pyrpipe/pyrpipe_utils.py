@@ -25,7 +25,7 @@ class bcolors:
     BOLD = '\033[1m'
     UNDERLINE = '\033[4m'
 
-def printBoldRed(text):
+def print_boldred(text):
     print (bcolors.FAIL + bcolors.BOLD+ text + bcolors.ENDC)
 
 def printGreen(text):
@@ -69,7 +69,7 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
 
 
 def restorePyrpipeWorkspace(file):
-    if not checkFilesExists(file):
+    if not check_files_exist(file):
         print(file+" doesn't exist")
         return False
     #load the session
@@ -105,11 +105,11 @@ def checkPathsExists(*args):
     return True
 
 
-def checkFilesExists(*args):
+def check_files_exist(*args):
     failFlag=False
     for path in args:
         if not os.path.isfile(path):
-            #printBoldRed("File not found: "+path)
+            #print_boldred("File not found: "+path)
             failFlag=True
     
     if failFlag:
@@ -117,7 +117,7 @@ def checkFilesExists(*args):
     return True
 
 def checkHisatIndex(index):
-    return checkFilesExists(index+".1.ht2")
+    return check_files_exist(index+".1.ht2")
 
 def checkSalmonIndex(index):
     if not checkPathsExists(index):
@@ -133,14 +133,14 @@ def checkStarIndex(index):
                       'genomeParameters.txt',
                       'Genome']
         for f in filesTocheck:
-            if not checkFilesExists(os.path.join(index,f)):
+            if not check_files_exist(os.path.join(index,f)):
                 return False
         return True
     
     return False
 
 def checkBowtie2Index(index):
-    return checkFilesExists(index+".1.bt2")
+    return check_files_exist(index+".1.bt2")
     
 
 def bytetoReadable(sizeInBytes):
@@ -158,7 +158,7 @@ def getFileSize(file_path):
     Return File size in human readable format
     """
     
-    if (checkFilesExists(file_path)):
+    if (check_files_exist(file_path)):
         file_info = os.stat(file_path)
         return bytetoReadable(file_info.st_size)
     
@@ -212,7 +212,7 @@ def parseJavaStyleArgs(validArgsList,passedArgs):
     return popenArgs
     
     
-def parseUnixStyleArgs(validArgsList,passedArgs):
+def parse_unix_style_args(validArgsList,passedArgs):
     """
     Function creates arguments to pass to unix systems through popen
     Parameters
@@ -228,7 +228,7 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
 
         Examples
         --------
-        >>> parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
+        >>> parse_unix_style_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
         Unknown argument Attr2 XX. ignoring...
         ['-O', './test', 'IN1', 'IN2']
     """
@@ -273,7 +273,7 @@ def parseUnixStyleArgs(validArgsList,passedArgs):
 
 
 
-def getFileDirectory(filePath):
+def get_file_directory(filePath):
     return os.path.split(filePath)[0]
 
 def getFileName(filePath):
@@ -282,7 +282,7 @@ def getFileName(filePath):
 def getFileExtension(filePath):
     return os.path.splitext(filePath)[1]
 
-def getFileBaseName(filePath):
+def get_file_basename(filePath):
     """return file name without the extension
     arg1:
         file path or file name
@@ -309,5 +309,5 @@ def getListUnion(*args):
 
 if __name__ == "__main__":
     print("main")
-    #print(parseUnixStyleArgs(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
+    #print(parse_unix_style_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
     print(parseJavaStyleArgs(['A','B','-C'], {"A": "3", "B": "22","-C":"","--":("-Xmx2g","-da",)}))
