@@ -17,28 +17,30 @@ import matplotlib.pyplot as plt
 import os
 
 class Benchmark:
-    def __init__(self,logFile,envLog,outDir=os.getcwd()):
+    def __init__(self,log_file,env_log,out_dir=""):
         """Describe...
         
         
         
         """
         
-        if not pu.checkFilesExists(logFile,envLog):
-            raise Exception("Please check input for benchmark report. {} {}".format(logFile,envLog))
-        self.logFile=logFile
-        self.envLpg=envLog
+        if not pu.check_files_exist(log_file,env_log):
+            raise Exception("Please check input for benchmark report. {} {}".format(log_file,env_log))
+        if not out_dir:
+            out_dir=os.getcwd()
+        self.log_file=log_file
+        self.env_log=env_log
         self.runtimes_by_prog={}
         self.runtimes_by_object={}
         #init
-        pu.printBlue("parsing log...")
-        self.parseLogs()
-        pu.printBlue("done.")
-        #outdir
-        self.benchmarksDir=os.path.join(outDir,'benchmark_reports')
-        if not pu.checkPathsExists(self.benchmarksDir):
-            if not pu.mkdir(self.benchmarksDir):
-                raise Exception("Error running benchmarks. Can not create output directory {}".format(self.benchmarksDir))
+        pu.print_blue("parsing log...")
+        self.parse_logs()
+        pu.print_blue("done.")
+        #out_dir
+        self.benchmark_dir=os.path.join(out_dir,'benchmark_reports')
+        if not pu.check_paths_exist(self.benchmark_dir):
+            if not pu.mkdir(self.benchmark_dir):
+                raise Exception("Error running benchmarks. Can not create output directory {}".format(self.benchmark_dir))
             
         
         
@@ -48,8 +50,8 @@ class Benchmark:
         """
         try:
             runtime= dt.datetime.strptime(timestring,"%H:%M:%S")
-            deltaTime = dt.timedelta(days=0,hours=runtime.hour, minutes=runtime.minute, seconds=runtime.second)
-            return deltaTime.seconds
+            delta_time = dt.timedelta(days=0,hours=runtime.hour, minutes=runtime.minute, seconds=runtime.second)
+            return delta_time.seconds
         except ValueError:
             #try days format
             temp=timestring.split(",")
@@ -59,10 +61,10 @@ class Benchmark:
             runtime= dt.datetime.strptime(rest,"%H:%M:%S")
             #one day less
             #lastruntime=lastruntime+dt.timedelta(days=days-1)
-            deltaTime = dt.timedelta(days=days,hours=runtime.hour, minutes=runtime.minute, seconds=runtime.second)
-            return deltaTime.seconds+(86400*days)
+            delta_time = dt.timedelta(days=days,hours=runtime.hour, minutes=runtime.minute, seconds=runtime.second)
+            return delta_time.seconds+(86400*days)
         
-    def parseLogs(self):
+    def parse_logs(self):
         """Parse the input logs.
         For each command create a dict with runtimes as list and program name as key
         For each object id in input log create a dict.
@@ -75,17 +77,15 @@ class Benchmark:
         
         
         
-        with open(self.logFile) as f:
+        with open(self.log_file) as f:
             data=f.read().splitlines()
-        numCommands=0
-        failedCommands=0
-        passedCommands=0
-        numPrograms=0
+        num_commands=0
+
     
         for l in data:
             if not l.startswith("#"):
                 thisDict=json.loads(l)
-                numCommands+=1
+                num_commands+=1
                 #ignore failed commands
                 if int(thisDict['exitcode'])!=0:
                     continue
@@ -107,7 +107,7 @@ class Benchmark:
                 try:
                     objectid=thisDict['objectid']
                 except KeyError:
-                    objectid='SRR'+str(numCommands%50)
+                    objectid='SRR'+str(num_commands%50)
                 
                 if objectid in self.runtimes_by_object:
                     #if the object is used with same program extend the list
@@ -192,11 +192,11 @@ class Benchmark:
         #plt.show()
         
         #save plot
-        plotfile=os.path.join(self.benchmarksDir,'time_per_object.png')
+        plotfile=os.path.join(self.benchmark_dir,'time_per_object.png')
         plt.savefig(plotfile,bbox_inches='tight')
         
-        #write data to outdir
-        outfile=os.path.join(self.benchmarksDir,'time_per_object.csv')
+        #write data to out_dir
+        outfile=os.path.join(self.benchmark_dir,'time_per_object.csv')
         data.to_csv(outfile, index=False)
     
     
@@ -250,7 +250,7 @@ class Benchmark:
         sns.despine(left = True, bottom = True)
         ax.set(xlabel='runtime (sec.)')
         #save plot
-        plotfile=os.path.join(self.benchmarksDir,'time_per_program.png')
+        plotfile=os.path.join(self.benchmark_dir,'time_per_program.png')
         plt.savefig(plotfile,bbox_inches='tight')
         
         
@@ -279,7 +279,7 @@ class Benchmark:
         
         
         #save to file
-        plotfile=os.path.join(self.benchmarksDir,'program_boxplots.png')
+        plotfile=os.path.join(self.benchmark_dir,'program_boxplots.png')
         plt.savefig(plotfile,bbox_inches='tight')
         #plt.show()
         #clear plot
@@ -296,15 +296,15 @@ class Benchmark:
         f.suptitle('Summary of total runtimes', fontsize=26)
         
         #save plot
-        plotfile=os.path.join(self.benchmarksDir,'program_summary.png')
+        plotfile=os.path.join(self.benchmark_dir,'program_summary.png')
         plt.savefig(plotfile,bbox_inches='tight')
         
-        #write data to outdir
-        outfile=os.path.join(self.benchmarksDir,'time_per_program.csv')
+        #write data to out_dir
+        outfile=os.path.join(self.benchmark_dir,'time_per_program.csv')
         data.to_csv(outfile, index=False)
         #save boxplot data
         box_data=pd.DataFrame({ key:pd.Series(value) for key, value in self.runtimes_by_prog.items() })
-        outfile=os.path.join(self.benchmarksDir,'program_box_data.csv')
+        outfile=os.path.join(self.benchmark_dir,'program_box_data.csv')
         box_data.to_csv(outfile, index=False)
         
         
@@ -314,7 +314,7 @@ if __name__ == "__main__":
     print("testing")
     l="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipe.log"
     e="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipeENV.log"
-    ob=Benchmark(l,e,outDir="/home/usingh/work/urmi/hoap/test/bmtest")
+    ob=Benchmark(l,e,out_dir="/home/usingh/work/urmi/hoap/test/bmtest")
     d=(ob.get_time_perobject())
     ob.plot_time_perobject()
 
