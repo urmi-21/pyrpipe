@@ -12,7 +12,7 @@ from pyrpipe.pyrpipe_engine import *
 
 class Aligner:
     def __init__(self):
-        self.category="Alignement"
+        self.category="Aligner"
         self.passedArgumentDict={}
     
     def performAlignment(self):

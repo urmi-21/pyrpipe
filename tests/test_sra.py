@@ -25,3 +25,4 @@ def test_sra():
     assert newOb.fastqFilesExistsLocally()==True, "Failed to locate .fastq files on disk"
     assert newOb.sraFileExistsLocally()!=True, "Failed to delete .sra files from disk"
     
+    #delete downloaded files
