@@ -681,7 +681,7 @@ class Bowtie2(Aligner):
         """
         
         #check for a valid index
-        if not self.checkIndex():
+        if not self.check_index():
             raise Exception("ERROR: Invalid Bowtie2 index. Please run build index to generate an index.")
         
         #override existing arguments
@@ -827,7 +827,7 @@ class Kallisto(Aligner):
         
         #check for a valid index
         if subcommand!="index":
-            if not self.checkIndex():
+            if not self.check_index():
                 raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
         
         #override existing arguments
@@ -842,7 +842,7 @@ class Kallisto(Aligner):
             print_boldred("kallisto failed")
         return status       
     
-    def checkIndex(self):
+    def check_index(self):
         return check_files_exist(self.kallisto_index)
             
 
@@ -993,7 +993,7 @@ class Salmon(Aligner):
         
         #check for a valid index
         if subcommand!="index":
-            if not self.checkIndex():
+            if not self.check_index():
                 raise Exception("ERROR: Invalid salmon index. Please run build index to generate an index.")
         
         #override existing arguments
@@ -1008,7 +1008,7 @@ class Salmon(Aligner):
             print_boldred("salmon failed")
         return status 
 
-    def checkIndex(self):
+    def check_index(self):
         if hasattr(self,'salmon_index'):
             return checkSalmonIndex(self.salmon_index)
         return False

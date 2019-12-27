@@ -413,9 +413,10 @@ def mkdir(dir_path):
     Returns
     bool: true is directory created
     """
-    print("creating Dir:"+dir_path)
+    #print("creating Dir:"+dir_path)
     try:
-        os.mkdir(dir_path)
+        #os.mkdir(dir_path)
+        os.makedirs(dir_path)
     except OSError:
         return False
     return True

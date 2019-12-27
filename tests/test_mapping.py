@@ -61,3 +61,8 @@ def test_bowtie():
     assert bt.check_index()==False, "Failed bowtie2 check_index"
     st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
     assert st==True, "Failed to build bowtie2 index"
+    opts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/bowtie2.sam"}
+    st=bt.run_bowtie2(**opts)
+    
+def test_kallisto():
+    pass
