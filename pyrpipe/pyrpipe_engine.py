@@ -12,14 +12,18 @@ import os
 import subprocess
 import time
 from datetime import datetime 
+from datetime import timedelta
 import logging
 import sys
 import platform
 from multiprocessing import cpu_count
-from pyrpipe.pyrpipe_utils import *
+from pyrpipe import pyrpipe_utils as pu
 import json
 
 class LogFormatter():
+    """
+    A formatter for logs
+    """
     def __init__(self):
         self.start_time = time.time()
     
@@ -52,6 +56,14 @@ class LogFormatter():
         
 
 class PyrpipeLogger():
+    """
+    Class to manage pyrpipe logs
+    
+    Attributes
+    -----------
+    env_logger: logger to log the current environment
+    cmd_logger: logger to log the execution status, stdout, stderr and runtimes for each command run using execute_command()
+    """
     def __init__(self):
         self.__name__="pyrpipeLogger"
         #loggers
@@ -88,6 +100,17 @@ class PyrpipeLogger():
         
     
     def create_logger(self,name,logfile,formatter,level=logging.DEBUG):
+        """Creates a logger
+        Parameters
+        ----------
+        name(str): name of logger
+        logfile(str): file name to save logs
+        formatter(formatter object): formatter for log
+        
+        Returns
+        -------
+        logger
+        """
         #Get different loggers
         handler = logging.FileHandler(logfile)        
         handler.setFormatter(formatter)
@@ -98,10 +121,14 @@ class PyrpipeLogger():
         return logger
     
     def init_cmdlog(self):
+        """init the cmdlog
+        """
         self.cmd_logger.debug("#START LOG")
     
 
     def init_envlog(self):
+        """init the envlog
+        """
         self.env_logger.debug("#START LOG")
         
         #get current time
@@ -138,8 +165,8 @@ class PyrpipeLogger():
         
 
 ###create logger
-pyrpipeLoggerObject=pyrpipeLogger()
-print_yellow("Logs will be saved to {}.log".format(pyrpipeLoggerObject.logger_basename))
+pyrpipeLoggerObject=PyrpipeLogger()
+pu.print_yellow("Logs will be saved to {}.log".format(pyrpipeLoggerObject.logger_basename))
     
 """
 All functions that interact with shell are defined here. 
@@ -147,26 +174,24 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
 
-def searchFilesLocally(searchPath,searchPattern):
-    """Find files and return as list
-    Use global paths for safety
-    """
+   
     
-    searchCmd=['find',searchPath,'-name',searchPattern]
-    st=runLinuxCommand(searchCmd)
-    output=[]
-    if st[0]==0:
-        output=st[1].decode("utf-8").split("\n")
-    return output
+def getShellOutput(cmd,verbose=False):
+    """Function to run a shell command and return returncode, stdout and stderr
     
+    Parameters
+    ----------
+    cdm(list): command to run
+    verbose(bool): to print messages
     
-def runLinuxCommand(cmd,verbose=False):
-    """Run shell commands. These are not logged.
+    Returns
+    -------
+    tuple: (returncode, stdout and stderr)
     """
     #not logging these commands
-    logMessage=" ".join(cmd)
+    log_message=" ".join(cmd)
     if verbose:
-        print_blue("$ "+logMessage)
+        pu.print_blue("$ "+log_message)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
@@ -174,9 +199,18 @@ def runLinuxCommand(cmd,verbose=False):
     except:
         return(-1,"","Command failed to execute")
 
-def getCommandReturnStatus(cmd):
+def getReturnStatus(cmd):
+    """
+    run a shell command and get the return status
+    Parameters
+    ----------
+    cmd(list): shell command in list
+    Returns
+    -------
+    bool: True is returncode is 0
+    """
     #not logging these commands
-    status=runLinuxCommand(cmd)
+    status=getShellOutput(cmd)
     if status[0]==0:
         return True
     return False
@@ -184,51 +218,46 @@ def getCommandReturnStatus(cmd):
 #prints stdout in real time. optimal for huge stdout and no stderr
 #not used anymore
 def execute_commandRealtime(cmd):
-    pl.logger.debug("Executing command:\n$ q"+" ".join(cmd)) 
-    start_time = time.time()
+    """Execute shell command and print stdout in realtime.
+    """
+    
+    #start_time = time.time()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     
     for stdout_line in iter(popen.stdout.readline, ""):
             yield stdout_line 
     popen.stdout.close()
     return_code = popen.wait()
-    end_time = time.time()
-    pl.logger.debug("Executing command:\n$ q"+str(end_time - start_time)) 
+    #end_time = time.time()
+    
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
 def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
-    """
-    Function to execute commands using popen. All logs are managed inside the function for all the commands executed.
+    """Function to execute commands using popen. 
+    All commands executed by this function can be logged and saved to pyrpipe logs.
     
     Parameters
     ----------
-    cmd: list
-        command to execute via popen in a list
-    verbose: bool
-        whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
-    quiet: bool
-        Absolutely no output on screen
-    logs: bool
-        Log the execution to file
-    objectid: string
-        An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
-    command_name: string
-        Name of command to be save in log. If empty it is determined as the first element of the cmd list.
+    cmd(list): command to execute via popen in a list
+    verbose(bool): Whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
+    quiet (bool):  Absolutely no output on screen
+    logs( bool):   Log the execution 
+    objectid(string): An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
+    command_name (string):  Name of command to be save in log. If empty it is determined as the first element of the cmd list.
         
     Returns
     -------
-    bool
-        Return status
+    bool: Return status.True is returncode is 0
     """
     if not command_name:
         command_name=cmd[0]
-    logMessage=" ".join(cmd)
+    log_message=" ".join(cmd)
     if not quiet:
-        print_blue("$ "+logMessage)
-    timeStart = time.time()
-    strStartTime=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        pu.print_blue("$ "+log_message)
+    time_start = time.time()
+    starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
@@ -242,15 +271,15 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         else:
             stderr=""
         
-        timeDiff = round(time.time() - timeStart) #round to remove microsecond term
+        timeDiff = round(time.time() - time_start) #round to remove microsecond term
     
         if verbose:
             if stdout:
-                print_blue("STDOUT:\n"+stdout)
+                pu.print_blue("STDOUT:\n"+stdout)
             if stderr:
-                print_boldred("STDERR:\n"+stderr)
+                pu.print_boldred("STDERR:\n"+stderr)
         if not quiet:
-            print_green("Time taken:"+str(dt.timedelta(seconds=timeDiff)))
+            pu.print_green("Time taken:"+str(timedelta(seconds=timeDiff)))
             
                 
         exitCode=result.returncode
@@ -258,7 +287,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         ##Add to logs        
         if logs:
             """
-            fullMessage=logMessage+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
+            fullMessage=log_message+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
             pyrpipeLoggerObject.cmd_logger.debug(fullMessage)
         
             ##log stdout
@@ -279,10 +308,10 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                 pyrpipeLoggerObject.logged_programs.append(command_name)
             
             #create a dict
-            logDict={'cmd':logMessage,
+            logDict={'cmd':log_message,
                  'exitcode':exitCode,
-                 'runtime':str(dt.timedelta(seconds=timeDiff)),
-                 'starttime':str(strStartTime),
+                 'runtime':str(timedelta(seconds=timeDiff)),
+                 'starttime':str(starttime_str),
                  'stdout':stdout,
                  'stderr':stderr,
                  'objectid':objectid,
@@ -297,13 +326,13 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         return False
     
     except OSError as e:
-        print_boldred("OSError exception occured.\n"+str(e))
+        pu.print_boldred("OSError exception occured.\n"+str(e))
         #log error
-        timeDiff = round(time.time() - timeStart)
-        logDict={'cmd':logMessage,
+        timeDiff = round(time.time() - time_start)
+        logDict={'cmd':log_message,
                  'exitcode':'-1',
-                 'runtime':str(dt.timedelta(seconds=timeDiff)),
-                 'starttime':str(strStartTime),
+                 'runtime':str(timedelta(seconds=timeDiff)),
+                 'starttime':str(starttime_str),
                  'stdout':"",
                  'stderr':"OSError exception occured.\n"+str(e),
                  'objectid':objectid,
@@ -312,13 +341,13 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
         return False
     except subprocess.CalledProcessError as e:
-        print_boldred("CalledProcessError exception occured.\n"+str(e))
+        pu.print_boldred("CalledProcessError exception occured.\n"+str(e))
         #log error
-        timeDiff = round(time.time() - timeStart)
-        logDict={'cmd':logMessage,
+        timeDiff = round(time.time() - time_start)
+        logDict={'cmd':log_message,
                  'exitcode':'-1',
-                 'runtime':str(dt.timedelta(seconds=timeDiff)),
-                 'starttime':str(strStartTime),
+                 'runtime':str(timedelta(seconds=timeDiff)),
+                 'starttime':str(starttime_str),
                  'stdout':"",
                  'stderr':"CalledProcessError exception occured.\n"+str(e),
                  'objectid':objectid,
@@ -327,13 +356,13 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
         return False
     except:
-        print_boldred("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
+        pu.print_boldred("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
         #log error
-        timeDiff = round(time.time() - timeStart)
-        logDict={'cmd':logMessage,
+        timeDiff = round(time.time() - time_start)
+        logDict={'cmd':log_message,
                  'exitcode':'-1',
-                 'runtime':str(dt.timedelta(seconds=timeDiff)),
-                 'starttime':str(strStartTime),
+                 'runtime':str(timedelta(seconds=timeDiff)),
+                 'starttime':str(starttime_str),
                  'stdout':"",
                  'stderr':str("Fatal error occured during execution.\n"+str(sys.exc_info()[0])),
                  'objectid':objectid,
@@ -346,19 +375,21 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
 
 
 #modyfied from https://www.biostars.org/p/139422/
-def isPairedSRA(pathToSraFile):
+def is_paired(sra_file):
     """Function to test wheather a .sra file is paired or single.
     
     Parameters
     ----------
-    arg1: string
-        the path ro sra file
+    sra_file (string)  the path ro sra file
+    Returns
+    -------
+    bool: True is sra is paired
     """
-    if not check_files_exist(pathToSraFile):
-        raise Exception("Error checking layout. {0} doesn't exist".format(pathToSraFile));
+    if not pu.check_files_exist(sra_file):
+        raise Exception("Error checking layout. {0} doesn't exist".format(sra_file));
     
     try:
-        fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", pathToSraFile]
+        fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", sra_file]
         output = subprocess.check_output(fastqdCmd,stderr=subprocess.DEVNULL);
         numLines=output.decode("utf-8").count("\n")
         if(numLines == 4):
@@ -368,12 +399,13 @@ def isPairedSRA(pathToSraFile):
         else:
             raise Exception("Unexpected output from fast-dump");
     except subprocess.CalledProcessError as e:
-        raise Exception("Error running fastq-dump");
+        raise Exception("Error running fastq-dump: {}".format(str(e)));
 
 
 def getProgramPath(programName):
     """
     Get path of installed program
+    Returns the path as string    
     """
     whichCmd=['which',programName]
     out = subprocess.check_output(whichCmd,universal_newlines=True)
@@ -381,24 +413,25 @@ def getProgramPath(programName):
 
 def getProgramVersion(programName):
     """
-    Get path of installed program
+    Get version of installed program
+    return version as string
     """
     versionCommands=['--version','-version','--ver','-ver','-v','--v']
     for v in versionCommands:
         cmd=[programName,v]
-        out=runLinuxCommand(cmd)
+        out=getShellOutput(cmd)
         if out[0]==0:
             return out[1].decode("utf-8")
     
     return ""
     
-def checkDep(depList):
+def check_dependencies(dependencies):
     """Check whether specified programs exist in the environment.
     This uses the which command to test whether a program is present.
     
     Parameters
     ----------
-    arg1: list
+    dependencies (list):
         list of programs to test
         
     Returns
@@ -406,14 +439,14 @@ def checkDep(depList):
         bool True is all dependencies are satified, False otherwise.
     """
     errorFlag=False
-    for s in depList:
+    for s in dependencies:
         #print_blue("Checking "+s+"...")
         thisCmd=['which',s]
-        if(getCommandReturnStatus(thisCmd)):
+        if(getReturnStatus(thisCmd)):
             #print_green ("Found "+s)
             pass
         else:
-            print_boldred ("Can not find "+s)
+            pu.print_boldred ("Can not find "+s)
             errorFlag=True
     if errorFlag:
         return False
@@ -422,14 +455,20 @@ def checkDep(depList):
 
 #TODO: Re-implement following using native python libraries and move to utils
 def deleteFileFromDisk(filePath):
-    if check_files_exist(filePath):
+    """Delete a given file from disk
+    Returns true if file is deleted or doesn't exist
+    """
+    if pu.check_files_exist(filePath):
         rm_Cmd=['rm',filePath]
-        rv= getCommandReturnStatus(rm_Cmd)
+        rv= getReturnStatus(rm_Cmd)
         return rv
     #if file doesn't exist return true
     return True
 
 def deleteMultipleFilesFromDisk(*args):
+    """Delete multiple files passed as argument.
+    returns true is all files a re deleted
+    """
     errorFlag=False
     for filePath in args:
         status=deleteFileFromDisk(filePath)
@@ -438,31 +477,49 @@ def deleteMultipleFilesFromDisk(*args):
     
     return not(errorFlag)
 
-def moveFile(source,destination):
+def move_file(source,destination):
+    """perform mv command to move a file from sourc to destination
+    Returns True if move is successful
     """
-    perform mv command
-    """
-    print("MOV:"+source+"-->"+destination)
+    #print("MOV:"+source+"-->"+destination)
     mv_cmd=['mv',source,destination]
-    if not getCommandReturnStatus(mv_cmd):
+    if not getReturnStatus(mv_cmd):
         return False
     return True
 
-#function to search files using find and return results as a list
-#use os.scandir
-def findFiles(path,name,recursive):
+
+#TODO: use os.scandir
+def find_files(search_path,search_pattern,recursive=False):
+    """Function to find files using find command and return as list
+    Use global paths for safety
+    Parameters
+    ----------
+    search_path(str): path to search under
+    search_pattern(str): pattern to search e.g. "*.bam"
+    recursive (bool): search all subdirs if true
+    Returns
+    -------
+    list: list containing the found paths
+    """
+    
     if recursive:
-        find_cmd=['find', path,'-type', 'f','-name',name]   
+        find_cmd=['find', search_path,'-type', 'f','-name',search_pattern]   
     else:
-        find_cmd=['find', path,'-type', 'f','-maxdepth', '1','-name',name] 
-    #print ("Executing: "+ ' '.join(find_cmd))
-    #get output as string
-    out = subprocess.check_output(find_cmd,universal_newlines=True)
-    results=out.split()
-    return results
+        find_cmd=['find', search_path,'-type', 'f','-maxdepth', '1','-name',search_pattern] 
+    print(" ".join(find_cmd))
+    st=getShellOutput(find_cmd)
+    output=[]
+    if st[0]==0:
+        output=st[1].decode("utf-8").split("\n")
+    #remove empty strings
+    output.remove('')
+    return output
+    
 
 
 if __name__ == "__main__": 
     print ("Logger")
+    print(os.getcwd())
+    print(find_files("../","*.py"))
 
 
