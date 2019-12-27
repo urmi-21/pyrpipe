@@ -59,7 +59,7 @@ class Stringtie(Assembly):
             self.reference_gtf=reference_gtf
             self.passed_args_dict['-G']=reference_gtf
         
-    def perform_assembly(self,bam_file,out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,bam_file,out_dir="",out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie using a bam file. Manages the outout file names and returns it.
                 
         Parameters
@@ -81,7 +81,10 @@ class Stringtie(Assembly):
         
         #create path to output file
         fname=get_file_basename(bam_file)
-        out_dir=get_file_directory(bam_file)
+        
+        if not out_dir:
+            out_dir=get_file_directory(bam_file)
+            
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         """
@@ -184,7 +187,7 @@ class Stringtie(Assembly):
        
         stie_cmd=['stringtie']
         #add options
-        stie_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
+        stie_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
         
                 
         #start ececution
@@ -317,7 +320,7 @@ class Cufflinks(Assembly):
        
             cuff_cmd=[command]
             #add options
-            cuff_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
+            cuff_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
                   
             #start ececution
             status=execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -349,7 +352,7 @@ class Cufflinks(Assembly):
        
         cufflinks_cmd=['cufflinks']
         #add options
-        cufflinks_cmd.extend(parse_unix_style_args(self.valid_args_list,merged_args_dict))        
+        cufflinks_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
         
         
         #start ececution

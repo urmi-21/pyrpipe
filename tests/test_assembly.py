@@ -15,6 +15,7 @@ Created on Sun Nov 24 16:24:44 2019
 """
 import pytest
 from pyrpipe import assembly
+from pyrpipe import pyrpipe_utils as pu
 from testingEnvironment import testSpecs
 import os
 
@@ -28,4 +29,8 @@ def test_assembly():
     assert aob.category == "Assembler","Failed Assembly init"
     
 def test_stringtie():
-    input_bam=""
+    bam="tests/test_files/athaliana/mapping/hisat2_sorted.bam"
+    gtf="tests/test_files/athaliana/genome/Arabidopsis_thaliana.TAIR10.45_1and2.gtf"
+    stie=assembly.Stringtie(reference_gtf=gtf)
+    result=stie.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
+    assert pu.check_files_exist(result)==True, "Failed stringtie"
