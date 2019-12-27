@@ -475,14 +475,24 @@ class Star(Aligner):
 
 
 class Bowtie2(Aligner):
-    def __init__(self,bowtie2Index,**kwargs):
+    """This class represents bowtie2 program.
+       Parameters
+       ----------
+       bowtie2_index string
+            path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
+       **kwargs dict
+            parameters passed to the bowtie2 program. These parameters could be overridden later when running bowtie2.
+    Attributes
+    ----------
+    """ 
+    def __init__(self,bowtie2_index,**kwargs):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
         
         super().__init__() 
         self.programName="bowtie2"
         self.dep_list=[self.programName]        
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
@@ -503,17 +513,97 @@ class Bowtie2(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(bowtie2Index)>0 and checkBowtie2Index(bowtie2Index):
-            print("Bowtie2 index is: "+bowtie2Index)
-            self.bowtie2Index=bowtie2Index
-            self.passedArgumentDict['-x']=self.bowtie2Index
+        if len(bowtie2_index)>0 and pu.check_bowtie2index(bowtie2_index):
+            print("Bowtie2 index is: "+bowtie2_index)
+            self.bowtie2_index=bowtie2_index
+            self.passedArgumentDict['-x']=self.bowtie2_index
         else:
             print("No Bowtie2 index provided. Please build index now to generate an index...")
         
         
+    def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Build a bowtie2 index with given parameters and saves the new index to self.bowtie2_index.
+        Parameters
+        ----------
+        index_path: string
+            Path where the index will be created
+        index_name: string
+            A name for the index
+        arg3: tuple
+            Path to reference input files
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            
+        arg4: dict
+            Parameters for the hisat2-build command
+        
+        Returns
+        -------
+        bool:
+            Returns the status of hisat2-build
+        """
+        
+        #check input references
+        if len(args)<1:
+            pu.print_boldred("No reference sequence provided to bowtie2-build. Exiting")
+            return False
+        
+        if not pu.check_files_exist(*args):
+            pu.print_boldred("Please check input reference sequences provided to bowtie2-build. Exiting")
+            return False
+            
+        overwrite=True
+        
+        
+        bowtie2_build_args=['-f','-c','--large-index','--debug','--sanitized','--verbose','-a',
+                            '--noauto','-p','--packed','--bmax','--bmaxdivn','--dcv','--nodc',
+                            '-r','--noref','-3','--justref','-o','--offrate','-t','--ftabchars',
+                            '--threads','--seed','-q','--quiet','-h','--help','--usage','--version']
+        #create the out dir
+        if not pu.check_paths_exist(index_path):
+            if not pu.mkdir(index_path):
+                print("ERROR in building bowtie2 index. Failed to create index directory.")
+                return False
+        
+        if not overwrite:
+            #check if files exists
+            if pu.check_bowtie2index(os.path.join(index_path,index_name)):
+                print("bowtie2 index with same name already exists. Exiting...")
+                return True
+            
+        bowtie2Build_Cmd=['bowtie2-build']
+        #add options
+        bowtie2Build_Cmd.extend(pu.parse_unix_args(bowtie2_build_args,kwargs))
+        #add input files
+        bowtie2Build_Cmd.append(str(",".join(args)))
+        #add dir/basenae
+        bowtie2Build_Cmd.append(os.path.join(index_path,index_name))
+        #print("Executing:"+str(" ".join(hisat2Build_Cmd)))
+        
+        #start ececution
+        status=pe.execute_command(bowtie2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        if not status:
+            pu.print_boldred("bowtie2-build failed")
+            return False
+        
+        #check index files
+        if not pu.check_bowtie2index(os.path.join(index_path,index_name)):
+            pu.print_boldred("bowtie2-build failed")
+            return False
+        
+        #set the index path
+        self.bowtie2_index=os.path.join(index_path,index_name)
+        self.passedArgumentDict['-x']=self.bowtie2_index
+        
+        #return status
+        return True
+        
     
-    
-    def perform_alignment(self,sra_object,out_suffix="_bt2",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_bt2",out_dir="",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
@@ -522,12 +612,23 @@ class Bowtie2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         arg2: string
             Suffix for the output sam file
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg3: dict
             Options to pass to bowtie.
         """
-        
+        if not out_dir:
+            out_dir=sra_object.location
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
+                
         #create path to output sam file
-        outFile=os.path.join(sra_object.location,sra_object.srrAccession+out_suffix+".sam")
+        outFile=os.path.join(out_dir,sra_object.srrAccession+out_suffix+".sam")
                     
         """
         Handle overwrite
@@ -548,11 +649,11 @@ class Bowtie2(Aligner):
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_bowtie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sra_object
-            if check_files_exist(outFile):
+            if pu.check_files_exist(outFile):
                 return outFile
         else:
             return ""
@@ -560,10 +661,16 @@ class Bowtie2(Aligner):
         
         
     
-    def runBowTie2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bowtie2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running bowtie2.
         
         ----------
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg1: dict
             arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
@@ -580,23 +687,22 @@ class Bowtie2(Aligner):
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
-        bowtie2_Cmd=['bowtie2']
-        bowtie2_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
+        bowtie2_cmd=['bowtie2']
+        bowtie2_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
         
-        #print("Executing:"+" ".join(bowtie2_Cmd))
+        #print("Executing:"+" ".join(bowtie2_cmd))
         
         #start ececution
-        status=execute_command(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(bowtie2_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("bowtie2 failed")
+            pu.print_boldred("bowtie2 failed")
         return status
     
     
-    def checkIndex(self):
-        if hasattr(self,'bowtie2Index'):
-            return(checkBowtie2Index(self.bowtie2Index))
-        else:
-            return False
+    def check_index(self):
+        if hasattr(self,'bowtie2_index'):
+            return(pu.check_bowtie2index(self.bowtie2_index))
+        return False
 
 
 class Kallisto(Aligner):

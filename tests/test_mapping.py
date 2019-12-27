@@ -33,7 +33,7 @@ def test_hisat2():
     st=hs.run_hisat2(**hsMapOpts)
     assert st==True, "Failed to run hisat"
 """ 
-    
+"""    
 def test_star():
     star=mapping.Star(star_index="")
     assert star.check_index()==False, "Failed star check_index"
@@ -53,3 +53,11 @@ def test_star():
             }
     st=star.run_star(**opts)
     assert st==True, "Failed to run star"
+"""
+
+
+def test_bowtie():
+    bt=mapping.Bowtie2(bowtie2_index="")
+    assert bt.check_index()==False, "Failed bowtie2 check_index"
+    st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
+    assert st==True, "Failed to build bowtie2 index"
