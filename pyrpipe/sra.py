@@ -8,35 +8,37 @@ Created on Sat Nov 23 15:45:26 2019
 
 """
 
-from pyrpipe.pyrpipe_utils import *
-from pyrpipe.pyrpipe_engine import *
+from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import pyrpipe_engine as pe
 import os
 
 
 class SRA:
-    def __init__(self,srrAccession,location=os.getcwd()):
-        """Init SRA object.
+    """This class represents an SRA object
         Parameters
         ----------
-        arg1 : string
-            A valid SRR accession id
-        arg2 : String
-            Path where all data related to this object (e.g. .sra files, metadata, fastq files) will be stored. 
-            Default value of the path will be "./<SRR_accession>". <SRR_accession> is added at the end of the path
-            so that final location is location/<SRR_accession>.
-            For consistency, location and SRR Accession id are not allowed to be modified.
+        srr_accession(string): A valid SRR accession
+        location (String): Path where all data related to this object (e.g. .sra files, metadata, fastq files) will be stored. 
+                Default value of the path will be "./<SRR_accession>". <SRR_accession> is added at the end of the path
+                so that final location is location/<SRR_accession>.
+                For consistency, location and SRR Accession id are not allowed to be modified.
+        
+        Attributes
+        -----------
         
         """
+    def __init__(self,srr_accession,location=os.getcwd()):
         
-        self.depList=['prefetch',"fasterq-dump"]
-        if not checkDep(self.depList):
+        
+        self.dep_list=['prefetch',"fasterq-dump"]
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: Please install missing programs.")
         
         
-        print_info("Creating SRA: "+srrAccession)
-        self.srrAccession=srrAccession
+        pu.print_info("Creating SRA: "+srr_accession)
+        self.srr_accession=srr_accession
         #append the SRR accession to the location
-        self.location=os.path.join(location,self.srrAccession)
+        self.location=os.path.join(location,self.srr_accession)
         
         ##check if sra, fastq files already exists
     
@@ -44,34 +46,27 @@ class SRA:
     def __setattr__(self, name, value):
         """Make srr accession immutable
         """
-        immutableFields=['srrAccession']
+        immutableFields=['srr_accession','location']
         
         if (name in immutableFields and name in self.__dict__):
             raise Exception("Can not modify "+name)
         else:
             self.__dict__[name] = value
                 
-        
-        
-    
-        
-    def getSrrAccession(self):
-            return self.srrAccession
     
   
-    def downloadSRAFile(self,verbose=False,quiet=False,logs=True,**kwargs):
+    def download_sra(self,verbose=False,quiet=False,logs=True,**kwargs):
         """This function downloads .sra file from NCBI SRA servers using the prefetch command.
 
         NCBI sra-toolkit 2.9 or higher must be installed on the system in order to use prefetch. 
-        prefetch will create a folder with name same as <srrAccession> under the location (path) specified.
+        prefetch will create a folder with name same as <srr_accession> under the location (path) specified.
         The path of downloaded file is saved in the object as localSRAPath. This localSRAPath is then used
         by other functions to access the downloaded data. 
         The **kwargs is for passing arguments to the prefetch command.
         
         Parameters
         ----------
-        arg1:
-            dict containing prefetch arguments
+        kwargs(dict): dict containing additional prefetch arguments
         
         Returns
         -------
@@ -80,15 +75,15 @@ class SRA:
 
         Examples
         --------
-        >>> object.downloadSRAFile()
+        >>> object.download_sra()
         True
         """
         
-        print_info("Downloading "+self.srrAccession+" ...")
+        pu.print_info("Downloading "+self.srr_accession+" ...")
         
         #scan for prefetch arguments
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
-        pathFound=False
+        
         
         #ignore location and file name arguments if given
         if '-O' in kwargs:
@@ -96,33 +91,33 @@ class SRA:
             #delete -O parameter
             del kwargs['-O']
         if '-o' in kwargs:
-            print("Ignoring -o flag."+" File name is: "+self.srrAccession)
+            print("Ignoring -o flag."+" File name is: "+self.srr_accession)
             #delete -o parameter
             del kwargs['-o']
             
 
         prefetch_Cmd=['prefetch']
-        prefetch_Cmd.extend(parse_unix_args(prefetchArgsList,kwargs))
+        prefetch_Cmd.extend(pu.parse_unix_args(prefetchArgsList,kwargs))
         prefetch_Cmd.extend(['-O',self.location])
-        prefetch_Cmd.append(self.srrAccession)
+        prefetch_Cmd.append(self.srr_accession)
                 
-        cmdStatus=execute_command(prefetch_Cmd,objectid=self.srrAccession)
+        cmdStatus=pe.execute_command(prefetch_Cmd,objectid=self.srr_accession)
         if not cmdStatus:
-            print_boldred("prefetch failed for:"+self.srrAccession)
+            pu.print_boldred("prefetch failed for:"+self.srr_accession)
             return False
         
         #store path to the downloaded sra file
-        self.localSRAFilePath=os.path.join(self.location,self.srrAccession+".sra")
+        self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
         #validate path exists
-        if not check_files_exist(self.localSRAFilePath):
-            print_boldred("Error downloading file. File "+self.localSRAFilePath+" does not exist!!!")
+        if not pu.check_files_exist(self.localSRAFilePath):
+            pu.print_boldred("Error downloading file. File "+self.localSRAFilePath+" does not exist!!!")
             return False
         
-        print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(get_file_size(self.localSRAFilePath)))
+        print ("Downloaded file: "+self.localSRAFilePath+" {0} ".format(pu.get_file_size(self.localSRAFilePath)))
         #save file .sra file size
-        self.sraFileSize=get_file_size(self.localSRAFilePath)
+        self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
         #test if file is paired or single end
-        if isPairedSRA(self.localSRAFilePath):
+        if pe.is_paired(self.localSRAFilePath):
             self.layout="PAIRED"
         else:
             self.layout="SINGLE"
@@ -144,15 +139,14 @@ class SRA:
             return False
         
         if self.layout=='PAIRED':
-            errorFlag=False
             if hasattr(self,'localfastq1Path'):
-                if not check_files_exist(self.localfastq1Path):
+                if not pu.check_files_exist(self.localfastq1Path):
                     return False
             else:
                 return False
             
             if hasattr(self,'localfastq2Path'):
-                if not check_files_exist(self.localfastq2Path):
+                if not pu.check_files_exist(self.localfastq2Path):
                     return False
             else:
                 return False
@@ -161,11 +155,11 @@ class SRA:
             
         else:
             if hasattr(self,'localfastqPath'):
-                return check_files_exist(self.localfastqPath)
+                return pu.check_files_exist(self.localfastqPath)
             else:            
                 return False
     
-    def runFasterQDump(self,deleteSRA=False,verbose=False,quiet=False,logs=True,**kwargs):
+    def run_fasterqdump(self,delete_sra=False,verbose=False,quiet=False,logs=True,**kwargs):
         """Execute fasterq-dump to convert .sra file to fastq files.
         The fastq files will be stored in the same directory as the sra file. All fastq files should be consistently named
         using the extension .fastq
@@ -185,13 +179,13 @@ class SRA:
 
         Examples
         --------
-        >>> object.runFasterQDump()
+        >>> object.run_fasterqdump()
         True
         """
         
         #first check is sra exists
         if not self.sraFileExistsLocally():
-            print ("Error executing fasterq-dump: .sra file not found. Please run downloadSRAFile().")
+            print ("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
             return False
         #else directly run fasterq-dump on accession ?
         
@@ -208,7 +202,7 @@ class SRA:
             #delete -O parameter
             del kwargs['-O']
         if '-o' in kwargs:
-            print("Ignoring -o flag."+" File name is: "+self.srrAccession)
+            print("Ignoring -o flag."+" File name is: "+self.srr_accession)
             #delete -o parameter
             del kwargs['-o']
         
@@ -216,43 +210,43 @@ class SRA:
         #execute command
         
         fstrqd_Cmd=['fasterq-dump']
-        fstrqd_Cmd.extend(parse_unix_args(fasterqdumpArgsList,kwargs))
+        fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
         #add location
         fstrqd_Cmd.extend(['-O',self.location])
-        #add output filename. output will be <srrAccession>.fastq or <srrAccession>_1.fastq and <srrAccession>_2.fastq
-        fstrqd_Cmd.extend(['-o',self.srrAccession+".fastq"])
+        #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
+        fstrqd_Cmd.extend(['-o',self.srr_accession+".fastq"])
         fstrqd_Cmd.append(self.localSRAFilePath)
         
         #execute command
-        cmdStatus=execute_command(fstrqd_Cmd,objectid=self.srrAccession)
+        cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)
         if not cmdStatus:
-            print("prefetch failed for:"+self.srrAccession)
+            print("prefetch failed for:"+self.srr_accession)
             return False
         
         
         #check if fastq files are downloaded 
         if(self.layout=="SINGLE"):
-            self.localfastqPath=os.path.join(self.location,self.srrAccession+".fastq")
+            self.localfastqPath=os.path.join(self.location,self.srr_accession+".fastq")
             
-            if not check_files_exist(self.localfastqPath):
-                print_boldred("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
+            if not pu.check_files_exist(self.localfastqPath):
+                pu.print_boldred("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
                 return False
             
         else:
-            self.localfastq1Path=os.path.join(self.location,self.srrAccession+"_1.fastq")
-            self.localfastq2Path=os.path.join(self.location,self.srrAccession+"_2.fastq")
+            self.localfastq1Path=os.path.join(self.location,self.srr_accession+"_1.fastq")
+            self.localfastq2Path=os.path.join(self.location,self.srr_accession+"_2.fastq")
             
-            if not check_files_exist(self.localfastq1Path,self.localfastq2Path):
-                print_boldred("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
+            if not pu.check_files_exist(self.localfastq1Path,self.localfastq2Path):
+                pu.print_boldred("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
                 return False
             
         #delete sra file if specified
-        if deleteSRA:
-            self.deleteSRAFile()
+        if delete_sra:
+            self.delete_sra()
             
         return True
     
-    def performFastqQC(self,qcObject,deleteRawFastq=False):
+    def perform_qc(self,qcObject,deleteRawFastq=False):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
         The qcObject should be initialized with all the parameters.
@@ -275,30 +269,30 @@ class SRA:
 
         Examples
         --------
-        >>> object.performFastqQC(qc.BBmap())
+        >>> object.perform_qc(qc.BBmap())
         True
         """
         #check a valid qcObject
         if not (hasattr(qcObject,'category') and qcObject.category=='RNASeqQC'):
-            print ("Error: No valid QC object provided. Skipping QC for "+self.srrAccession)
+            print ("Error: No valid QC object provided. Skipping QC for "+self.srr_accession)
             return False
         
         #save thq qc object for later references
         self.QCObject=qcObject
         print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
-        qcStatus=qcObject.performQC(self,objectid=self.srrAccession)
+        qcStatus=qcObject.performQC(self,objectid=self.srr_accession)
         
         #if job failed
         if not qcStatus[0]:
-            print ("Error performing QC for "+self.srrAccession)
+            print ("Error performing QC for "+self.srr_accession)
             return False
         
         if self.layout=='PAIRED':
             
             #delete old fastq files if specified
             if deleteRawFastq:
-                self.deleteFastqFiles()
+                self.delete_fastq()
             
             else:
                 #create new fields to refer to older fastq files
@@ -310,7 +304,7 @@ class SRA:
             self.localfastq2Path=qcStatus[1]
         else:
             if deleteRawFastq:
-                self.deleteFastqFiles()
+                self.delete_fastq()
             else:
                 self.localRawfastqPath=self.localfastqPath
                 
@@ -320,28 +314,26 @@ class SRA:
         
         return True
     
-    def deleteFastqFiles(self):
+    def delete_fastq(self):
         """Delte the fastq files from the disk.
         The files are referenced by self.localfastqPath or self.localfastq1Path and self.localfastq2Path
         """
         if self.layout=='PAIRED':
-            if deleteMultipleFilesFromDisk(self.localfastq1Path,self.localfastq2Path):
+            if pe.deleteMultipleFilesFromDisk(self.localfastq1Path,self.localfastq2Path):
                 del self.localfastq1Path
                 del self.localfastq2Path
                 return True
-            return False
-                
         else:
-            if deleteFileFromDisk(self.localfastqPath):
+            if pe.deleteFileFromDisk(self.localfastqPath):
                 del self.localfastqPath
                 return True
-            return False
+        return False
         
         
-    def deleteSRAFile(self):
+    def delete_sra(self):
         """Delete the downloaded SRA files.
         """
-        if(deleteFileFromDisk(self.localSRAFilePath)):
+        if(pe.deleteFileFromDisk(self.localSRAFilePath)):
             del self.localSRAFilePath
             return True
         return False

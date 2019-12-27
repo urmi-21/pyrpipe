@@ -33,7 +33,7 @@ class Hisat2(Aligner):
         super().__init__() 
         self.programName="hisat2"
         #check if hisat2 exists
-        if not checkDep([self.programName]):
+        if not check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
@@ -233,7 +233,7 @@ class Star(Aligner):
         
         self.depList=[self.programName]        
         #check if hisat2 exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         self.validArgsList=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
@@ -424,7 +424,7 @@ class Bowtie2(Aligner):
         super().__init__() 
         self.programName="bowtie2"
         self.depList=[self.programName]        
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
@@ -548,7 +548,7 @@ class Kallisto(Aligner):
         super().__init__() 
         self.programName="kallisto"
         self.depList=[self.programName]        
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         
@@ -690,7 +690,7 @@ class Salmon(Aligner):
         super().__init__() 
         self.programName="salmon"
         self.depList=[self.programName]        
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         

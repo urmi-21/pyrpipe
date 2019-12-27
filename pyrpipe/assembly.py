@@ -45,7 +45,7 @@ class Stringtie(Assembly):
         super().__init__()
         self.program_name="stringtie"
         #check if stringtie exists
-        if not checkDep([self.program_name]):
+        if not check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
         self.valid_args_list=['-G','--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
@@ -214,7 +214,7 @@ class Cufflinks(Assembly):
         super().__init__()
         self.program_name="cufflinks"
         #check if stringtie exists
-        if not checkDep([self.program_name]):
+        if not check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
             
         

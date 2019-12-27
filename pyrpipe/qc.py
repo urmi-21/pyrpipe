@@ -37,7 +37,7 @@ class Trimgalore(RNASeqQC):
                             '--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t',
                             '--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         #initialize the passed arguments
@@ -156,7 +156,7 @@ class BBmap(RNASeqQC):
         self.programName="bbduk.sh"
         self.depList=[self.programName]
         #check if program exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         

@@ -19,7 +19,7 @@ class Samtools(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="samtools"
         #check if hisat2 exists
-        if not checkDep([self.programName]):
+        if not check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r',
@@ -220,7 +220,7 @@ class Portcullis(RNASeqTools):
         self.programName="portcullis"
         self.depList=[self.programName]
         #check if program exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=['-t','--threads','-v','--verbose','--help','-o','-b',
@@ -319,7 +319,7 @@ class Mikado(RNASeqTools):
         self.programName="mikado"
         self.depList=[self.programName]
         #check if program exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=[]        
@@ -528,7 +528,7 @@ class Ribocode(RNASeqTools):
         self.programName="RiboCode"
         self.depList=[self.programName]
         #check if program exists
-        if not checkDep(self.depList):
+        if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.validArgsList=[]        
