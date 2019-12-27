@@ -7,36 +7,53 @@ Created on Sun Nov 24 19:53:42 2019
 contains classes of RNA-Seq mapping programs
 """
 
-from pyrpipe.pyrpipe_utils import *
-from pyrpipe.pyrpipe_engine import *
+from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import pyrpipe_engine as pe
+import os
 
 class Aligner:
-    def __init__(self):
+    """This is an abstract class for alignment programs.
+    """
+    def __init__(self,index=""):
         self.category="Aligner"
         self.passedArgumentDict={}
+        self.index=index
+        
+    def build_index(self):
+        """function to create an index used by the aligner
+        """
+        pass
     
-    def performAlignment(self):
+    def check_index(self):
+        """Function to check if index of this object is valid and exists
+        """
+    
+    def perform_alignment(self,sra_object):
+        """Function to perform alignment taking and sraobject as input
+        
+        """
         pass
 
 class Hisat2(Aligner):
-    def __init__(self,hisat2Index="",**kwargs):
-        """HISAT2 constructor. Initialize hisat2's index and other parameters.
-        Parameters
-        ----------
-        hisat2Index string
-            path to q histat2 index (note -x is ommited from validArgsList). This index will be used when hisat is invoked.
-        dict
+    """This class represents hisat2 program.
+       Parameters
+       ----------
+       hisat2_index string
+            path to q histat2 index. This index will be used when hisat is invoked using this object.
+       **kwargs dict
             parameters passed to the hisat2 program. These parameters could be overridden later when running hisat.
-        ----------
+    Attributes
+    ----------
+    """ 
+    def __init__(self,hisat2_index="",**kwargs):
         
-        """ 
         super().__init__() 
         self.programName="hisat2"
         #check if hisat2 exists
-        if not check_dependencies([self.programName]):
+        if not pe.check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
+        self.valid_args=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
                             '-u','-5','-3','--phred33','--phred64','--int-quals',
                             '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
                             '--pen-noncansplice','--pen-canintronlen','--pen-noncanintronlen','--min-intronlen'
@@ -56,23 +73,24 @@ class Hisat2(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(hisat2Index)>0 and checkHisatIndex(hisat2Index):
-            print("HISAT2 index is: "+hisat2Index)
-            self.hisat2Index=hisat2Index
-            self.passedArgumentDict['-x']=self.hisat2Index
+        if len(hisat2_index)>0 and pu.check_hisatindex(hisat2_index):
+            print("HISAT2 index is: "+hisat2_index)
+            self.hisat2_index=hisat2_index
+            self.passedArgumentDict['-x']=self.hisat2_index
+            self.index=self.hisat2_index
         else:
-            print("No Hisat2 index provided. Please build index now to generate an index using buildHisat2Index()....")
+            print("No Hisat2 index provided. Please build index now to generate an index using build_Index()....")
             
         
         
             
-    def buildHisat2Index(self,indexPath,indexName,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Build a hisat index with given parameters and saves the new index to self.hisat2Index.
+    def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Build a hisat index with given parameters and saves the new index to self.hisat2_index.
         Parameters
         ----------
-        arg1: string
+        index_path: string
             Path where the index will be created
-        arg2: string
+        index_name: string
             A name for the index
         arg3: tuple
             Path to reference input files
@@ -84,68 +102,82 @@ class Hisat2(Aligner):
         bool:
             Returns the status of hisat2-build
         """
+        
+        #check input references
+        if len(args)<1:
+            pu.print_boldred("No reference sequence provided to hisat2-build. Exiting")
+            return False
+        
+        if not pu.check_files_exist(*args):
+            pu.print_boldred("Please check input reference sequences provided to hisat2-build. Exiting")
+            return False
+            
         overwrite=True
         print("Building hisat index...")
         
-        hisat2BuildValidArgsList=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
+        hisat2Buildvalid_args=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
                                   '-t','--localoffrate','--localftabchars','--snp','--haplotype','--ss','--exon',
                                   '--seed','-q','-h','--usage','--version']
         #create the out dir
-        if not checkPathsExists(indexPath):
-            if not mkdir(indexPath):
+        if not pu.check_paths_exist(index_path):
+            if not pu.mkdir(index_path):
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
         
         if not overwrite:
             #check if files exists
-            if checkHisatIndex(os.path.join(indexPath,indexName)):
+            if pu.check_hisatindex(os.path.join(index_path,index_name)):
                 print("Hisat2 index with same name already exists. Exiting...")
-                return False
+                return True
         
         hisat2Build_Cmd=['hisat2-build']
         #add options
-        hisat2Build_Cmd.extend(parse_unix_args(hisat2BuildValidArgsList,kwargs))
+        hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,kwargs))
         #add input files
         hisat2Build_Cmd.append(str(",".join(args)))
         #add dir/basenae
-        hisat2Build_Cmd.append(os.path.join(indexPath,indexName))
+        hisat2Build_Cmd.append(os.path.join(index_path,index_name))
         #print("Executing:"+str(" ".join(hisat2Build_Cmd)))
         
         #start ececution
-        status=executeCommand(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("hisatBuild failed")
+            pu.print_boldred("hisatBuild failed")
             return False
         
-        #check if sam file is present in the location directory of sraOb
-        if not checkHisatIndex(os.path.join(indexPath,indexName)):
-            print_boldred("hisatBuild failed")
+        #check index files
+        if not pu.check_hisatindex(os.path.join(index_path,index_name)):
+            pu.print_boldred("hisatBuild failed")
             return False
         
         #set the index path
-        self.hisat2Index=os.path.join(indexPath,indexName)
-        self.passedArgumentDict['-x']=self.hisat2Index
+        self.hisat2_index=os.path.join(index_path,index_name)
+        self.passedArgumentDict['-x']=self.hisat2_index
         
-        #return the path to output sam
+        #return status
         return True
         
         
-    def performAlignment(self,sraOb,outSamSuffix="_hisat2",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to perform alignment using self object and the provided sraOb.
+    def perform_alignment(self,sra_object,out_suffix="_hisat2",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
         ----------
-        arg1: SRA object
+        sra_object SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
-        arg2: string
+        out_suffix: string
             Suffix for the output sam file
-        arg3: dict
-            Options to pass to hisat2.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to hisat2. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         """
         
         
         #create path to output sam file
-        outSamFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+        outSamFile=os.path.join(sra_object.location,sra_object.srrAccession+out_suffix+".sam")
         
         """
         Handle overwrite
@@ -158,32 +190,37 @@ class Hisat2(Aligner):
                 return outSamFile
         
         #find layout and fq file paths
-        if sraOb.layout == 'PAIRED':
-            newOpts={"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path,"-S":outSamFile}
+        if sra_object.layout == 'PAIRED':
+            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile}
         else:
-            newOpts={"-U":sraOb.localfastqPath,"-S":outSamFile}
+            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile}
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        #call runHisat2
-        status=self.runHisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
+        #call run_hisat2
+        status=self.run_hisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
-            if check_files_exist(outSamFile):
+            #check if sam file is present in the location directory of sra_object
+            if pu.check_files_exist(outSamFile):
                 return outSamFile
         else:
             return ""
             
         
-    def runHisat2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_hisat2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running hisat2.
-        Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2Index.
+        Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2_index.
         All output will be written to SRA.location by default.
         
         Parameters
         ----------
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
         arg1: dict
             arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
@@ -194,7 +231,7 @@ class Hisat2(Aligner):
         """
         
         #check for a valid index
-        if not self.checkHisat2Index():
+        if not self.check_index():
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
         #override existing arguments
@@ -202,21 +239,21 @@ class Hisat2(Aligner):
        
         hisat2_Cmd=['hisat2']
         #add options
-        hisat2_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))        
+        hisat2_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
         
         #execute command
-        cmdStatus=executeCommand(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        if not cmdStatus:
+        cmd_status=pe.execute_command(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        if not cmd_status:
             print("hisat2 failed:"+" ".join(hisat2_Cmd))
      
         #return status
-        return cmdStatus
+        return cmd_status
         
         
     
-    def checkHisat2Index(self):
-        if hasattr(self,'hisat2Index'):
-            return(checkHisatIndex(self.hisat2Index))
+    def check_index(self):
+        if hasattr(self,'hisat2_index'):
+            return(pu.check_hisatindex(self.hisat2_index))
         else:
             return False
 
@@ -225,18 +262,27 @@ class Hisat2(Aligner):
 
 
 class Star(Aligner):
-    def __init__(self,starIndex="",**kwargs):
-        """STAR constructor. Initialize star's index and other parameters.
-        """
+    """This class represents STAR program.
+       Parameters
+       ----------
+       star_index string
+            path to a star index. This index will be used when star is invoked using this object.
+       **kwargs dict
+            parameters passed to the star program. These parameters could be overridden later when running star.
+    Attributes
+    ----------
+    """ 
+    def __init__(self,star_index="",**kwargs):
+        
         super().__init__() 
         self.programName="STAR"
         
-        self.depList=[self.programName]        
-        #check if hisat2 exists
-        if not check_dependencies(self.depList):
+        self.dep_list=[self.programName]        
+        #check if star exists
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-        self.validArgsList=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
+        self.valid_args=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
                             '--genomeDir','--genomeLoad','--genomeFastaFiles','--genomeChrBinNbits','--genomeSAindexNbases','--genomeSAsparseD','--genomeSuffixLengthMax','--genomeChainFiles','--genomeFileSizes',
                             '--sjdbFileChrStartEnd','--sjdbGTFfile','--sjdbGTFchrPrefix','--sjdbGTFfeatureExon','--sjdbGTFtagExonParentTranscript','--sjdbGTFtagExonParentGene','--sjdbOverhang','--sjdbScore','--sjdbInsertSave',
                             '--inputBAMfile','--readFilesIn','--readFilesCommand','--readMapNumber','--readMatesLengthsIn','--readNameSeparator','--clip3pNbases','--clip5pNbases','--clip3pAdapterSeq','--clip3pAdapterMMp','--clip3pAfterAdapterNbases',
@@ -257,17 +303,17 @@ class Star(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(starIndex)>0 and checkStarIndex(starIndex):
-            print("STAR index is: "+starIndex)
-            self.starIndex=starIndex
-            self.passedArgumentDict['--genomeDir']=self.starIndex
+        if len(star_index)>0 and pu.check_starindex(star_index):
+            print("STAR index is: "+star_index)
+            self.star_index=star_index
+            self.passedArgumentDict['--genomeDir']=self.star_index
         else:
-            print("No STAR index provided. Please build index now to generate an index using buildStarIndex()....")
+            print("No STAR index provided. Please build index now to generate an index using build_index()....")
             
     
-    #STAR --runThreadN 8 --runMode genomeGenerate --genomeDir ./starIndex --genomeFastaFiles /home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa
-    def buildStarIndex(self,indexPath,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Build a star index with given parameters and saves the new index to self.starIndex.
+    
+    def build_index(self,index_path,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Build a star index with given parameters and saves the new index to self.star_index.
         Parameters
         ----------
         arg1: string
@@ -284,53 +330,58 @@ class Star(Aligner):
             Returns status of star command
         """
         if len(args)<1:
-            print_boldred("Please provide input fasta file to build STAR index")
+            pu.print_boldred("Please provide input fasta file to build STAR index")
             return ""
         
-        print("Building STAR index...")
+       
         
-        #create path if doesnt exists
-        if not checkPathsExists(indexPath):
-            if not mkdir(indexPath):
+        #create path if doesnt exist
+        if not pu.check_paths_exist(index_path):
+            if not pu.mkdir(index_path):
                 raise Exception("Error creating STAR index. Exiting.")
                 return False
         
         #add runMode
-        newOpts={"--runMode":"genomeGenerate","--genomeDir":indexPath,"--genomeFastaFiles":" ".join(args)}
+        newOpts={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":" ".join(args)}
         
         mergedOpts={**kwargs,**newOpts}
         
         starbuild_Cmd=['STAR']
-        starbuild_Cmd.extend(parse_unix_args(self.validArgsList,mergedOpts))
+        starbuild_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedOpts))
         
         #execute command
-        status=executeCommand(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
         
         if status:
-            print("Star build finished")
-            #check if sam file is present in the location directory of sraOb
-            if checkPathsExists(indexPath):
+            if pu.check_paths_exist(index_path):
                 #update object's index
-                self.starIndex=indexPath
-                self.passedArgumentDict['--genomeDir']=self.starIndex
-                if self.checkstarIndex():
+                self.star_index=index_path
+                self.passedArgumentDict['--genomeDir']=self.star_index
+                if self.check_index():
                     return True
         else:
             return False
         
  
             
-    def performAlignment(self,sraOb,outSamSuffix="_star",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to perform alignment using self object and the provided sraOb.
-        All star output will be written to the sraOb directory by default.
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Function to perform alignment using star and the provided sra_object.
+        All star output will be written to the sra_object directory by default.
         
         Parameters
         ----------
-        arg1: SRA object
+        sra_object: SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
-        arg2: string
+        out_suffix: string
             Suffix for the output file
+        out_dir (str):outout directory default: sra_object.location
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg3: dict
             Options to pass to hisat2.
             
@@ -339,44 +390,51 @@ class Star(Aligner):
         string:
             path to the output dir
         """
-        outDir=sraOb.location
+        
+        if not out_dir:
+            out_dir=sra_object.location
+        else:
+            #create out_dir if not exists
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
         
         #find layout and fq file paths
-        if sraOb.layout == 'PAIRED':
-            newOpts={"--readFilesIn":sraOb.localfastq1Path+" "+sraOb.localfastq2Path}
+        if sra_object.layout == 'PAIRED':
+            newOpts={"--readFilesIn":sra_object.localfastq1Path+" "+sra_object.localfastq2Path}
         else:
-            newOpts={"--readFilesIn":sraOb.localfastqPath}
+            newOpts={"--readFilesIn":sra_object.localfastqPath}
         
         #add out dir
-        newOpts["--outFileNamePrefix"]=outDir+"/"
+        newOpts["--outFileNamePrefix"]=out_dir+"/"
         
-        #add index
-        
-        
+               
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
         #call star
-        status=self.runStar(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
+        status=self.run_star(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
                 
         
         if status:
             print("Star finished")
-            #check if sam file is present in the location directory of sraOb
-            if checkPathsExists(outDir):
-                
-                return outDir
+            if pu.check_paths_exist(out_dir):
+                return out_dir
         else:
             return ""
         
-        
     
-    def runStar(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_star(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running star.
-        The self.starIndex index used.
+        The self.star_index index used.
         
         Parameters
         ----------
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to stringtie. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg1: dict
             arguments to pass to star. This will override parametrs already existing in the self.passedArgumentList list but NOT replace all of them.
             
@@ -387,29 +445,29 @@ class Star(Aligner):
         """
         
         #check for a valid index
-        if not self.checkstarIndex():
+        if not self.check_index():
             raise Exception("ERROR: Invalid star index. Please run build index to generate an index.")
             
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        star_Cmd=['STAR']
+        star_cmd=['STAR']
         #add options
-        star_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))        
+        star_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
         
         #execute command
-        cmdStatus=executeCommand(star_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        cmd_status=pe.execute_command(star_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
-        if not cmdStatus:
-            print("STAR failed:"+" ".join(star_Cmd))
+        if not cmd_status:
+            print("STAR failed:"+" ".join(star_cmd))
      
         #return status
-        return cmdStatus
+        return cmd_status
     
     
-    def checkstarIndex(self):
-        if hasattr(self,'starIndex'):
-            return(checkStarIndex(self.starIndex))
+    def check_index(self):
+        if hasattr(self,'star_index'):
+            return(pu.check_starindex(self.star_index))
         else:
             return False
             
@@ -423,11 +481,11 @@ class Bowtie2(Aligner):
         
         super().__init__() 
         self.programName="bowtie2"
-        self.depList=[self.programName]        
-        if not check_dependencies(self.depList):
+        self.dep_list=[self.programName]        
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
+        self.valid_args=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
                             '--trim-to','--phred33','--phred64','--int-quals','--very-fast','--fast',
                             '--sensitive','--very-sensitive','--very-fast-local','--fast-local',
                             '--sensitive-local','--very-sensitive-local','-N','-L','-i','--n-ceil',
@@ -455,8 +513,8 @@ class Bowtie2(Aligner):
         
     
     
-    def performAlignment(self,sraOb,outSamSuffix="_bt2",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to perform alignment using self object and the provided sraOb.
+    def perform_alignment(self,sra_object,out_suffix="_bt2",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
         ----------
@@ -469,7 +527,7 @@ class Bowtie2(Aligner):
         """
         
         #create path to output sam file
-        outFile=os.path.join(sraOb.location,sraOb.srrAccession+outSamSuffix+".sam")
+        outFile=os.path.join(sra_object.location,sra_object.srrAccession+out_suffix+".sam")
                     
         """
         Handle overwrite
@@ -482,18 +540,18 @@ class Bowtie2(Aligner):
                 return outFile
         
         #find layout and fq file paths
-        if sraOb.layout == 'PAIRED':
-            newOpts={"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path,"-S":outFile}
+        if sra_object.layout == 'PAIRED':
+            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outFile}
         else:
-            newOpts={"-U":sraOb.localfastqPath,"-S":outFile}
+            newOpts={"-U":sra_object.localfastqPath,"-S":outFile}
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
+        status=self.runBowTie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
+            #check if sam file is present in the location directory of sra_object
             if check_files_exist(outFile):
                 return outFile
         else:
@@ -523,12 +581,12 @@ class Bowtie2(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         bowtie2_Cmd=['bowtie2']
-        bowtie2_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        bowtie2_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
         
         #print("Executing:"+" ".join(bowtie2_Cmd))
         
         #start ececution
-        status=executeCommand(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=execute_command(bowtie2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
             print_boldred("bowtie2 failed")
         return status
@@ -547,8 +605,8 @@ class Kallisto(Aligner):
     def __init__(self,kallisto_index,**kwargs):
         super().__init__() 
         self.programName="kallisto"
-        self.depList=[self.programName]        
-        if not check_dependencies(self.depList):
+        self.dep_list=[self.programName]        
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         
@@ -564,7 +622,7 @@ class Kallisto(Aligner):
             ##kallisto h5dump
         self.validArgsh5dump=['-o','--output-dir']
         
-        self.validArgsList=getListUnion(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
+        self.valid_args=getListUnion(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
@@ -588,8 +646,8 @@ class Kallisto(Aligner):
             return False
         
         #create out dir
-        if not checkPathsExists(index_path):
-            if not mkdir(indexPath):
+        if not check_paths_exist(index_path):
+            if not mkdir(index_path):
                 print("ERROR in building kallisto index. Failed to create index directory.")
                 return False
             
@@ -601,7 +659,7 @@ class Kallisto(Aligner):
         status=self.run_kallisto("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
+            #check if sam file is present in the location directory of sra_object
             if check_files_exist(indexOut):
                 self.kallisto_index=indexOut
                 self.passedArgumentDict['-i']=self.kallisto_index
@@ -611,7 +669,7 @@ class Kallisto(Aligner):
             print_boldred("Failed to create kallisto index")
             return False
     
-    def run_kallisto_quant(self,sraOb,outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_kallisto_quant(self,sra_object,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run kallisto quant
         
@@ -621,27 +679,27 @@ class Kallisto(Aligner):
             Path to salmon out directory
         """
         
-        if not outDir:
-            outDir=os.path.join(sraOb.location,"kallisto_out")
+        if not out_dir:
+            out_dir=os.path.join(sra_object.location,"kallisto_out")
         
         
         
-        if sraOb.layout == 'PAIRED':
-            newOpts={"-o":outDir,"--":(sraOb.localfastq1Path,sraOb.localfastq2Path)}
+        if sra_object.layout == 'PAIRED':
+            newOpts={"-o":out_dir,"--":(sra_object.localfastq1Path,sra_object.localfastq2Path)}
         else:
-            newOpts={"-o":outDir,"--single":"", "--":(sraOb.localfastqPath,)}
+            newOpts={"-o":out_dir,"--single":"", "--":(sra_object.localfastqPath,)}
         
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
+        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
-            if check_files_exist(os.path.join(outDir,"abundance.tsv")):
-                return outDir
+            #check if sam file is present in the location directory of sra_object
+            if check_files_exist(os.path.join(out_dir,"abundance.tsv")):
+                return out_dir
         
         print_boldred("kallisto quant failed")
         return ""
@@ -670,10 +728,10 @@ class Kallisto(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         kallisto_Cmd=['kallisto',subcommand]
-        kallisto_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        kallisto_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
         
         #start ececution
-        status=executeCommand(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
+        status=execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
         if not status:
             print_boldred("kallisto failed")
         return status       
@@ -689,8 +747,8 @@ class Salmon(Aligner):
     def __init__(self,salmon_index,**kwargs):    
         super().__init__() 
         self.programName="salmon"
-        self.depList=[self.programName]        
-        if not check_dependencies(self.depList):
+        self.dep_list=[self.programName]        
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         
@@ -727,7 +785,7 @@ class Salmon(Aligner):
         ##salmon quantmerge
         self.validArgsQuantMerge=['--quants','--names','-c','--column','-o','--output']
 
-        self.validArgsList=getListUnion(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
+        self.valid_args=getListUnion(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
@@ -752,8 +810,8 @@ class Salmon(Aligner):
             print_boldred("{} does not exist. Exiting".format(fasta))
             return False
         #create out dir
-        if not checkPathsExists(index_path):
-            if not mkdir(indexPath):
+        if not check_paths_exist(index_path):
+            if not mkdir(index_path):
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
         indexOut=os.path.join(index_path,index_name)
@@ -764,9 +822,9 @@ class Salmon(Aligner):
         status=self.run_salmon("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
+            #check if sam file is present in the location directory of sra_object
             #if check_files_exist(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
-            if checkPathsExists(indexOut):
+            if check_paths_exist(indexOut):
                 self.salmon_index=indexOut
                 self.passedArgumentDict['-i']=self.salmon_index
                 print_green("salmon index is:"+self.salmon_index)
@@ -777,7 +835,7 @@ class Salmon(Aligner):
         
         
     
-    def run_salmon_quant(self,sraOb,outDir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_salmon_quant(self,sra_object,out_dir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run salmon quant
         
@@ -787,27 +845,27 @@ class Salmon(Aligner):
             Path to salmon out directory
         """
         
-        if not outDir:
-            outDir=os.path.join(sraOb.location,"salmon_out")
+        if not out_dir:
+            out_dir=os.path.join(sra_object.location,"salmon_out")
         
         
         
-        if sraOb.layout == 'PAIRED':
-            newOpts={"-o":outDir,"-l":libType,"-1":sraOb.localfastq1Path,"-2":sraOb.localfastq2Path}
+        if sra_object.layout == 'PAIRED':
+            newOpts={"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path}
         else:
-            newOpts={"-o":outDir,"-l":libType,"-r":sraOb.localfastqPath}
+            newOpts={"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath}
         
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sraOb.srrAccession,**mergedOpts)
+        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sraOb
-            if check_files_exist(os.path.join(outDir,"quant.sf")):
-                return outDir
+            #check if sam file is present in the location directory of sra_object
+            if check_files_exist(os.path.join(out_dir,"quant.sf")):
+                return out_dir
         
         print_boldred("salmon quant failed")
         return ""
@@ -836,10 +894,10 @@ class Salmon(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         salmon_Cmd=['salmon',subcommand]
-        salmon_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        salmon_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
         
         #start ececution
-        status=executeCommand(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
+        status=execute_command(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
         if not status:
             print_boldred("salmon failed")
         return status 
