@@ -6,8 +6,9 @@ Created on Mon Nov 25 15:21:01 2019
 @author: usingh
 """
 
-from pyrpipe.pyrpipe_utils import *
-from pyrpipe.pyrpipe_engine import *
+from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import pyrpipe_engine as pe
+import os
 
 class Assembly:
     """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
@@ -45,7 +46,7 @@ class Stringtie(Assembly):
         super().__init__()
         self.program_name="stringtie"
         #check if stringtie exists
-        if not check_dependencies([self.program_name]):
+        if not pe.check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
         self.valid_args_list=['-G','--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
@@ -55,7 +56,7 @@ class Stringtie(Assembly):
         self.passed_args_dict=kwargs
         
         #check the reference GTF
-        if len(reference_gtf)>0 and check_files_exist(reference_gtf):
+        if len(reference_gtf)>0 and pu.check_files_exist(reference_gtf):
             self.reference_gtf=reference_gtf
             self.passed_args_dict['-G']=reference_gtf
         
@@ -80,10 +81,10 @@ class Stringtie(Assembly):
         """
         
         #create path to output file
-        fname=get_file_basename(bam_file)
+        fname=pu.get_file_basename(bam_file)
         
         if not out_dir:
-            out_dir=get_file_directory(bam_file)
+            out_dir=pu.get_file_directory(bam_file)
             
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
@@ -105,12 +106,12 @@ class Stringtie(Assembly):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if check_files_exist(out_gtf_file):
+            if pu.check_files_exist(out_gtf_file):
                 return out_gtf_file
         else:
             return ""
         
-    def performStringtieMerge(self,*args,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def stringtie_merge(self,*args,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
         Parameters
         ----------
@@ -136,8 +137,8 @@ class Stringtie(Assembly):
             return ""
         
         #create path to output sam file
-        fname=get_file_basename(args[0])
-        out_dir=get_file_directory(args[0])
+        fname=pu.get_file_basename(args[0])
+        out_dir=pu.get_file_directory(args[0])
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         if not overwrite:
@@ -156,7 +157,7 @@ class Stringtie(Assembly):
         
         if status:
             #check if sam file is present in the location directory of sraOb
-            if check_files_exist(out_gtf_file):
+            if pu.check_files_exist(out_gtf_file):
                 return out_gtf_file
         else:
             return ""
@@ -187,13 +188,13 @@ class Stringtie(Assembly):
        
         stie_cmd=['stringtie']
         #add options
-        stie_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
+        stie_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
         
                 
         #start ececution
-        status=execute_command(stie_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(stie_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("stringtie failed")
+            pu.print_boldred("stringtie failed")
         
         #return status
         return status
@@ -201,20 +202,14 @@ class Stringtie(Assembly):
     
     
 class Cufflinks(Assembly):
+    """This class represents cufflinks
+    """
     def __init__(self,reference_gtf="",**kwargs):
-        """Stringtie constructor. Initialize stringtie parameters.
         
-        Parameters
-        ----------
-        arg1: string
-            Path to the reference gtf file.
-        arg2: dict
-            Options passed to stringtie. These could be overridden later when executing cufflinks.
-        """
         super().__init__()
         self.program_name="cufflinks"
         #check if stringtie exists
-        if not check_dependencies([self.program_name]):
+        if not pe.check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
             
         
@@ -236,18 +231,18 @@ class Cufflinks(Assembly):
         self.cuffnormArgsList=['-o','--output-dir','-L','--labels','--norm-standards-file','-p','--num-threads','--library-type','--library-norm-method','--output-format','--compatible-hits-norm','--total-hits-norm','-v','--verbose','-q','--quiet','--seed','--no-update-check']
         self.cuffmergeArgsList=['h','--help','-o','-g','–-ref-gtf','-p','–-num-threads','-s','-–ref-sequence']
         
-        self.valid_args_list=getListUnion(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
+        self.valid_args_list=pu.get_union(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
         
         #keep the passed arguments
         self.passed_args_dict=kwargs
         
         #check the reference GTF
-        if len(reference_gtf)>0 and check_files_exist(reference_gtf):
+        if len(reference_gtf)>0 and pu.check_files_exist(reference_gtf):
             self.reference_gtf=reference_gtf
             self.passed_args_dict['-g']=reference_gtf
     
     
-    def perform_assembly(self,bam_file,out_suffix="_cufflinks",overwrite=True,**kwargs):
+    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",overwrite=True,**kwargs):
         """Function to run cufflinks with BAM file as input.
                 
         Parameters
@@ -269,8 +264,12 @@ class Cufflinks(Assembly):
         """
         
         #create path to output file
-        fname=get_file_basename(bam_file)
-        out_dir=get_file_directory(bam_file)
+        fname=pu.get_file_basename(bam_file)
+        if not out_dir:
+            out_dir=pu.get_file_directory(bam_file)
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         """
@@ -287,18 +286,18 @@ class Cufflinks(Assembly):
         merged_opts={**kwargs,**new_opts}
         
         #call cufflinks
-        status=self.runCufflinks(**merged_opts)
+        status=self.run_cufflinks(**merged_opts)
         
         if status:
             #move out_dir/transcripts.gtf to outfile
-            moveFile(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
+            pe.move_file(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
             #check if sam file is present in the location directory of sraOb
-            if check_files_exist(out_gtf_file):
+            if pu.check_files_exist(out_gtf_file):
                 return out_gtf_file
         else:
             return ""
     
-    def runCuffCommand(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_cuff(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cuff* commands
         
         Parameters
@@ -320,20 +319,20 @@ class Cufflinks(Assembly):
        
             cuff_cmd=[command]
             #add options
-            cuff_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
+            cuff_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
                   
             #start ececution
-            status=execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+            status=pe.execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
             if not status:
-                print_boldred("cufflinks failed")
+                pu.print_boldred("cufflinks failed")
                 #return status
             return status
         else:
-            print_boldred("Unknown command {}"+command)
+            pu.print_boldred("Unknown command {}"+command)
             return False
     
     
-    def runCufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_cufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cufflinks
         
         Parameters
@@ -352,12 +351,12 @@ class Cufflinks(Assembly):
        
         cufflinks_cmd=['cufflinks']
         #add options
-        cufflinks_cmd.extend(parse_unix_args(self.valid_args_list,merged_args_dict))        
+        cufflinks_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
         
         
         #start ececution
-        status=execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("cufflinks failed")
+            pu.print_boldred("cufflinks failed")
         #return status
         return status

@@ -871,13 +871,13 @@ class Kallisto(Aligner):
 
 
 class Salmon(Aligner):
-    """Salmon constructor. Initialize kallisto parameters.
-    """       
+    """This class represents salmon
+    """      
     def __init__(self,salmon_index,**kwargs):    
         super().__init__() 
         self.programName="salmon"
         self.dep_list=[self.programName]        
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         
@@ -920,7 +920,7 @@ class Salmon(Aligner):
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(salmon_index)>0 and check_salmon_index(salmon_index):
+        if len(salmon_index)>0 and pu.check_salmon_index(salmon_index):
             print("salmon index is: "+salmon_index)
             self.salmon_index=salmon_index
             self.passedArgumentDict['-i']=self.salmon_index
@@ -929,18 +929,26 @@ class Salmon(Aligner):
             
             
             
-    def build_salmon_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         build salmon index
+        
+        index_path (str): path to the output directory
+        index_name (str): index name
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options
         """
         
         #check input
-        if not check_files_exist(fasta):
-            print_boldred("{} does not exist. Exiting".format(fasta))
+        if not pu.check_files_exist(fasta):
+            pu.print_boldred("{} does not exist. Exiting".format(fasta))
             return False
         #create out dir
-        if not check_paths_exist(index_path):
-            if not mkdir(index_path):
+        if not pu.check_paths_exist(index_path):
+            if not pu.mkdir(index_path):
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
         indexOut=os.path.join(index_path,index_name)
@@ -953,13 +961,13 @@ class Salmon(Aligner):
         if status:
             #check if sam file is present in the location directory of sra_object
             #if check_files_exist(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
-            if check_paths_exist(indexOut):
+            if pu.check_paths_exist(indexOut):
                 self.salmon_index=indexOut
                 self.passedArgumentDict['-i']=self.salmon_index
-                print_green("salmon index is:"+self.salmon_index)
+                pu.print_green("salmon index is:"+self.salmon_index)
                 return True
         
-        print_boldred("Failed to create salmon index")
+        pu.print_boldred("Failed to create salmon index")
         return False
         
         
@@ -968,6 +976,11 @@ class Salmon(Aligner):
         """
         run salmon quant
         
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options
         Returns
         -------
         string
@@ -993,10 +1006,10 @@ class Salmon(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sra_object
-            if check_files_exist(os.path.join(out_dir,"quant.sf")):
+            if pu.check_files_exist(os.path.join(out_dir,"quant.sf")):
                 return out_dir
         
-        print_boldred("salmon quant failed")
+        pu.print_boldred("salmon quant failed")
         return ""
         
         
@@ -1023,17 +1036,17 @@ class Salmon(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         salmon_Cmd=['salmon',subcommand]
-        salmon_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
+        salmon_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
         
         #start ececution
-        status=execute_command(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
+        status=pe.execute_command(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
         if not status:
-            print_boldred("salmon failed")
+            pu.print_boldred("salmon failed")
         return status 
 
     def check_index(self):
         if hasattr(self,'salmon_index'):
-            return checkSalmonIndex(self.salmon_index)
+            return pu.check_salmonindex(self.salmon_index)
         return False
 
 

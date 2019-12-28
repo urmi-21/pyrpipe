@@ -22,15 +22,20 @@ import os
 testVars=testSpecs()
 
 def test_assembly():
-    srrID=testVars.srr
-    testDir=testVars.testDir
     #create assemble object
     aob=assembly.Assembly()
     assert aob.category == "Assembler","Failed Assembly init"
     
 def test_stringtie():
-    bam="tests/test_files/athaliana/mapping/hisat2_sorted.bam"
-    gtf="tests/test_files/athaliana/genome/Arabidopsis_thaliana.TAIR10.45_1and2.gtf"
+    bam=testVars.hisatSortedBam
+    gtf=testVars.gtf
     stie=assembly.Stringtie(reference_gtf=gtf)
     result=stie.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
+    assert pu.check_files_exist(result)==True, "Failed stringtie"
+    
+def test_cufflinks():
+    bam=testVars.hisatSortedBam
+    gtf=testVars.gtf
+    cl=assembly.Cufflinks(reference_gtf=gtf)
+    result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
     assert pu.check_files_exist(result)==True, "Failed stringtie"

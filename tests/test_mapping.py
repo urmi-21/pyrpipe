@@ -19,7 +19,7 @@ def test_mapping():
     mob=mapping.Aligner()
     assert mob.category == "Aligner","Failed Mapping init"
     
-"""
+
 def test_hisat2():
     #test hisat build and hisat mapping
     hsOpts={"--dta-cufflinks":"","-p":"10"}
@@ -32,8 +32,7 @@ def test_hisat2():
     hsMapOpts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/hisatTest.sam"}
     st=hs.run_hisat2(**hsMapOpts)
     assert st==True, "Failed to run hisat"
-""" 
-"""    
+
 def test_star():
     star=mapping.Star(star_index="")
     assert star.check_index()==False, "Failed star check_index"
@@ -53,9 +52,9 @@ def test_star():
             }
     st=star.run_star(**opts)
     assert st==True, "Failed to run star"
-"""
 
-"""
+
+
 def test_bowtie():
     bt=mapping.Bowtie2(bowtie2_index="")
     assert bt.check_index()==False, "Failed bowtie2 check_index"
@@ -63,7 +62,8 @@ def test_bowtie():
     assert st==True, "Failed to build bowtie2 index"
     opts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/bowtie2.sam"}
     st=bt.run_bowtie2(**opts)
-"""
+    assert st==True, "Failed to run bowtie2"
+
  
 def test_kallisto():
     kl=mapping.Kallisto(kallisto_index="")
@@ -72,8 +72,20 @@ def test_kallisto():
     assert st==True, "Failed to build kallisto index"
     opts={"-o":testVars.testDir+"/kalOut","--":(testVars.fq1,testVars.fq2)}
     st=kl.run_kallisto("quant",**opts)
+    assert st==True, "Failed to run kallisto"
     
     
+def test_salmon():
+    sl=mapping.Salmon(salmon_index="")
+    assert sl.check_index()==False, "Failed salmon check_index"
+    st=sl.build_index(index_path=testVars.testDir+"/salmonIndex",index_name="salIndex",fasta=testVars.cdna)
+    assert st==True, "Failed to build salmon index"
+    opts={"-o":testVars.testDir+"/salOut",
+          "-l":"A",
+          "-1":testVars.fq1,
+          "-2":testVars.fq2}
+    st=sl.run_salmon("quant",**opts)
+    assert st==True, "Failed to run salmon"
     
     
     
