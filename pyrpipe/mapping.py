@@ -706,13 +706,14 @@ class Bowtie2(Aligner):
 
 
 class Kallisto(Aligner):
-    """Kallisto constructor. Initialize kallisto parameters.
-        """       
+    """This class represents kallisto
+    """
+    
     def __init__(self,kallisto_index,**kwargs):
         super().__init__() 
         self.programName="kallisto"
         self.dep_list=[self.programName]        
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         
@@ -728,32 +729,39 @@ class Kallisto(Aligner):
             ##kallisto h5dump
         self.validArgsh5dump=['-o','--output-dir']
         
-        self.valid_args=getListUnion(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
+        self.valid_args=pu.get_union(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(kallisto_index)>0 and check_files_exist(kallisto_index):
+        if len(kallisto_index)>0 and pu.check_files_exist(kallisto_index):
             print("kallisto index is: "+kallisto_index)
             self.kallisto_index=kallisto_index
             self.passedArgumentDict['-i']=self.kallisto_index
         else:
             print("No kallisto index provided. Please use build_index() now to generate an index...")
             
-    def build_kallisto_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """
-        build kallisto index
+    def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Function to  build kallisto index
+        index_path (str): path to the output directory
+        index_name (str): index name
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options 
+                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         """
         
         #check input
-        if not check_files_exist(fasta):
-            print_boldred("{} does not exist. Exiting".format(fasta))
+        if not pu.check_files_exist(fasta):
+            pu.print_boldred("{} does not exist. Exiting".format(fasta))
             return False
         
         #create out dir
-        if not check_paths_exist(index_path):
-            if not mkdir(index_path):
+        if not pu.check_paths_exist(index_path):
+            if not pu.mkdir(index_path):
                 print("ERROR in building kallisto index. Failed to create index directory.")
                 return False
             
@@ -766,23 +774,30 @@ class Kallisto(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sra_object
-            if check_files_exist(indexOut):
+            if pu.check_files_exist(indexOut):
                 self.kallisto_index=indexOut
                 self.passedArgumentDict['-i']=self.kallisto_index
-                print_green("kallisto_index is:"+self.kallisto_index)
+                pu.print_green("kallisto_index is:"+self.kallisto_index)
                 return True
         else:
-            print_boldred("Failed to create kallisto index")
+            pu.print_boldred("Failed to create kallisto index")
             return False
     
     def run_kallisto_quant(self,sra_object,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run kallisto quant
-        
+        sra_object (SRA): SRA object contatining paths to fastq files
+        index_path (str): path to the output directory
+        index_name (str): index name
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options
         Returns
         -------
         string
-            Path to salmon out directory
+            Path to kallisto out directory
         """
         
         if not out_dir:
@@ -804,25 +819,29 @@ class Kallisto(Aligner):
         
         if status:
             #check if sam file is present in the location directory of sra_object
-            if check_files_exist(os.path.join(out_dir,"abundance.tsv")):
+            if pu.check_files_exist(os.path.join(out_dir,"abundance.tsv")):
                 return out_dir
         
-        print_boldred("kallisto quant failed")
+        pu.print_boldred("kallisto quant failed")
         return ""
         
     
     
     def run_kallisto(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running kallisto.
-        
+        Parameters
         ----------
-        arg1: dict
-            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options
+        
             
         Returns
         -------
         bool:
-                Returns the status of bowtie2. True is passed, False if failed.
+                Returns the status of kallisto. True is passed, False if failed.
         """
         
         #check for a valid index
@@ -834,16 +853,20 @@ class Kallisto(Aligner):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         kallisto_Cmd=['kallisto',subcommand]
-        kallisto_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
+        kallisto_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
         
         #start ececution
-        status=execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
+        status=pe.execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
         if not status:
-            print_boldred("kallisto failed")
+            pe.print_boldred("kallisto failed")
         return status       
     
     def check_index(self):
-        return check_files_exist(self.kallisto_index)
+        """Check valid kallisto index
+        """
+        if hasattr(self,'kallisto_index'):
+            return(pu.check_files_exist(self.kallisto_index))
+        return False
             
 
 
@@ -891,7 +914,7 @@ class Salmon(Aligner):
         ##salmon quantmerge
         self.validArgsQuantMerge=['--quants','--names','-c','--column','-o','--output']
 
-        self.valid_args=getListUnion(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
+        self.valid_args=pu.get_union(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
         
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
