@@ -6,16 +6,22 @@ Created on Mon Nov 25 17:48:00 2019
 @author: usingh
 """
 
-from pyrpipe.pyrpipe_utils import *
-from pyrpipe.pyrpipe_engine import *
+from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import pyrpipe_engine as pe
+import os
 
 class RNASeqQC:
+    """This is an abstract parent class for fastq quality control programs.
+    """
     def __init__(self):
         self.category="RNASeqQC"
-    def performQC(self):
+        
+    def perform_qc(self):
         pass
 
 class Trimgalore(RNASeqQC):
+    """This class represents trimgalore
+    """
     def __init__(self,**kwargs):
         """
         Parameters
@@ -27,8 +33,8 @@ class Trimgalore(RNASeqQC):
         #run super to inherit parent class properties
         super().__init__() 
         self.programName="trim_galore"
-        self.depList=[self.programName,'cutadapt']
-        self.validArgsList=['-h','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
+        self.dep_list=[self.programName,'cutadapt']
+        self.valid_args=['-h','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
                             '--illumina','--nextera','--small_rna','--consider_already_trimmed',
                             '--max_length','--stringency','-e','--gzip','--dont_gzip','--length',
                             '--max_n','--trim-n','-o','--no_report_file','--suppress_warn',
@@ -37,7 +43,7 @@ class Trimgalore(RNASeqQC):
                             '--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t',
                             '--retain_unpaired','-r1','-r2']
         #check if hisat2 exists
-        if not check_dependencies(self.depList):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         #initialize the passed arguments
@@ -45,81 +51,96 @@ class Trimgalore(RNASeqQC):
         
         
             
-    def performQC(self,sraOb,outFileSuffix="_trimgalore",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_qc(self,sra_object,out_dir="",out_suffix="_trimgalore",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform qc using trimgalore.
-        The function performQC() is consistent for all QC classess.
+        The function perform_qc() is consistent for all QC classess.
         
         Parameters
         ----------
-        arg1: SRA
-            An SRA object whose fastq files will be used
+        sra_object (SRA):  An SRA object whose fastq files will be used
+        out_suffix: string
+            Suffix for the output sam file
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
         
         Returns
         -------
         tuple
-            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+            Returns the path of fastq files after QC. tuple has one item for single end files and two for paired.
             
         """
-        #create path to output files
-        outDir=sraOb.location
+        
+        if not out_dir:
+            out_dir=sra_object.location
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
         
         #create new options based on parametrs
         newOpts={}
         #get layout
-        if sraOb.layout=='PAIRED':
-            fq1=sraOb.localfastq1Path
-            fq2=sraOb.localfastq2Path
-            outFile1=os.path.join(outDir,getFileBaseName(fq1)+outFileSuffix+".fastq")
-            outFile2=os.path.join(outDir,getFileBaseName(fq2)+outFileSuffix+".fastq")
-            newOpts={"--paired":"","--":(fq1,fq2),"-o":outDir}
+        if sra_object.layout=='PAIRED':
+            fq1=sra_object.localfastq1Path
+            fq2=sra_object.localfastq2Path
+            out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
+            out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
+            newOpts={"--paired":"","--":(fq1,fq2),"-o":out_dir}
             mergedOpts={**kwargs,**newOpts}
             #run trimgalore
-            self.runTrimGalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+            self.run_trimgalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
             """
             running trim galore will create two files named <input>_val_1.fq and <input>_val_2.fq
             move these files to the specified out files
             """
-            oldFile1=os.path.join(outDir,getFileBaseName(fq1)+"_val_1.fq")
-            oldFile2=os.path.join(outDir,getFileBaseName(fq2)+"_val_2.fq")
+            oldFile1=os.path.join(out_dir,pu.get_file_basename(fq1)+"_val_1.fq")
+            oldFile2=os.path.join(out_dir,pu.get_file_basename(fq2)+"_val_2.fq")
             
-            mv1=moveFile(oldFile1,outFile1)
-            mv2=moveFile(oldFile2,outFile2)
+            pe.move_file(oldFile1,out_file1)
+            pe.move_file(oldFile2,out_file2)
             
-            if not check_files_exist(outFile1,outFile2):
+            if not pu.check_files_exist(out_file1,out_file2):
                 print("Trimgalore failed")
                 return ("",)
-            return outFile1,outFile2
+            return out_file1,out_file2
             
         else:
-            fq=sraOb.localfastqPath
-            outFile=os.path.join(outDir, getFileBaseName(fq)+outFileSuffix+".fastq")
+            fq=sra_object.localfastqPath
+            out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
             #giving input arguments as a tuple "--":(fq,)
-            newOpts={"--":(fq,),"-o":outDir}
+            newOpts={"--":(fq,),"-o":out_dir}
             #run trimgalore
             mergedOpts={**kwargs,**newOpts}
             
-            self.runTrimGalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+            self.run_trimgalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
             """
             running trim galore will create one file named <input>_trimmed.fq
             move these files to the specified out files
             """
-            oldFile=os.path.join(outDir,getFileBaseName(fq)+"_trimmed.fq")
+            oldFile=os.path.join(out_dir,pu.get_file_basename(fq)+"_trimmed.fq")
             
-            mv=moveFile(oldFile,outFile)
+            pe.move_file(oldFile,out_file)
             
-            if not check_files_exist(outFile):
+            if not pu.check_files_exist(out_file):
                 print("Trimgalore failed")
                 return ("",)
-            return (outFile,)
+            return (out_file,)
         
         
             
-    def runTrimGalore(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_trimgalore(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running trimgalore
         
         Parameters
         ----------
-        arg1: dict
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs (dict):
             Options to pass to trimgalore (will override existing parameters)
         """
         
@@ -127,14 +148,14 @@ class Trimgalore(RNASeqQC):
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
         
         #create command to run
-        trimGalore_Cmd=['trim_galore']
-        trimGalore_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        trimgalore_cmd=['trim_galore']
+        trimgalore_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
         
         
         #start ececution
-        status=executeCommand(trimGalore_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(trimgalore_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("trimgalore failed")
+            pu.print_boldred("trimgalore failed")
         
         #return status
         return status
@@ -144,6 +165,8 @@ class Trimgalore(RNASeqQC):
             
 
 class BBmap(RNASeqQC):
+    """This class represents bbmap programs
+    """
     def __init__(self,**kwargs):
         """
         Parameters
@@ -154,13 +177,13 @@ class BBmap(RNASeqQC):
         #run super to inherit parent class properties
         super().__init__() 
         self.programName="bbduk.sh"
-        self.depList=[self.programName]
+        self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.depList):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         
-        self.validArgsList=['in','in2','ref','literal','touppercase','interleaved','qin','reads','copyundefined',
+        self.valid_args=['in','in2','ref','literal','touppercase','interleaved','qin','reads','copyundefined',
                             'samplerate','samref','out','out2','outm','outm2','outs','stats','refstats','rpkm',
                             'dump','duk','nzo','overwrite','showspeed','ziplevel','fastawrap','qout','statscolumns',
                             'rename','refnames','trd','ordered','maxbasesout','maxbasesoutm','','json','bhist','qhist',
@@ -183,8 +206,8 @@ class BBmap(RNASeqQC):
             
             
             
-    def performQC(self,sraOb,outFileSuffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Run bbduk on fastq files specified by the sraOb
+    def perform_qc(self,sra_object,out_suffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Run bbduk on fastq files specified by the sra_object
         
         Parameters
         ----------
@@ -194,6 +217,11 @@ class BBmap(RNASeqQC):
             Suffix for output file name
         arg3: bool
             overwrite existing files
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
         arg3: dict
             options passed to bbduk
             
@@ -201,62 +229,62 @@ class BBmap(RNASeqQC):
         tuple
             Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         """
-        if sraOb.layout=='PAIRED':
-            fq1=sraOb.localfastq1Path
-            fq2=sraOb.localfastq2Path
+        if sra_object.layout=='PAIRED':
+            fq1=sra_object.localfastq1Path
+            fq2=sra_object.localfastq2Path
             #append input and output options
-            outDir=sraOb.location
-            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
-            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
-            outFile1Path=os.path.join(outDir,outFileName1)
-            outFile2Path=os.path.join(outDir,outFileName2)
+            out_dir=sra_object.location
+            out_fileName1=pu.get_file_basename(fq1)+out_suffix+".fastq"
+            out_fileName2=pu.get_file_basename(fq2)+out_suffix+".fastq"
+            out_file1Path=os.path.join(out_dir,out_fileName1)
+            out_file2Path=os.path.join(out_dir,out_fileName2)
             
-            newOpts={"in":fq1,"in2":fq2,"out":outFile1Path,"out2":outFile2Path}
+            newOpts={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if check_files_exist(outFile1Path,outFile2Path):
-                    return(outFile1Path,outFile2Path)
+            if self.run_bbduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if pu.check_files_exist(out_file1Path,out_file2Path):
+                    return(out_file1Path,out_file2Path)
             return("",)
             
             
         else:
-            fq=sraOb.localfastqPath
+            fq=sra_object.localfastqPath
             #append input and output options
-            outDir=sraOb.location
-            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
-            outFilePath=os.path.join(outDir,outFileName)
-            newOpts={"in":fq,"out":outFilePath}
+            out_dir=sra_object.location
+            out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
+            out_filePath=os.path.join(out_dir,out_fileName)
+            newOpts={"in":fq,"out":out_filePath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if check_files_exist(outFilePath):
-                    return(outFilePath,)
+            if self.run_bbduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if pu.check_files_exist(out_filePath):
+                    return(out_filePath,)
             return("",)
                     
     
     
     
     
-    def runBBduk(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bbduk(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run bbduk.sh
         """
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
         
         #create command to run
-        bbduk_Cmd=["bbduk.sh"]
+        bbduk_cmd=["bbduk.sh"]
         
         #bbduk.sh follows java style arguments
-        bbduk_Cmd.extend(parseJavaStyleArgs(self.validArgsList,mergedArgsDict))
+        bbduk_cmd.extend(pu.parseJavaStyleArgs(self.valid_args,mergedArgsDict))
         
         
         #start ececution
-        status=executeCommand(bbduk_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(bbduk_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("bbduk failed")
+            pu.print_boldred("bbduk failed")
         #return status
         return status
     
@@ -269,7 +297,7 @@ class BBmap(RNASeqQC):
     bbsplit.sh in1=reads1.fq in2=reads2.fq ref=path_to_ref outu1=clean1.fq outu2=clean2.fq
     """
     
-    def performCleaning(self,sraOb,bbsplitIndex,outFileSuffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_cleaning(self,sra_object,bbsplitIndex,out_suffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         
@@ -283,6 +311,11 @@ class BBmap(RNASeqQC):
             Suffix for output file name
         arg4: bool
             overwrite existing files
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
         arg5: dict
             options passed to bbsplit
             
@@ -293,26 +326,26 @@ class BBmap(RNASeqQC):
         
         #check index
         indexPath=""
-        if not checkPathsExists(bbsplitIndex):
+        if not pu.check_paths_exist(bbsplitIndex):
             #index folder doesn't exist
             #check if input is path to fasta
-            if not check_files_exist(bbsplitIndex):
+            if not pu.check_files_exist(bbsplitIndex):
                 print("Error: Please check bbsplit index")
                 return ("",)
             #check if index folder "ref" exists in this directory
-            indexPath=os.path.join(getFileDirectory(bbsplitIndex),"ref")
-            if checkPathsExists(indexPath):
+            indexPath=os.path.join(pu.get_file_directory(bbsplitIndex),"ref")
+            if pu.check_paths_exist(indexPath):
                 print("Using bbsplit index: "+indexPath)
             else:
                 #create new index
                 print("Creating new index"+indexPath)
-                newOpts={"ref_x":bbsplitIndex,"path":getFileDirectory(bbsplitIndex)}
+                newOpts={"ref_x":bbsplitIndex,"path": pu.get_file_directory(bbsplitIndex)}
                 mergedOpts={**kwargs,**newOpts}
                 #run bbduk
-                if not self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if not self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
                     print("Error creating bbsplit index.")
                     return ("",)
-                if not checkPathsExists(indexPath):
+                if not pu.check_paths_exist(indexPath):
                     print("Error creating bbsplit index.")
                     return ("",)
         else:
@@ -323,45 +356,45 @@ class BBmap(RNASeqQC):
         indexPath=os.path.dirname(indexPath)
         
         
-        if sraOb.layout=='PAIRED':
-            fq1=sraOb.localfastq1Path
-            fq2=sraOb.localfastq2Path
+        if sra_object.layout=='PAIRED':
+            fq1=sra_object.localfastq1Path
+            fq2=sra_object.localfastq2Path
             #append input and output options
-            outDir=sraOb.location
-            outFileName1=getFileBaseName(fq1)+outFileSuffix+".fastq"
-            outFileName2=getFileBaseName(fq2)+outFileSuffix+".fastq"
-            outFile1Path=os.path.join(outDir,outFileName1)
-            outFile2Path=os.path.join(outDir,outFileName2)
+            out_dir=sra_object.location
+            out_fileName1=pu.get_file_basename(fq1)+out_suffix+".fastq"
+            out_fileName2=pu.get_file_basename(fq2)+out_suffix+".fastq"
+            out_file1Path=os.path.join(out_dir,out_fileName1)
+            out_file2Path=os.path.join(out_dir,out_fileName2)
             
-            newOpts={"in1":fq1,"in2":fq2,"outu1":outFile1Path,"outu2":outFile2Path,"path":indexPath}
+            newOpts={"in1":fq1,"in2":fq2,"outu1":out_file1Path,"outu2":out_file2Path,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if check_files_exist(outFile1Path,outFile2Path):
-                    return(outFile1Path,outFile2Path)
+            if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if pu.check_files_exist(out_file1Path,out_file2Path):
+                    return(out_file1Path,out_file2Path)
             return("",)
             
             
         else:
-            fq=sraOb.localfastqPath
+            fq=sra_object.localfastqPath
             #append input and output options
-            outDir=sraOb.location
-            outFileName=getFileBaseName(fq)+outFileSuffix+".fastq"
-            outFilePath=os.path.join(outDir,outFileName)
-            newOpts={"in":fq,"outu":outFilePath,"path":indexPath}
+            out_dir=sra_object.location
+            out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
+            out_filePath=os.path.join(out_dir,out_fileName)
+            newOpts={"in":fq,"outu":out_filePath,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
             #run bbduk
-            if self.runBBsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
-                if check_files_exist(outFilePath):
-                    return(outFilePath,)
+            if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if pu.check_files_exist(out_filePath):
+                    return(out_filePath,)
             
             return("",)
     
     
     
-    def runBBsplit(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bbsplit(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """wrapper to run bbsplit
         """
         
@@ -375,16 +408,16 @@ class BBmap(RNASeqQC):
         mergedArgsDict={**kwargs}
         
         #create command to run
-        bbsp_Cmd=["bbsplit.sh"]
+        bbsp_cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
-        bbsp_Cmd.extend(parseJavaStyleArgs(bbSplitValidArgs,mergedArgsDict))
+        bbsp_cmd.extend(pu.parse_java_args(bbSplitValidArgs,mergedArgsDict))
         
         
         #start ececution
-        status=executeCommand(bbsp_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(bbsp_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("bbsplit failed")
+            pu.print_boldred("bbsplit failed")
         #return status
         return status
     
