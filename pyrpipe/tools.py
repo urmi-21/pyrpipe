@@ -260,9 +260,9 @@ class Samtools(RNASeqTools):
 class Portcullis(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="portcullis"
-        self.depList=[self.programName]
+        self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.depList):
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=['-t','--threads','-v','--verbose','--help','-o','-b',
@@ -274,26 +274,33 @@ class Portcullis(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
-    def runPortcullisFull(self,referenceFasta,bam_file,out_dir="",delete_bam_file=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_portcullisFull(self,reference_fasta,bam_file,out_dir="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run portculis full
         
         Parameters
         ----------
-        referenceFasta: string
+        reference_fasta: string
             Path to the reference fasta file
         bam_file: string
             Path to input bam file
         out_dir: string
             Path to the out put dir. current directory is not given.
+        
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
+        
         """
         
-        if not check_files_exist(referenceFasta,bam_file):
+        if not check_files_exist(reference_fasta,bam_file):
             print ("Please check input for portcullis.")
             return ""
         
         
-        newOpts={"--":(referenceFasta,bam_file)}
+        newOpts={"--":(reference_fasta,bam_file)}
         mergedOpts={**kwargs,**newOpts}
         #add out dir path
         if not out_dir:
@@ -311,7 +318,7 @@ class Portcullis(RNASeqTools):
         if not checkPathsExists(out_dir):
             return ""
 
-        if delete_bam_file:
+        if delete_bam:
             if not deleteFileFromDisk(bam_file):
                     print("Error deleting bam file:"+bam_file)
         
@@ -359,9 +366,9 @@ class Portcullis(RNASeqTools):
 class Mikado(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="mikado"
-        self.depList=[self.programName]
+        self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.depList):
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=[]        
@@ -568,9 +575,9 @@ class Mikado(RNASeqTools):
 class Ribocode(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="RiboCode"
-        self.depList=[self.programName]
+        self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.depList):
+        if not check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=[]        
