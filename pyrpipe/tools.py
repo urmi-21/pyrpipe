@@ -147,7 +147,7 @@ class Samtools(RNASeqTools):
             return ""
             
 
-        bamSorted=self.sort_bam(sam2bam_file,out_dir=out_dir, out_suffix,delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         if not bamSorted:
             return ""
@@ -204,13 +204,13 @@ class Samtools(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not check_files_exist(outMergedFile):
+        if not pu.check_files_exist(outMergedFile):
             return ""
         
 
         if delete_bams:
             for bam_file in args:
-                if not deleteFileFromDisk(bam_file):
+                if not pe.deleteFileFromDisk(bam_file):
                     print("Error deleting sam file:"+bam_file)
                     
         return outMergedFile
@@ -262,7 +262,7 @@ class Portcullis(RNASeqTools):
         self.programName="portcullis"
         self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=['-t','--threads','-v','--verbose','--help','-o','-b',
@@ -295,7 +295,7 @@ class Portcullis(RNASeqTools):
         
         """
         
-        if not check_files_exist(reference_fasta,bam_file):
+        if not pu.check_files_exist(reference_fasta,bam_file):
             print ("Please check input for portcullis.")
             return ""
         
@@ -308,23 +308,23 @@ class Portcullis(RNASeqTools):
                   
         mergedOpts={**mergedOpts,**{"-o":out_dir}}
         
-        status=self.runPortcullis("full",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_portcullis("full",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
             print("portcullis full failed for:"+bam_file)
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(out_dir):
+        if not pu.check_paths_exist(out_dir):
             return ""
 
         if delete_bam:
-            if not deleteFileFromDisk(bam_file):
+            if not pe.deleteFileFromDisk(bam_file):
                     print("Error deleting bam file:"+bam_file)
         
         return out_dir
     
-    def runPortcullis(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_portcullis(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Wrapper to run portcullis.
         
@@ -345,17 +345,17 @@ class Portcullis(RNASeqTools):
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        portcullis_Cmd=['portcullis',sub_command]
+        portcullis_cmd=['portcullis',sub_command]
         #add options
-        portcullis_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
+        portcullis_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
                 
-        print("Executing:"+" ".join(portcullis_Cmd))
+        print("Executing:"+" ".join(portcullis_cmd))
         
         
         #start ececution
-        status=executeCommand(portcullis_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(portcullis_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("portcullis failed")
+            pu.print_boldred("portcullis failed")
                 
         #return status
         return status
@@ -368,48 +368,45 @@ class Mikado(RNASeqTools):
         self.programName="mikado"
         self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=[]        
         self.passedArgumentDict=kwargs
         
         
-    #mikado prepare --start-method spawn --log mikadoPrepareLog --minimum_length 30
-    #--procs 28 --output-dir mikadoPrepOutNew 
-    #--fasta /pylon5/mc5pl7p/usingh/lib/hisatIndex/ensembl_release98/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
-    #--list smolGtfList
     
-    def searchGTFtolist(self, out_file,searchPath=os.getcwd(),searchQuery="*.gtf",out_dir=os.getcwd(),strand=False):
-        searchCmd=['find',searchPath,'-name',searchQuery]
-        st=runLinuxCommand(searchCmd)
-        if st[0]==0:
-            output=st[1].decode("utf-8").split("\n")
-            
-        return self.createMikadoGTFlist(out_file,*output,out_dir=out_dir,strand=strand)
+#    def searchGTFtolist(self, out_file, out_dir, searchPath,searchQuery="*.gtf",strand=False):
+##        output=pe.find_files(searchPath,searchQuery)            
+#        return self.createMikadoGTFlist(out_file,out_dir,*output,strand=strand)
 
 
         
     
-    def createMikadoGTFlist(self,out_file,*args,out_dir=os.getcwd(),strand=False):
+    def createMikadoGTFlist(self,out_file,out_dir,searchPath,searchQuery="*.gtf",strand=False):
         """Create a file to be used by mikado configure
         """
         
-        outFilePath=os.path.join(out_dir,out_file+".yaml")
+        files=pe.find_files(searchPath,searchQuery)
+        args=files
+        
+        #create out dir
+        if not pu.check_paths_exist(out_dir):
+            pu.mkdir(out_dir)
+        outFilePath=os.path.join(out_dir,out_file+".txt")
         
         
         gtfs=[]
         for l in args:
             thisName=pu.get_file_basename(l)
             if thisName:
-			    #print("\t".join([l,thisName,strand]))
                 gtfs.append("\t".join([l,thisName,str(strand)]))
         
         f=open(outFilePath,"w")
         f.write("\n".join(gtfs))
         f.close()
         
-        print_green("Mikado list file written to:"+outFilePath)
+        pu.print_green("Mikado list file written to:"+outFilePath)
         return outFilePath
                 
 
@@ -432,13 +429,13 @@ class Mikado(RNASeqTools):
         """
         
         #check all file exists
-        if not check_files_exist(listFile,genome,junctions,scoring):
+        if not pu.check_files_exist(listFile,genome,junctions,scoring):
             print("Please check mikado input")
             return ""
         
         #create out dir
-        if not checkPathsExists(out_dir):
-            if not mkdir(out_dir):
+        if not pu.check_paths_exist(out_dir):
+            if not pu.mkdir(out_dir):
                 raise Exception("Exception in mikado configure.")
             
         outFilePath=os.path.join(out_dir,out_file+".yaml")
@@ -451,11 +448,11 @@ class Mikado(RNASeqTools):
         status=self.runMikado("configure",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print_boldred("Mikado configure failed.\nPlease make sure the paths in list file are global.")
+            pu.print_boldred("Mikado configure failed.\nPlease make sure the paths in list file are global.")
             return ""
         
         #check if bam file exists
-        if not check_files_exist(outFilePath):
+        if not pu.check_files_exist(outFilePath):
             return ""
         
         return outFilePath
@@ -466,7 +463,7 @@ class Mikado(RNASeqTools):
         """
         
         #check input files exist
-        if not check_files_exist(jsonconf):
+        if not pu.check_files_exist(jsonconf):
             print("Please check the input configuration to mikado.")
             return ""
         if not out_dir:
@@ -484,7 +481,7 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(out_dir):
+        if not pu.check_paths_exist(out_dir):
             return ""
         
         return out_dir
@@ -495,7 +492,7 @@ class Mikado(RNASeqTools):
         """Wrapper to run mikado serialise
         """
         #check input files exist
-        if not check_files_exist(blastTargets,orfs,xml):
+        if not pu.check_files_exist(blastTargets,orfs,xml):
             print("Please check the input to mikado.")
             return ""
         if not out_dir:
@@ -513,7 +510,7 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(out_dir):
+        if not pu.check_paths_exist(out_dir):
             return ""
         
         return out_dir
@@ -523,7 +520,7 @@ class Mikado(RNASeqTools):
         """Wrapper to run mikado pick
         """
         #check input files exist
-        if not check_files_exist(jsonconf):
+        if not pu.check_files_exist(jsonconf):
             print("Please check the input to mikado.")
             return ""
         if not out_dir:
@@ -541,7 +538,7 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(out_dir):
+        if not pu.check_paths_exist(out_dir):
             return ""
         
         return out_dir
@@ -556,14 +553,14 @@ class Mikado(RNASeqTools):
        
         mikado_Cmd=['mikado',sub_command]
         #add options
-        mikado_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
+        mikado_Cmd.extend(pe.parse_unix_args(self.valid_args,mergedArgsDict))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
         #start ececution
-        status=executeCommand(mikado_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(mikado_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("mikado failed")
+            pu.print_boldred("mikado failed")
         #return status
         return status
         
@@ -577,7 +574,7 @@ class Ribocode(RNASeqTools):
         self.programName="RiboCode"
         self.dep_list=[self.programName]
         #check if program exists
-        if not check_dependencies(self.dep_list):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=[]        
@@ -589,21 +586,21 @@ class Ribocode(RNASeqTools):
         """
         
         #check input
-        if not check_files_exist(gtf,genome,bam):
-            print_boldred("Please check input files for Ribocode")
+        if not pu.check_files_exist(gtf,genome,bam):
+            pu.print_boldred("Please check input files for Ribocode")
             return ""
         
         out_dir=pu.get_file_directory(gtf)
         outFile=os.path.join(out_dir,outsuffix)
         
-        newOpts={"-g":gtf,"f":genome,"-r":bam,"-l":l,-o:outFile}
+        newOpts={"-g":gtf,"f":genome,"-r":bam,"-l":l,"-o":outFile}
         
         ribocode_Cmd=['RiboCode_onestep']
-        ribocode_Cmd.extend(parse_unix_args(self.valid_args,newOpts))
+        ribocode_Cmd.extend(pu.parse_unix_args(self.valid_args,newOpts))
         
-        status=executeCommand(ribocode_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(ribocode_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("ribocode failed")
+            pu.print_boldred("ribocode failed")
             return ""
         
         return outFile

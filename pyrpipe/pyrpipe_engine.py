@@ -512,7 +512,8 @@ def find_files(search_path,search_pattern,recursive=False):
     if st[0]==0:
         output=st[1].decode("utf-8").split("\n")
     #remove empty strings
-    output.remove('')
+    if '' in output:
+        output.remove('')
     return output
     
 
