@@ -6,7 +6,6 @@ Created on Thu Dec 26 23:32:09 2019
 @author: usingh
 """
 
-import pytest
 from pyrpipe import mapping
 from pyrpipe import pyrpipe_utils as pu
 from testingEnvironment import testSpecs

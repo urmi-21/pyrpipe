@@ -20,3 +20,4 @@ class testSpecs:
         self.hisatSam=testfiles+"/mapping/hisat2.sam"
         self.hisatBam=testfiles+"/mapping/hisat2.bam"
         self.hisatSortedBam=testfiles+"/mapping/hisat2_sorted.bam"
+        self.rRNAfa="tests/test_files/euk_1000_rRNA.fa"

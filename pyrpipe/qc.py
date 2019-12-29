@@ -34,7 +34,7 @@ class Trimgalore(RNASeqQC):
         super().__init__() 
         self.programName="trim_galore"
         self.dep_list=[self.programName,'cutadapt']
-        self.valid_args=['-h','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
+        self.valid_args=['--cores','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
                             '--illumina','--nextera','--small_rna','--consider_already_trimmed',
                             '--max_length','--stringency','-e','--gzip','--dont_gzip','--length',
                             '--max_n','--trim-n','-o','--no_report_file','--suppress_warn',
@@ -206,7 +206,7 @@ class BBmap(RNASeqQC):
             
             
             
-    def perform_qc(self,sra_object,out_suffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run bbduk on fastq files specified by the sra_object
         
         Parameters
@@ -229,11 +229,18 @@ class BBmap(RNASeqQC):
         tuple
             Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         """
+        
+        #make out_dir
+        if not out_dir:
+                out_dir=sra_object.location
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
+                    
         if sra_object.layout=='PAIRED':
             fq1=sra_object.localfastq1Path
             fq2=sra_object.localfastq2Path
-            #append input and output options
-            out_dir=sra_object.location
+            
             out_fileName1=pu.get_file_basename(fq1)+out_suffix+".fastq"
             out_fileName2=pu.get_file_basename(fq2)+out_suffix+".fastq"
             out_file1Path=os.path.join(out_dir,out_fileName1)
@@ -251,8 +258,6 @@ class BBmap(RNASeqQC):
             
         else:
             fq=sra_object.localfastqPath
-            #append input and output options
-            out_dir=sra_object.location
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
             out_filePath=os.path.join(out_dir,out_fileName)
             newOpts={"in":fq,"out":out_filePath}
@@ -278,7 +283,7 @@ class BBmap(RNASeqQC):
         bbduk_cmd=["bbduk.sh"]
         
         #bbduk.sh follows java style arguments
-        bbduk_cmd.extend(pu.parseJavaStyleArgs(self.valid_args,mergedArgsDict))
+        bbduk_cmd.extend(pu.parse_java_args(self.valid_args,mergedArgsDict))
         
         
         #start ececution
@@ -297,15 +302,15 @@ class BBmap(RNASeqQC):
     bbsplit.sh in1=reads1.fq in2=reads2.fq ref=path_to_ref outu1=clean1.fq outu2=clean2.fq
     """
     
-    def perform_cleaning(self,sra_object,bbsplitIndex,out_suffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         
         Parameters
         ----------
-        arg1: SRA
+        sra_object: SRA
             an SRA object
-        arg2: string
+        bbsplit_index: string
             Path to bbsplit index or fasta file which will generate index
         arg3: string
             Suffix for output file name
@@ -326,20 +331,20 @@ class BBmap(RNASeqQC):
         
         #check index
         indexPath=""
-        if not pu.check_paths_exist(bbsplitIndex):
+        if not pu.check_paths_exist(bbsplit_index):
             #index folder doesn't exist
             #check if input is path to fasta
-            if not pu.check_files_exist(bbsplitIndex):
+            if not pu.check_files_exist(bbsplit_index):
                 print("Error: Please check bbsplit index")
                 return ("",)
             #check if index folder "ref" exists in this directory
-            indexPath=os.path.join(pu.get_file_directory(bbsplitIndex),"ref")
+            indexPath=os.path.join(pu.get_file_directory(bbsplit_index),"ref")
             if pu.check_paths_exist(indexPath):
                 print("Using bbsplit index: "+indexPath)
             else:
                 #create new index
                 print("Creating new index"+indexPath)
-                newOpts={"ref_x":bbsplitIndex,"path": pu.get_file_directory(bbsplitIndex)}
+                newOpts={"ref_x":bbsplit_index,"path": pu.get_file_directory(bbsplit_index)}
                 mergedOpts={**kwargs,**newOpts}
                 #run bbduk
                 if not self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
@@ -349,18 +354,25 @@ class BBmap(RNASeqQC):
                     print("Error creating bbsplit index.")
                     return ("",)
         else:
-            indexPath=bbsplitIndex
+            indexPath=bbsplit_index
                 
         
         #indexPath point to the ref directory, go one directory higher
         indexPath=os.path.dirname(indexPath)
         
         
+        #make out_dir
+        if not out_dir:
+                out_dir=sra_object.location
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
+        
         if sra_object.layout=='PAIRED':
             fq1=sra_object.localfastq1Path
             fq2=sra_object.localfastq2Path
             #append input and output options
-            out_dir=sra_object.location
+            
             out_fileName1=pu.get_file_basename(fq1)+out_suffix+".fastq"
             out_fileName2=pu.get_file_basename(fq2)+out_suffix+".fastq"
             out_file1Path=os.path.join(out_dir,out_fileName1)
@@ -369,7 +381,7 @@ class BBmap(RNASeqQC):
             newOpts={"in1":fq1,"in2":fq2,"outu1":out_file1Path,"outu2":out_file2Path,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
-            #run bbduk
+            #run bbsplit
             if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
                 if pu.check_files_exist(out_file1Path,out_file2Path):
                     return(out_file1Path,out_file2Path)
@@ -379,13 +391,13 @@ class BBmap(RNASeqQC):
         else:
             fq=sra_object.localfastqPath
             #append input and output options
-            out_dir=sra_object.location
+           
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
             out_filePath=os.path.join(out_dir,out_fileName)
             newOpts={"in":fq,"outu":out_filePath,"path":indexPath}
             mergedOpts={**kwargs,**newOpts}
             
-            #run bbduk
+            #run bbsplit
             if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
                 if pu.check_files_exist(out_filePath):
                     return(out_filePath,)
@@ -398,7 +410,7 @@ class BBmap(RNASeqQC):
         """wrapper to run bbsplit
         """
         
-        bbSplitValidArgs=['ref','ref_x','build','path','in','in1','in2','outu','outu2','outu1','qin','interleaved',
+        bbsplit_args=['ref','ref_x','build','path','in','in1','in2','outu','outu2','outu1','qin','interleaved',
                           'maxindel','minratio','minhits','ambiguous','ambiguous2',
                           'qtrim','untrim','out_','basename','bs','scafstats',
                           'refstats','nzo','-Xmx','-eoom','-da']
@@ -411,7 +423,7 @@ class BBmap(RNASeqQC):
         bbsp_cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
-        bbsp_cmd.extend(pu.parse_java_args(bbSplitValidArgs,mergedArgsDict))
+        bbsp_cmd.extend(pu.parse_java_args(bbsplit_args,mergedArgsDict))
         
         
         #start ececution
