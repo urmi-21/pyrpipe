@@ -5,107 +5,135 @@ Created on Wed Dec  4 14:54:22 2019
 
 @author: usingh
 """
-from pyrpipe.pyrpipe_utils import *
-from pyrpipe.pyrpipe_engine import *
+from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import pyrpipe_engine as pe
+import os
 
 class RNASeqTools:
     def __init__(self):
         self.category="RNASeqTools"
     
 
-##Replace with pysam
-
 class Samtools(RNASeqTools):
     def __init__(self,**kwargs):
         self.programName="samtools"
         #check if hisat2 exists
-        if not check_dependencies([self.programName]):
+        if not pe.check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r',
+        self.valid_args=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r',
                             '-R','-q','-l','-m','-f','-F','-G','-s','-M','-x','-B','-?','-S','-O','-T','-@']
         
         self.passedArgumentDict=kwargs
         
         
         
-    def samToBam(self,samFile,outFileSuffix="",deleteSam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sam_to_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to a bam file. 
         Output bam file will have same name as input sam.
+        
+        out_suffix: string
+            Suffix for the output sam file
+        delete_sam(bool): delete the sam file after conversion
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
         
         Returns
         -------
         string
                 Returns the path to the bam file. Returns empty string if operation failed.
         """        
+        if not out_dir:            
+            out_dir=pu.get_file_directory(sam_file)
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
         
-        outDir=getFileDirectory(samFile)
-        fname=getFileBaseName(samFile)
-        #output will be outBamFile
-        outBamFile=os.path.join(outDir,fname+outFileSuffix+'.bam')
+        fname=pu.get_file_basename(sam_file)
         
-        newOpts={"--":(samFile,),"-o":outBamFile,"-b":""}
+        #output will be out_bam
+        out_bam=os.path.join(out_dir,fname+out_suffix+'.bam')
+        
+        newOpts={"--":(sam_file,),"-o":out_bam,"-b":""}
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("view",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("view",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
                 
         if not status:
-            print("Sam to bam failed for:"+samFile)
+            print("Sam to bam failed for:"+sam_file)
             return ""
         
         #check if bam file exists
-        if not check_files_exist(outBamFile):
+        if not pu.check_files_exist(out_bam):
             return ""
         
-        #deletesamfile
-        if deleteSam:
-            if not deleteFileFromDisk(samFile):
-                print("Error deleting sam file:"+samFile)
+        #delete_sam_file
+        if delete_sam:
+            if not pe.deleteFileFromDisk(sam_file):
+                print("Error deleting sam file:"+sam_file)
                 
         #return path to file
-        return outBamFile
+        return out_bam
         
         
         
         
-    #sort bam file.output will be bamFile_sorted.bam
-    def sortBam(self,bamFile,outFileSuffix="",deleteOriginalBam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    #sort bam file.output will be bam_file_sorted.bam
+    def sort_bam(self,bam_file,out_dir="",out_suffix="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
+        
         Returns
         -------
         string
                 Returns path to the sorted bam file. Returns empty string if operation failed.
         
         """
+        if not out_dir:
+            out_dir=pu.get_file_directory(bam_file)
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
+                
+        fname=pu.get_file_basename(bam_file)
+        #output will be out_bam
+        outSortedbam_file=os.path.join(out_dir,fname+out_suffix+'_sorted.bam')
         
-        outDir=getFileDirectory(bamFile)
-        fname=getFileBaseName(bamFile)
-        #output will be outBamFile
-        outSortedBamFile=os.path.join(outDir,fname+outFileSuffix+'_sorted.bam')
-        
-        newOpts={"--":(bamFile,),"-o":outSortedBamFile}
+        newOpts={"--":(bam_file,),"-o":outSortedbam_file}
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("sort",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("sort",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print("Bam sort failed for:"+bamFile)
+            print("Bam sort failed for:"+bam_file)
             return ""
         
         #check if bam file exists
-        if not check_files_exist(outSortedBamFile):
+        if not pu.check_files_exist(outSortedbam_file):
             return ""
 
-        if deleteOriginalBam:
-            if not deleteFileFromDisk(bamFile):
-                print("Error deleting sam file:"+bamFile)
+        if delete_bam:
+            if not pe.deleteFileFromDisk(bam_file):
+                print("Error deleting sam file:"+bam_file)
                 
         #return path to file
-        return outSortedBamFile
+        return outSortedbam_file
     
-    def samToSortedBam(self,samFile,outFileSuffix="",deleteSam=False,deleteOriginalBam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
         
         Returns
         -------
@@ -113,13 +141,13 @@ class Samtools(RNASeqTools):
                 Returns path to the sorted bam file. Returns empty string if operation failed.
         """
         
-        sam2BamFile=self.samToBam(samFile,deleteSam=deleteSam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        sam2bam_file=self.sam_to_bam(sam_file,delete_sam=delete_sam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
-        if not sam2BamFile:
+        if not sam2bam_file:
             return ""
             
 
-        bamSorted=self.sortBam(sam2BamFile,outFileSuffix,deleteOriginalBam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        bamSorted=self.sort_bam(sam2bam_file,out_dir=out_dir, out_suffix,delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         if not bamSorted:
             return ""
@@ -127,17 +155,23 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def mergeBamFiles(self,*args,outFileName="merged",outPath="",deleteOriginalBamFiles=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def merge_bam(self,*args,out_file="merged",out_dir="",delete_bams=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Merge multiple bam files into a single file
         
         Parameters
         ----------
-        outFileName: string
+        out_file: string
             Output file name to save the results. .bam will be added at the end.
         args:tuple
             Paths to bam files to combine
-        outPath: string
-            Path where to save the merged bam file. Default path is the same as the first bamfile's
+        out_dir: string
+            Path where to save the merged bam file. Default path is the same as the first bam_file's
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
+        
         kwargs: dict
             arguments passed to samtools merge command
             
@@ -151,16 +185,19 @@ class Samtools(RNASeqTools):
             print("Please supply at least 2 files to merge")
             return ""
         
-        if outPath == "":
-            outPath=getFileDirectory(args[0])
+        if not out_dir:
+            out_dir=pu.get_file_directory(args[0])
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
         
-        outMergedFile=os.path.join(outPath,outFileName+".bam")
+        outMergedFile=os.path.join(out_dir,out_file+".bam")
         
         newOpts={"--":(outMergedFile,)+args}
         
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.runSamtools("merge",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("merge",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
             print("Bam merge failed for:"+outMergedFile)
@@ -171,25 +208,30 @@ class Samtools(RNASeqTools):
             return ""
         
 
-        if deleteOriginalBamFiles:
-            for bamFile in args:
-                if not deleteFileFromDisk(bamFile):
-                    print("Error deleting sam file:"+bamFile)
+        if delete_bams:
+            for bam_file in args:
+                if not deleteFileFromDisk(bam_file):
+                    print("Error deleting sam file:"+bam_file)
                     
         return outMergedFile
         
         
         
-    def runSamtools(self,subCommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_samtools(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """A wrapper to run samtools.
         
         Parameters
         ----------
-        subcommand: string
-            Subcommand to pass to samtools e.g. sort, merge etc
+        sub_command: string
+            sub_command to pass to samtools e.g. sort, merge etc
         arg1: dict
             arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
-            
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
+        
         Returns
         -------
         bool:
@@ -199,14 +241,14 @@ class Samtools(RNASeqTools):
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        samtools_Cmd=['samtools',subCommand]
+        samtools_cmd=['samtools',sub_command]
         #add options
-        samtools_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        samtools_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
                 
         #start ececution
-        status=executeCommand(samtools_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(samtools_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            print_boldred("samtools failed")
+            pu.print_boldred("samtools failed")
         
         #return status
         return status
@@ -223,7 +265,7 @@ class Portcullis(RNASeqTools):
         if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=['-t','--threads','-v','--verbose','--help','-o','-b',
+        self.valid_args=['-t','--threads','-v','--verbose','--help','-o','-b',
                             '--bam_filter','--exon_gff','--intron_gff','--source',
                             '--force','--copy','--use_csi','--orientation','--strandedness',
                             '--separate','--extra','-r','--max_length','--canonical','--min_cov',
@@ -232,7 +274,7 @@ class Portcullis(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
-    def runPortcullisFull(self,referenceFasta,bamFile,outDir="",deleteOriginalBamFile=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runPortcullisFull(self,referenceFasta,bam_file,out_dir="",delete_bam_file=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run portculis full
         
@@ -240,49 +282,49 @@ class Portcullis(RNASeqTools):
         ----------
         referenceFasta: string
             Path to the reference fasta file
-        bamFile: string
+        bam_file: string
             Path to input bam file
-        outDir: string
+        out_dir: string
             Path to the out put dir. current directory is not given.
         """
         
-        if not check_files_exist(referenceFasta,bamFile):
+        if not check_files_exist(referenceFasta,bam_file):
             print ("Please check input for portcullis.")
             return ""
         
         
-        newOpts={"--":(referenceFasta,bamFile)}
+        newOpts={"--":(referenceFasta,bam_file)}
         mergedOpts={**kwargs,**newOpts}
         #add out dir path
-        if not outDir:
-            outDir=os.path.join(os.getcwd(),"portcullis_out")
+        if not out_dir:
+            out_dir=os.path.join(os.getcwd(),"portcullis_out")
                   
-        mergedOpts={**mergedOpts,**{"-o":outDir}}
+        mergedOpts={**mergedOpts,**{"-o":out_dir}}
         
         status=self.runPortcullis("full",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print("portcullis full failed for:"+bamFile)
+            print("portcullis full failed for:"+bam_file)
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(outDir):
+        if not checkPathsExists(out_dir):
             return ""
 
-        if deleteOriginalBamFile:
-            if not deleteFileFromDisk(bamFile):
-                    print("Error deleting bam file:"+bamFile)
+        if delete_bam_file:
+            if not deleteFileFromDisk(bam_file):
+                    print("Error deleting bam file:"+bam_file)
         
-        return outDir
+        return out_dir
     
-    def runPortcullis(self,subCommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runPortcullis(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Wrapper to run portcullis.
         
         Parameters
         ----------
-         subcommand: string
-            Subcommand to pass to portcullis e.g. full, prep, junc etc.
+         sub_command: string
+            sub_command to pass to portcullis e.g. full, prep, junc etc.
         arg1: dict
             arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
             
@@ -296,9 +338,9 @@ class Portcullis(RNASeqTools):
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        portcullis_Cmd=['portcullis',subCommand]
+        portcullis_Cmd=['portcullis',sub_command]
         #add options
-        portcullis_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        portcullis_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
                 
         print("Executing:"+" ".join(portcullis_Cmd))
         
@@ -322,7 +364,7 @@ class Mikado(RNASeqTools):
         if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=[]        
+        self.valid_args=[]        
         self.passedArgumentDict=kwargs
         
         
@@ -331,27 +373,27 @@ class Mikado(RNASeqTools):
     #--fasta /pylon5/mc5pl7p/usingh/lib/hisatIndex/ensembl_release98/Homo_sapiens.GRCh38.dna.primary_assembly.fa 
     #--list smolGtfList
     
-    def searchGTFtolist(self, outFileName,searchPath=os.getcwd(),searchQuery="*.gtf",outDir=os.getcwd(),strand=False):
+    def searchGTFtolist(self, out_file,searchPath=os.getcwd(),searchQuery="*.gtf",out_dir=os.getcwd(),strand=False):
         searchCmd=['find',searchPath,'-name',searchQuery]
         st=runLinuxCommand(searchCmd)
         if st[0]==0:
             output=st[1].decode("utf-8").split("\n")
             
-        return self.createMikadoGTFlist(outFileName,*output,outDir=outDir,strand=strand)
+        return self.createMikadoGTFlist(out_file,*output,out_dir=out_dir,strand=strand)
 
 
         
     
-    def createMikadoGTFlist(self,outFileName,*args,outDir=os.getcwd(),strand=False):
+    def createMikadoGTFlist(self,out_file,*args,out_dir=os.getcwd(),strand=False):
         """Create a file to be used by mikado configure
         """
         
-        outFilePath=os.path.join(outDir,outFileName+".yaml")
+        outFilePath=os.path.join(out_dir,out_file+".yaml")
         
         
         gtfs=[]
         for l in args:
-            thisName=getFileBaseName(l)
+            thisName=pu.get_file_basename(l)
             if thisName:
 			    #print("\t".join([l,thisName,strand]))
                 gtfs.append("\t".join([l,thisName,str(strand)]))
@@ -370,7 +412,7 @@ class Mikado(RNASeqTools):
         """
         pass
     
-    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,outFileName,outDir=os.getcwd(),verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,out_dir=os.getcwd(),verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado configure
         Make sure the paths in list file are global.
         Parameters
@@ -388,11 +430,11 @@ class Mikado(RNASeqTools):
             return ""
         
         #create out dir
-        if not checkPathsExists(outDir):
-            if not mkdir(outDir):
+        if not checkPathsExists(out_dir):
+            if not mkdir(out_dir):
                 raise Exception("Exception in mikado configure.")
             
-        outFilePath=os.path.join(outDir,outFileName+".yaml")
+        outFilePath=os.path.join(out_dir,out_file+".yaml")
         
         newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--":(outFilePath,)}
         
@@ -412,7 +454,7 @@ class Mikado(RNASeqTools):
         return outFilePath
         
     
-    def runMikadoPrepare(self,jsonconf, outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPrepare(self,jsonconf, out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado prepare
         """
         
@@ -420,10 +462,10 @@ class Mikado(RNASeqTools):
         if not check_files_exist(jsonconf):
             print("Please check the input configuration to mikado.")
             return ""
-        if not outDir:
-            outDir=os.getcwd()
+        if not out_dir:
+            out_dir=os.getcwd()
 
-        newOpts={"--output-dir":outDir,"--json-conf":jsonconf}
+        newOpts={"--output-dir":out_dir,"--json-conf":jsonconf}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -435,24 +477,24 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(outDir):
+        if not checkPathsExists(out_dir):
             return ""
         
-        return outDir
+        return out_dir
         
         
         
-    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
         if not check_files_exist(blastTargets,orfs,xml):
             print("Please check the input to mikado.")
             return ""
-        if not outDir:
-            outDir=os.getcwd()
+        if not out_dir:
+            out_dir=os.getcwd()
         
-        newOpts={"--json-conf":jsonconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":outDir}
+        newOpts={"--json-conf":jsonconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -464,21 +506,21 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(outDir):
+        if not checkPathsExists(out_dir):
             return ""
         
-        return outDir
+        return out_dir
         
         
-    def runMikadoPick(self,jsonconf,outDir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPick(self,jsonconf,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
         if not check_files_exist(jsonconf):
             print("Please check the input to mikado.")
             return ""
-        if not outDir:
-            outDir=os.getcwd()
+        if not out_dir:
+            out_dir=os.getcwd()
         
         newOpts={"--json-conf":jsonconf}
         
@@ -492,22 +534,22 @@ class Mikado(RNASeqTools):
             return ""
         
         #check if bam file exists
-        if not checkPathsExists(outDir):
+        if not checkPathsExists(out_dir):
             return ""
         
-        return outDir
+        return out_dir
         
         
-    def runMikado(self,subCommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikado(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado
         """
         
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
-        mikado_Cmd=['mikado',subCommand]
+        mikado_Cmd=['mikado',sub_command]
         #add options
-        mikado_Cmd.extend(parse_unix_args(self.validArgsList,mergedArgsDict))
+        mikado_Cmd.extend(parse_unix_args(self.valid_args,mergedArgsDict))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
@@ -531,7 +573,7 @@ class Ribocode(RNASeqTools):
         if not check_dependencies(self.depList):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.validArgsList=[]        
+        self.valid_args=[]        
         self.passedArgumentDict=kwargs
         
         
@@ -544,13 +586,13 @@ class Ribocode(RNASeqTools):
             print_boldred("Please check input files for Ribocode")
             return ""
         
-        outDir=getFileDirectory(gtf)
-        outFile=os.path.join(outDir,outsuffix)
+        out_dir=pu.get_file_directory(gtf)
+        outFile=os.path.join(out_dir,outsuffix)
         
         newOpts={"-g":gtf,"f":genome,"-r":bam,"-l":l,-o:outFile}
         
         ribocode_Cmd=['RiboCode_onestep']
-        ribocode_Cmd.extend(parse_unix_args(self.validArgsList,newOpts))
+        ribocode_Cmd.extend(parse_unix_args(self.valid_args,newOpts))
         
         status=executeCommand(ribocode_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
