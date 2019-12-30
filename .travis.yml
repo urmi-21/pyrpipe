@@ -42,7 +42,7 @@ install:
   - tar -xvzf /tmp/salmon.tar.gz
   - export PATH=$PATH:$PWD/salmon-latest_linux_x86_64/bin/
   #install cutadapt
-  - pip3 install --user --upgrade cutadapt
+  - pip3 install --upgrade cutadapt
   #install trim_galore
   - wget https://github.com/FelixKrueger/TrimGalore/archive/0.6.5.tar.gz -O /tmp/tg.tar.gz
   - tar -xvzf /tmp/tg.tar.gz
