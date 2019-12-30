@@ -118,16 +118,17 @@ sraOb=sra.SRA('SRR5507495',testDir)
 #download sra
 sraOb.download_sra()
 #run fastqdump;delete sra when done
-sraOb.run_fasterqdump(deleteSRA=False,**{"-f":"","-t":testDir})
+sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":testDir})
 
 tgOb=qc.Trimgalore()
 
-#sraOb.performFastqQC(tgOb)
-pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
-bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
-bbdOb=qc.BBmap(**bbdOpts)
+sraOb.perform_qc(tgOb)
 
-sraOb.perform_qc(bbdOb)
+#pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
+#bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
+#bbdOb=qc.BBmap(**bbdOpts)
+
+#sraOb.perform_qc(bbdOb)
 #status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
 
 #print(status)
@@ -148,7 +149,7 @@ sraOb.perform_qc(bbdOb)
 #build hisat index
 
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
-hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
+hs=mapping.Hisat2(hisat2_index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
 #hsbArgs={"-p":"8","-a":"","-q":""}
 #if hs.buildHisat2Index("/home/usingh/work/urmi/hoap/test/yeastInd2","index22","/home/usingh/work/urmi/hoap/test/hisatYeast/S288C_reference_genome_R64-2-1_20150113/S288C_reference_sequence_R64-2-1_20150113.fsa",**hsbArgs):
 #    print("Success")
@@ -158,7 +159,7 @@ sam=hs.perform_alignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #get sorted bam
 samOb=tools.Samtools(**{"-@":"8"})
-bam=samOb.sam_sorted_bam(sam,deleteSam=True,deleteOriginalBam=True)
+bam=samOb.sam_sorted_bam(sam,delete_sam=True,delete_bam=True)
 
 
 #bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
@@ -283,6 +284,7 @@ mk.runMikadoPick(config)
 #
 
 #run salmon
+"""
 slm=mapping.Salmon(salmon_index="")
 st=slm.build_salmon_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="salInd",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta",verbose=True,quiet=False)
 
@@ -294,3 +296,4 @@ kl=mapping.Kallisto(kallisto_index="/home/usingh/work/urmi/hoap/test/sdata/kInd2
 #kl.build_kallisto_index(index_path="/home/usingh/work/urmi/hoap/test/sdata",index_name="kInd2",fasta="/home/usingh/work/urmi/hoap/test/sdata/transcripts.fasta")
 sout=kl.run_kallisto_quant(sraOb,objectid=sraOb.srrAccession)
 print(sout)
+"""
