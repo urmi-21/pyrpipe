@@ -7,11 +7,23 @@ python:
   - "nightly"  # nightly build
 # install dependencies
 install:
+  - pip install -r requirements.txt
+  - pip install .
+  #instal deps
   - sudo apt-get update
   #install boost
   - sudo apt-get -y install libboost-all-dev
-  - pip install -r requirements.txt
-  - pip install .
+  #install portcullis
+  - wget https://github.com/maplesond/portcullis/releases/download/1.2.0/portcullis-1.2.0.tar.gz -O /tmp/port.tar.gz
+  - tar -xvzf /tmp/port.tar.gz
+  - cd portcullis-1.2.0
+  - ./configure --prefix=$(pwd)
+  - make && make install
+  - cd ..
+  - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
+  #install mikado
+  - pip install Cython
+  - pip install mikado
   #install sratoolkit
   - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
   - tar -xvzf /tmp/sratools.tar.gz
@@ -62,17 +74,7 @@ install:
   - make && make install
   - cd ..
   - export PATH=$PATH:$PWD/samtools-1.10/bin/
-  #install portcullis
-  - wget https://github.com/maplesond/portcullis/releases/download/1.2.0/portcullis-1.2.0.tar.gz -O /tmp/port.tar.gz
-  - tar -xvzf /tmp/port.tar.gz
-  - cd portcullis-1.2.0
-  - ./configure --prefix=$(pwd)
-  - make && make install
-  - cd ..
-  - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
-  #install mikado
-  - pip install Cython
-  - pip install mikado
+  
   
   
 # command to run tests
