@@ -116,9 +116,9 @@ btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
 #riboseq SRR3590744
 sraOb=sra.SRA('SRR5507495',testDir)
 #download sra
-sraOb.downloadSRAFile()
+sraOb.download_sra()
 #run fastqdump;delete sra when done
-sraOb.runFasterQDump(deleteSRA=False,**{"-f":"","-t":testDir})
+sraOb.run_fasterqdump(deleteSRA=False,**{"-f":"","-t":testDir})
 
 tgOb=qc.Trimgalore()
 
@@ -127,7 +127,7 @@ pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
 bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
 bbdOb=qc.BBmap(**bbdOpts)
 
-sraOb.performFastqQC(bbdOb)
+sraOb.perform_qc(bbdOb)
 #status=bbdOb.performCleaning(sraOb,"/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa")
 
 #print(status)
@@ -154,11 +154,11 @@ hs=mapping.Hisat2(hisat2Index="/home/usingh/work/urmi/hoap/test/yeastInd2/index2
 #    print("Success")
     
 #run hisat
-sam=hs.performAlignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
+sam=hs.perform_alignment(sraOb,**{"--dta-cufflinks":"","-p":"8"})
 
 #get sorted bam
 samOb=tools.Samtools(**{"-@":"8"})
-bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
+bam=samOb.sam_sorted_bam(sam,deleteSam=True,deleteOriginalBam=True)
 
 
 #bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
@@ -166,7 +166,7 @@ bam=samOb.samToSortedBam(sam,deleteSam=True,deleteOriginalBam=True)
 
 #run stringtie
 st=assembly.Stringtie()
-g1=st.performAssembly(bam,objectid="myob")
+g1=st.perform_assembly(bam,objectid="myob")
 
 
 #gtfs=(g1,)

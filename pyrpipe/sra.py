@@ -281,7 +281,7 @@ class SRA:
         self.QCObject=qcObject
         print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
-        qcStatus=qcObject.performQC(self,objectid=self.srr_accession)
+        qcStatus=qcObject.perform_qc(self,objectid=self.srr_accession)
         
         #if job failed
         if not qcStatus[0]:

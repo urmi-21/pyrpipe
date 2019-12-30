@@ -177,7 +177,7 @@ class Hisat2(Aligner):
         
         
         #create path to output sam file
-        outSamFile=os.path.join(sra_object.location,sra_object.srrAccession+out_suffix+".sam")
+        outSamFile=os.path.join(sra_object.location,sra_object.srr_accession+out_suffix+".sam")
         
         """
         Handle overwrite
@@ -199,7 +199,7 @@ class Hisat2(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call run_hisat2
-        status=self.run_hisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_hisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sra_object
@@ -412,7 +412,7 @@ class Star(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call star
-        status=self.run_star(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_star(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
                 
         
         if status:
@@ -628,7 +628,7 @@ class Bowtie2(Aligner):
                 pu.mkdir(out_dir)
                 
         #create path to output sam file
-        outFile=os.path.join(out_dir,sra_object.srrAccession+out_suffix+".sam")
+        outFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
                     
         """
         Handle overwrite
@@ -649,7 +649,7 @@ class Bowtie2(Aligner):
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
         
-        status=self.run_bowtie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_bowtie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sra_object
@@ -815,7 +815,7 @@ class Kallisto(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sra_object
@@ -1002,7 +1002,7 @@ class Salmon(Aligner):
         mergedOpts={**kwargs,**newOpts}
         
         #call salmon
-        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srrAccession,**mergedOpts)
+        status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
         if status:
             #check if sam file is present in the location directory of sra_object
