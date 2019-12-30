@@ -55,8 +55,10 @@ install:
   - wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 -O /tmp/samtools.tar.bz2
   - tar -xvjf /tmp/samtools.tar.bz2
   - cd samtools-1.10
+  - ./configure --prefix=$(pwd)
   - make && make install
   - cd ..
+  - export PATH=$PATH:$PWD/samtools-1.10/bin/
   #install portcullis
   - pip install portcullis
   #install mikado
