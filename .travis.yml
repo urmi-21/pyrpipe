@@ -52,7 +52,7 @@ install:
   - tar -xvzf /tmp/bbtools.tar.gz
   - export PATH=$PATH:$PWD/bbmap/
   #install samtools
-  - wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 /tmp/samtools.tar.bz2
+  - wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 -O /tmp/samtools.tar.bz2
   - tar -xvjf /tmp/samtools.tar.bz2
   - cd samtools-1.10
   - make && make install
