@@ -20,8 +20,9 @@ def test_samtools():
     #test sam to sorted bam
     sm=tools.Samtools()    
     sortedBam=sm.sam_sorted_bam(testVars.hisatSam,out_dir=testVars.testDir,**{"-@":"10"})
+    print("check:"+sortedBam)
     st=pu.check_files_exist(sortedBam)
-    assert st==True, "Failed to sam to sorted bam hisat"
+    assert st==True, "Failed to convert sam to sorted bam"
     
     #test merge
     mergedBam=sm.merge_bam(testVars.hisatSortedBam,testVars.starSortedBam,out_dir=testVars.testDir,**{"-f":""})
