@@ -1,5 +1,6 @@
 [![Build Status](https://travis-ci.org/urmi-21/pyrpipe.svg?branch=master)](https://travis-ci.org/urmi-21/pyrpipe)
 [![Coverage Status](https://coveralls.io/repos/github/urmi-21/pyrpipe/badge.svg?branch=master)](https://coveralls.io/github/urmi-21/pyrpipe?branch=master)
+![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrpipe)
 
 # pyrpipe: python rna-seq pipeliner
 
