@@ -19,18 +19,22 @@ def getTimestamp(shorten=False):
         timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
     return timestamp
 
-def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
+def save_session(filename="session",timestamp=True,out_dir=""):
     """Save current workspace using dill.
     """
     #timestamp format YYYYMMDDHHMISE
     timestamp=getTimestamp(True)
     
     
-    if not outDir:        
-        outDir=os.getcwd()
+    if not out_dir:        
+        out_dir=os.getcwd()
+    else:
+        if not os.path.isdir(out_dir):
+            os.makedirs(out_dir)
     
-    outFile=os.path.join(outDir,filename)
-    outFile=outFile+"_"+timestamp+".pyrpipe"
+    outFile=os.path.join(out_dir,filename)
+    if timestamp:
+        outFile=outFile+"_"+timestamp+".pyrpipe"
     
     """
     Do not pickle logger. This causes problems when restoring session with python < 3.7
@@ -51,7 +55,7 @@ def savePyrpipeWorkspace(filename="myWorkspace",outDir=""):
     return True
 
 
-def restorePyrpipeWorkspace(file):
+def restore_session(file):
     if not os.path.isfile(file):
         print(file+" doesn't exist")
         return False
