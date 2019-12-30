@@ -47,7 +47,17 @@ install:
   - wget https://github.com/FelixKrueger/TrimGalore/archive/0.6.5.tar.gz -O /tmp/tg.tar.gz
   - tar -xvzf /tmp/tg.tar.gz
   - export PATH=$PATH:$PWD/TrimGalore-0.6.5/
-  
+  #install bbduk
+  - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.73.tar.gz/download -O /tmp/bbtools.tar.gz
+  - tar -xvzf /tmp/bbtools.tar.gz
+  - export PATH=$PATH:$PWD/bbmap/
+  #install samtools
+  - wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 /tmp/samtools.tar.bz2
+  - tar -xvjf /tmp/samtools.tar.bz2
+  - cd samtools-1.10
+  - make && make install
+  - cd ..
+  #install 
   
 # command to run tests
 script:
