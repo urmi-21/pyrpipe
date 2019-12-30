@@ -60,7 +60,7 @@ install:
   - cd ..
   - export PATH=$PATH:$PWD/samtools-1.10/bin/
   #install portcullis
-  - pip install portcullis
+  - conda install portcullis --channel=bioconda
   #install mikado
   - pip install mikado
   
