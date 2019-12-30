@@ -60,7 +60,13 @@ install:
   - cd ..
   - export PATH=$PATH:$PWD/samtools-1.10/bin/
   #install portcullis
-  - conda install portcullis --channel=bioconda
+  - wget https://github.com/maplesond/portcullis/releases/download/1.2.0/portcullis-1.2.0.tar.gz -O /tmp/port.tar.gz
+  - tar -xvzf /tmp/port.tar.gz
+  - cd portcullis-1.2.0
+  - ./configure --prefix=$(pwd)
+  -make && make install
+  - cd ..
+  - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
   #install mikado
   - pip install mikado
   
