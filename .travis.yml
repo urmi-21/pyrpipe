@@ -64,7 +64,7 @@ install:
   - tar -xvzf /tmp/port.tar.gz
   - cd portcullis-1.2.0
   - ./configure --prefix=$(pwd)
-  -make && make install
+  - make && make install
   - cd ..
   - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
   #install mikado
