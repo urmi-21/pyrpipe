@@ -9,7 +9,7 @@ python:
 install:
   - sudo apt-get update
   #install boost
-  - sudo apt-get install libboost-all-dev
+  - sudo apt-get -y install libboost-all-dev
   - pip install -r requirements.txt
   - pip install .
   #install sratoolkit
@@ -71,6 +71,7 @@ install:
   - cd ..
   - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
   #install mikado
+  - pip install Cython
   - pip install mikado
   
   
