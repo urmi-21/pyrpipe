@@ -30,7 +30,24 @@ install:
   - tar -xvzf /tmp/star.tar.gz
   - export PATH=$PATH:$PWD/STAR-2.7.3a/bin/Linux_x86_64/
   #install bowtie2
-  - 
+  - wget https://sourceforge.net/projects/bowtie-bio/files/bowtie2/2.3.5.1/bowtie2-2.3.5.1-linux-x86_64.zip/download -O /tmp/btie.zip
+  - unzip /tmp/btie.zip
+  - export PATH=$PATH:$PWD/bowtie2-2.3.5.1-linux-x86_64/
+  #install kallisto
+  - wget https://github.com/pachterlab/kallisto/releases/download/v0.46.1/kallisto_linux-v0.46.1.tar.gz -O /tmp/kallisto.tar.gz
+  - tar -xvgf /tmp/kallisto.tar.gz
+  - export PATH=$PATH:$PWD/kallisto/
+  #install salmon
+  - wget https://github.com/COMBINE-lab/salmon/releases/download/v1.1.0/salmon-1.1.0_linux_x86_64.tar.gz -O /tmp/salmon.tar.gz
+  - tar -xvzf /tmp/salmon.tar.gz
+  - export PATH=$PATH:$PWD/salmon-latest_linux_x86_64/bin/
+  #install cutadapt
+  - pip3 install --user --upgrade cutadapt
+  #install trim_galore
+  - wget https://github.com/FelixKrueger/TrimGalore/archive/0.6.5.tar.gz -O /tmp/tg.tar.gz
+  - tar -xvzf /tmp/tg.tar.gz
+  - export PATH=$PATH:$PWD/TrimGalore-0.6.5/
+  
   
 # command to run tests
 script:
