@@ -57,7 +57,10 @@ install:
   - cd samtools-1.10
   - make && make install
   - cd ..
-  #install 
+  #install portcullis
+  - pip install portcullis
+  #install mikado
+  - pip install mikado
   
 # command to run tests
 script:
