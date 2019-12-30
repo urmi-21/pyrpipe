@@ -20,7 +20,9 @@ install:
   - ./configure --prefix=$(pwd)
   - make && make install
   - cd ..
-  - export PATH=$PATH:$PWD/portcullis-1.2.0/bin/
+  - export PATH=$PATH:$PWD/portcullis-1.2.0/scripts/
+  - ls portcullis-1.2.0/*
+  - ls portcullis-1.2.0/scripts/*
   #install mikado
   - pip install Cython
   - pip install mikado
