@@ -17,6 +17,21 @@ install:
   - wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.0.6.Linux_x86_64.tar.gz -O /tmp/stie.tar.gz
   - tar -xvzf /tmp/stie.tar.gz
   - export PATH=$PATH:$PWD/stringtie-2.0.6.Linux_x86_64/
+  #install cufflinks
+  - wget http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz -O /tmp/cuff.tar.gz
+  - tar -xvzf /tmp/cuff.tar.gz
+  - export PATH=$PATH:$PWD/cufflinks-2.2.1.Linux_x86_64/
+  #install hisat2
+  - wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2.zip
+  - unzip /tmp/hisat2.zip
+  - export PATH=$PATH:$PWD/hisat2-2.1.0/
+  #install STAR
+  - wget https://github.com/alexdobin/STAR/archive/2.7.3a.tar.gz -O /tmp/star.tar.gz
+  - tar -xvzf /tmp/star.tar.gz
+  - export PATH=$PATH:$PWD/STAR-2.7.3a/bin/Linux_x86_64/
+  #install bowtie2
+  - 
+  
 # command to run tests
 script:
   - pytest
