@@ -82,7 +82,7 @@ install:
   
 # command to run tests
 script:
-  - pytest tests/test_sra.py --cov=pyrpipe/
+  - pytest --cov=pyrpipe/
   
-#after_success:
-#  - coveralls
+after_success:
+  - coveralls
