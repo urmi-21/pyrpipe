@@ -10,8 +10,8 @@ install:
   - pip install .
   #- pip install pytest
   #- pip install pytest-cov
-  #- pip install coveralls
-  - pip install python-coveralls
+  - pip install coveralls
+  - pip install coverage
   #instal deps
   - sudo apt-get update
   #install boost
@@ -83,7 +83,7 @@ install:
   
 # command to run tests
 script:
-  - pytest tests/test_sra.py --cov pyrpipe
-  
+  - coverage run -m pytest tests/test_sra.py
+  - coverage report --show-missing  
 after_success:
   - coveralls
