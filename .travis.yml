@@ -8,9 +8,10 @@ python:
 install:
   - pip install -r requirements.txt
   - pip install .
-  - pip install pytest
-  - pip install pytest-cov
-  - pip install coveralls
+  #- pip install pytest
+  #- pip install pytest-cov
+  #- pip install coveralls
+  - pip install python-coveralls
   #instal deps
   - sudo apt-get update
   #install boost
@@ -82,7 +83,7 @@ install:
   
 # command to run tests
 script:
-  - pytest --cov pyrpipe
+  - pytest tests/test_sra.py --cov pyrpipe
   
 after_success:
   - coveralls
