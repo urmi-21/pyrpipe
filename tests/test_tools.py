@@ -28,13 +28,14 @@ def test_samtools():
     mergedBam=sm.merge_bam(testVars.hisatSortedBam,testVars.starSortedBam,out_dir=testVars.testDir,**{"-f":""})
     st=pu.check_files_exist(mergedBam)
     assert st==True, "Failed to merge bam"
-    
+
+"""    
 def test_portcullis():
     pc=tools.Portcullis()
     port_out=pc.run_portcullisFull(testVars.genome,testVars.hisatSortedBam,out_dir=testVars.testDir)
     st=pu.check_paths_exist(port_out)
     assert st==True, "Failed portcullis run"
-    
+""" 
     
 def test_mikado():
     gtfdir=testVars.mikadofiles
