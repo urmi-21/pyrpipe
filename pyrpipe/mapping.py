@@ -4,7 +4,7 @@
 Created on Sun Nov 24 19:53:42 2019
 
 @author: usingh
-contains classes of RNA-Seq mapping programs
+contains classes of RNA-Seq alignment programs
 """
 
 from pyrpipe import pyrpipe_utils as pu
