@@ -300,6 +300,11 @@ print(sout)
 
 #run trinity
 tr=assembly.Trinity()
-trOpts={"--seqType":"fq","--left":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.left.fq.gz",
-        "--right":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.right.fq.gz","--output":"/home/usingh/work/urmi/hoap/test/trin","--max_memory":"2G"}
-tr.run_trinity(verbose=True,**trOpts)
+#trOpts={"--seqType":"fq","--left":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.left.fq.gz",
+#        "--right":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.right.fq.gz","--output":"/home/usingh/work/urmi/hoap/test/trinity_testout","--max_memory":"2G"}
+#tr.run_trinity(verbose=True,**trOpts)
+
+tr.perform_assembly(sraOb,verbose=True)
+
+
+

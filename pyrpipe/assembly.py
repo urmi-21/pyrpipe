@@ -421,16 +421,16 @@ class Trinity(Assembly):
             parent_dir=sra_object.location
             out_dir=os.path.join(parent_dir,out_dir)
             if sra_object.layout == 'PAIRED':
-                newOpts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":max_memory}
+                new_opts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":max_memory}
             else:
-                newOpts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
+                new_opts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
         elif bam_file is not None:
             if not pu.check_files_exist(bam_file):
                 pu.print_boldred("Input to trinity does not exist:"+bam_file)
                 return ""
             parent_dir=pu.get_file_directory(bam_file)
             out_dir=os.path.join(parent_dir,out_dir)
-            newOpts={"--genome_guided_bam":bam_file,"--output":out_dir,"--max_memory":max_memory,"--genome_guided_max_intron":max_intron}
+            new_opts={"--genome_guided_bam":bam_file,"--output":out_dir,"--max_memory":max_memory,"--genome_guided_max_intron":max_intron}
         else:
             pu.print_boldred("Please provide valid input to run trinity")
             return ""
