@@ -360,3 +360,151 @@ class Cufflinks(Assembly):
             pu.print_boldred("cufflinks failed")
         #return status
         return status
+    
+    
+    
+class Trinity(Assembly):
+    """This class represents Trinity RNA-Seq assembler
+    """
+    def __init__(self,**kwargs):
+        
+        super().__init__()
+        self.program_name="Trinity"
+        #check if trinity exists
+        if not pe.check_dependencies([self.program_name]):
+            raise Exception("ERROR: "+ self.program_name+" not found.")
+        
+        
+        self.valid_args_list=['--seqType','--max_memory','--left','--right','--single','--SS_lib_type','--CPU','--min_contig_length',
+                              '--long_reads','--genome_guided_bam','--jaccard_clip','--trimmomatic','--normalize_reads','--no_distributed_trinity_exec',
+                              '--output','--full_cleanup','--cite','--verbose','--version','--show_full_usage_info','--KMER_SIZE','--prep','--no_cleanup',
+                              '--no_version_check','--min_kmer_cov','--inchworm_cpu','--no_run_inchworm','--max_reads_per_graph','--min_glue','--no_bowtie',
+                              '--no_run_chrysalis','--bfly_opts','--PasaFly','--CuffFly','--group_pairs_distance','--path_reinforcement_distance','--no_path_merging',
+                              '--min_per_id_same_path','--max_diffs_same_path','--max_internal_gap_same_path','--bflyHeapSpaceMax','--bflyHeapSpaceInit',
+                              '--bflyGCThreads','--bflyCPU','--bflyCalculateCPU','--bfly_jar','--quality_trimming_params','--normalize_max_read_cov',
+                              '--normalize_by_read_set','--genome_guided_max_intron','--genome_guided_min_coverage','--genome_guided_min_reads_per_partition',
+                              '--grid_conf','--grid_node_CPU','--grid_node_max_memory']
+
+        
+        #keep the passed arguments
+        self.passed_args_dict=kwargs
+    
+    
+    def perform_assembly(self,bam_file,out_dir="",out_suffix="_trinity",overwrite=True,**kwargs):
+        """Function to run cufflinks with BAM file as input.
+                
+        Parameters
+        ----------
+        arg1: string
+            path to bam file
+        arg2: string
+            Suffix for the output gtf file
+        arg3: bool
+            Overwrite if output file already exists.
+        arg4: dict
+            Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            
+        Returns
+        -------
+        string
+            path to output GTF file
+        
+        """
+        
+        #create path to output file
+        fname=pu.get_file_basename(bam_file)
+        if not out_dir:
+            out_dir=pu.get_file_directory(bam_file)
+        else:
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
+        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
+        
+        """
+        Handle overwrite
+        """
+        if not overwrite:
+            #check if file exists. return if yes
+            if os.path.isfile(out_gtf_file):
+                print("The file "+out_gtf_file+" already exists. Exiting..")
+                return out_gtf_file
+            
+        #Add output file name and input bam
+        new_opts={"-o":out_dir,"--":(bam_file,)}
+        merged_opts={**kwargs,**new_opts}
+        
+        #call cufflinks
+        status=self.run_cufflinks(**merged_opts)
+        
+        if status:
+            #move out_dir/transcripts.gtf to outfile
+            pe.move_file(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
+            #check if sam file is present in the location directory of sraOb
+            if pu.check_files_exist(out_gtf_file):
+                return out_gtf_file
+        else:
+            return ""
+    
+    def run_cuff(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running cuff* commands
+        
+        Parameters
+        ----------
+        command: string
+            the command name
+        arg2: dict
+            Options passed to cuff command
+        
+        Returns
+        -------
+        bool
+            return status of the command.
+        """
+        validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
+        if command in validCommands:
+            #override existing arguments
+            merged_args_dict={**self.passed_args_dict,**kwargs}
+       
+            cuff_cmd=[command]
+            #add options
+            cuff_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+                  
+            #start ececution
+            status=pe.execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+            if not status:
+                pu.print_boldred("cufflinks failed")
+                #return status
+            return status
+        else:
+            pu.print_boldred("Unknown command {}"+command)
+            return False
+    
+    
+    def run_cufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running cufflinks
+        
+        Parameters
+        ----------
+        arg1: dict
+            Options passed to cufflinks
+        
+        Returns
+        -------
+        bool
+            status of cufflinks command.
+        """
+            
+        #override existing arguments
+        merged_args_dict={**self.passed_args_dict,**kwargs}
+       
+        cufflinks_cmd=['cufflinks']
+        #add options
+        cufflinks_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+        
+        
+        #start ececution
+        status=pe.execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        if not status:
+            pu.print_boldred("cufflinks failed")
+        #return status
+        return status
