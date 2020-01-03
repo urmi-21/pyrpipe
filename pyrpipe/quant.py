@@ -33,7 +33,7 @@ class Quant:
         """
         pass
     
-class Kallisto(Aligner):
+class Kallisto(Quant):
     """This class represents kallisto
     """
     
@@ -198,7 +198,7 @@ class Kallisto(Aligner):
             
 
 
-class Salmon(Aligner):
+class Salmon(Quant):
     """This class represents salmon
     """      
     def __init__(self,salmon_index,**kwargs):    
