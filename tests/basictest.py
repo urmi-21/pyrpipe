@@ -297,3 +297,9 @@ kl=mapping.Kallisto(kallisto_index="/home/usingh/work/urmi/hoap/test/sdata/kInd2
 sout=kl.run_kallisto_quant(sraOb,objectid=sraOb.srrAccession)
 print(sout)
 """
+
+#run trinity
+tr=assembly.Trinity()
+trOpts={"--seqType":"fq","--left":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.left.fq.gz",
+        "--right":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.right.fq.gz","--output":"/home/usingh/work/urmi/hoap/test/trin","--max_memory":"2G"}
+tr.run_trinity(verbose=True,**trOpts)

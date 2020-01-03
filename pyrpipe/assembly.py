@@ -412,6 +412,10 @@ class Trinity(Assembly):
         
         """
         
+        #add trinity to outdir
+        if "trinity" not in out_dir:
+            out_dir+="_trinity"
+        
         new_opts={}
         if sra_object is not None:
             parent_dir=sra_object.location
