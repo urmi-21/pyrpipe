@@ -60,8 +60,7 @@ install:
   - ./configure --prefix=$(pwd)
   - make && make install
   - export PATH=$PATH:$PWD/bin
-  - cd ..
-  
+  - cd ..  
   #install hisat2
   - wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2.zip
   - unzip /tmp/hisat2.zip
