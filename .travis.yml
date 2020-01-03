@@ -58,6 +58,7 @@ install:
   - tar -xvzf /tmp/jfish.tar.gz
   - cd jellyfish-2.3.0
   - ./configure --prefix=$(pwd)
+  - make && make install
   - export PATH=$PATH:$PWD/bin
   - cd ..
   
