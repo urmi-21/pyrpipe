@@ -98,7 +98,7 @@ install:
   
 # command to run tests
 script:
-  - coverage run -m pytest tests/*
+  - coverage run -m pytest tests/
   - coverage report --show-missing  
 after_success:
   - coveralls
