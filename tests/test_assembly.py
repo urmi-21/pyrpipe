@@ -25,7 +25,7 @@ def test_assembly():
     #create assemble object
     aob=assembly.Assembly()
     assert aob.category == "Assembler","Failed Assembly init"
-"""    
+
 def test_stringtie():
     bam=testVars.hisatSortedBam
     gtf=testVars.gtf
@@ -40,7 +40,7 @@ def test_cufflinks():
     result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
     assert pu.check_files_exist(result)==True, "Failed stringtie"
     
-"""
+
 def test_trinityFQ():
     tr=assembly.Trinity()
     tr_opts={"--seqType":"fq","--left":testVars.fq1,
