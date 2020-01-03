@@ -45,6 +45,22 @@ install:
   - wget http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz -O /tmp/cuff.tar.gz
   - tar -xvzf /tmp/cuff.tar.gz
   - export PATH=$PATH:$PWD/cufflinks-2.2.1.Linux_x86_64/
+  #install Trinity
+  - wget https://github.com/trinityrnaseq/trinityrnaseq/releases/download/v2.9.0/trinityrnaseq-v2.9.0.FULL.tar.gz -O /tmp/trin.tar.gz
+  - tar -xvzf /tmp/trin.tar.gz
+  - cd trinityrnaseq-v2.9.0
+  - make
+  - export TRINITY_HOME=$(pwd)
+  - cd ..
+  - export PATH=$PATH:$PWD/trinityrnaseq-v2.9.0
+  #install jellyfish
+  - wget https://github.com/gmarcais/Jellyfish/releases/download/v2.3.0/jellyfish-2.3.0.tar.gz -O /tmp/jfish.tar.gz
+  - tar -xvzf /tmp/jfish.tar.gz
+  - cd jellyfish-2.3.0
+  - ./configure --prefix=$(pwd)
+  - export PATH=$PATH:$PWD/bin
+  - cd ..
+  
   #install hisat2
   - wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2.zip
   - unzip /tmp/hisat2.zip
