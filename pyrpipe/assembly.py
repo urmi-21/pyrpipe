@@ -370,8 +370,9 @@ class Trinity(Assembly):
         
         super().__init__()
         self.program_name="Trinity"
+        self.dep_list=[self.program_name,'jellyfish']
         #check if trinity exists
-        if not pe.check_dependencies([self.program_name]):
+        if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.program_name+" not found.")
         
         
@@ -390,7 +391,7 @@ class Trinity(Assembly):
         self.passed_args_dict=kwargs
     
     
-    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G"overwrite=True,**kwargs):
+    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G",max_intron=10000,overwrite=True,**kwargs):
         """Function to run trinity with sra object or BAM file as input.
                 
         Parameters
@@ -411,6 +412,7 @@ class Trinity(Assembly):
         
         """
         
+        new_opts={}
         if sra_object is not None:
             parent_dir=sra_object.location
             out_dir=os.path.join(parent_dir,out_dir)
@@ -424,36 +426,27 @@ class Trinity(Assembly):
                 return ""
             parent_dir=pu.get_file_directory(bam_file)
             out_dir=os.path.join(parent_dir,out_dir)
-            newOpts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
+            newOpts={"--genome_guided_bam":bam_file,"--output":out_dir,"--max_memory":max_memory,"--genome_guided_max_intron":max_intron}
         else:
+            pu.print_boldred("Please provide valid input to run trinity")
             return ""
         
-        """
-        Handle overwrite
-        """
-        if not overwrite:
-            pass
-            
-        #Add output file name and input bam
-        new_opts={}
         merged_opts={**kwargs,**new_opts}
         
-        #call cufflinks
+        #call trinity
         status=self.run_trinity(**merged_opts)
         
         if status:
-            #move out_dir/transcripts.gtf to outfile
-            pe.move_file(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
-            #check if sam file is present in the location directory of sraOb
-            if pu.check_files_exist(out_gtf_file):
-                return out_gtf_file
+            #check out dir
+            if pu.check_paths_exist(out_dir):
+                return out_dir
         else:
             return ""
 
     
     
     def run_trinity(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running cufflinks
+        """Wrapper for running trinity
         
         Parameters
         ----------
@@ -469,15 +462,15 @@ class Trinity(Assembly):
         #override existing arguments
         merged_args_dict={**self.passed_args_dict,**kwargs}
        
-        cufflinks_cmd=['cufflinks']
+        trinity_cmd=['Trinity']
         #add options
-        cufflinks_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+        trinity_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
         
         
         #start ececution
-        status=pe.execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(trinity_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            pu.print_boldred("cufflinks failed")
+            pu.print_boldred("trinity failed")
         #return status
         return status
     
