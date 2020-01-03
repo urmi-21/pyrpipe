@@ -390,8 +390,8 @@ class Trinity(Assembly):
         self.passed_args_dict=kwargs
     
     
-    def perform_assembly(self,bam_file,out_dir="",out_suffix="_trinity",overwrite=True,**kwargs):
-        """Function to run cufflinks with BAM file as input.
+    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G"overwrite=True,**kwargs):
+        """Function to run trinity with sra object or BAM file as input.
                 
         Parameters
         ----------
@@ -411,30 +411,35 @@ class Trinity(Assembly):
         
         """
         
-        #create path to output file
-        fname=pu.get_file_basename(bam_file)
-        if not out_dir:
-            out_dir=pu.get_file_directory(bam_file)
+        if sra_object is not None:
+            parent_dir=sra_object.location
+            out_dir=os.path.join(parent_dir,out_dir)
+            if sra_object.layout == 'PAIRED':
+                newOpts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":max_memory}
+            else:
+                newOpts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
+        elif bam_file is not None:
+            if not pu.check_files_exist(bam_file):
+                pu.print_boldred("Input to trinity does not exist:"+bam_file)
+                return ""
+            parent_dir=pu.get_file_directory(bam_file)
+            out_dir=os.path.join(parent_dir,out_dir)
+            newOpts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
         else:
-            if not pu.check_paths_exist(out_dir):
-                pu.mkdir(out_dir)
-        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
+            return ""
         
         """
         Handle overwrite
         """
         if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(out_gtf_file):
-                print("The file "+out_gtf_file+" already exists. Exiting..")
-                return out_gtf_file
+            pass
             
         #Add output file name and input bam
-        new_opts={"-o":out_dir,"--":(bam_file,)}
+        new_opts={}
         merged_opts={**kwargs,**new_opts}
         
         #call cufflinks
-        status=self.run_cufflinks(**merged_opts)
+        status=self.run_trinity(**merged_opts)
         
         if status:
             #move out_dir/transcripts.gtf to outfile
@@ -444,43 +449,10 @@ class Trinity(Assembly):
                 return out_gtf_file
         else:
             return ""
-    
-    def run_cuff(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running cuff* commands
-        
-        Parameters
-        ----------
-        command: string
-            the command name
-        arg2: dict
-            Options passed to cuff command
-        
-        Returns
-        -------
-        bool
-            return status of the command.
-        """
-        validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
-        if command in validCommands:
-            #override existing arguments
-            merged_args_dict={**self.passed_args_dict,**kwargs}
-       
-            cuff_cmd=[command]
-            #add options
-            cuff_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
-                  
-            #start ececution
-            status=pe.execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-            if not status:
-                pu.print_boldred("cufflinks failed")
-                #return status
-            return status
-        else:
-            pu.print_boldred("Unknown command {}"+command)
-            return False
+
     
     
-    def run_cufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_trinity(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cufflinks
         
         Parameters
@@ -508,3 +480,7 @@ class Trinity(Assembly):
             pu.print_boldred("cufflinks failed")
         #return status
         return status
+    
+    
+    
+    
