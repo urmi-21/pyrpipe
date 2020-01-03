@@ -370,7 +370,7 @@ class Trinity(Assembly):
         
         super().__init__()
         self.program_name="Trinity"
-        self.dep_list=[self.program_name,'jellyfish']
+        self.dep_list=[self.program_name,'jellyfish','bowtie2']
         #check if trinity exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.program_name+" not found.")

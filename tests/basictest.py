@@ -298,6 +298,12 @@ sout=kl.run_kallisto_quant(sraOb,objectid=sraOb.srrAccession)
 print(sout)
 """
 
+sraOb=sra.SRA('SRR976159',testDir)
+#download sra
+sraOb.download_sra()
+#run fastqdump;delete sra when done
+sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":testDir})
+
 #run trinity
 tr=assembly.Trinity()
 #trOpts={"--seqType":"fq","--left":"/home/usingh/work/urmi/hoap/test/test_Trinity_Assembly/reads.left.fq.gz",
