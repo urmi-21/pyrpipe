@@ -27,7 +27,7 @@ Allows easy development of analyses pipelines in python by providing
 
 ## Tools supported currently
 ### SRA access
-    * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
+* [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
 ### QC
     * [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
     * [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
