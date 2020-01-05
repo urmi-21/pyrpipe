@@ -25,15 +25,28 @@ Allows easy development of analyses pipelines in python by providing
 * python 3.5 or higher
 * OS: Unix based
 
-## Tools supported currently
+## Tools covered:
 ### SRA access
 * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
+
 ### QC
-    * [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
-    * [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+* [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
+* [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
+
+### Alignment
 * [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
+* [STAR](https://github.com/alexdobin/STAR)
+* [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
+
+### Assembly
 * [Stringtie](https://github.com/gpertea/stringtie)
+* [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)
+* [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki)
+
+### Tools
 * [Samtools](https://github.com/samtools/samtools)
+* [Portcullis](https://github.com/maplesond/portcullis)
+* [Mikado](https://github.com/EI-CoreBioinformatics/mikado)
 
 
 
