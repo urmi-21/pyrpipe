@@ -29,7 +29,8 @@ def test_samtools():
     st=pu.check_files_exist(mergedBam)
     assert st==True, "Failed to merge bam"
 
-"""    
+"""
+#TODO check portcullis installation in travis    
 def test_portcullis():
     pc=tools.Portcullis()
     port_out=pc.run_portcullisFull(testVars.genome,testVars.hisatSortedBam,out_dir=testVars.testDir)
