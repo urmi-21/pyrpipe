@@ -25,10 +25,12 @@ Allows easy development of analyses pipelines in python by providing
 * python 3.5 or higher
 * OS: Unix based
 
-Required third-party programs
-
-* [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
-* [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
+## Tools supported currently
+### SRA access
+    * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
+### QC
+    * [Trimgalore](https://github.com/FelixKrueger/TrimGalore)
+    * [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/)
 * [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)
 * [Stringtie](https://github.com/gpertea/stringtie)
 * [Samtools](https://github.com/samtools/samtools)
