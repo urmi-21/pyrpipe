@@ -25,7 +25,7 @@ Allows easy development of analyses pipelines in python by providing
 * python 3.5 or higher
 * OS: Unix based
 
-## Tools covered:
+## pyrpipe provides API to:
 ### SRA access
 * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
 
