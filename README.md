@@ -14,16 +14,16 @@ pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Se
 pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
 
 ### What it does
-Allows easy development of analyses pipelines in python by providing 
+Allows fast and easy development of bioinformatics pipelines in python by providing 
 * a high level api to popular bioinformatics tools
 * a general api to execute any linux command from python (using the subprocess module)
-* logging features to log all the commands and output
+* comprehensive logging features to log all the commands, output and their return status
 * report generating features for easy sharing, reproducing, benchmarking and debugging
 
 
 ## Prerequisites
 * python 3.5 or higher
-* OS: Unix based
+* OS: Linux, Mac
 
 ## pyrpipe provides API to:
 ### SRA access
