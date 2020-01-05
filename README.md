@@ -25,13 +25,25 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * python 3.5 or higher
 * OS: Linux, Mac
 
-| Tool                                                                                 | Purpose    |
-|--------------------------------------------------------------------------------------|------------|
-| [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)                  | SRA access |
-| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | QC         |
-| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | QC         |
 
 ## pyrpipe provides API to:
+
+| Tool                                                                                 | Purpose             |
+|--------------------------------------------------------------------------------------|---------------------|
+| [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)                  | SRA access          |
+| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | QC                  |
+| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | QC                  |
+| [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)                            | Alignment           |
+| [STAR](https://github.com/alexdobin/STAR)                                            | Alignment           |
+| [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)                     | Alignment           |
+| [Kallisto](https://pachterlab.github.io/kallisto/)                                   | Quant               |
+| [Salmon](https://combine-lab.github.io/salmon/)                                      | Quant               |
+| [Stringtie](https://github.com/gpertea/stringtie)                                    | Transcript Assembly |
+| [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)                           | Transcript Assembly |
+| [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki)                       | Transcript Assembly |
+| [Samtools](https://github.com/samtools/samtools)                                     | Tools               |
+| [Portcullis](https://github.com/maplesond/portcullis)                                | Tools               |
+| [Mikado](https://github.com/EI-CoreBioinformatics/mikado)                            | Tools               |
 ### SRA access
 * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
 
