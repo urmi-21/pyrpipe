@@ -25,6 +25,12 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * python 3.5 or higher
 * OS: Linux, Mac
 
+| Tool                                                                                 | Purpose    |
+|--------------------------------------------------------------------------------------|------------|
+| [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)                  | SRA access |
+| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | QC         |
+| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | QC         |
+
 ## pyrpipe provides API to:
 ### SRA access
 * [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)
