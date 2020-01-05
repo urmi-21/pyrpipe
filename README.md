@@ -38,6 +38,10 @@ Allows easy development of analyses pipelines in python by providing
 * [STAR](https://github.com/alexdobin/STAR)
 * [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)
 
+### Quant
+* [Kallisto](https://pachterlab.github.io/kallisto/)
+* [Salmon](https://combine-lab.github.io/salmon/)
+
 ### Assembly
 * [Stringtie](https://github.com/gpertea/stringtie)
 * [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)
