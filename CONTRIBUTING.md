@@ -5,7 +5,7 @@ To contribute to pyrpipe, please fork this repository, make changes and then sen
 
 # Getting Started
 
-## Cloning MetaOmGraph
+## Cloning pyrpipe
 
 
 ## Dependencies
