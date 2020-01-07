@@ -1,2 +1,3 @@
-omit=
+[report]
+omit =
 	/home/travis/virtualenv/*
