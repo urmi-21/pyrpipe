@@ -97,7 +97,7 @@ install:
 # command to run tests
 script:
   - ls
-  - travis_wait 30 coverage run pytest tests/test_sra.py
+  - travis_wait 30 coverage run -m pytest tests/test_sra.py
   - coverage report --show-missing  
 after_success:
   - coveralls
