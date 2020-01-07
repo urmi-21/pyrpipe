@@ -97,7 +97,7 @@ install:
 # command to run tests
 script:
   - ls
-  - travis_wait 30 coverage run -m pyrpipe pytest tests/
+  - travis_wait 30 coverage run --source pyrpipe/* pytest tests/
   - coverage report --show-missing  
 after_success:
   - coveralls
