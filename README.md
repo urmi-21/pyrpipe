@@ -23,7 +23,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 
 
 ## Prerequisites
-* python 3.5 or higher
+* python 3.6 or higher
 * OS: Linux, Mac
 
 
