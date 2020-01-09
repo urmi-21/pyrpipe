@@ -286,15 +286,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         
         ##Add to logs        
         if logs:
-            """
-            fullMessage=log_message+"\n"+"exit code:"+str(exitCode)+"\texecution time:"+str(dt.timedelta(seconds=timeDiff))
-            pyrpipeLoggerObject.cmd_logger.debug(fullMessage)
-        
-            ##log stdout
-            pyrpipeLoggerObject.stdoutLogger.debug(stdout)
-            ##log stderr
-            pyrpipeLoggerObject.stderrLogger.debug(stderr)
-            """
+
             ##get the program used and log its path
             if command_name not in pyrpipeLoggerObject.logged_programs:
                 ##get which thisProgram
@@ -307,7 +299,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                 pyrpipeLoggerObject.env_logger.debug(json.dumps(progDesc))
                 pyrpipeLoggerObject.logged_programs.append(command_name)
             
-            #create a dict
+            #create a dict and dump as json
             logDict={'cmd':log_message,
                  'exitcode':exitCode,
                  'runtime':str(timedelta(seconds=timeDiff)),
@@ -318,13 +310,11 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                  'commandname':command_name
                 }
             pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
-            
-        
     
         if exitCode==0:
             return True
         return False
-    
+    #handle exceptions
     except OSError as e:
         pu.print_boldred("OSError exception occured.\n"+str(e))
         #log error
@@ -374,7 +364,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
 
 
 
-#modyfied from https://www.biostars.org/p/139422/
+#modified from https://www.biostars.org/p/139422/
 def is_paired(sra_file):
     """Function to test wheather a .sra file is paired or single.
     
