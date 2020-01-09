@@ -11,9 +11,12 @@ import datetime as dt
 
 
 
-#functions to print in color
 
-class bcolors:
+
+class Colors:
+    """
+    Colors used for printing messages.
+    """
     HEADER = '\033[95m'
     OKBLUE = '\033[94m'
     OKGREEN = '\033[92m'
@@ -34,7 +37,7 @@ def print_boldred(text):
     --------
     None
     """
-    print (bcolors.FAIL + bcolors.BOLD+ text + bcolors.ENDC)
+    print (Colors.FAIL + Colors.BOLD+ text + Colors.ENDC)
 
 def print_green(text):
     """Print in green font
@@ -45,7 +48,7 @@ def print_green(text):
     --------
     None
     """
-    print (bcolors.OKGREEN + text + bcolors.ENDC)
+    print (Colors.OKGREEN + text + Colors.ENDC)
 
 def print_blue(text):
     """Print in blue font
@@ -56,7 +59,7 @@ def print_blue(text):
     --------
     None
     """
-    print (bcolors.OKBLUE + text + bcolors.ENDC) 
+    print (Colors.OKBLUE + text + Colors.ENDC) 
 
 def print_magenta(text):
     """Print in magenta font
@@ -67,7 +70,7 @@ def print_magenta(text):
     --------
     None
     """
-    print (bcolors.LightMagenta + text + bcolors.ENDC) 
+    print (Colors.LightMagenta + text + Colors.ENDC) 
     
 def print_info(text):
     """Print an info message
@@ -89,7 +92,7 @@ def print_yellow(text):
     --------
     None
     """
-    print (bcolors.LightYellow + text + bcolors.ENDC) 
+    print (Colors.LightYellow + text + Colors.ENDC) 
 
 ######End color functions###################
 
@@ -423,7 +426,7 @@ def mkdir(dir_path):
 
 
 def get_union(*args):
-    """Find and return unioin of multiple input lists.
+    """Return unioin of multiple input lists.
     """
     return list(set().union(*args)) 
     
