@@ -17,12 +17,17 @@ import matplotlib.pyplot as plt
 import os
 
 class Benchmark:
+    """Class to generate benchmark reports from pyrpipe logs.
+    Parameters
+    ----------
+    log_file (string): path to the log file
+    env_log (string): path to the ENV log file
+    out_dir (string): path to the output directory
+        
+        
+    """
     def __init__(self,log_file,env_log,out_dir=""):
-        """Describe...
         
-        
-        
-        """
         
         if not pu.check_files_exist(log_file,env_log):
             raise Exception("Please check input for benchmark report. {} {}".format(log_file,env_log))
@@ -47,6 +52,9 @@ class Benchmark:
     def parse_runtime(self,timestring):
         """
         Parse runtime as string and return seconds.
+        Returns
+        -------
+        float
         """
         try:
             runtime= dt.datetime.strptime(timestring,"%H:%M:%S")
@@ -122,6 +130,9 @@ class Benchmark:
         #print(self.runtimes_by_object)
                                    
     def get_time_perobject(self,func="sum"):
+        """Returns a dataframe containing total execution time for each object in a pyrpipe log.
+        An object is identified by the objectid e.g. SRR accession.
+        """
         result=pd.DataFrame()
         for k in self.runtimes_by_object:
             
@@ -148,6 +159,9 @@ class Benchmark:
         return result
         
     def plot_time_perobject(self):
+        """Function to plot charts summarizing runtimes for each object in the pipeline.
+        The charts are save to the out_dir path.
+        """
         data=self.get_time_perobject()
         #remove rows with no object id
         data=data[data['id']!='NA']
@@ -201,7 +215,7 @@ class Benchmark:
     
     
     def get_time_perprogram(self):
-        """Returns a dataframe with program execution times
+        """Returns a dataframe with program execution times.
         """
         result=pd.DataFrame()
         for k in self.runtimes_by_prog:
@@ -232,6 +246,8 @@ class Benchmark:
         
         
     def plot_time_perprogram(self):
+        """Function to plot charts to summarize runtimes of each program
+        """
         data=self.get_time_perprogram()
         sns.set_context('poster')
         f, ax = plt.subplots()
