@@ -2,7 +2,14 @@ language: python
 python:
   - "3.6"      # current default Python on Travis CI
   - "3.7"
-  
+
+services:
+  - docker
+
+before_install:
+  - docker run --it --rm -v $(pwd):/data maplesond/portcullis:stable portcullis --help
+  - which portcullis
+
 # install dependencies
 install:
   - pip install -r requirements.txt
@@ -97,7 +104,7 @@ install:
 # command to run tests
 script:
   - ls
-  - travis_wait 30 coverage run -m pytest tests/
+  - travis_wait 30 coverage run -m pytest tests/test_tools.py
   - coverage report --show-missing  
 after_success:
   - coveralls
