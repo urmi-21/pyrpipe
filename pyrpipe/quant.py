@@ -159,6 +159,7 @@ class Kallisto(Quant):
         """Wrapper for running kallisto.
         Parameters
         ----------
+        subcommand (str): subcommand for kallisto
         verbose (bool): Print stdout and std error
         quiet (bool): Print nothing
         logs (bool): Log this command to pyrpipe logs
@@ -343,16 +344,22 @@ class Salmon(Quant):
         
         
     def run_salmon(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running kallisto.
+        """Wrapper for running salmon.
         
+        Parameters
         ----------
-        arg1: dict
-            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+        subcommand (str): subcommand for salmon
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): Options to pass to kallisto. This will override the existing options
+        
             
         Returns
         -------
         bool:
-                Returns the status of bowtie2. True is passed, False if failed.
+                Returns the status of salmon. True is passed, False if failed.
         """
         
         #check for a valid index

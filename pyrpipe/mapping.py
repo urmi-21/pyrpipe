@@ -164,7 +164,7 @@ class Hisat2(Aligner):
         
         
     def perform_alignment(self,sra_object,out_suffix="_hisat2",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to perform alignment using self object and the provided sra_object.
+        """Function to perform alignment using sra_object.
         
         Parameters
         ----------
@@ -321,12 +321,17 @@ class Star(Aligner):
         """Build a star index with given parameters and saves the new index to self.star_index.
         Parameters
         ----------
-        arg1: string
+        index_path: string
             Path where the index will be created
         
-        arg2: tuple
+        args: tuple
             Path to reference input files
-        arg3: dict
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
             Parameters for the star command
         
         Returns
@@ -487,8 +492,8 @@ class Bowtie2(Aligner):
             path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
        **kwargs dict
             parameters passed to the bowtie2 program. These parameters could be overridden later when running bowtie2.
-    Attributes
-    ----------
+       Attributes
+       ----------
     """ 
     def __init__(self,bowtie2_index,**kwargs):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
@@ -676,8 +681,7 @@ class Bowtie2(Aligner):
         objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs (dict): Options to pass to stringtie. This will override the existing options 
                        in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        arg1: dict
-            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+        kwargs (dict): arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
         Returns
         -------
@@ -705,6 +709,9 @@ class Bowtie2(Aligner):
     
     
     def check_index(self):
+        """Function to check bowtie index.
+        Returns True is index exist on disk.
+        """
         if hasattr(self,'bowtie2_index'):
             return(pu.check_bowtie2index(self.bowtie2_index))
         return False

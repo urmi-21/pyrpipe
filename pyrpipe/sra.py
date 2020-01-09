@@ -27,9 +27,11 @@ class SRA:
         -----------
         
         """
-    def __init__(self,srr_accession,location=os.getcwd()):
+    def __init__(self,srr_accession,location=None):
         
-        
+        if location is None:
+            location=os.getcwd()
+            
         self.dep_list=['prefetch',"fasterq-dump"]
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: Please install missing programs.")
@@ -129,12 +131,17 @@ class SRA:
            
     
     def sraFileExistsLocally(self):
+        """Function to check if sra file is present on disk
+        """
         if hasattr(self,'localSRAFilePath'):
             return(os.path.isfile(self.localSRAFilePath))
         else:
             return False
         
     def fastqFilesExistsLocally(self):
+        """Function to check if fastq file is present on disk
+        """
+        
         if not hasattr(self,'layout'):
             return False
         
@@ -166,11 +173,11 @@ class SRA:
         
         Parameters
         ----------
-        arg1: bool
-            delete sra file after completion
-            
-        arg2: dict
-            A dict containing fasterq-dump arguments
+        delete_sra (bool): delete sra file after completion
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        kwargs (dict): A dict containing fasterq-dump arguments
         
         Returns
         -------
@@ -256,11 +263,10 @@ class SRA:
       
         Parameters
         ----------
-        arg1: object
+        qcObject (RNASeqQC object):
             qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
             
-        arg2: bool
-            Delete the raw fastq files after QC
+        deleteRawFastq (bool): Delete the raw fastq files after QC
         
         Returns
         -------
@@ -337,13 +343,6 @@ class SRA:
             del self.localSRAFilePath
             return True
         return False
-        
-        
-
-if __name__ == "__main__":
-    #test
-    print("main")
-        
     
     
     

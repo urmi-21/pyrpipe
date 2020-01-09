@@ -13,7 +13,9 @@ import os
 #import pyrpipe
 
 def getTimestamp(shorten=False):
-    
+    """Return timestamp YYYYMMDDHHMISE
+    shorten: return shorter version without spaces.
+    """
     timestamp=str(dt.datetime.now()).split(".")[0].replace(" ","-")
     if shorten:
         timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
@@ -21,6 +23,7 @@ def getTimestamp(shorten=False):
 
 def save_session(filename="session",timestamp=True,out_dir=""):
     """Save current workspace using dill.
+    Returns True is save is successful
     """
     #timestamp format YYYYMMDDHHMISE
     timestamp=getTimestamp(True)
@@ -41,21 +44,25 @@ def save_session(filename="session",timestamp=True,out_dir=""):
     Delete all logger instances. 
     del pre.pyrpipeLoggerObject
     del pyrpipe.pyrpipe_engine.pyrpipeLoggerObject
-    """
-    
+    """    
     """
     creating a logger class fixed this issue
     """ 
     
     
     #save workspace
-    dill.dump_session(outFile)
-    print("Session saved to: "+outFile)
-    
-    return True
+    try:
+        dill.dump_session(outFile)
+        print("Session saved to: "+outFile)
+        return True
+    except Exception:
+        raise Exception("Failed to save session")
+        return False
 
 
 def restore_session(file):
+    """Resore a session from file.
+    """
     if not os.path.isfile(file):
         print(file+" doesn't exist")
         return False

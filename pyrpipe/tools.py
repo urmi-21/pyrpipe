@@ -330,11 +330,12 @@ class Portcullis(RNASeqTools):
         
         Parameters
         ----------
-         sub_command: string
-            sub_command to pass to portcullis e.g. full, prep, junc etc.
-        arg1: dict
-            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
-            
+         sub_command (string): sub_command to pass to portcullis e.g. full, prep, junc etc.
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs (dict): arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
         Returns
         -------
         bool:
@@ -375,14 +376,7 @@ class Mikado(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
-    
-#    def searchGTFtolist(self, out_file, out_dir, searchPath,searchQuery="*.gtf",strand=False):
-##        output=pe.find_files(searchPath,searchQuery)            
-#        return self.createMikadoGTFlist(out_file,out_dir,*output,strand=strand)
-
-
-        
-    
+ 
     def createMikadoGTFlist(self,out_file,out_dir,searchPath,searchQuery="*.gtf",strand=False):
         """Create a file to be used by mikado configure
         """

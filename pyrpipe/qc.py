@@ -293,14 +293,7 @@ class BBmap(RNASeqQC):
         #return status
         return status
     
-    
-    """
-    index 
-    bbsplit.sh ref_x=/home/usingh/work/urmi/hoap/test/bowtieIndex/euk_combined_rRNA.fa path=./xds
-    
-    clean
-    bbsplit.sh in1=reads1.fq in2=reads2.fq ref=path_to_ref outu1=clean1.fq outu2=clean2.fq
-    """
+ 
     
     def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
