@@ -61,7 +61,7 @@ class Stringtie(Assembly):
             self.passed_args_dict['-G']=reference_gtf
         
     def perform_assembly(self,bam_file,out_dir="",out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to run stringtie using a bam file. Manages the outout file names and returns it.
+        """Function to run stringtie using a bam file.
                 
         Parameters
         ----------
@@ -213,7 +213,7 @@ class Cufflinks(Assembly):
             raise Exception("ERROR: "+ self.program_name+" not found.")
             
         
-        
+        #define valid arguments
         self.cufflinksArgsList=['-h','--help','-o','--output-dir','-p','--num-threads','--seed','-G','--GTF','-g','--GTF-guide','-M','--mask-file','-b','--frag-bias-correct','-u','--multi-read-correct','--library-type','--library-norm-method',
 '-m','--frag-len-mean','-s','--frag-len-std-dev','--max-mle-iterations','--compatible-hits-norm','--total-hits-norm','--num-frag-count-draws','--num-frag-assign-draws','--max-frag-multihits','--no-effective-length-correction',
 '--no-length-correction','-N','--upper-quartile-norm','--raw-mapped-norm','-L','--label','-F','--min-isoform-fraction','-j','--pre-mrna-fraction','-I','--max-intron-length','-a','--junc-alpha','-A','--small-anchor-fraction',
@@ -242,19 +242,24 @@ class Cufflinks(Assembly):
             self.passed_args_dict['-g']=reference_gtf
     
     
-    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",overwrite=True,**kwargs):
+    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run cufflinks with BAM file as input.
                 
         Parameters
         ----------
-        arg1: string
+        bam_file: string
             path to bam file
-        arg2: string
+        out_dir: output directory
+        out_suffix: string
             Suffix for the output gtf file
-        arg3: bool
+        overwrite: bool
             Overwrite if output file already exists.
-        arg4: dict
-            Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        kwargs: dict
+            Options to pass to cufflinks. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
         Returns
         -------
@@ -286,7 +291,7 @@ class Cufflinks(Assembly):
         merged_opts={**kwargs,**new_opts}
         
         #call cufflinks
-        status=self.run_cufflinks(**merged_opts)
+        status=self.run_cufflinks(verbose,quiet,logs,objectid,**merged_opts)
         
         if status:
             #move out_dir/transcripts.gtf to outfile
@@ -304,8 +309,11 @@ class Cufflinks(Assembly):
         ----------
         command: string
             the command name
-        arg2: dict
-            Options passed to cuff command
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        
         
         Returns
         -------
@@ -337,7 +345,12 @@ class Cufflinks(Assembly):
         
         Parameters
         ----------
-        arg1: dict
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        
+        kwargs: dict
             Options passed to cufflinks
         
         Returns
@@ -391,18 +404,29 @@ class Trinity(Assembly):
         self.passed_args_dict=kwargs
     
     
-    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G",max_intron=10000,overwrite=True,**kwargs):
+    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G",max_intron=10000,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run trinity with sra object or BAM file as input.
                 
         Parameters
         ----------
-        arg1: string
+        sra_object: SRA
+            object of SRA class
+        bam_file: string
             path to bam file
-        arg2: string
-            Suffix for the output gtf file
-        arg3: bool
-            Overwrite if output file already exists.
-        arg4: dict
+        out_dir: string
+            path to out directory
+        max_memory: string
+            Max memory argument e.g. "2G"
+        max_intron: int
+            specify the "--genome_guided_max_intron" argument
+        overwrite: bool
+            Overwrite if output file already exists
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        
+        kwargs: dict
             Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
         Returns
@@ -438,7 +462,7 @@ class Trinity(Assembly):
         merged_opts={**kwargs,**new_opts}
         
         #call trinity
-        status=self.run_trinity(**merged_opts)
+        status=self.run_trinity(verbose,quiet,logs,objectid,**merged_opts)
         
         if status:
             #check out dir
@@ -454,13 +478,17 @@ class Trinity(Assembly):
         
         Parameters
         ----------
-        arg1: dict
-            Options passed to cufflinks
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        kwargs: dict
+            Options passed to trinity
         
         Returns
         -------
         bool
-            status of cufflinks command.
+            status of trinity command.
         """
             
         #override existing arguments
