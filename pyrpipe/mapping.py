@@ -92,9 +92,14 @@ class Hisat2(Aligner):
             Path where the index will be created
         index_name: string
             A name for the index
-        arg3: tuple
+        args: tuple
             Path to reference input files
-        arg4: dict
+        verbose (bool): Print stdout and std error
+        quiet (bool): Print nothing
+        logs (bool): Log this command to pyrpipe logs
+        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
             Parameters for the hisat2-build command
         
         Returns
