@@ -1,4 +1,3 @@
--e git://github.com/urmi-21/pyrpipe#egg=pyrpipe
 #for sessions
 dill
 #for reports
