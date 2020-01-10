@@ -7,10 +7,10 @@ services:
   - docker
 
 before_install:
-  - docker run -v $(pwd):/data maplesond/portcullis:stable portcullis --help
+  #- docker run -v $(pwd):/data maplesond/portcullis:stable portcullis --help
   - docker pull maplesond/portcullis
   - docker images
-  - docker run portcullis --help
+  - docker run maplesond/portcullis portcullis --help
   - which portcullis
 
 # install dependencies
