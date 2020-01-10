@@ -1,3 +1,4 @@
+-e https://github.com/urmi-21/pyrpipe
 #for sessions
 dill
 #for reports
