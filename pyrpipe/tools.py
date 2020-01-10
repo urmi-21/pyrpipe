@@ -172,8 +172,6 @@ class Samtools(RNASeqTools):
         objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs (dict): Options to pass to trimgalore. This will override the existing options 
         
-        kwargs: dict
-            arguments passed to samtools merge command
             
         Returns
         -------
