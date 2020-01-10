@@ -67,7 +67,7 @@ install:
   - wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2.zip
   - unzip /tmp/hisat2.zip
   - export PATH=$PATH:$PWD/hisat2-2.1.0/
-  install STAR
+  #install STAR
   - wget https://github.com/alexdobin/STAR/archive/2.7.3a.tar.gz -O /tmp/star.tar.gz
   - tar -xvzf /tmp/star.tar.gz
   - export PATH=$PATH:$PWD/STAR-2.7.3a/bin/Linux_x86_64/
