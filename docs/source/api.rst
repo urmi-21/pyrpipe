@@ -1,29 +1,35 @@
 ======================================================
-pyrpipe: python RNA-Seq pipelines
+pyrpipe
 ======================================================
 
-Introduction
-============
+Specifying RNA-Seq data
+=======================
 
-Pysam is a python module that makes it easy to read and manipulate
-mapped short read sequence data stored in SAM/BAM files.  It is a
-lightweight wrapper of the htslib_ C-API.
+Use the :py:mod:`sra` module to create an :class:`SRA` object::
 
-This page provides a quick introduction in using pysam followed by the
-API. See :ref:`usage` for more detailed usage instructions.
+	from pyrpipe import sra
+	sra_obj = sra.SRA(srr_accession="SRR976159")
 
-To use the module to read a file in BAM format, create a
-:class:`~pysam.AlignmentFile` object::
+After the object is created, download the raw data to disk using the 
+:meth:`SRA.download_sra` method::
+	sra_obj.download_sra()
+This will download the raw data in .sra format.
+To convert .sra file to fastq, use :meth:`SRA.run_fasterqdump` method::
 
-   import pysam
-   samfile = pysam.AlignmentFile("ex1.bam", "rb")
+	sra_obj.run_fasterqdump()
 
-Once a file is opened you can iterate over all of the read mapping to
-a specified region using :meth:`~pysam.AlignmentFile.fetch`.  Each
-iteration returns a :class:`~pysam.AlignedSegment` object which
-represents a single read along with its fields and optional tags::
+The sra_obj will keep track of all the downloaded data. The location of downloaded data could be accesed by::
 
-   for read in samfile.fetch('chr1', 100, 120):
-	print read
+	sra_obj.location
 
-   samfile.close()
+To get the paths to sra of fastq files, use::
+
+	sra_obj.localSRAFilePath
+	sra_obj.localfastqPath
+	#for paired
+	sra_obj.localfastq1Path
+	sra_obj.localfastq1Path
+
+
+Performing read alignment
+=========================
