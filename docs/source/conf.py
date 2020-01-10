@@ -16,9 +16,10 @@ import sys
 #import sphinx_glpi_theme
 #html_theme = "glpi"
 #html_theme_path = [sphinx_glpi_theme.get_html_themes_path()]
-import sphinx_pdj_theme
-html_theme = 'sphinx_pdj_theme'
-htm_theme_path = [sphinx_pdj_theme.get_html_theme_path()]
+#import sphinx_pdj_theme
+import sphinx_rtd_theme
+html_theme = 'sphinx_rtd_theme'
+htm_theme_path = [sphinx_rtd_theme.get_html_theme_path()]
 
 sys.path.insert(0, os.path.abspath('../pyrpipe'))
 sys.setrecursionlimit(1500)
