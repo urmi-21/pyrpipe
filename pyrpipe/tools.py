@@ -262,8 +262,8 @@ class Portcullis(RNASeqTools):
         self.programName="portcullis"
         self.dep_list=[self.programName]
         #check if program exists
-        #if not pe.check_dependencies(self.dep_list):
-        #    raise Exception("ERROR: "+ self.programName+" not found.")
+        if not pe.check_dependencies(self.dep_list):
+            raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.valid_args=['-t','--threads','-v','--verbose','--help','-o','-b',
                             '--bam_filter','--exon_gff','--intron_gff','--source',

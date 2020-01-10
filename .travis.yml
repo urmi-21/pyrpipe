@@ -7,11 +7,13 @@ services:
   - docker
 
 before_install:
-  #- docker run -v $(pwd):/data maplesond/portcullis:stable portcullis --help
+  #so dirty
   - docker pull maplesond/portcullis
-  #- docker images
-  #- docker run maplesond/portcullis portcullis --help
-  - alias portcullis='docker run maplesond/portcullis portcullis'
+  - mkdir portcullisDocker
+  - echo '#!/bin/bash' > portcullisDocker/portcullis
+  - echo 'docker run --rm -v' $(pwd)':/data maplesond/portcullis portcullis $1' >> portcullisDocker/portcullis
+  - chmod +x portcullisDocker/portcullis
+  - export PATH=$PATH:$PWD/portcullisDocker/
 
 # install dependencies
 install:
