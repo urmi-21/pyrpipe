@@ -32,10 +32,14 @@ def test_samtools():
 
 #TODO check portcullis installation in travis    
 def test_portcullis():
-    pc=tools.Portcullis()
-    port_out=pc.run_portcullisFull(testVars.genome,testVars.hisatSortedBam,out_dir=testVars.testDir)
-    st=pu.check_paths_exist(port_out)
-    assert st==True, "Failed portcullis run"
+    try:
+        pc=tools.Portcullis()
+        port_out=pc.run_portcullisFull(testVars.genome,testVars.hisatSortedBam,out_dir=testVars.testDir)
+        st=pu.check_paths_exist(port_out)
+        assert st==True, "Failed portcullis run"
+    except Exception:
+        print("Error with portcullis")
+        assert False==True,"Error"
 
  
 def test_mikado():
@@ -45,4 +49,4 @@ def test_mikado():
     
     listfile=mk.createMikadoGTFlist("mikadolist",out_dir,gtfdir)
     st=pu.check_files_exist(listfile)
-    assert st==True, "Mikado list failed"
+    assert st==True, "Mikado list failed" 
