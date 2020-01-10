@@ -1,4 +1,4 @@
-git+git://github.com/urmi-21/pyrpipe#egg=pyrpipe
+-e git://github.com/urmi-21/pyrpipe#egg=pyrpipe
 #for sessions
 dill
 #for reports
