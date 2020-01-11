@@ -7,7 +7,7 @@ Created on Mon Nov 25 15:53:26 2019
 """
 
 from pyrpipe import sra,mapping,assembly,qc,tools,pyrpipe_session
-
+import os
 
 #########define directories indices, reference gtf etc####
 testDir="/home/usingh/work/urmi/hoap/test"
@@ -114,7 +114,7 @@ gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,delete
 
 btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
 #riboseq SRR3590744
-sraOb=sra.SRA('SRR5507495',testDir)
+sraOb=sra.SRA(srr_accession='SRR5507495',location=testDir)
 #download sra
 sraOb.download_sra()
 #run fastqdump;delete sra when done
@@ -298,6 +298,7 @@ sout=kl.run_kallisto_quant(sraOb,objectid=sraOb.srrAccession)
 print(sout)
 """
 
+"""
 sraOb=sra.SRA('SRR976159',testDir)
 #download sra
 sraOb.download_sra()
@@ -311,6 +312,26 @@ tr=assembly.Trinity()
 #tr.run_trinity(verbose=True,**trOpts)
 
 tr.perform_assembly(sraOb,verbose=True)
+"""
+
+sr=sra.SRA(scan_path="/home/usingh/work/urmi/hoap/test/SRR5507495/")
+
+
+# scan a dir to crteate SRA objects
+#subdirs=next(os.walk(testDir))[1]
+
+subdirs=[os.path.join(testDir, o) for o in os.listdir(testDir) 
+                    if os.path.isdir(os.path.join(testDir,o))]
+
+sraList=[]
+for d in subdirs:
+    try:
+        thisSRA=sra.SRA(scan_path=d)
+        sraList.append(thisSRA)
+        print("FOUND data in "+d)
+    except:
+        print("no data in "+d)
+
 
 
 

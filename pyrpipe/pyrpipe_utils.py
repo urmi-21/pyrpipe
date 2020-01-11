@@ -430,6 +430,8 @@ def get_union(*args):
     """
     return list(set().union(*args)) 
     
+def scan_SRA_dir(path):
+    pass
 
 if __name__ == "__main__":
     print("main")

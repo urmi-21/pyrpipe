@@ -27,7 +27,7 @@ class SRA:
         -----------
         
         """
-    def __init__(self,srr_accession=None,scan_path=None, location=None):
+    def __init__(self,srr_accession=None, location=None,scan_path=None):
         
         if scan_path is not None:
             #use the scan_path to create sra object
@@ -43,15 +43,17 @@ class SRA:
             raise Exception("Please provide a valid path to scan for RNA-Seq data")
         
         #scan path
-        if not self.search_sra(path):
-            if not self. search_fastq(path):
+        if not self.search_fastq(path):
+            if not self.search_sra(path):
                 raise Exception("Please provide a valid path to scan for RNA-Seq data")
     
     def search_sra(self,path):
         """Search .sra file under a dir
+        Return True if found otherwise False
         """
         #search files under the path
-        sra_files=pe.find_files(path,".sra")
+        
+        sra_files=pe.find_files(path,"*.sra")
         
         if len(sra_files)<1:
             return False
@@ -68,31 +70,37 @@ class SRA:
             self.layout="PAIRED"
         else:
             self.layout="SINGLE"
-            
+        
+        pu.print_green("Found .sra "+self.localSRAFilePath)
         return True
         
     def search_fastq(self,path):
-        """Search .sra file under a dir
+        """Search .fastq file under a dir and create SRA object
+        Return True if found otherwise False
         """
         #search files under the path
-        fq_files=pe.find_files(path,".fastq")
+        fq_files=pe.find_files(path,"*.fastq")
         
         if len(fq_files)<1:
             return False
         
         if len(fq_files)>2:
-            pu.print_boldred("Found multiple .fastq files. Using the first entry...")
+            pu.print_boldred("Can not determine .fastq. Exiting...")
+            return False
         
         
         #case with single fastq
         if len(fq_files)==1:
             self.localfastqPath=fq_files[0]
+            pu.print_green("Found .fastq "+self.localfastqPath)
+            self.layout="SINGLE"
         
         #case with paired fastq
         if len(fq_files)==2:
-            fq_files.sort()
             self.localfastq1Path=fq_files[0]
-            self.localfastq2Path=fq_files[0]
+            self.localfastq2Path=fq_files[1]
+            pu.print_green("Found .fastq "+self.localfastq1Path+" "+self.localfastq2Path)
+            self.layout="PAIRED"
         
         self.location=path
         self.srr_accession=pu.get_file_basename(fq_files[0])
@@ -299,7 +307,7 @@ class SRA:
         #execute command
         cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)
         if not cmdStatus:
-            print("prefetch failed for:"+self.srr_accession)
+            print("fasterqdump failed for:"+self.srr_accession)
             return False
         
         

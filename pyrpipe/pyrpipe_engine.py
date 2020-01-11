@@ -479,7 +479,7 @@ def move_file(source,destination):
 
 
 #TODO: use os.scandir
-def find_files(search_path,search_pattern,recursive=False):
+def find_files(search_path,search_pattern,recursive=False,verbose=False):
     """Function to find files using find command and return as list
     Use global paths for safety
     Parameters
@@ -495,8 +495,9 @@ def find_files(search_path,search_pattern,recursive=False):
     if recursive:
         find_cmd=['find', search_path,'-type', 'f','-name',search_pattern]   
     else:
-        find_cmd=['find', search_path,'-type', 'f','-maxdepth', '1','-name',search_pattern] 
-    print(" ".join(find_cmd))
+        find_cmd=['find', search_path,'-maxdepth', '1','-type', 'f','-name',search_pattern] 
+    if verbose:
+        print("$ "+" ".join(find_cmd))
     st=getShellOutput(find_cmd)
     output=[]
     if st[0]==0:
