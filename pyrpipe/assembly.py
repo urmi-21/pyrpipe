@@ -18,14 +18,12 @@ class Assembly:
     def perform_assembly(bam_file):
         """Function to perform assembly using a bam file as input. Inherited by all children.
         
-        Parameters
-        ----------
-        bam_file (string): Path to the bam file.
+                
+        :param bam_file: the temperature value
+        :type bam_file: string
         
-        
-        Returns
-        --------
-        string: path to output GTF or output directory depending on the specific assembly program.
+        :return: path to output GTF or output directory depending on the specific assembly program.
+        :rtype: string
         """
         pass
 
