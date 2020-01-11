@@ -38,3 +38,7 @@ The method :meth:`perform_alignment` can be used with the SRA object.
 An example using Hisat2::
 	hs=mapping.Hisat2(hisat2_index="",**hsOpts)
 	hs.perform_alignment(ob,**{"-p":"10"})
+
+Using third-party tools
+========================
+The module :py:mod:`pyrpipe_engine` contains helper methods to run any shell command from python.

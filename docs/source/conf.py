@@ -12,7 +12,7 @@
 #
 import os
 import sys
-
+from pyrpipe import version
 #import sphinx_glpi_theme
 #html_theme = "glpi"
 #html_theme_path = [sphinx_glpi_theme.get_html_themes_path()]
@@ -32,7 +32,7 @@ author = 'Urminder Singh'
 
 # The full version, including alpha/beta/rc tags
 release = '0.0.1'
-
+version = version.__version__
 
 # -- General configuration ---------------------------------------------------
 
