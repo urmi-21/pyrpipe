@@ -5,9 +5,9 @@ pyrpipe: python RNA-Seq pipelines
 :Date: |today|
 :Version: |version|
 
-*****
+*************
 Introduction
-*****
+*************
 pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs.
 pyrpipe allows coding RNA-Seq workflows in pure python in an object oriented manner. pyrpipe provides a high level API to many popular RNA-Seq tools for easier and faster development.
 pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
@@ -26,8 +26,8 @@ Contents
 .. toctree::
    :maxdepth: 2
 
-   api.rst
    usage.rst
+   api.rst
    installation.rst
    faq.rst
    developer.rst
