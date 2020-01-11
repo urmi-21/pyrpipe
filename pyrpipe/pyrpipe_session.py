@@ -21,7 +21,7 @@ def getTimestamp(shorten=False):
         timestamp=timestamp.replace("-","").replace(" ","").replace(":","")
     return timestamp
 
-def save_session(filename="session",timestamp=True,out_dir=""):
+def save_session(filename,add_timestamp=True,out_dir=""):
     """Save current workspace using dill.
     Returns True is save is successful
     """
@@ -36,8 +36,10 @@ def save_session(filename="session",timestamp=True,out_dir=""):
             os.makedirs(out_dir)
     
     outFile=os.path.join(out_dir,filename)
-    if timestamp:
+    if add_timestamp:
         outFile=outFile+"_"+timestamp+".pyrpipe"
+    else:
+        outFile=outFile+".pyrpipe"
     
     """
     Do not pickle logger. This causes problems when restoring session with python < 3.7
