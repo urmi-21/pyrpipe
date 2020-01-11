@@ -39,8 +39,11 @@ def test_pipeline1():
     assert st==True,"tg failed"
     
     #runbowtie2
-    bt2=mapping.Bowtie2("/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex")
-    st=bt2.perform_alignment(sraOb)
+    bt=mapping.Bowtie2(bowtie2_index="")
+    assert bt.check_index()==False, "Failed bowtie2 check_index"
+    st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
+    assert st==True, "Failed to build bowtie2 index"
+    st=bt.perform_alignment(sraOb)
     assert os.path.isfile(st)==True,"bowtie failed"
     
     hsOpts={"--dta-cufflinks":"","-p":"8"}
