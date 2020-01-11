@@ -25,3 +25,6 @@ class testSpecs:
         
         self.mikadofiles="tests/test_files/athaliana/mikado"
         
+        self.bbdukAdapters="tests/test_files/adapters2.fa"
+        
+        
