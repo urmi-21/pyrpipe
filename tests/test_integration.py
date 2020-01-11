@@ -17,7 +17,7 @@ testVars=testSpecs()
 fq1=testVars.fq1
 fq2=testVars.fq2
 rRNAfasta=testVars.rRNAfa
-srr='SRR1583780'
+srr='SRR978411'
 workingDir=testVars.testDir
     
 def test_pipeline1():
