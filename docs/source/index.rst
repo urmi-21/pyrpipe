@@ -20,20 +20,22 @@ To install the latest release, type::
 
 See the :ref:`Installation notes <installation>` for details.
 
+
+
 Contents
 --------
 
 .. toctree::
    :maxdepth: 2
 
+   installation.rst
    usage.rst
    api.rst
-   installation.rst
-   faq.rst
-   developer.rst
-   release.rst
-   benchmarking.rst
-   glossary.rst
+..  faq.rst
+..  developer.rst
+..  release.rst
+..  benchmarking.rst
+..  glossary.rst
 
 Indices and tables
 ------------------

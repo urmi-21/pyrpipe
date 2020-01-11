@@ -1,6 +1,7 @@
 ======================
 Installation
 ======================
+.. _installation:
 pyrpipe is available on PyPI and could be installed via pip::
 
 	pip install pyrpipe
