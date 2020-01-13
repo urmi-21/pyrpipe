@@ -56,6 +56,6 @@ def test_trinityBam():
     tr_opts={"--genome_guided_bam":bam,
              "--genome_guided_max_intron":"10000",
             "--output":testVars.testDir+"/trinity_testoutbam",
-            "--max_memory":"3G"}
+            }
     st=tr.run_trinity(**tr_opts)
     assert st==True, "Failed trinity with bam"
