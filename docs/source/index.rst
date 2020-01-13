@@ -20,6 +20,10 @@ To install the latest release, type::
 
 See the :ref:`Installation notes <installation>` for details.
 
+***********
+Philosophy
+***********
+pyrpipe follows an object oriented approach.
 
 
 Contents
