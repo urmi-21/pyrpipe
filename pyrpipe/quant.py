@@ -35,6 +35,11 @@ class Quant:
     
 class Kallisto(Quant):
     """This class represents kallisto
+    
+    kallisto_index: string
+        path to kallisto index
+    kwargs: dict
+        parametrs passed to kallisto
     """
     
     def __init__(self,kallisto_index,**kwargs):
@@ -72,6 +77,7 @@ class Kallisto(Quant):
             
     def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to  build kallisto index
+        
         index_path: str
             path to the output directory
         index_name: str
@@ -86,6 +92,9 @@ class Kallisto(Quant):
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
             Options to pass to kallisto. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            
+        :return: Status of kallisto index
+        :rtype: bool
         """
         
         #check input
@@ -118,8 +127,8 @@ class Kallisto(Quant):
             return False
     
     def perform_quant(self,sra_object,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """
-        run kallisto quant
+        """Run kallisto quant
+        
         sra_object: SRA
             SRA object contatining paths to fastq files
         index_path: str
@@ -170,8 +179,10 @@ class Kallisto(Quant):
     
     def run_kallisto(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running kallisto.
+        
         Parameters
         ----------
+        
         subcommand: str
             subcommand for kallisto
         verbose: bool
@@ -217,6 +228,11 @@ class Kallisto(Quant):
 
 class Salmon(Quant):
     """This class represents salmon
+    
+    salmon_index: string
+        Path to salmon index
+    kwargs: dict
+        Options passed to salmon
     """      
     def __init__(self,salmon_index,**kwargs):    
         super().__init__() 
@@ -276,7 +292,7 @@ class Salmon(Quant):
             
     def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
-        build salmon index
+        build salmon index and store the path to index in self
         
         index_path: str
             path to the output directory
@@ -291,7 +307,10 @@ class Salmon(Quant):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to kallisto. This will override the existing options
+            Options to pass to salmon. This will override the existing options
+            
+        :return: status of salmon index
+        :rtype: bool
         """
         
         #check input
@@ -325,8 +344,7 @@ class Salmon(Quant):
         
     
     def perform_quant(self,sra_object,out_dir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """
-        run salmon quant
+        """run salmon quant
         
         verbose: bool
             Print stdout and std error
@@ -337,7 +355,7 @@ class Salmon(Quant):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to kallisto. This will override the existing options
+            Options to pass to salmon. This will override the existing options
 
         :return: Path to salmon out directory
         :rtype: string
@@ -375,6 +393,7 @@ class Salmon(Quant):
         
         Parameters
         ----------
+        
         subcommand: str
             subcommand for salmon
         verbose: bool
@@ -386,7 +405,7 @@ class Salmon(Quant):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to kallisto. This will override the existing options
+            Options to pass to salmon. This will override the existing options
 
         :return: Returns the status of salmon. True is passed, False if failed.
         :rtype: bool

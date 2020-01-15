@@ -21,13 +21,16 @@ class RNASeqQC:
 
 class Trimgalore(RNASeqQC):
     """This class represents trimgalore
+    
+    Parameters
+    ----------
+        
+        kwargs:
+            trim_galore arguments.
     """
     def __init__(self,**kwargs):
         """
-        Parameters
-        ----------
-        kwargs:
-            trim_galore arguments. could override later too.
+        
         """
         
         #run super to inherit parent class properties
@@ -57,6 +60,7 @@ class Trimgalore(RNASeqQC):
         
         Parameters
         ----------
+        
         sra_object: SRA
             An SRA object whose fastq files will be used
         out_suffix: string
@@ -149,6 +153,9 @@ class Trimgalore(RNASeqQC):
         
         kwargs: dict
             Options to pass to trimgalore (will override existing parameters)
+            
+        :return: Status of trimgalore command
+        :rtype: bool
         """
         
         #override existing arguments
@@ -178,6 +185,7 @@ class BBmap(RNASeqQC):
         """
         Parameters
         ----------
+        
         kwargs:
             bbduk.sh arguments.
         """
@@ -218,23 +226,30 @@ class BBmap(RNASeqQC):
         
         Parameters
         ----------
-        arg1: SRA
-            an SRA object
-        arg2: string
-            Suffix for output file name
-        arg3: bool
-            overwrite existing files
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
-        arg3: dict
+        sra_object: SRA
+            an SRA object
+        out_dir: string
+            Path to out dir. Default: sra_object.location
+        out_suffix: string
+            Suffix for output file name
+        overwrite: bool
+            overwrite existing files
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
             options passed to bbduk
             
-        Returns
-        tuple
-            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+        :return: Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+        :rtype: tuple
+            
         """
         
         #make out_dir
@@ -308,13 +323,16 @@ class BBmap(RNASeqQC):
         
         Parameters
         ----------
+        
         sra_object: SRA
             an SRA object
         bbsplit_index: string
             Path to bbsplit index or fasta file which will generate index
-        arg3: string
+        out_dir: string
+            Path to output dir. Default: sra_object.location
+        out_suffix: string
             Suffix for output file name
-        arg4: bool
+        overwrite: bool
             overwrite existing files
         verbose: bool
             Print stdout and std error
@@ -325,7 +343,7 @@ class BBmap(RNASeqQC):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
-        arg5: dict
+        kwargs: dict
             options passed to bbsplit
 
             :return: Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
@@ -411,6 +429,9 @@ class BBmap(RNASeqQC):
     
     def run_bbsplit(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """wrapper to run bbsplit
+        
+        :return: Status of bbsplit command
+        :rtype: bool
         """
         
         bbsplit_args=['ref','ref_x','build','path','in','in1','in2','outu','outu2','outu1','qin','interleaved',

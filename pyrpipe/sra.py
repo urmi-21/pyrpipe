@@ -15,15 +15,20 @@ import os
 
 class SRA:
     """This class represents an SRA object
+    
         Parameters
         ----------
+        
         srr_accession: string
             A valid SRR accession
-        location: String
+        location: string
             Path where all data related to this object (e.g. .sra files, metadata, fastq files) will be stored.
             Default value of the path will be "./<SRR_accession>". <SRR_accession> is added at the end of the path
             so that final location is location/<SRR_accession>.
             For consistency, location and SRR Accession id are not allowed to be modified.
+            
+        scan_path: string
+            If RNA-Seq data already exists locally, provide the scan path to scan a directory and create an SRA object.
         
         Attributes
         -----------
@@ -150,6 +155,7 @@ class SRA:
         
         Parameters
         ----------
+        
         kwargs: dict
             dict containing additional prefetch arguments
 
@@ -254,6 +260,7 @@ class SRA:
         
         Parameters
         ----------
+        
         delete_sra: bool
             delete sra file after completion
         verbose: bool
@@ -347,6 +354,7 @@ class SRA:
       
         Parameters
         ----------
+        
         qcObject: RNASeqQC object
             qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
             

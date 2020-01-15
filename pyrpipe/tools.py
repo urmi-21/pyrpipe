@@ -45,7 +45,7 @@ class Samtools(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to samtools. This will override the existing options 
 
         :return: Returns the path to the bam file. Returns empty string if operation failed.
         :rtype: string
@@ -98,7 +98,7 @@ class Samtools(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to samtools. This will override the existing options 
 
         :return: Returns path to the sorted bam file. Returns empty string if operation failed.
         :rtype: string
@@ -136,6 +136,7 @@ class Samtools(RNASeqTools):
     
     def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -145,7 +146,7 @@ class Samtools(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to samtools. This will override the existing options 
 
         :return: Returns path to the sorted bam file. Returns empty string if operation failed.
         :rtype: string
@@ -170,6 +171,7 @@ class Samtools(RNASeqTools):
         
         Parameters
         ----------
+        
         out_file: string
             Output file name to save the results. .bam will be added at the end.
         args:tuple
@@ -185,7 +187,7 @@ class Samtools(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to samtools. This will override the existing options 
 
         :return: Returns the path to the merged bam file.
         :rtype: string
@@ -232,6 +234,7 @@ class Samtools(RNASeqTools):
         
         Parameters
         ----------
+        
         sub_command: string
             sub_command to pass to samtools e.g. sort, merge etc
         arg1: dict
@@ -245,7 +248,7 @@ class Samtools(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to samtools. This will override the existing options 
 
         :return: Returns the status of samtools. True is passed, False if failed.
         :rtype: bool
@@ -293,6 +296,7 @@ class Portcullis(RNASeqTools):
         
         Parameters
         ----------
+        
         reference_fasta: string
             Path to the reference fasta file
         bam_file: string
@@ -309,7 +313,7 @@ class Portcullis(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
+            Options to pass to portcullis. This will override the existing options 
         
         """
         
@@ -348,6 +352,7 @@ class Portcullis(RNASeqTools):
         
         Parameters
         ----------
+        
         sub_command: string
             sub_command to pass to portcullis e.g. full, prep, junc etc.
         verbose: bool
@@ -359,7 +364,7 @@ class Portcullis(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            arguments to pass to portcullis. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
 
         :return: Returns the status of portcullis. True is passed, False if failed.
         :rtype: bool
@@ -436,6 +441,7 @@ class Mikado(RNASeqTools):
     def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,out_dir=os.getcwd(),verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado configure
         Make sure the paths in list file are global.
+        
         Parameters
         ----------
 
