@@ -32,10 +32,11 @@ class Stringtie(Assembly):
         
         Parameters
         ----------
+        
         reference_gtf: string
             Path to the reference gtf file. If a valid gtf file is provided the option -G will be set to the gtf file. This can't
             be overriden later when calling functions of this class.
-        arg2: dict
+        kwargs: dict
             Options passed to stringtie. Some of these could be overridden later when calling functions of this class.
             Format to pass the arguments:
         """
@@ -118,14 +119,14 @@ class Stringtie(Assembly):
         
     def stringtie_merge(self,*args,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
+        
         Parameters
         ----------
+        
         args: tuple
             path to gtf files to merge
         out_suffix: string
             Suffix for output gtf file name
-        arg2: tuple
-            input Gtf files
         overwrite: bool
             Overwrite if output file already exists.
         verbose: bool
@@ -182,6 +183,7 @@ class Stringtie(Assembly):
         
         Parameters
         ----------
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -217,6 +219,9 @@ class Stringtie(Assembly):
     
 class Cufflinks(Assembly):
     """This class represents cufflinks
+    
+    kwargs: dict
+        Parameters passed to cufflinks
     """
     def __init__(self,reference_gtf="",**kwargs):
         
@@ -322,6 +327,7 @@ class Cufflinks(Assembly):
         
         Parameters
         ----------
+        
         command: string
             the command name
         verbose: bool
@@ -332,6 +338,8 @@ class Cufflinks(Assembly):
             Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession.
+        kwargs: dict
+            Options passed to command
         
         :return: Returns the status of the command.
         :rtype: bool
@@ -361,6 +369,7 @@ class Cufflinks(Assembly):
         
         Parameters
         ----------
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -395,6 +404,9 @@ class Cufflinks(Assembly):
     
 class Trinity(Assembly):
     """This class represents Trinity RNA-Seq assembler
+    
+    kwargs: dict
+        parametrs passed to Trinity
     """
     def __init__(self,**kwargs):
         
@@ -426,6 +438,7 @@ class Trinity(Assembly):
                 
         Parameters
         ----------
+        
         sra_object: SRA
             object of SRA class
         bam_file: string
@@ -448,7 +461,7 @@ class Trinity(Assembly):
             Provide an id to attach with this command e.g. the SRR accession.
         
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            Options to pass to Trinity. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
 
         :return: Return the path to output GTF file
         :rtype: string
@@ -496,6 +509,7 @@ class Trinity(Assembly):
         
         Parameters
         ----------
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
