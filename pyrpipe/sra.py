@@ -17,11 +17,13 @@ class SRA:
     """This class represents an SRA object
         Parameters
         ----------
-        srr_accession(string): A valid SRR accession
-        location (String): Path where all data related to this object (e.g. .sra files, metadata, fastq files) will be stored. 
-                Default value of the path will be "./<SRR_accession>". <SRR_accession> is added at the end of the path
-                so that final location is location/<SRR_accession>.
-                For consistency, location and SRR Accession id are not allowed to be modified.
+        srr_accession: string
+            A valid SRR accession
+        location: String
+            Path where all data related to this object (e.g. .sra files, metadata, fastq files) will be stored.
+            Default value of the path will be "./<SRR_accession>". <SRR_accession> is added at the end of the path
+            so that final location is location/<SRR_accession>.
+            For consistency, location and SRR Accession id are not allowed to be modified.
         
         Attributes
         -----------
@@ -148,12 +150,11 @@ class SRA:
         
         Parameters
         ----------
-        kwargs(dict): dict containing additional prefetch arguments
-        
-        Returns
-        -------
-        bool
-            Return status of the prefetch command. True if successful download and False if failed.
+        kwargs: dict
+            dict containing additional prefetch arguments
+
+        :return: Return status of the prefetch command. True if successful download and False if failed.
+        :rtype: bool
 
         Examples
         --------
@@ -253,16 +254,19 @@ class SRA:
         
         Parameters
         ----------
-        delete_sra (bool): delete sra file after completion
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        kwargs (dict): A dict containing fasterq-dump arguments
+        delete_sra: bool
+            delete sra file after completion
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        kwargs: dict
+            A dict containing fasterq-dump arguments
         
-        Returns
-        -------
-        bool
-            Return status of the fasterq-dump command. True if successful download and False if failed.
+        :return: Return status of the fasterq-dump command. True if successful download and False if failed.
+        :rtype: bool
 
         Examples
         --------
@@ -343,15 +347,14 @@ class SRA:
       
         Parameters
         ----------
-        qcObject (RNASeqQC object):
+        qcObject: RNASeqQC object
             qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
             
-        deleteRawFastq (bool): Delete the raw fastq files after QC
-        
-        Returns
-        -------
-        bool
-            Return status of the QC. True if successful download and False if failed.
+        deleteRawFastq: bool
+            Delete the raw fastq files after QC
+
+        :return: Return status of the QC. True if successful download and False if failed.
+        :rtype: bool
 
         Examples
         --------

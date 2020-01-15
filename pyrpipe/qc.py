@@ -57,20 +57,23 @@ class Trimgalore(RNASeqQC):
         
         Parameters
         ----------
-        sra_object (SRA):  An SRA object whose fastq files will be used
+        sra_object: SRA
+            An SRA object whose fastq files will be used
         out_suffix: string
             Suffix for the output sam file
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-        Returns
-        -------
-        tuple
-            Returns the path of fastq files after QC. tuple has one item for single end files and two for paired.
-            
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+            :return: Returns the path of fastq files after QC. tuple has one item for single end files and two for paired.
+            :rtype: tuple
         """
         
         if not out_dir:
@@ -135,12 +138,16 @@ class Trimgalore(RNASeqQC):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
-        kwargs (dict):
+        kwargs: dict
             Options to pass to trimgalore (will override existing parameters)
         """
         
@@ -309,17 +316,20 @@ class BBmap(RNASeqQC):
             Suffix for output file name
         arg4: bool
             overwrite existing files
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
         arg5: dict
             options passed to bbsplit
-            
-        Returns
-        tuple
-            Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+
+            :return: Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
+            :rtype: tuple
         """
         
         #check index

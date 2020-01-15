@@ -32,7 +32,9 @@ def print_boldred(text):
     """Print in bold red font
     Parameters
     ----------
-    text(str): text to print
+    text: str
+        text to print
+        
     Returns
     --------
     None
@@ -43,7 +45,9 @@ def print_green(text):
     """Print in green font
     Parameters
     ----------
-    text(str): text to print
+    text: str
+        text to print
+        
     Returns
     --------
     None
@@ -54,7 +58,9 @@ def print_blue(text):
     """Print in blue font
     Parameters
     ----------
-    text(str): text to print
+    text: str
+        text to print
+        
     Returns
     --------
     None
@@ -76,7 +82,9 @@ def print_info(text):
     """Print an info message
     Parameters
     ----------
-    text(str): text to print
+    text: str
+        text to print
+
     Returns
     --------
     None
@@ -87,7 +95,9 @@ def print_yellow(text):
     """Print in yellow font
     Parameters
     ----------
-    text(str): text to print
+    text: str
+        text to print
+        
     Returns
     --------
     None
@@ -100,10 +110,11 @@ def get_time_stamp(shorten=False):
     """Function to return current timestamp.
     Parameters
     ----------
-    shorten(bool): return short version without space, dash and colons
-    Returns
-    string: timestamp as string
-    --------
+    shorten: bool
+        return short version without space, dash and colons
+
+    :return: timestamp as string
+    :rtype: string
     """
     
     timestamp=str(dt.datetime.now()).split(".")[0].replace(" ","-")
@@ -130,11 +141,11 @@ def check_paths_exist(*args):
     
     Parametrs
     ---------
-    args(tuple): a list of paths to check
-    
-    Returns
-    -------
-    bool: return true only if all paths exist
+    args: tuple
+        a list of paths to check
+
+    :return: return true only if all paths exist
+    :rtype: bool
     """
     fail_flag=False
     for path in args:
@@ -150,11 +161,11 @@ def check_files_exist(*args):
     
     Parametrs
     ---------
-    args(tuple): a list of paths to check
-    
-    Returns
-    -------
-    bool: return true only if all files exist
+    args: tuple
+        a list of paths to check
+
+    :return: return true only if all files exist
+    :rtype: bool
     """
     fail_flag=False
     for path in args:
@@ -170,11 +181,11 @@ def check_hisatindex(index):
     """Function to check if hisat2 index is valid and exists.
     Parameters
     ----------
-    index(str): Path to the index 
-    
-    Returns
-    -------
-    bool: Return true if index is valid
+    index: str
+        Path to the index 
+
+    :return: Return true if index is valid
+    :rtype: bool
     """
     return check_files_exist(index+".1.ht2")
 
@@ -182,11 +193,11 @@ def check_salmonindex(index):
     """Function to check if salmon index is valid and exists.
     Parameters
     ----------
-    index(str): Path to the index 
-    
-    Returns
-    -------
-    bool: Return true if index is valid
+    index: str
+        Path to the index 
+
+    :return: Return true if index is valid
+    :rtype: bool
     """
     if not check_paths_exist(index):
         return False
@@ -196,11 +207,11 @@ def check_starindex(index):
     """Function to check if star index is valid and exists.
     Parameters
     ----------
-    index(str): Path to the index 
-    
-    Returns
-    -------
-    bool: Return true if index is valid
+    index: str
+        Path to the index 
+
+    :return: Return true if index is valid
+    :rtype: bool
     """
     if check_paths_exist(index):
         files_to_check=['chrLength.txt',
@@ -220,11 +231,11 @@ def check_bowtie2index(index):
     """Function to check if bowtie2 index is valid and exists.
     Parameters
     ----------
-    index(str): Path to the index 
-    
-    Returns
-    -------
-    bool: Return true if index is valid
+    index: str
+        Path to the index 
+
+    :return: Return true if index is valid
+    :rtype: bool
     """
     return check_files_exist(index+".1.bt2")
     
@@ -233,11 +244,11 @@ def byte_to_readable(size_bytes):
     """Function to convert bytes to human readable format (MB,GB ...)
     Parameters
     ----------
-    size_bytes(float): size in bytes
-    
-    Returns
-    -------
-    str: Return size in human readable format
+    size_bytes: float
+        size in bytes
+
+    :return: Return size in human readable format
+    :rtype: str
     """
     
     for x in ['bytes', 'KB', 'MB', 'GB', 'TB']:
@@ -250,10 +261,11 @@ def get_file_size(file_path):
     """Returns file size in human readable format
     Parameters
     ----------
-    file_path(str): Path to file
-    Returns
-    -------
-    string: Return size in human readable format
+    file_path: str
+        Path to file
+
+    :return: Return size in human readable format
+    :rtype: string
     """
     
     if (check_files_exist(file_path)):
@@ -267,12 +279,14 @@ def parse_java_args(valid_args_list,passed_args):
     Function creates arguments to pass to java programs
     Parameters
     ----------
-    valid_args_list (list): list of valid arguments. Invalid arguments will be ignored
-    passed_args (*dict): keyword value argument list to be parsed
-        
-    Returns
-    -------
-    list: a list with command line arguments to be used with subprocess.popen
+    valid_args_list: list
+        list of valid arguments. Invalid arguments will be ignored
+    passed_args: *dict
+        keyword value argument list to be parsed
+
+    :return: a list with command line arguments to be used with subprocess.popen
+    :rtype: list
+    
     Examples
     --------
     >>> parse_java_args(['A','B','-C'], {"A": "3", "B": "22","-C":""})
@@ -311,12 +325,14 @@ def parse_unix_args(valid_args_list,passed_args):
     """Function creates command line arguments to pass to unix programs
     Parameters
     ----------
-    valid_args_list (list): list of valid arguments. Invalid arguments will be ignored
-    passed_args (*dict): keyword value argument list to be parsed
+    valid_args_list: list
+        list of valid arguments. Invalid arguments will be ignored
+    passed_args: *dict
+        keyword value argument list to be parsed
         
-    Returns
-    -------
-    list: a list with command line arguments to be used with subprocess.popen
+    :return: a list with command line arguments to be used with subprocess.popen
+    :rtype: list
+    
     Examples
     --------
     >>> parse_unix_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")})
@@ -368,10 +384,11 @@ def get_file_directory(file_path):
     """Returns directory of a file
     Parameters
     ----------
-    file_path(str): Path to file
-    Returns
-    -------
-    string: directory os file_path
+    file_path: str
+        Path to file
+
+    :return: directory os file_path
+    :rtype: string
     """
     return os.path.split(file_path)[0]
 
@@ -379,10 +396,11 @@ def get_filename(file_path):
     """Returns filename with extension
     Parameters
     ----------
-    file_path(str): Path to file
-    Returns
-    -------
-    string: filename
+    file_path: str
+        Path to file
+
+    :return: filename
+    :rtyep: string
     """
     return os.path.split(file_path)[1]
 
@@ -390,10 +408,11 @@ def get_fileext(file_path):
     """Returns file extension
     Parameters
     ----------
-    file_path(str): Path to file
-    Returns
-    -------
-    string: file extension
+    file_path: str
+        Path to file
+
+    :return: file extension
+    :rtype: string
     """
     return os.path.splitext(file_path)[1]
 
@@ -401,10 +420,11 @@ def get_file_basename(file_path):
     """Returns file basename without extension
     Parameters
     ----------
-    file_path(str): Path to file
-    Returns
-    -------
-    string: file basename without extension
+    file_path: str
+        Path to file
+
+    :return: file basename without extension
+    :rtype: string
     """
     return os.path.splitext(get_filename(file_path))[0]
     
@@ -413,8 +433,9 @@ def get_file_basename(file_path):
 
 def mkdir(dir_path):
     """Create a directory
-    Returns
-    bool: true is directory created
+
+    :return: true is directory created
+    :rtype: bool
     """
     #print("creating Dir:"+dir_path)
     try:

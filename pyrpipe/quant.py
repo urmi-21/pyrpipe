@@ -72,14 +72,20 @@ class Kallisto(Quant):
             
     def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to  build kallisto index
-        index_path (str): path to the output directory
-        index_name (str): index name
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        index_path: str
+            path to the output directory
+        index_name: str
+            index name
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         """
         
         #check input
@@ -114,18 +120,25 @@ class Kallisto(Quant):
     def perform_quant(self,sra_object,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run kallisto quant
-        sra_object (SRA): SRA object contatining paths to fastq files
-        index_path (str): path to the output directory
-        index_name (str): index name
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options
-        Returns
-        -------
-        string
-            Path to kallisto out directory
+        sra_object: SRA
+            SRA object contatining paths to fastq files
+        index_path: str
+            path to the output directory
+        index_name: str
+            index name
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options
+
+        :return: Path to kallisto out directory
+        :rtype: string
         """
         
         if not out_dir:
@@ -159,18 +172,21 @@ class Kallisto(Quant):
         """Wrapper for running kallisto.
         Parameters
         ----------
-        subcommand (str): subcommand for kallisto
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options
-        
-            
-        Returns
-        -------
-        bool:
-                Returns the status of kallisto. True is passed, False if failed.
+        subcommand: str
+            subcommand for kallisto
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options
+
+        :return: Returns the status of kallisto. True is passed, False if failed.
+        :rtype: bool
         """
         
         #check for a valid index
@@ -262,13 +278,20 @@ class Salmon(Quant):
         """
         build salmon index
         
-        index_path (str): path to the output directory
-        index_name (str): index name
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options
+        index_path: str
+            path to the output directory
+        index_name: str
+            index name
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options
         """
         
         #check input
@@ -305,15 +328,19 @@ class Salmon(Quant):
         """
         run salmon quant
         
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options
-        Returns
-        -------
-        string
-            Path to salmon out directory
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options
+
+        :return: Path to salmon out directory
+        :rtype: string
         """
         
         if not out_dir:
@@ -348,18 +375,21 @@ class Salmon(Quant):
         
         Parameters
         ----------
-        subcommand (str): subcommand for salmon
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to kallisto. This will override the existing options
-        
-            
-        Returns
-        -------
-        bool:
-                Returns the status of salmon. True is passed, False if failed.
+        subcommand: str
+            subcommand for salmon
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to kallisto. This will override the existing options
+
+        :return: Returns the status of salmon. True is passed, False if failed.
+        :rtype: bool
         """
         
         #check for a valid index

@@ -188,12 +188,16 @@ class Hisat2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output sam file
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to hisat2. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to hisat2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         """
         
         
@@ -237,18 +241,20 @@ class Hisat2(Aligner):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
-        arg1: dict
+        arg: dict
             arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
-            
-        Returns
-        -------
-        bool:
-                Returns the status of hisat2. True is passed, False if failed.
+
+        :return: Returns the status of hisat2. True is passed, False if failed.
+        :rtype: bool
         """
         
         #check for a valid index
@@ -286,9 +292,9 @@ class Star(Aligner):
     """This class represents STAR program.
        Parameters
        ----------
-       star_index string
+       star_index: string
             path to a star index. This index will be used when star is invoked using this object.
-       **kwargs dict
+       **kwargs: dict
             parameters passed to the star program. These parameters could be overridden later when running star.
     Attributes
     ----------
@@ -342,18 +348,20 @@ class Star(Aligner):
         
         args: tuple
             Path to reference input files
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
         kwargs: dict
             Parameters for the star command
-        
-        Returns
-        -------
-        bool:
-            Returns status of star command
+
+        :return: Returns status of star command
+        :rtype: bool
         """
         if len(args)<1:
             pu.print_boldred("Please provide input fasta file to build STAR index")
@@ -401,20 +409,23 @@ class Star(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output file
-        out_dir (str):outout directory default: sra_object.location
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        out_dir: str
+            outout directory default: sra_object.location
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg3: dict
             Options to pass to hisat2.
-            
-        Returns
-        -------
-        string:
-            path to the output dir
+
+        :return: Return the path to the output dir
+        :rtype: string
         """
         
         if not out_dir:
@@ -455,19 +466,21 @@ class Star(Aligner):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg1: dict
             arguments to pass to star. This will override parametrs already existing in the self.passedArgumentList list but NOT replace all of them.
             
-        Returns
-        -------
-        bool:
-                Returns the status of star. True is passed, False if failed.
+        :return: Returns the status of star. True is passed, False if failed.
+        :rtype: bool
         """
         
         #check for a valid index
@@ -504,9 +517,9 @@ class Bowtie2(Aligner):
     """This class represents bowtie2 program.
        Parameters
        ----------
-       bowtie2_index string
+       bowtie2_index: string
             path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
-       **kwargs dict
+       **kwargs: dict
             parameters passed to the bowtie2 program. These parameters could be overridden later when running bowtie2.
        Attributes
        ----------
@@ -557,20 +570,22 @@ class Bowtie2(Aligner):
             A name for the index
         arg3: tuple
             Path to reference input files
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
         arg4: dict
             Parameters for the hisat2-build command
-        
-        Returns
-        -------
-        bool:
-            Returns the status of hisat2-build
+ 
+        :return: Returns the status of hisat2-build
+        :rtype: bool
         """
         
         #check input references
@@ -638,12 +653,16 @@ class Bowtie2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         arg2: string
             Suffix for the output sam file
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         arg3: dict
             Options to pass to bowtie.
         """
@@ -691,18 +710,21 @@ class Bowtie2(Aligner):
         """Wrapper for running bowtie2.
         
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        kwargs (dict): arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        kwargs: dict
+            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             
-        Returns
-        -------
-        bool:
-                Returns the status of bowtie2. True is passed, False if failed.
+        :return: Returns the status of bowtie2. True is passed, False if failed.
+        :rtype: bool
         """
         
         #check for a valid index

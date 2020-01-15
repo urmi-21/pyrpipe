@@ -20,9 +20,12 @@ class Benchmark:
     """Class to generate benchmark reports from pyrpipe logs.
     Parameters
     ----------
-    log_file (string): path to the log file
-    env_log (string): path to the ENV log file
-    out_dir (string): path to the output directory
+    log_file: string
+        path to the log file
+    env_log: string
+        path to the ENV log file
+    out_dir: string
+        path to the output directory
         
         
     """

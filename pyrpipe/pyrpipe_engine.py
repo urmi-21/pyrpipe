@@ -103,9 +103,12 @@ class PyrpipeLogger():
         """Creates a logger
         Parameters
         ----------
-        name(str): name of logger
-        logfile(str): file name to save logs
-        formatter(formatter object): formatter for log
+        name: str
+            name of logger
+        logfile: str
+            file name to save logs
+        formatter: formatter object
+            formatter for log
         
         Returns
         -------
@@ -181,12 +184,13 @@ def getShellOutput(cmd,verbose=False):
     
     Parameters
     ----------
-    cdm(list): command to run
-    verbose(bool): to print messages
+    cdm: list
+        command to run
+    verbose: bool
+        to print messages
     
-    Returns
-    -------
-    tuple: (returncode, stdout and stderr)
+    :return: returncode, stdout and stderr
+    :rtype: tuple
     """
     #not logging these commands
     log_message=" ".join(cmd)
@@ -204,10 +208,11 @@ def getReturnStatus(cmd):
     run a shell command and get the return status
     Parameters
     ----------
-    cmd(list): shell command in list
-    Returns
-    -------
-    bool: True is returncode is 0
+    cmd: list
+        shell command in list
+
+    :return: True is returncode is 0
+    :rtype: bool
     """
     #not logging these commands
     status=getShellOutput(cmd)
@@ -240,16 +245,21 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
     
     Parameters
     ----------
-    cmd(list): command to execute via popen in a list
-    verbose(bool): Whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
-    quiet (bool):  Absolutely no output on screen
-    logs( bool):   Log the execution 
-    objectid(string): An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
-    command_name (string):  Name of command to be save in log. If empty it is determined as the first element of the cmd list.
-        
-    Returns
-    -------
-    bool: Return status.True is returncode is 0
+    cmd: list
+        command to execute via popen in a list
+    verbose: bool
+        Whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
+    quiet: bool
+        Absolutely no output on screen
+    logs: bool
+        Log the execution 
+    objectid: string
+        An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
+    command_name: string
+        Name of command to be save in log. If empty it is determined as the first element of the cmd list.
+
+    :return: Return status.True is returncode is 0
+    :rtype: bool
     """
     if not command_name:
         command_name=cmd[0]
@@ -421,12 +431,11 @@ def check_dependencies(dependencies):
     
     Parameters
     ----------
-    dependencies (list):
+    dependencies: list
         list of programs to test
-        
-    Returns
-    -------
-        bool True is all dependencies are satified, False otherwise.
+
+    :return: True is all dependencies are satified, False otherwise.
+    :rtype: bool
     """
     errorFlag=False
     for s in dependencies:
@@ -484,12 +493,15 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
     Use global paths for safety
     Parameters
     ----------
-    search_path(str): path to search under
-    search_pattern(str): pattern to search e.g. "*.bam"
-    recursive (bool): search all subdirs if true
-    Returns
-    -------
-    list: list containing the found paths
+    search_path: str
+        path to search under
+    search_pattern: str
+        pattern to search e.g. "*.bam"
+    recursive: bool
+        search all subdirs if true
+
+    :return: list containing the found paths
+    :rtype: list
     """
     
     if recursive:
