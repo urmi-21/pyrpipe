@@ -36,14 +36,19 @@ class Aligner:
 
 class Hisat2(Aligner):
     """This class represents hisat2 program.
+    
        Parameters
        ----------
-       hisat2_index string
+       
+       hisat2_index: string
             path to q histat2 index. This index will be used when hisat is invoked using this object.
-       **kwargs dict
+            
+       **kwargs: dict
             parameters passed to the hisat2 program. These parameters could be overridden later when running hisat.
+            
     Attributes
     ----------
+    
     """ 
     def __init__(self,hisat2_index="",**kwargs):
         
