@@ -39,8 +39,9 @@ class Hisat2(Aligner):
     
        Parameters
        ----------       
+       
        hisat2_index: string
-            path to q histat2 index. This index will be used when hisat is invoked using this object.
+            path to the histat2 index. This index is stored with the object and will be used when hisat is invoked using this object.
             
        **kwargs: dict
             parameters passed to the hisat2 program. These parameters could be overridden later when running hisat.
@@ -184,6 +185,7 @@ class Hisat2(Aligner):
         
         Parameters
         ----------
+        
         sra_object SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
@@ -236,11 +238,10 @@ class Hisat2(Aligner):
         
     def run_hisat2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running hisat2.
-        Run HISAT2 using and SRA object and produce .bam file as result. The HISAT2 index used will be self.hisat2_index.
-        All output will be written to SRA.location by default.
         
         Parameters
         ----------
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -250,7 +251,7 @@ class Hisat2(Aligner):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
-        arg: dict
+        kwargs: dict
             arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
 
         :return: Returns the status of hisat2. True is passed, False if failed.
@@ -290,12 +291,15 @@ class Hisat2(Aligner):
 
 class Star(Aligner):
     """This class represents STAR program.
+    
        Parameters
        ----------
+       
        star_index: string
             path to a star index. This index will be used when star is invoked using this object.
-       **kwargs: dict
+       kwargs: dict
             parameters passed to the star program. These parameters could be overridden later when running star.
+            
     Attributes
     ----------
     """ 
@@ -341,8 +345,10 @@ class Star(Aligner):
     
     def build_index(self,index_path,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a star index with given parameters and saves the new index to self.star_index.
+        
         Parameters
         ----------
+        
         index_path: string
             Path where the index will be created
         
@@ -400,11 +406,12 @@ class Star(Aligner):
  
             
     def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to perform alignment using star and the provided sra_object.
+        """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
         Parameters
         ----------
+        
         sra_object: SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
@@ -420,9 +427,8 @@ class Star(Aligner):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        arg3: dict
-            Options to pass to hisat2.
+            Options to pass to STAR. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        
 
         :return: Return the path to the output dir
         :rtype: string
@@ -466,6 +472,7 @@ class Star(Aligner):
         
         Parameters
         ----------
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -476,7 +483,7 @@ class Star(Aligner):
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
             Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        arg1: dict
+        kwargs: dict
             arguments to pass to star. This will override parametrs already existing in the self.passedArgumentList list but NOT replace all of them.
             
         :return: Returns the status of star. True is passed, False if failed.
@@ -515,12 +522,15 @@ class Star(Aligner):
 
 class Bowtie2(Aligner):
     """This class represents bowtie2 program.
+    
        Parameters
        ----------
+       
        bowtie2_index: string
             path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
        **kwargs: dict
             parameters passed to the bowtie2 program. These parameters could be overridden later when running bowtie2.
+            
        Attributes
        ----------
     """ 
@@ -562,8 +572,10 @@ class Bowtie2(Aligner):
         
     def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a bowtie2 index with given parameters and saves the new index to self.bowtie2_index.
+        
         Parameters
         ----------
+        
         index_path: string
             Path where the index will be created
         index_name: string
@@ -579,12 +591,11 @@ class Bowtie2(Aligner):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+            Options to pass to bowtie2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
-        arg4: dict
-            Parameters for the hisat2-build command
+        
  
-        :return: Returns the status of hisat2-build
+        :return: Returns the status of bowtie-build
         :rtype: bool
         """
         
@@ -649,9 +660,10 @@ class Bowtie2(Aligner):
         
         Parameters
         ----------
-        arg1: SRA object
+        
+        sra_object: SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
-        arg2: string
+        out_suffix: string
             Suffix for the output sam file
         verbose: bool
             Print stdout and std error
@@ -662,9 +674,10 @@ class Bowtie2(Aligner):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        arg3: dict
-            Options to pass to bowtie.
+            Options to pass to bowtie2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        
+        :return: Returns the output sam file path
+        :rtype: string
         """
         if not out_dir:
             out_dir=sra_object.location
@@ -709,7 +722,8 @@ class Bowtie2(Aligner):
     def run_bowtie2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running bowtie2.
         
-        ----------
+        
+        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -718,8 +732,7 @@ class Bowtie2(Aligner):
             Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        
         kwargs: dict
             arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
             

@@ -18,8 +18,10 @@ import os
 
 class Benchmark:
     """Class to generate benchmark reports from pyrpipe logs.
+    
     Parameters
     ----------
+    
     log_file: string
         path to the log file
     env_log: string
@@ -55,9 +57,9 @@ class Benchmark:
     def parse_runtime(self,timestring):
         """
         Parse runtime as string and return seconds.
-        Returns
-        -------
-        float
+        
+        Returns: float
+            runtime in sec
         """
         try:
             runtime= dt.datetime.strptime(timestring,"%H:%M:%S")
@@ -329,18 +331,5 @@ class Benchmark:
         
             
             
-if __name__ == "__main__":
-    print("testing")
-    l="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipe.log"
-    e="/home/usingh/work/urmi/hoap/test/bmtest/2019-12-19-13_17_11_pyrpipeENV.log"
-    ob=Benchmark(l,e,out_dir="/home/usingh/work/urmi/hoap/test/bmtest")
-    d=(ob.get_time_perobject())
-    ob.plot_time_perobject()
-
-    d2=ob.get_time_perprogram()
-    ob.plot_time_perprogram()
-
-
-
 
 
