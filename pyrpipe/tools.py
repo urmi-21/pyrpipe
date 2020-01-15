@@ -34,17 +34,21 @@ class Samtools(RNASeqTools):
         
         out_suffix: string
             Suffix for the output sam file
-        delete_sam(bool): delete the sam file after conversion
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-        Returns
-        -------
-        string
-                Returns the path to the bam file. Returns empty string if operation failed.
+        delete_sam: bool
+            delete the sam file after conversion
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+        :return: Returns the path to the bam file. Returns empty string if operation failed.
+        :rtype: string
         """        
         if not out_dir:            
             out_dir=pu.get_file_directory(sam_file)
@@ -85,16 +89,19 @@ class Samtools(RNASeqTools):
     def sort_bam(self,bam_file,out_dir="",out_suffix="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-        Returns
-        -------
-        string
-                Returns path to the sorted bam file. Returns empty string if operation failed.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+        :return: Returns path to the sorted bam file. Returns empty string if operation failed.
+        :rtype: string
         
         """
         if not out_dir:
@@ -129,16 +136,19 @@ class Samtools(RNASeqTools):
     
     def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-        Returns
-        -------
-        string
-                Returns path to the sorted bam file. Returns empty string if operation failed.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+        :return: Returns path to the sorted bam file. Returns empty string if operation failed.
+        :rtype: string
         """
         
         sam2bam_file=self.sam_to_bam(sam_file,delete_sam=delete_sam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
@@ -166,17 +176,19 @@ class Samtools(RNASeqTools):
             Paths to bam files to combine
         out_dir: string
             Path where to save the merged bam file. Default path is the same as the first bam_file's
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-            
-        Returns
-        -------
-        string
-            Returns the path to the merged bam file.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+        :return: Returns the path to the merged bam file.
+        :rtype: string
         """
         
         if len(args) < 2:
@@ -224,16 +236,19 @@ class Samtools(RNASeqTools):
             sub_command to pass to samtools e.g. sort, merge etc
         arg1: dict
             arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
-        
-        Returns
-        -------
-        bool:
-                Returns the status of samtools. True is passed, False if failed.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
+
+        :return: Returns the status of samtools. True is passed, False if failed.
+        :rtype: bool
         """
             
         #override existing arguments
@@ -285,11 +300,16 @@ class Portcullis(RNASeqTools):
         out_dir: string
             Path to the out put dir. current directory is not given.
         
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to trimgalore. This will override the existing options 
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to trimgalore. This will override the existing options 
         
         """
         
@@ -328,16 +348,21 @@ class Portcullis(RNASeqTools):
         
         Parameters
         ----------
-         sub_command (string): sub_command to pass to portcullis e.g. full, prep, junc etc.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
-        Returns
-        -------
-        bool:
-                Returns the status of portcullis. True is passed, False if failed.
+        sub_command: string
+            sub_command to pass to portcullis e.g. full, prep, junc etc.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+
+        :return: Returns the status of portcullis. True is passed, False if failed.
+        :rtype: bool
         """
         
         
@@ -413,11 +438,9 @@ class Mikado(RNASeqTools):
         Make sure the paths in list file are global.
         Parameters
         ----------
-        
-        returns
-        -------
-        string
-            Path to the created configuration file
+
+        :return: Path to the created configuration file
+        :rtype: string
         """
         
         #check all file exists

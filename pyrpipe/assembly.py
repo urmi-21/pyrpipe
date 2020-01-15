@@ -63,19 +63,26 @@ class Stringtie(Assembly):
                 
         Parameters
         ----------
-        bam_file (string): path to the bam file
-        out_suffix (string): Suffix for the output gtf file
-        overwrite (bool): Overwrite if output file already exists.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        
+        bam_file: string
+            path to the bam file
+        out_suffix: string
+            Suffix for the output gtf file
+        overwrite: bool
+            Overwrite if output file already exists.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
-        Returns
-        -------
-        string: path to output GTF file
+        :return: Returns the path to output GTF file
+        :rtype: string
         """
         
         #create path to output file
@@ -113,21 +120,27 @@ class Stringtie(Assembly):
         """Function to run stringtie merge.
         Parameters
         ----------
-        args (tuple): path to gtf files to merge
-        out_suffix (string): Suffix for output gtf file name
+        args: tuple
+            path to gtf files to merge
+        out_suffix: string
+            Suffix for output gtf file name
         arg2: tuple
             input Gtf files
-        overwrite (bool): Overwrite if output file already exists.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
-        Returns
-        -------
-        string: path to the merged GTF file
+        overwrite: bool
+            Overwrite if output file already exists.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+
+        :return: Returns the path to the merged GTF file
+        :rtype: string
         """
         
         if len(args) < 1:
@@ -169,16 +182,19 @@ class Stringtie(Assembly):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs (dict): Options to pass to stringtie. This will override the existing options 
-                       in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
-        Returns
-        -------
-        bool: status of stringtie command.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+
+        :return: Returns the status of stringtie command.
+        :rtype: bool
         """
             
         #override existing arguments
@@ -252,18 +268,19 @@ class Cufflinks(Assembly):
             Suffix for the output gtf file
         overwrite: bool
             Overwrite if output file already exists.
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession.
         kwargs: dict
             Options to pass to cufflinks. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
-        Returns
-        -------
-        string
-            path to output GTF file
-        
+
+        :return: Returns the path to output GTF file
+        :rtype: string       
         """
         
         #create path to output file
@@ -307,16 +324,17 @@ class Cufflinks(Assembly):
         ----------
         command: string
             the command name
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession.
         
-        
-        Returns
-        -------
-        bool
-            return status of the command.
+        :return: Returns the status of the command.
+        :rtype: bool
         """
         validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
         if command in validCommands:
@@ -343,18 +361,19 @@ class Cufflinks(Assembly):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
-        
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession.
         kwargs: dict
             Options passed to cufflinks
         
-        Returns
-        -------
-        bool
-            status of cufflinks command.
+        :return: Returns the status of cufflinks command.
+        :rtype: bool
         """
             
         #override existing arguments
@@ -419,19 +438,20 @@ class Trinity(Assembly):
             specify the "--genome_guided_max_intron" argument
         overwrite: bool
             Overwrite if output file already exists
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession.
         
         kwargs: dict
             Options to pass to stringtie. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
-        Returns
-        -------
-        string
-            path to output GTF file
-        
+
+        :return: Return the path to output GTF file
+        :rtype: string
         """
         
         #add trinity to outdir
@@ -476,17 +496,19 @@ class Trinity(Assembly):
         
         Parameters
         ----------
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession.
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession.
         kwargs: dict
             Options passed to trinity
-        
-        Returns
-        -------
-        bool
-            status of trinity command.
+
+        :return: Return the status of trinity command.
+        :rtype: bool
         """
             
         #override existing arguments
