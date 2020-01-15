@@ -30,77 +30,78 @@ class Colors:
 
 def print_boldred(text):
     """Print in bold red font
+    
     Parameters
     ----------
+    
     text: str
         text to print
         
-    Returns
-    --------
-    None
+    Returns:   None
     """
     print (Colors.FAIL + Colors.BOLD+ text + Colors.ENDC)
 
 def print_green(text):
     """Print in green font
+    
     Parameters
     ----------
+    
     text: str
         text to print
         
-    Returns
-    --------
-    None
+    Returns:   None
     """
     print (Colors.OKGREEN + text + Colors.ENDC)
 
 def print_blue(text):
     """Print in blue font
+    
     Parameters
     ----------
+    
     text: str
         text to print
         
-    Returns
-    --------
-    None
+    Returns:   None
     """
     print (Colors.OKBLUE + text + Colors.ENDC) 
 
 def print_magenta(text):
     """Print in magenta font
+    
     Parameters
     ----------
+    
     text(str): text to print
-    Returns
-    --------
-    None
+    
+    Returns:   None
     """
     print (Colors.LightMagenta + text + Colors.ENDC) 
     
 def print_info(text):
     """Print an info message
+    
     Parameters
     ----------
+    
     text: str
         text to print
 
-    Returns
-    --------
-    None
+    Returns:   None
     """
     print_magenta(text)
     
 def print_yellow(text):
     """Print in yellow font
+    
     Parameters
     ----------
+    
     text: str
         text to print
         
-    Returns
-    --------
-    None
+    Returns:   None
     """
     print (Colors.LightYellow + text + Colors.ENDC) 
 
@@ -108,8 +109,10 @@ def print_yellow(text):
 
 def get_time_stamp(shorten=False):
     """Function to return current timestamp.
+    
     Parameters
     ----------
+    
     shorten: bool
         return short version without space, dash and colons
 
@@ -141,6 +144,7 @@ def check_paths_exist(*args):
     
     Parametrs
     ---------
+    
     args: tuple
         a list of paths to check
 
@@ -161,6 +165,7 @@ def check_files_exist(*args):
     
     Parametrs
     ---------
+    
     args: tuple
         a list of paths to check
 
@@ -179,8 +184,10 @@ def check_files_exist(*args):
 
 def check_hisatindex(index):
     """Function to check if hisat2 index is valid and exists.
+    
     Parameters
     ----------
+    
     index: str
         Path to the index 
 
@@ -191,8 +198,10 @@ def check_hisatindex(index):
 
 def check_salmonindex(index):
     """Function to check if salmon index is valid and exists.
+    
     Parameters
     ----------
+    
     index: str
         Path to the index 
 
@@ -205,8 +214,10 @@ def check_salmonindex(index):
 
 def check_starindex(index):
     """Function to check if star index is valid and exists.
+    
     Parameters
     ----------
+    
     index: str
         Path to the index 
 
@@ -229,8 +240,10 @@ def check_starindex(index):
 
 def check_bowtie2index(index):
     """Function to check if bowtie2 index is valid and exists.
+    
     Parameters
     ----------
+    
     index: str
         Path to the index 
 
@@ -242,8 +255,10 @@ def check_bowtie2index(index):
 
 def byte_to_readable(size_bytes):
     """Function to convert bytes to human readable format (MB,GB ...)
+    
     Parameters
     ----------
+    
     size_bytes: float
         size in bytes
 
@@ -259,8 +274,10 @@ def byte_to_readable(size_bytes):
 
 def get_file_size(file_path):
     """Returns file size in human readable format
+    
     Parameters
     ----------
+    
     file_path: str
         Path to file
 
@@ -277,8 +294,10 @@ def get_file_size(file_path):
 def parse_java_args(valid_args_list,passed_args):
     """
     Function creates arguments to pass to java programs
+    
     Parameters
     ----------
+    
     valid_args_list: list
         list of valid arguments. Invalid arguments will be ignored
     passed_args: *dict
@@ -323,8 +342,10 @@ def parse_java_args(valid_args_list,passed_args):
     
 def parse_unix_args(valid_args_list,passed_args):
     """Function creates command line arguments to pass to unix programs
+    
     Parameters
     ----------
+    
     valid_args_list: list
         list of valid arguments. Invalid arguments will be ignored
     passed_args: *dict
@@ -382,8 +403,10 @@ def parse_unix_args(valid_args_list,passed_args):
 
 def get_file_directory(file_path):
     """Returns directory of a file
+    
     Parameters
     ----------
+    
     file_path: str
         Path to file
 
@@ -394,8 +417,10 @@ def get_file_directory(file_path):
 
 def get_filename(file_path):
     """Returns filename with extension
+    
     Parameters
     ----------
+    
     file_path: str
         Path to file
 
@@ -406,8 +431,10 @@ def get_filename(file_path):
 
 def get_fileext(file_path):
     """Returns file extension
+    
     Parameters
     ----------
+    
     file_path: str
         Path to file
 
@@ -418,8 +445,10 @@ def get_fileext(file_path):
 
 def get_file_basename(file_path):
     """Returns file basename without extension
+    
     Parameters
     ----------
+    
     file_path: str
         Path to file
 
@@ -451,10 +480,7 @@ def get_union(*args):
     """
     return list(set().union(*args)) 
     
-def scan_SRA_dir(path):
-    pass
+#def scan_SRA_dir(path):
+#    pass
 
-if __name__ == "__main__":
-    print("main")
-    #print(parse_unix_style_args(['-O','-t','-q'], {"-O": "./test", "Attr2": "XX","--":("IN1","IN2")}))
-    print(parse_java_args(['A','B','-C'], {"A": "3", "B": "22","-C":"","--":("-Xmx2g","-da",)}))
+

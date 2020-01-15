@@ -61,6 +61,7 @@ class PyrpipeLogger():
     
     Attributes
     -----------
+    
     env_logger: logger to log the current environment
     cmd_logger: logger to log the execution status, stdout, stderr and runtimes for each command run using execute_command()
     """
@@ -101,8 +102,10 @@ class PyrpipeLogger():
     
     def create_logger(self,name,logfile,formatter,level=logging.DEBUG):
         """Creates a logger
+        
         Parameters
         ----------
+        
         name: str
             name of logger
         logfile: str
@@ -110,9 +113,8 @@ class PyrpipeLogger():
         formatter: formatter object
             formatter for log
         
-        Returns
-        -------
-        logger
+        Returns: logger
+            A logger object
         """
         #Get different loggers
         handler = logging.FileHandler(logfile)        
@@ -184,12 +186,13 @@ def getShellOutput(cmd,verbose=False):
     
     Parameters
     ----------
+    
     cdm: list
         command to run
     verbose: bool
         to print messages
     
-    :return: returncode, stdout and stderr
+    :return: (returncode, stdout and stderr)
     :rtype: tuple
     """
     #not logging these commands
@@ -206,8 +209,10 @@ def getShellOutput(cmd,verbose=False):
 def getReturnStatus(cmd):
     """
     run a shell command and get the return status
+    
     Parameters
     ----------
+    
     cmd: list
         shell command in list
 
@@ -245,6 +250,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
     
     Parameters
     ----------
+    
     cmd: list
         command to execute via popen in a list
     verbose: bool
@@ -380,10 +386,12 @@ def is_paired(sra_file):
     
     Parameters
     ----------
+    
     sra_file (string)  the path ro sra file
-    Returns
-    -------
-    bool: True is sra is paired
+    
+    
+    :return: True is sra is paired
+    :rtype: bool
     """
     if not pu.check_files_exist(sra_file):
         raise Exception("Error checking layout. {0} doesn't exist".format(sra_file));
@@ -431,6 +439,7 @@ def check_dependencies(dependencies):
     
     Parameters
     ----------
+    
     dependencies: list
         list of programs to test
 
@@ -491,8 +500,10 @@ def move_file(source,destination):
 def find_files(search_path,search_pattern,recursive=False,verbose=False):
     """Function to find files using find command and return as list
     Use global paths for safety
+    
     Parameters
     ----------
+    
     search_path: str
         path to search under
     search_pattern: str
@@ -520,10 +531,5 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
     return output
     
 
-
-if __name__ == "__main__": 
-    print ("Logger")
-    print(os.getcwd())
-    print(find_files("../","*.py"))
 
 

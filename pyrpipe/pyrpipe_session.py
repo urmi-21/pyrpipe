@@ -64,6 +64,9 @@ def save_session(filename,add_timestamp=True,out_dir=""):
 
 def restore_session(file):
     """Resore a session from file.
+    
+    :return: Returns True if session is restored
+    :rtype: bool
     """
     if not os.path.isfile(file):
         print(file+" doesn't exist")
