@@ -268,7 +268,8 @@ class Cufflinks(Assembly):
         ----------
         bam_file: string
             path to bam file
-        out_dir: output directory
+        out_dir: 
+            output directory
         out_suffix: string
             Suffix for the output gtf file
         overwrite: bool
