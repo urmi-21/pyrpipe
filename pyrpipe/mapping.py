@@ -38,8 +38,7 @@ class Hisat2(Aligner):
     """This class represents hisat2 program.
     
        Parameters
-       ----------
-       
+       ----------       
        hisat2_index: string
             path to q histat2 index. This index will be used when hisat is invoked using this object.
             
@@ -91,26 +90,38 @@ class Hisat2(Aligner):
             
     def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2_index.
+        
         Parameters
         ----------
+        
         index_path: string
             Path where the index will be created
+            
         index_name: string
             A name for the index
+            
         args: tuple
             Path to reference input files
-        verbose (bool): Print stdout and std error
-        quiet (bool): Print nothing
-        logs (bool): Log this command to pyrpipe logs
-        objectid (str): Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+            
+        verbose : bool
+            Print stdout and std error
+            
+        quiet : bool 
+            Print nothing
+            
+        logs : bool 
+            Log this command to pyrpipe logs
+            
+        objectid : string 
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
         kwargs: dict
             Parameters for the hisat2-build command
         
-        Returns
-        -------
-        bool:
-            Returns the status of hisat2-build
+        
+            
+        :return: Returns the status of hisat2-build
+        :rtype: bool
         """
         
         #check input references

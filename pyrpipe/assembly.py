@@ -19,7 +19,7 @@ class Assembly:
         """Function to perform assembly using a bam file as input. Inherited by all children.
         
                 
-        :param bam_file: the temperature value
+        :param bam_file: path to input BAM
         :type bam_file: string
         
         :return: path to output GTF or output directory depending on the specific assembly program.
