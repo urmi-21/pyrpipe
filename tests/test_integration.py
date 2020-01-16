@@ -17,8 +17,8 @@ testVars=testSpecs()
 fq1=testVars.fq1
 fq2=testVars.fq2
 rRNAfasta=testVars.rRNAfa
-#srr='SRR978411'
-srr='ERR3770564'
+srr='SRR978411' #arabidopsis paired end data
+#srr='ERR3770564'
 workingDir=testVars.testDir
     
 def test_pipeline1():
