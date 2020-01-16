@@ -369,6 +369,14 @@ class Star(Aligner):
         :return: Returns status of star command
         :rtype: bool
         """
+        
+        #if index already exists then exit
+        if pu.check_starindex(index_path):
+            pu.print_green("STAR index already exists")
+            return True
+            
+        
+        #check input files
         if len(args)<1:
             pu.print_boldred("Please provide input fasta file to build STAR index")
             return False
