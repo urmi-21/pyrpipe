@@ -373,7 +373,7 @@ class Star(Aligner):
             pu.print_boldred("Please provide input fasta file to build STAR index")
             return False
         
-        if not pu.check_files_exist(args):
+        if not pu.check_files_exist(*args):
             raise Exception("Please check input to star index")
             return False
         
