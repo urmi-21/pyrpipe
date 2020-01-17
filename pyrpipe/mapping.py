@@ -372,7 +372,9 @@ class Star(Aligner):
         
         #if index already exists then exit
         if pu.check_starindex(index_path):
-            pu.print_green("STAR index already exists")
+            pu.print_green("STAR index already exists. Using it...")
+            self.star_index=index_path
+            self.passedArgumentDict['--genomeDir']=self.star_index
             return True
             
         
