@@ -200,7 +200,7 @@ def getShellOutput(cmd,verbose=False):
     if verbose:
         pu.print_blue("$ "+log_message)
     try:
-        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
         stdout,stderr = result.communicate()
         return(result.returncode,stdout,stderr)
     except:
@@ -226,19 +226,15 @@ def getReturnStatus(cmd):
     return False
 
 #prints stdout in real time. optimal for huge stdout and no stderr
-#not used anymore
 def execute_commandRealtime(cmd):
     """Execute shell command and print stdout in realtime.
     """
-    
-    #start_time = time.time()
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     
     for stdout_line in iter(popen.stdout.readline, ""):
             yield stdout_line 
     popen.stdout.close()
     return_code = popen.wait()
-    #end_time = time.time()
     
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)

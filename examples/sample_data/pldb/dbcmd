@@ -1,0 +1,1 @@
+makeblastdb -in un.fasta -input_type fasta -dbtype prot -title mydb -out mydb
