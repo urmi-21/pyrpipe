@@ -168,6 +168,22 @@ class SRA:
         True
         """
         
+        
+        #store path to the downloaded sra file
+        self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
+        #check if already exists
+        if pu.check_files_exist(self.localSRAFilePath):
+            pu.print_green("File already exists:"+self.localSRAFilePath)
+            #save file .sra file size
+            self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
+            #test if file is paired or single end
+            if pe.is_paired(self.localSRAFilePath):
+                self.layout="PAIRED"
+            else:
+                self.layout="SINGLE"
+            return True
+            
+        
         pu.print_info("Downloading "+self.srr_accession+" ...")
         
         #scan for prefetch arguments
@@ -195,8 +211,7 @@ class SRA:
             pu.print_boldred("prefetch failed for:"+self.srr_accession)
             return False
         
-        #store path to the downloaded sra file
-        self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
+        
         #validate path exists
         if not pu.check_files_exist(self.localSRAFilePath):
             pu.print_boldred("Error downloading file. File "+self.localSRAFilePath+" does not exist!!!")
