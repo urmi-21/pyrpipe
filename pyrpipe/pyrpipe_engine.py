@@ -240,7 +240,7 @@ def execute_commandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 
-def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
+def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objectid="NA",command_name=""):
     """Function to execute commands using popen. 
     All commands executed by this function can be logged and saved to pyrpipe logs.
     
@@ -255,6 +255,8 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         Absolutely no output on screen
     logs: bool
         Log the execution 
+    dryrun: bool
+        If True, perform a dry run i.e. print commands to screen and log and exit
     objectid: string
         An id to be attached with the command. This is useful fo storing logs for SRA objects where object id is the SRR id.
     command_name: string
@@ -266,6 +268,24 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
     if not command_name:
         command_name=cmd[0]
     log_message=" ".join(cmd)
+    
+    #dryrun: print and exit
+    if dryrun:
+        pu.print_blue("$ "+log_message)
+        #log
+        #create a dict and dump as json
+        logDict={'cmd':log_message,
+                 'exitcode':"0",
+                 'runtime':"0",
+                 'starttime':"0",
+                 'stdout':"dryrun",
+                 'stderr':"",
+                 'objectid':objectid,
+                 'commandname':command_name
+                }
+        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        return True
+    
     if not quiet:
         pu.print_blue("$ "+log_message)
     time_start = time.time()
