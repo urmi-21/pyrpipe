@@ -277,13 +277,13 @@ class Benchmark:
         
         #clear plot
         plt.clf()
-        #make boxplots
+        #make boxplots for runtime distribution
         sns.set_color_codes('bright')
         sns.set_context('poster')
         box_data=self.get_programtime_boxdata()
         #convert data to floats for boxplot
         box_data['data']=box_data['data'].astype(float)
-        print(box_data)
+        #print(box_data)
         numprog=len(self.runtimes_by_prog.keys())
         #sns.set(style="ticks")
         # Initialize the figure with a logarithmic x axis
