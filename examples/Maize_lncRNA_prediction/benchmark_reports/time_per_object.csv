@@ -1,0 +1,3 @@
+id,fasterq-dump,gffread,STAR,plncpro predict,prefetch,stringtie,trim_galore,total
+SRR3098744,89,7,6817,815,406,1198,836,10168
+SRR3098746,75,9,6448,910,491,1209,782,9924

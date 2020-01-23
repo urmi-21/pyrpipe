@@ -1,0 +1,8 @@
+average,program,total
+82.0,fasterq-dump,164
+809.0,trim_galore,1618
+1203.5,stringtie,2407
+862.5,plncpro predict,1725
+8.0,gffread,16
+6632.5,STAR,13265
+448.5,prefetch,897

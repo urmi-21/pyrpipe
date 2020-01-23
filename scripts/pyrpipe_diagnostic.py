@@ -184,7 +184,9 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
                 failedCommands+=1
             
             #program name
-            programname=thisDict['cmd'].split(" ")[0]
+            programname=thisDict['commandname']
+            #if programname == "":
+            #    programname=thisDict['cmd'].split(" ")[0]
             #add program version info
             newDict={**thisDict,**progList[programname]}
             
@@ -362,10 +364,10 @@ def generateBashScript(logFile,outFile,filterList,coverage='a'):
 
 def checkEnvLog(logFile):
     #check all logs exist
-    logFileDir=pu.getFileDirectory(logFile)
-    basename=pu.getFileBaseName(logFile)
+    logFileDir=pu.get_file_directory(logFile)
+    basename=pu.get_file_basename(logFile)
     envLog=os.path.join(logFileDir,basename+"ENV.log")
-    if not pu.checkFilesExists(logFile,envLog):
+    if not pu.check_files_exist(logFile,envLog):
         print("Please check missing log files. Exiting.")
         sys.exit(1)
     return envLog
@@ -399,12 +401,12 @@ def generateBenchmarkReport(logFile,envLog,filterList,tempDir,outFile="",verbose
     ignores failed commands with exitcode !=0
     """
     
-    ob=bm.Benchmark(logFile,envLog,outDir=tempDir)
+    ob=bm.Benchmark(logFile,envLog,out_dir=tempDir)
     #generate benchmarks
     ob.plot_time_perobject()
     ob.plot_time_perprogram()
     
-    pu.printGreen("Benchmark report saved to:"+tempDir+"/benchmark_reports")
+    pu.print_green("Benchmark report saved to:"+tempDir+"/benchmark_reports")
 
 
 def report():
@@ -431,7 +433,7 @@ def report():
         print("Generating report")
     outFile=""
     if args.o is None:
-        outFile=pu.getFileBaseName(args.logfile)
+        outFile=pu.get_file_basename(args.logfile)
     else:
         outFile=args.o
     outFile+='.'+args.e
@@ -446,7 +448,7 @@ def report():
         elif args.e == 'md':
             writeHtmlToMarkdown(htmlReport,outFile)
     else:
-        pu.printBoldRed("unknown extension:"+args.e+". Exiting")
+        pu.print_boldred("unknown extension:"+args.e+". Exiting")
     
     
     
@@ -473,7 +475,7 @@ def shell():
         print("Generating report")
     outFile=""
     if args.o is None:
-        outFile=pu.getFileBaseName(logFile)
+        outFile=pu.get_file_basename(logFile)
     else:
         outFile=args.o
     outFile+='.sh'
@@ -510,7 +512,7 @@ def benchmark():
         print("Generating benchmarks")
     outFile=""
     if args.o is None:
-        outFile=pu.getFileBaseName(args.logfile)
+        outFile=pu.get_file_basename(args.logfile)
     else:
         outFile=args.o
     outFile+='.'+args.e
@@ -525,7 +527,7 @@ def benchmark():
     else:
         tempDir=os.path.join(os.getcwd(),"tmp")
     #create tmp dir
-    if not pu.checkPathsExists(tempDir):
+    if not pu.check_paths_exist(tempDir):
         pu.mkdir(tempDir)
         
     generateBenchmarkReport(logFile,envLog,filters,tempDir,outFile=outFile,verbose=args.v)
@@ -557,7 +559,7 @@ def multiqc():
         print("Generating benchmarks")
     outFile=""
     if args.o is None:
-        outFile=pu.getFileBaseName(args.logfile)
+        outFile=pu.get_file_basename(args.logfile)
     else:
         outFile=args.o
     outFile+='.html'
@@ -573,7 +575,7 @@ def multiqc():
     else:
         tempDir=os.path.join(os.getcwd(),"tmp")
     #create tmp dir
-    if not pu.checkPathsExists(tempDir):
+    if not pu.check_paths_exist(tempDir):
         pu.mkdir(tempDir) 
     
     #run multiqc
