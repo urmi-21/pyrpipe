@@ -36,9 +36,9 @@ install:
   - pip install Cython
   - pip install mikado
   #install sratoolkit
-  - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/current/sratoolkit.current-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
+  - wget wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.9.6-1/sratoolkit.2.9.6-1-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
   - tar -xvzf /tmp/sratools.tar.gz
-  - export PATH=$PATH:$PWD/sratoolkit.2.10.2-ubuntu64/bin/
+  - export PATH=$PATH:$PWD/sratoolkit.2.9.6-1-ubuntu64/bin/
   #install stringtie
   - wget http://ccb.jhu.edu/software/stringtie/dl/stringtie-2.0.6.Linux_x86_64.tar.gz -O /tmp/stie.tar.gz
   - tar -xvzf /tmp/stie.tar.gz
