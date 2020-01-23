@@ -42,6 +42,7 @@ setuptools.setup(
     long_description_content_type="text/markdown",
     url="https://github.com/urmi-21/pyrpipe",
     packages=setuptools.find_packages(),
+    include_package_data=True,
     scripts=['scripts/pyrpipe_diagnostic.py'],
     install_requires=[line.rstrip() for line in open("requirements.txt", "rt")],
     tests_require=["pytest"],
