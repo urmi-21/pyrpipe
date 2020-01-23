@@ -214,7 +214,7 @@ class Kallisto(Quant):
         #start ececution
         status=pe.execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))
         if not status:
-            pe.print_boldred("kallisto failed")
+            pu.print_boldred("kallisto failed")
         return status       
     
     def check_index(self):

@@ -17,8 +17,10 @@ testVars=testSpecs()
 fq1=testVars.fq1
 fq2=testVars.fq2
 rRNAfasta=testVars.rRNAfa
-srr='SRR978411' #arabidopsis paired end data
-#srr='ERR3770564'
+
+#srr='ERR3770564' #single end arabidopsis data
+#srr='SRR978414' #small a thal paired end data
+srr='SRR4113368'
 workingDir=testVars.testDir
     
 def test_pipeline1():
@@ -34,7 +36,7 @@ def test_pipeline1():
     st=sraOb.perform_qc(bbdOb)
     assert st==True,"bbduk failed"
     
-    tgOpts={"--cores": "10", "-o":testVars.testDir, "--paired":"", "--": (fq1,fq2)}
+    tgOpts={"--cores": "10", "-o":testVars.testDir}
     tg=qc.Trimgalore(**tgOpts)
     st=sraOb.perform_qc(tg)
     assert st==True,"tg failed"
@@ -66,7 +68,7 @@ def test_pipeline1():
     
     tr=assembly.Trinity()
     tr_out=tr.perform_assembly(sraOb,verbose=True)
-    assert pu.check_files_exist(tr_out)==True, "Failed stringtie"
+    assert pu.check_paths_exist(tr_out)==True, "Failed trinity"
 
     kl=quant.Kallisto(kallisto_index="")
     assert kl.check_index()==False, "Failed kallisto check_index"
