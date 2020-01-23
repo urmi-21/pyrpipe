@@ -40,16 +40,7 @@ def test_cufflinks():
     result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
     assert pu.check_files_exist(result)==True, "Failed stringtie"
     
-
-def test_trinityFQ():
-    tr=assembly.Trinity()
-    tr_opts={"--seqType":"fq","--left":testVars.fq1,
-            "--right":testVars.fq2,
-            "--output":testVars.testDir+"/trinity_testoutfq",
-            "--max_memory":"3G"}
-    st=tr.run_trinity(**tr_opts)
-    assert st==True, "Failed trinity with fq"
-
+    
 def test_trinityBam():
     tr=assembly.Trinity()
     bam=testVars.hisatSortedBam
@@ -60,3 +51,14 @@ def test_trinityBam():
             }
     st=tr.run_trinity(**tr_opts)
     assert st==True, "Failed trinity with bam"
+
+def test_trinityFQ():
+    tr=assembly.Trinity()
+    tr_opts={"--seqType":"fq","--left":testVars.fq1,
+            "--right":testVars.fq2,
+            "--output":testVars.testDir+"/trinity_testoutfq",
+            "--max_memory":"3G"}
+    st=tr.run_trinity(**tr_opts)
+    assert st==True, "Failed trinity with fq"
+
+
