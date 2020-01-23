@@ -1,0 +1,6 @@
+
+2020-01-22T23:28:38 prefetch.2.10.0: 1) Downloading 'SRR3098744'...
+2020-01-22T23:28:38 prefetch.2.10.0:  Downloading via https...
+2020-01-22T23:35:21 prefetch.2.10.0:  https download succeed
+2020-01-22T23:35:21 prefetch.2.10.0: 1) 'SRR3098744' was downloaded successfully
+2020-01-22T23:35:21 prefetch.2.10.0: 'SRR3098744' has 0 unresolved dependencies

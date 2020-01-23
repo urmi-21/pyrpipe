@@ -1,0 +1,427 @@
+Using an excessive number of cores has a diminishing return! It is recommended not to exceed 8 cores per trimming process (you asked for 10 cores). Please consider re-specifying
+Path to Cutadapt set as: 'cutadapt' (default)
+Cutadapt seems to be working fine (tested command 'cutadapt --version')
+Cutadapt version: 2.6
+Cutadapt seems to be using Python 3! Proceeding with multi-core enabled Cutadapt using 10 cores
+Parallel gzip (pigz) detected. Proceeding with multicore (de)compression using 10 cores
+
+No quality encoding type selected. Assuming that the data provided uses Sanger encoded Phred scores (default)
+
+Output will be written into the directory: /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/
+
+
+AUTO-DETECTING ADAPTER TYPE
+===========================
+Attempting to auto-detect adapter type from the first 1 million sequences of the first file (>> /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq <<)
+
+Found perfect matches for the following adapter sequences:
+Adapter type	Count	Sequence	Sequences analysed	Percentage
+Illumina	9450	AGATCGGAAGAGC	1000000	0.95
+smallRNA	1	TGGAATTCTCGG	1000000	0.00
+Nextera	0	CTGTCTCTTATA	1000000	0.00
+Using Illumina adapter for trimming (count: 9450). Second best hit was smallRNA (count: 1)
+
+Writing report to '/pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq_trimming_report.txt'
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq
+Trimming mode: paired-end
+Trim Galore version: 0.6.4_dev
+Cutadapt version: 2.6
+Python version: 3.6.3 :: Intel Corporation
+Number of cores used for trimming: 10
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+
+Cutadapt seems to be fairly up-to-date (version 2.6). Setting -j 10
+Writing final adapter and quality trimmed output to SRR3098744_1_trimmed.fq
+
+
+  >>> Now performing quality (cutoff '-q 20') and adapter trimming in a single pass for the adapter sequence: 'AGATCGGAAGAGC' from file /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq <<< 
+10000000 sequences processed
+20000000 sequences processed
+30000000 sequences processed
+40000000 sequences processed
+50000000 sequences processed
+60000000 sequences processed
+70000000 sequences processed
+80000000 sequences processed
+90000000 sequences processed
+This is cutadapt 2.6 with Python 3.6.3
+Command line parameters: -j 10 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq
+Processing reads on 10 cores in single-end mode ...
+Finished in 214.22 s (2 us/read; 25.82 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:              92,170,823
+Reads with adapters:                23,552,072 (25.6%)
+Reads written (passing filters):    92,170,823 (100.0%)
+
+Total basepairs processed: 11,613,523,698 bp
+Quality-trimmed:             106,029,323 bp (0.9%)
+Total written (filtered):  11,443,573,255 bp (98.5%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 23552072 times.
+
+No. of allowed errors:
+0-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 27.3%
+  C: 31.6%
+  G: 22.5%
+  T: 18.6%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	14510201	23042705.8	0	14510201
+2	5810228	5760676.4	0	5810228
+3	1241422	1440169.1	0	1241422
+4	432848	360042.3	0	432848
+5	134720	90010.6	0	134720
+6	93190	22502.6	0	93190
+7	89969	5625.7	0	89969
+8	65179	1406.4	0	65179
+9	62171	351.6	0	61148 1023
+10	86505	87.9	1	84050 2455
+11	36022	22.0	1	34725 1297
+12	62459	5.5	1	60854 1605
+13	63202	1.4	1	61554 1648
+14	40957	1.4	1	39786 1171
+15	55176	1.4	1	53743 1433
+16	32828	1.4	1	31838 990
+17	42093	1.4	1	40901 1192
+18	50655	1.4	1	49417 1238
+19	31203	1.4	1	30339 864
+20	40974	1.4	1	39990 984
+21	33552	1.4	1	32773 779
+22	36470	1.4	1	35585 885
+23	30988	1.4	1	30308 680
+24	27642	1.4	1	26962 680
+25	37290	1.4	1	36635 655
+26	14824	1.4	1	14488 336
+27	26269	1.4	1	25730 539
+28	28532	1.4	1	28008 524
+29	19037	1.4	1	18652 385
+30	22067	1.4	1	21708 359
+31	18520	1.4	1	18153 367
+32	23824	1.4	1	23417 407
+33	10400	1.4	1	10167 233
+34	15432	1.4	1	15111 321
+35	20250	1.4	1	19967 283
+36	6074	1.4	1	5903 171
+37	16645	1.4	1	16412 233
+38	6575	1.4	1	6426 149
+39	11146	1.4	1	10954 192
+40	11345	1.4	1	11103 242
+41	8966	1.4	1	8790 176
+42	7025	1.4	1	6910 115
+43	11531	1.4	1	11374 157
+44	3758	1.4	1	3642 116
+45	5037	1.4	1	4938 99
+46	3420	1.4	1	3313 107
+47	5164	1.4	1	5048 116
+48	4451	1.4	1	4323 128
+49	5231	1.4	1	5086 145
+50	3799	1.4	1	3681 118
+51	4087	1.4	1	3975 112
+52	3088	1.4	1	3010 78
+53	3464	1.4	1	3368 96
+54	3185	1.4	1	3069 116
+55	3689	1.4	1	3579 110
+56	1309	1.4	1	1240 69
+57	2588	1.4	1	2505 83
+58	2160	1.4	1	2094 66
+59	1631	1.4	1	1579 52
+60	2373	1.4	1	2322 51
+61	1459	1.4	1	1400 59
+62	1354	1.4	1	1296 58
+63	1915	1.4	1	1856 59
+64	1438	1.4	1	1389 49
+65	1087	1.4	1	1025 62
+66	1293	1.4	1	1230 63
+67	1077	1.4	1	1017 60
+68	1056	1.4	1	995 61
+69	1143	1.4	1	1051 92
+70	1093	1.4	1	961 132
+71	1013	1.4	1	872 141
+72	1119	1.4	1	865 254
+73	1256	1.4	1	863 393
+74	1852	1.4	1	951 901
+75	9184	1.4	1	1105 8079
+76	8395	1.4	1	3093 5302
+77	5164	1.4	1	1773 3391
+78	3653	1.4	1	767 2886
+79	2559	1.4	1	476 2083
+80	1380	1.4	1	297 1083
+81	869	1.4	1	236 633
+82	627	1.4	1	179 448
+83	368	1.4	1	127 241
+84	349	1.4	1	128 221
+85	301	1.4	1	112 189
+86	308	1.4	1	109 199
+87	236	1.4	1	77 159
+88	224	1.4	1	76 148
+89	180	1.4	1	65 115
+90	202	1.4	1	67 135
+91	175	1.4	1	47 128
+92	204	1.4	1	68 136
+93	152	1.4	1	55 97
+94	158	1.4	1	60 98
+95	183	1.4	1	51 132
+96	159	1.4	1	36 123
+97	145	1.4	1	41 104
+98	148	1.4	1	35 113
+99	111	1.4	1	35 76
+100	122	1.4	1	28 94
+101	138	1.4	1	35 103
+102	162	1.4	1	37 125
+103	124	1.4	1	21 103
+104	130	1.4	1	32 98
+105	85	1.4	1	18 67
+106	130	1.4	1	36 94
+107	143	1.4	1	23 120
+108	106	1.4	1	21 85
+109	91	1.4	1	20 71
+110	128	1.4	1	24 104
+111	107	1.4	1	22 85
+112	93	1.4	1	18 75
+113	114	1.4	1	23 91
+114	105	1.4	1	18 87
+115	127	1.4	1	21 106
+116	127	1.4	1	21 106
+117	113	1.4	1	16 97
+118	127	1.4	1	14 113
+119	137	1.4	1	7 130
+120	139	1.4	1	7 132
+121	186	1.4	1	17 169
+122	220	1.4	1	14 206
+123	378	1.4	1	22 356
+124	494	1.4	1	16 478
+125	1054	1.4	1	42 1012
+126	8763	1.4	1	167 8596
+
+RUN STATISTICS FOR INPUT FILE: /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_1.fastq
+=============================================
+92170823 sequences processed in total
+The length threshold of paired-end sequences gets evaluated later on (in the validation step)
+
+Writing report to '/pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_2.fastq_trimming_report.txt'
+
+SUMMARISING RUN PARAMETERS
+==========================
+Input filename: /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_2.fastq
+Trimming mode: paired-end
+Trim Galore version: 0.6.4_dev
+Cutadapt version: 2.6
+Python version: 3.6.3 :: Intel Corporation
+Number of cores used for trimming: 10
+Quality Phred score cutoff: 20
+Quality encoding type selected: ASCII+33
+Adapter sequence: 'AGATCGGAAGAGC' (Illumina TruSeq, Sanger iPCR; auto-detected)
+Maximum trimming error rate: 0.1 (default)
+Minimum required adapter overlap (stringency): 1 bp
+Minimum required sequence length for both reads before a sequence pair gets removed: 20 bp
+
+Cutadapt seems to be fairly up-to-date (version 2.6). Setting -j -j 10
+Writing final adapter and quality trimmed output to SRR3098744_2_trimmed.fq
+
+
+  >>> Now performing quality (cutoff '-q 20') and adapter trimming in a single pass for the adapter sequence: 'AGATCGGAAGAGC' from file /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_2.fastq <<< 
+10000000 sequences processed
+20000000 sequences processed
+30000000 sequences processed
+40000000 sequences processed
+50000000 sequences processed
+60000000 sequences processed
+70000000 sequences processed
+80000000 sequences processed
+90000000 sequences processed
+This is cutadapt 2.6 with Python 3.6.3
+Command line parameters: -j 10 -e 0.1 -q 20 -O 1 -a AGATCGGAAGAGC /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_2.fastq
+Processing reads on 10 cores in single-end mode ...
+Finished in 214.07 s (2 us/read; 25.83 M reads/minute).
+
+=== Summary ===
+
+Total reads processed:              92,170,823
+Reads with adapters:                22,417,052 (24.3%)
+Reads written (passing filters):    92,170,823 (100.0%)
+
+Total basepairs processed: 11,613,523,698 bp
+Quality-trimmed:             186,415,642 bp (1.6%)
+Total written (filtered):  11,364,862,692 bp (97.9%)
+
+=== Adapter 1 ===
+
+Sequence: AGATCGGAAGAGC; Type: regular 3'; Length: 13; Trimmed: 22417052 times.
+
+No. of allowed errors:
+0-9 bp: 0; 10-13 bp: 1
+
+Bases preceding removed adapters:
+  A: 31.4%
+  C: 24.6%
+  G: 28.3%
+  T: 15.7%
+  none/other: 0.0%
+
+Overview of removed sequences
+length	count	expect	max.err	error counts
+1	12169032	23042705.8	0	12169032
+2	7535213	5760676.4	0	7535213
+3	831524	1440169.1	0	831524
+4	291075	360042.3	0	291075
+5	171719	90010.6	0	171719
+6	105099	22502.6	0	105099
+7	137323	5625.7	0	137323
+8	55681	1406.4	0	55681
+9	25340	351.6	0	23611 1729
+10	113308	87.9	1	108103 5205
+11	9891	22.0	1	6216 3675
+12	82903	5.5	1	79400 3503
+13	25085	1.4	1	23479 1606
+14	91895	1.4	1	88301 3594
+15	22230	1.4	1	21080 1150
+16	29592	1.4	1	28217 1375
+17	81606	1.4	1	78817 2789
+18	6254	1.4	1	5606 648
+19	65446	1.4	1	63462 1984
+20	34914	1.4	1	33813 1101
+21	2909	1.4	1	2540 369
+22	34917	1.4	1	33619 1298
+23	32896	1.4	1	31581 1315
+24	63855	1.4	1	61709 2146
+25	14579	1.4	1	13937 642
+26	22214	1.4	1	21481 733
+27	7301	1.4	1	6821 480
+28	40437	1.4	1	39289 1148
+29	2108	1.4	1	1807 301
+30	36408	1.4	1	35355 1053
+31	3940	1.4	1	3641 299
+32	23660	1.4	1	22955 705
+33	18082	1.4	1	17518 564
+34	5631	1.4	1	5319 312
+35	21464	1.4	1	20815 649
+36	6259	1.4	1	5910 349
+37	11647	1.4	1	11221 426
+38	14175	1.4	1	13738 437
+39	7493	1.4	1	7201 292
+40	8248	1.4	1	7853 395
+41	9166	1.4	1	8853 313
+42	12958	1.4	1	12603 355
+43	1301	1.4	1	1164 137
+44	6602	1.4	1	6381 221
+45	10196	1.4	1	9883 313
+46	3629	1.4	1	3457 172
+47	2815	1.4	1	2639 176
+48	5270	1.4	1	5094 176
+49	4281	1.4	1	4123 158
+50	3466	1.4	1	3303 163
+51	7116	1.4	1	6898 218
+52	3000	1.4	1	2855 145
+53	1973	1.4	1	1853 120
+54	1678	1.4	1	1565 113
+55	3011	1.4	1	2849 162
+56	2072	1.4	1	1941 131
+57	2244	1.4	1	2111 133
+58	2080	1.4	1	1957 123
+59	1886	1.4	1	1772 114
+60	1984	1.4	1	1857 127
+61	1916	1.4	1	1726 190
+62	1911	1.4	1	1715 196
+63	1852	1.4	1	1613 239
+64	1765	1.4	1	1486 279
+65	1963	1.4	1	1486 477
+66	2473	1.4	1	1479 994
+67	14715	1.4	1	1735 12980
+68	14201	1.4	1	7932 6269
+69	4906	1.4	1	1771 3135
+70	2119	1.4	1	516 1603
+71	1234	1.4	1	201 1033
+72	737	1.4	1	182 555
+73	599	1.4	1	125 474
+74	423	1.4	1	117 306
+75	326	1.4	1	97 229
+76	333	1.4	1	114 219
+77	254	1.4	1	83 171
+78	238	1.4	1	88 150
+79	249	1.4	1	86 163
+80	213	1.4	1	71 142
+81	235	1.4	1	75 160
+82	215	1.4	1	91 124
+83	221	1.4	1	67 154
+84	191	1.4	1	78 113
+85	202	1.4	1	67 135
+86	176	1.4	1	70 106
+87	156	1.4	1	58 98
+88	184	1.4	1	51 133
+89	157	1.4	1	51 106
+90	166	1.4	1	36 130
+91	138	1.4	1	36 102
+92	130	1.4	1	42 88
+93	158	1.4	1	41 117
+94	160	1.4	1	53 107
+95	131	1.4	1	44 87
+96	120	1.4	1	20 100
+97	154	1.4	1	29 125
+98	91	1.4	1	27 64
+99	109	1.4	1	22 87
+100	113	1.4	1	25 88
+101	97	1.4	1	17 80
+102	100	1.4	1	20 80
+103	107	1.4	1	13 94
+104	125	1.4	1	22 103
+105	101	1.4	1	8 93
+106	91	1.4	1	10 81
+107	110	1.4	1	10 100
+108	132	1.4	1	11 121
+109	120	1.4	1	10 110
+110	88	1.4	1	4 84
+111	91	1.4	1	6 85
+112	99	1.4	1	4 95
+113	91	1.4	1	9 82
+114	76	1.4	1	3 73
+115	116	1.4	1	5 111
+116	110	1.4	1	5 105
+117	124	1.4	1	3 121
+118	123	1.4	1	4 119
+119	160	1.4	1	5 155
+120	166	1.4	1	4 162
+121	182	1.4	1	1 181
+122	256	1.4	1	9 247
+123	347	1.4	1	9 338
+124	416	1.4	1	5 411
+125	915	1.4	1	3 912
+126	6994	1.4	1	29 6965
+
+RUN STATISTICS FOR INPUT FILE: /pylon5/mc5pl7p/usingh/urmi/pyrpipeTest/testDir/maize/SRR3098744/SRR3098744_2.fastq
+=============================================
+92170823 sequences processed in total
+The length threshold of paired-end sequences gets evaluated later on (in the validation step)
+
+Validate paired-end files SRR3098744_1_trimmed.fq and SRR3098744_2_trimmed.fq
+file_1: SRR3098744_1_trimmed.fq, file_2: SRR3098744_2_trimmed.fq
+
+
+>>>>> Now validing the length of the 2 paired-end infiles: SRR3098744_1_trimmed.fq and SRR3098744_2_trimmed.fq <<<<<
+Writing validated paired-end Read 1 reads to SRR3098744_1_val_1.fq
+Writing validated paired-end Read 2 reads to SRR3098744_2_val_2.fq
+
+Total number of sequences analysed: 92170823
+
+Number of sequence pairs removed because at least one read was shorter than the length cutoff (20 bp): 469354 (0.51%)
+
+Deleting both intermediate output files SRR3098744_1_trimmed.fq and SRR3098744_2_trimmed.fq
+
+====================================================================================================
+

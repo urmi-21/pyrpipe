@@ -1,0 +1,5 @@
+Module	Section	Sample Name	Source
+Cutadapt	all_sections	SRR3098746_2	/home/usingh/work/urmi/hoap/pyrpipe/examples/Maize_lncRNA_prediction/tmp/SRR3098746_trim_galore.txt
+Cutadapt	all_sections	SRR3098746_1	/home/usingh/work/urmi/hoap/pyrpipe/examples/Maize_lncRNA_prediction/tmp/SRR3098746_trim_galore.txt
+Cutadapt	all_sections	SRR3098744_2	/home/usingh/work/urmi/hoap/pyrpipe/examples/Maize_lncRNA_prediction/tmp/SRR3098744_trim_galore.txt
+Cutadapt	all_sections	SRR3098744_1	/home/usingh/work/urmi/hoap/pyrpipe/examples/Maize_lncRNA_prediction/tmp/SRR3098744_trim_galore.txt

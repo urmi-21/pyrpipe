@@ -24,3 +24,9 @@ def test_shell():
     cmd="pyrpipe_diagnostic.py shell -o tests/testout/shellcmds tests/test_files/pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log"
     st=pe.execute_command(cmd.split(),verbose=True,quiet=False,logs=False,objectid="",command_name="")
     assert st==True, "shell failed"
+    
+    
+def test_multiqc():
+    cmd="pyrpipe_diagnostic.py multiqc -o tests/testout/mqcreport -t tests/testout/mqctmp tests/test_files/pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log"
+    st=pe.execute_command(cmd.split(),verbose=True,quiet=False,logs=False,objectid="",command_name="")
+    assert st==True, "shell failed"

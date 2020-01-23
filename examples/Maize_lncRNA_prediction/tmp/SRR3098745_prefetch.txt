@@ -1,0 +1,6 @@
+
+2020-01-22T23:23:01 prefetch.2.10.0: 1) Downloading 'SRR3098745'...
+2020-01-22T23:23:01 prefetch.2.10.0:  Downloading via https...
+2020-01-22T23:28:35 prefetch.2.10.0 int: timeout exhausted while reading file within network system module - Cannot KStreamRead: https://sra-downloadb.be-md.ncbi.nlm.nih.gov/sos2/sra-pub-run-7/SRR3098745/SRR3098745.1
+2020-01-22T23:28:35 prefetch.2.10.0:  https download failed
+2020-01-22T23:28:35 prefetch.2.10.0: 1) failed to download SRR3098745

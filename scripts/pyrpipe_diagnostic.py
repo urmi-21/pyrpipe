@@ -372,7 +372,7 @@ def checkEnvLog(logFile):
         sys.exit(1)
     return envLog
 
-def generateMultiqcReport(logFile,filterList,tempDir,outFile="",coverage='a',verbose=False,cleanup=False):
+def generateMultiqcReport(logFile,filterList,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
     #dump stdout from logs to temp directory
     stdout=getStdoutFromLog(logFile,filterList,coverage)
     
@@ -388,7 +388,8 @@ def generateMultiqcReport(logFile,filterList,tempDir,outFile="",coverage='a',ver
         flist.append(tempFile)
     
     #run multiqc
-    mc.run(tempDir)
+    #tempDir stores .txt files for MQC to read
+    mc.run(analysis_dir=tempDir,outdir=outDir)
     
     #cleanup
     if cleanup:
@@ -542,7 +543,7 @@ def multiqc():
             usage='''pyrpipe_diagnostic multiqc [<args>] <logfile>
                     
                     ''')    
-    parser.add_argument('-o', help='out file \ndefault: <logfile_multiqc.html>',action="store")
+    parser.add_argument('-o', help='out directory \ndefault: <./>',action="store")
     parser.add_argument('-c',help='Dump command options [(a)ll,fa(i)l,(p)ass]\ndefault: a',default='a',action="store")
     parser.add_argument('-v',help='verbose',action="store_true")
     parser.add_argument('-f',help='Filter by programs. Provide a comma-separated list e.g., prefetch,STAR,bowtie2 \ndefault None')
@@ -556,13 +557,13 @@ def multiqc():
     #parse args
     vFlag=args.v
     if vFlag:
-        print("Generating benchmarks")
-    outFile=""
+        print("Generating MutiQC report")
+    outDir=""
     if args.o is None:
-        outFile=pu.get_file_basename(args.logfile)
+        outDir=os.getcwd()
     else:
-        outFile=args.o
-    outFile+='.html'
+        outDir=args.o
+    
     
     filters=[]
     if args.f is not None:
@@ -579,7 +580,7 @@ def multiqc():
         pu.mkdir(tempDir) 
     
     #run multiqc
-    generateMultiqcReport(logFile,filters,tempDir,outFile=outFile,coverage=args.c,verbose=args.v,cleanup=args.r)
+    generateMultiqcReport(logFile,filters,tempDir,outDir=outDir,coverage=args.c,verbose=args.v,cleanup=args.r)
 
 
 ##Start parsing
@@ -591,7 +592,7 @@ parser = argparse.ArgumentParser(
             usage='''pyrpipe_diagnostic <command> [<args>] <logfile>
                     The commands are:
                     report     Generate analysis report
-                    bash      Generate all commands to bash script
+                    shell      Generate all commands to shell (bash) script
                     benchmark Generate bemchmarks
                     multiqc Generate HTML report using multiqc
                     
