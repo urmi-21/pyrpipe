@@ -34,14 +34,16 @@ class SRA:
         -----------
         
         """
-    def __init__(self,srr_accession=None, location=None,scan_path=None):
+    def __init__(self,srr_accession=None, location=None):
         
-        if scan_path is not None:
+        if location is None and srr_accession is None:
+            #pu.print_boldred("Please provide a valid srr accession or location, or both")
+            raise Exception("Please provide a valid srr accession or location, or both")
             #use the scan_path to create sra object
-            self.init_from_path(scan_path)
-        else:
+            #self.init_from_path(scan_path)
+        #else:
             #use the provided srr_accession
-            self.init_from_accession(srr_accession,location)
+        self.init_from_accession(srr_accession,location)
         
         ##check if sra, fastq files already exists
     
@@ -49,10 +51,12 @@ class SRA:
         if not pu.check_paths_exist(path):
             raise Exception("Please provide a valid path to scan for RNA-Seq data")
         
-        #scan path
-        if not self.search_fastq(path):
-            if not self.search_sra(path):
-                raise Exception("Please provide a valid path to scan for RNA-Seq data")
+        #scan path for fastq
+        self.search_fastq(path)
+        #scan path for sra
+        self.search_sra(path)
+        if not (self.fastqFilesExistsLocally() or self.sraFileExistsLocally()):
+                raise Exception("No files found at:"+ path+ "Please provide a valid path to scan for RNA-Seq data")
     
     def search_sra(self,path):
         """Search .sra file under a dir
@@ -68,7 +72,7 @@ class SRA:
         if len(sra_files)>1:
             pu.print_boldred("Found multiple .sra files. Using the first entry...")
         sra_path=sra_files[0]
-        self.location=path
+        #self.location=path
         self.srr_accession=pu.get_file_basename(sra_path)
         self.localSRAFilePath=sra_path
         self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
@@ -95,7 +99,7 @@ class SRA:
             pu.print_boldred("Can not determine .fastq. Exiting...")
             return False
         
-        
+        fq_files.sort()
         #case with single fastq
         if len(fq_files)==1:
             self.localfastqPath=fq_files[0]
@@ -109,8 +113,8 @@ class SRA:
             pu.print_green("Found .fastq "+self.localfastq1Path+" "+self.localfastq2Path)
             self.layout="PAIRED"
         
-        self.location=path
-        self.srr_accession=pu.get_file_basename(fq_files[0])
+        #self.location=path
+        #self.srr_accession=pu.get_file_basename(fq_files[0])
         return True
         
     
@@ -126,11 +130,33 @@ class SRA:
             
         if location is None:
             location=os.getcwd()
-            
         #pu.print_info("Creating SRA: "+srr_accession)
         self.srr_accession=srr_accession
         #create a dir named <srr_accession> and use as location
         self.location=os.path.join(location,self.srr_accession)
+    
+        #search for existing files in location
+        #self.search_fastq(self.location)
+        #scan path for sra
+        #self.search_sra(self.location)
+        
+        
+        #check SRA file
+        if pu.check_files_exist(os.path.join(self.location,self.srr_accession+".sra")):
+            pu.print_green(self.srr_accession+".sra exists.")
+            self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
+            self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
+            #test if file is paired or single end
+            if pe.is_paired(self.localSRAFilePath):
+                self.layout="PAIRED"
+            else:
+                self.layout="SINGLE"
+        
+        #check fastq file
+        self.search_fastq(self.location)
+        
+        
+        
         
     def __setattr__(self, name, value):
         """Make srr accession immutable
@@ -143,6 +169,65 @@ class SRA:
             self.__dict__[name] = value
                 
     
+    def download_fastq(self,verbose=False,quiet=False,logs=True,procs=2,**kwargs):
+        """Function to download fastq files
+        """
+        
+        #check if fastq files exists already
+        if self.fastqFilesExistsLocally():
+            pu.print_green("Fastq files exist already")
+            return True
+        
+        #fasterq-dump -e 2 -O SRR5507495 SRR5507495
+        fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V',
+                             '-L','-v','-q','-b','-m','-x','-S','-3','-P','-M',
+                             '-B','--option-file','--strict','--table','--include-technical',
+                             '--skip-technical','--concatenate-reads']
+        fstrqd_Cmd=['fasterq-dump']
+        fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
+        #add location
+        fstrqd_Cmd.extend(['-O',self.location])
+        #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
+        fstrqd_Cmd.extend(['-o',self.srr_accession+".fastq"])
+        fstrqd_Cmd.extend(['-e',str(procs)])
+        if self.sraFileExistsLocally():
+            fstrqd_Cmd.append(self.localSRAFilePath)
+        else:
+            fstrqd_Cmd.append(self.srr_accession)
+        
+        #execute command
+        cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)
+        if not cmdStatus:
+            print("fasterqdump failed for:"+self.srr_accession)
+            return False        
+        
+        
+        if not hasattr(self,'layout'):
+            fq_files=pe.find_files(self.location,self.srr_accession+"*.fastq")
+            if len(fq_files)==1:
+                self.layout='SINGLE'
+            else:
+                self.layout='PAIRED'
+        
+        #check if fastq files are downloaded        
+        if(self.layout=="SINGLE"):
+            self.localfastqPath=os.path.join(self.location,self.srr_accession+".fastq")
+            if not pu.check_files_exist(self.localfastqPath):
+                pu.print_boldred("Error running fasterq-dump file. File "+self.localfastqPath+" does not exist!!!")
+                return False
+        else:
+            self.localfastq1Path=os.path.join(self.location,self.srr_accession+"_1.fastq")
+            self.localfastq2Path=os.path.join(self.location,self.srr_accession+"_2.fastq")
+            if not pu.check_files_exist(self.localfastq1Path,self.localfastq2Path):
+                pu.print_boldred("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
+                return False
+        
+            
+            
+            
+        return True
+        
+        
   
     def download_sra(self,verbose=False,quiet=False,logs=True,**kwargs):
         """This function downloads .sra file from NCBI SRA servers using the prefetch command.
@@ -295,10 +380,14 @@ class SRA:
         >>> object.run_fasterqdump()
         True
         """
+        #check if fastq files exists already
+        if self.fastqFilesExistsLocally():
+            pu.print_green("Fastq files exist already")
+            return True
         
         #first check is sra exists
         if not self.sraFileExistsLocally():
-            print ("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
+            pu.print_boldred("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
             return False
         #else directly run fasterq-dump on accession ?
         

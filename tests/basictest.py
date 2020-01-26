@@ -111,7 +111,7 @@ gtfS=stieOb.runStringtie(samtOb.samToSortedBam(hisatSam,10,deleteSam=True,delete
 """
 
 
-
+"""
 btIndex="/home/usingh/work/urmi/hoap/test/bowtieIndex/rRNAindex"
 #riboseq SRR3590744
 sraOb=sra.SRA(srr_accession='SRR5507495',location=testDir)
@@ -123,7 +123,7 @@ sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":testDir})
 tgOb=qc.Trimgalore()
 
 sraOb.perform_qc(tgOb)
-
+"""
 #pathToAdapters="/home/usingh/lib_urmi/softwares/bbmap/resources/adapters2.fa"
 #bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":pathToAdapters}
 #bbdOb=qc.BBmap(**bbdOpts)
@@ -147,7 +147,7 @@ sraOb.perform_qc(tgOb)
 
 
 #build hisat index
-
+"""
 hsOpts={"--dta-cufflinks":"","-p":"12","--mp": "1,1", "--no-spliced-alignment":"", "--rdg": "10000,10000", "--rfg": "10000,10000"}
 hs=mapping.Hisat2(hisat2_index="/home/usingh/work/urmi/hoap/test/yeastInd2/index22",**hsOpts)
 #hsbArgs={"-p":"8","-a":"","-q":""}
@@ -168,7 +168,7 @@ bam=samOb.sam_sorted_bam(sam,delete_sam=True,delete_bam=True)
 #run stringtie
 st=assembly.Stringtie()
 g1=st.perform_assembly(bam,objectid="myob")
-
+"""
 
 #gtfs=(g1,)
 #test stmerge
@@ -314,6 +314,7 @@ tr=assembly.Trinity()
 tr.perform_assembly(sraOb,verbose=True)
 """
 
+"""
 sr=sra.SRA(scan_path="/home/usingh/work/urmi/hoap/test/SRR5507495/")
 
 
@@ -332,6 +333,8 @@ for d in subdirs:
     except:
         print("no data in "+d)
 
-
-
+"""
+print("fstqTEST")
+sob=sra.SRA('SRR5507495',testDir)
+sob.download_fastq(procs=2)
 
