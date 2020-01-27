@@ -2,43 +2,24 @@
 Basic usage
 ======================================================
 
-Specifying RNA-Seq data
-=======================
-
-Use the :py:mod:`sra` module to create an :class:`SRA` object::
-
-	from pyrpipe import sra
-	sra_obj = sra.SRA(srr_accession="SRR976159")
-
-After the object is created, download the raw data to disk using the 
-:meth:`SRA.download_sra` method::
-	sra_obj.download_sra()
-This will download the raw data in .sra format.
-To convert .sra file to fastq, use :meth:`SRA.run_fasterqdump` method::
-
-	sra_obj.run_fasterqdump()
-
-The sra_obj will keep track of all the downloaded data. The location of downloaded data could be accesed by::
-
-	sra_obj.location
-
-To get the paths to sra of fastq files, use::
-
-	sra_obj.localSRAFilePath
-	sra_obj.localfastqPath
-	#for paired
-	sra_obj.localfastq1Path
-	sra_obj.localfastq1Path
+Many usage examples are available at https://github.com/urmi-21/pyrpipe/tree/master/examples
 
 
-Performing read alignment
-=========================
-The :py:mod:`mapping` module contains several classes to access read alignment tools.
-The method :meth:`perform_alignment` can be used with the SRA object.
-An example using Hisat2::
-	hs=mapping.Hisat2(hisat2_index="",**hsOpts)
-	hs.perform_alignment(ob,**{"-p":"10"})
-
-Using third-party tools
+Transcript assembly
 ========================
+A pyrpipe worflow for A thaliana transcript assembly
+
+https://github.com/urmi-21/pyrpipe/tree/master/examples/Athaliana_transcript_assembly
+
+LncRNA prediction
+========================
+A pyrpipe workflow for Maize lncRNA prediction.
+
+https://github.com/urmi-21/pyrpipe/tree/master/examples/Maize_lncRNA_prediction
+
+Integrating third-party tools
+=============================
 The module :py:mod:`pyrpipe_engine` contains helper methods to run any shell command from python.
+See this examle for a detailed guide.
+
+https://github.com/urmi-21/pyrpipe/blob/master/examples/Integrating%20third-party%20tools.ipynb
