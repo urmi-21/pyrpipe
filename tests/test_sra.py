@@ -16,7 +16,7 @@ def test_sra():
     srrID=testVars.srr
     print ("Testing SRA...")
     testDir=testVars.testDir
-    newOb=sra.SRA(srrID,testDir)
+    newOb=sra.SRA(srrID,testDir+"/testsra")
     assert newOb.srr_accession==srrID,"Failed SRA init"
     assert newOb.download_sra()==True, "Failed to download SRA file"
     assert newOb.sraFileExistsLocally()==True, "Failed to locate .sra file on disk"

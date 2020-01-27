@@ -336,5 +336,5 @@ for d in subdirs:
 """
 print("fstqTEST")
 sob=sra.SRA('SRR5507495',testDir)
-sob.download_fastq(procs=2)
+sob.download_fastq(procs=8)
 

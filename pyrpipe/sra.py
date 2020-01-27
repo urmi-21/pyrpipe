@@ -178,7 +178,7 @@ class SRA:
             pu.print_green("Fastq files exist already")
             return True
         
-        #fasterq-dump -e 2 -O SRR5507495 SRR5507495
+        
         fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V',
                              '-L','-v','-q','-b','-m','-x','-S','-3','-P','-M',
                              '-B','--option-file','--strict','--table','--include-technical',
