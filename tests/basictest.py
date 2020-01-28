@@ -334,7 +334,8 @@ for d in subdirs:
         print("no data in "+d)
 
 """
+"""
 print("fstqTEST")
 sob=sra.SRA('SRR5507495',testDir)
 sob.download_fastq(procs=8)
-
+"""
