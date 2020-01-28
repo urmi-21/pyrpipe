@@ -1,0 +1,29 @@
+DIR: "test"
+THREADS: 8
+
+fasterqdump:
+        -e: '20'
+        -f: ''
+
+bbduk:
+        ktrim: r
+        k: '23'
+        mink: '11'
+        qtrim : "'rl'"
+        trimq : '10'
+        ref: 'adapters.fa'
+        --: 
+                - '-Xmx2g'
+
+hisat2:
+        --dta-cufflinks: ""
+        -p: "25"
+
+stringtie:
+        -p: "25"
+
+cufflinks:
+        --num-threads: "25"
+        --no-update-check: ""
+        -v: ""
+        -q: ""
