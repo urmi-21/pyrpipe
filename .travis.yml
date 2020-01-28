@@ -13,7 +13,7 @@ before_install:
   #create an executable for portcullis, this will call portcullis from docker
   - mkdir portcullisDocker
   - echo '#!/bin/bash' > portcullisDocker/portcullis
-  - echo 'docker run --rm -v' $(pwd)':/data maplesond/portcullis portcullis $1' >> portcullisDocker/portcullis
+  - echo 'docker run --rm -v' $(pwd)':/data maplesond/portcullis portcullis "$@"' >> portcullisDocker/portcullis
   - chmod +x portcullisDocker/portcullis
   - export PATH=$PATH:$PWD/portcullisDocker/
 
