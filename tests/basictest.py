@@ -241,37 +241,7 @@ print(clout)
 
 
 """
-#test mikado
-atRef="/home/usingh/work/urmi/hoap/test/athalData/ref/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa"
-mk=tools.Mikado()
-#find and save gtf list
-#mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
 
-mikadoDir="/home/usingh/work/urmi/hoap/test/mikadoTutorial"
-junc=mikadoDir+"/junctions.bed"
-ref=mikadoDir+"/chr5.fas"
-#Make sure the paths in list file are global.
-mklist=mikadoDir+"/list.txt"
-scoring=mikadoDir+"/plants.yaml"
-
-config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig")
-print(config)
-
-#run mikado
-
-mk.runMikadoPrepare(config)
-
-
-bt=mikadoDir+"/uniprot_sprot_plants.fasta"
-orfs=mikadoDir+"/mikado_prepared.fasta.transdecoder.bed"
-xml=mikadoDir+"/mikado.blast.xml.gz"
-mk.runMikadoSerialise(config,blastTargets=bt,orfs= orfs, xml=xml)
-mk.runMikadoPick(config)
-#bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
-#bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
-         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
-         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
-         #]
 """
 #mergedBam=samOb.mergeBamFiles(*bamList,outPath="/home/usingh/work/urmi/hoap/test/athalData/sraData/",outFileName="atMerged",*{"-f":""})
 #run portculis
@@ -339,3 +309,39 @@ print("fstqTEST")
 sob=sra.SRA('SRR5507495',testDir)
 sob.download_fastq(procs=8)
 """
+
+
+
+#test mikado
+#atRef="/home/usingh/work/urmi/hoap/test/athalData/ref/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa"
+mk=tools.Mikado()
+#find and save gtf list
+#mklist=mk.searchGTFtolist("athalGtfList",searchPath="/home/usingh/work/urmi/hoap/test/athalData/sraData",outDir="/home/usingh/work/urmi/hoap/test/athalData/sraData")
+
+mikadoDir="/home/usingh/work/urmi/hoap/test/mikadoTutorial"
+junc=mikadoDir+"/junctions.bed"
+ref=mikadoDir+"/chr5.fas"
+#Make sure the paths in list file are global.
+mklist=mikadoDir+"/list.txt"
+scoring=mikadoDir+"/plants.yaml"
+
+config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig",out_dir="/home/usingh/work/urmi/hoap/test/mkout/conf")
+print(config)
+
+#run mikado
+
+mk.runMikadoPrepare(config,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutPrep")
+
+
+bt=mikadoDir+"/uniprot_sprot_plants.fasta"
+orfs=mikadoDir+"/mikado_prepared.fasta.transdecoder.bed"
+xml=mikadoDir+"/mikado.blast.xml.gz"
+
+mk.runMikadoSerialise(config,blastTargets=bt,orfs= orfs, xml=xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/ser",verbose=True)
+
+mk.runMikadoPick(config,)
+#bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
+#bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
+         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
+         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
+         #]

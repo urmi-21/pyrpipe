@@ -8,6 +8,7 @@ Created on Wed Dec  4 14:54:22 2019
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os
+import yaml
 
 class RNASeqTools:
     def __init__(self):
@@ -438,7 +439,9 @@ class Mikado(RNASeqTools):
         """
         pass
     
-    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,out_dir=os.getcwd(),verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    
+    
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado configure
         Make sure the paths in list file are global.
         
@@ -455,13 +458,15 @@ class Mikado(RNASeqTools):
             return ""
         
         #create out dir
+        if out_dir==None:
+            out_dir=os.getcwd()
         if not pu.check_paths_exist(out_dir):
             if not pu.mkdir(out_dir):
                 raise Exception("Exception in mikado configure.")
             
         outFilePath=os.path.join(out_dir,out_file+".yaml")
         
-        newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--":(outFilePath,)}
+        newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--out-dir":out_dir,"--":(outFilePath,)}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -476,21 +481,22 @@ class Mikado(RNASeqTools):
         if not pu.check_files_exist(outFilePath):
             return ""
         
+        
         return outFilePath
         
     
-    def runMikadoPrepare(self,jsonconf, out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPrepare(self,yamlconf, out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado prepare
         """
         
         #check input files exist
-        if not pu.check_files_exist(jsonconf):
+        if not pu.check_files_exist(yamlconf):
             print("Please check the input configuration to mikado.")
             return ""
         if not out_dir:
             out_dir=os.getcwd()
 
-        newOpts={"--output-dir":out_dir,"--json-conf":jsonconf}
+        newOpts={"--output-dir":out_dir,"--json-conf":yamlconf}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -498,18 +504,30 @@ class Mikado(RNASeqTools):
         status=self.runMikado("prepare",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print("Mikado prepare failed for:"+jsonconf)
+            print("Mikado prepare failed for:"+yamlconf)
             return ""
         
         #check if bam file exists
         if not pu.check_paths_exist(out_dir):
             return ""
         
+        #after running mikado prep update the mikado config file to contain absolute path of mikafo_prepared.fa
+        #otherwise serialize step will fail if out dirs are different
+        #read the cofig.json file
+        with open(yamlconf) as f:
+            conf_data = yaml.safe_load(f)
+        tx=conf_data['serialise']['files']['transcripts']
+        conf_data['serialise']['files']['transcripts']=os.path.join(out_dir,tx)
+        #write to file
+        with open(yamlconf,'w') as f:
+            yaml.dump(conf_data, f)
+       
+        
         return out_dir
         
         
         
-    def runMikadoSerialise(self,jsonconf,blastTargets,orfs,xml,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoSerialise(self,yamlconf,blastTargets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
@@ -519,15 +537,19 @@ class Mikado(RNASeqTools):
         if not out_dir:
             out_dir=os.getcwd()
         
-        newOpts={"--json-conf":jsonconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
+        newOpts={"--json-conf":yamlconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
+        
+        #mikado serialize fails if executed out of directory
+        #confDir
+        #if not out_dir==os.getcwd()
         status=self.runMikado("serialise",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print("Mikado serialise failed for:"+jsonconf)
+            print("Mikado serialise failed for:"+yamlconf)
             return ""
         
         #check if bam file exists
@@ -537,17 +559,17 @@ class Mikado(RNASeqTools):
         return out_dir
         
         
-    def runMikadoPick(self,jsonconf,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPick(self,yamlconf,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
-        if not pu.check_files_exist(jsonconf):
+        if not pu.check_files_exist(yamlconf):
             print("Please check the input to mikado.")
             return ""
         if not out_dir:
             out_dir=os.getcwd()
         
-        newOpts={"--json-conf":jsonconf}
+        newOpts={"--json-conf":yamlconf}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
@@ -555,7 +577,7 @@ class Mikado(RNASeqTools):
         status=self.runMikado("pick",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
-            print("Mikado pick failed for:"+jsonconf)
+            print("Mikado pick failed for:"+yamlconf)
             return ""
         
         #check if bam file exists
@@ -574,7 +596,7 @@ class Mikado(RNASeqTools):
        
         mikado_Cmd=['mikado',sub_command]
         #add options
-        mikado_Cmd.extend(pe.parse_unix_args(self.valid_args,mergedArgsDict))
+        mikado_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
