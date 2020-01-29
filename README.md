@@ -61,7 +61,7 @@ Please follow these instruction:
 ### Install latest stable version
 
 ```
-pip install pyrpipe
+pip install pyrpipe --upgrade
 ```
 
 If above command fails due to dependency issues, try: 
