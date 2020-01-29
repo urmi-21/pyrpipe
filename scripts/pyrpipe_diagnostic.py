@@ -394,7 +394,7 @@ def generateMultiqcReport(logFile,filterList,tempDir,outDir="",coverage='a',verb
     #cleanup
     if cleanup:
         for f in flist:
-            pu.printBlue("Removing {}".format(f))
+            pu.print_blue("Removing {}".format(f))
             os.remove(f)   
 
 def generateBenchmarkReport(logFile,envLog,filterList,tempDir,outFile="",verbose=False):
