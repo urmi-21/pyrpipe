@@ -325,8 +325,8 @@ ref=mikadoDir+"/chr5.fas"
 mklist=mikadoDir+"/list.txt"
 scoring=mikadoDir+"/plants.yaml"
 
-config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig",out_dir="/home/usingh/work/urmi/hoap/test/mkout/conf")
-print(config)
+#config=mk.runMikadoConfigure(mklist,ref,"permissive",scoring,junc,"mkConfig",out_dir="/home/usingh/work/urmi/hoap/test/mkout/conf")
+#print(config)
 
 #run mikado
 
@@ -341,7 +341,7 @@ xml=mikadoDir+"/mikado.blast.xml.gz"
 
 #mk.runMikadoPick(config,out_dir="/home/usingh/work/urmi/hoap/test/mkout/pick",verbose=False)
 
-#listfile=mk.createMikadoGTFlist("mylist","/home/usingh/work/urmi/hoap/test/mkout",mikadoDir)
+#listfile=mk.createMikadoGTFlist("mylist","/home/usingh/work/urmi/hoap/test/mkout","/home/usingh/work/urmi/hoap/test/sample_data/")
 
 mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permissive",scoring,junc,"mkconf",bt,orfs,xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutNew",verbose=True)
 
