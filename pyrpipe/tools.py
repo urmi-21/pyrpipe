@@ -379,7 +379,7 @@ class Portcullis(RNASeqTools):
         #add options
         portcullis_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
                 
-        print("Executing:"+" ".join(portcullis_cmd))
+        #print("Executing:"+" ".join(portcullis_cmd))
         
         
         #start ececution

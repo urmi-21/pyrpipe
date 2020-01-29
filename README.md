@@ -7,8 +7,6 @@
 
 # pyrpipe: python rna-seq pipeliner
 
-### Version
-Dev
 
 ## Introduction
 pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs in an object oriented manner.
@@ -54,10 +52,22 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 
 ## Installation
 Please follow these instruction 
+
+### Install latest stable version
+
+```
+pip install pyrpipe
+```
+
+### Install current developer version
 ```
 git clone https://github.com/urmi-21/pyrpipe.git
 pip install -r pyrpipe/requirements.txt
 pip install -e path_to/pyrpipe
+
+#Running tests; From pyrpipe root perform
+
+py.test tests/
 ```
 
 ## Setting NCBI SRA Toolkit
@@ -65,5 +75,3 @@ Use  ```vdb-config -i``` to configure SRA Toolkit. Make sure that:
 * Under the **TOOLS** tab, prefetch downloads to is set to public user-repository
 * Under the **CACHE** tab, location of public user-repository is not empty
 
-## Setting up the working directory
-Please make sure that the working directory (where all data will be downloaded) does not contain any previously downloaded data to avoid problems with ```prefetch```.
