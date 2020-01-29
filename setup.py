@@ -11,6 +11,7 @@ import os
 import sys
 
 
+
 #exit if python 2
 if sys.version_info.major != 3:
     raise EnvironmentError("""pyrpipe requires python 3.5 or higher.Please upgrade your python.""")
@@ -53,4 +54,25 @@ setuptools.setup(
         "Operating System :: Unix",
     ],
     python_requires='>=3.6',
+    
+    classifiers=[
+        # How mature is this project? Common values are
+        #   3 - Alpha
+        #   4 - Beta
+        #   5 - Production/Stable
+        # 'Development Status :: 4 - Beta',
+
+        # Indicate who your project is intended for
+        'Intended Audience :: Science/Research',
+        'Topic :: Scientific/Engineering :: Bioinformatics',
+        #'Topic :: Scientific/Engineering :: Chemistry',
+
+        # Pick your license as you wish (should match "license" above)
+        'License :: OSI Approved :: MIT License',
+
+        # Specify the Python versions you support here. In particular, ensure
+        # that you indicate whether you support Python 2, Python 3 or both.
+        'Programming Language :: Python :: 3.6',
+        'Programming Language :: Python :: 3.7'
+    ],
 )
