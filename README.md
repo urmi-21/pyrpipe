@@ -51,7 +51,12 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 ### Read the documentation [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
 ## Installation
-Please follow these instruction 
+Please follow these instruction: 
+
+### To create a new Conda environment (optional):
+1. Download and install Conda
+2. `conda create -n pyrpipe python=3.7`
+3. `conda activate pyrpipe`
 
 ### Install latest stable version
 
