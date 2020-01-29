@@ -73,7 +73,8 @@ To run tests:
 1. Download the [test set](https://github.com/urmi-21/pyrpipe/tree/master/tests) ([direct link](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/urmi-21/pyrpipe/tree/master/tests))
 2. `pip install pytest`
 3. To build test_environment (This will download tools): 
-```cd tests 
+```
+cd tests 
 . ./build_test_env.sh
 ```
 4. Go one directory above (use same terminal used for `build_test_env.sh`) `tests` and run `py.test tests/`
