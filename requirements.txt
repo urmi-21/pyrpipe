@@ -6,3 +6,4 @@ weasyprint
 importlib_resources
 multiqc
 seaborn
+pyyaml
