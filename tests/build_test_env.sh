@@ -1,15 +1,5 @@
 #!/bin/bash 
 
-#icould not get portcullis to work from source this is docker version
- #little dirty
-docker pull maplesond/portcullis
-#create an executable for portcullis, this will call portcullis from docker
-mkdir portcullisDocker
-echo '#!/bin/bash' > portcullisDocker/portcullis
-echo 'docker run --rm -v' $(pwd)':/data maplesond/portcullis portcullis "$@"' >> portcullisDocker/portcullis
-chmod +x portcullisDocker/portcullis
-export PATH=$PWD/portcullisDocker/:$PATH
-
 # install dependencies
 #install samtools
 wget https://github.com/samtools/samtools/releases/download/1.10/samtools-1.10.tar.bz2 -O /tmp/samtools.tar.bz2
