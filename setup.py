@@ -55,7 +55,7 @@ setuptools.setup(
         
         # Indicate who your project is intended for
         'Intended Audience :: Science/Research',
-        'Topic :: Scientific/Engineering :: Bioinformatics',
+        'Topic :: Scientific/Engineering :: Bio-Informatics',
 
 
         # Specify the Python versions you support here. In particular, ensure
