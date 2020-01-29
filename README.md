@@ -77,7 +77,7 @@ To run tests:
 cd tests 
 . ./build_test_env.sh
 ```
-4. Go one directory above (use same terminal used for `build_test_env.sh`) `tests` and run `py.test tests/`
+4. Go one directory above (use same terminal used for `build_test_env.sh`) `tests` and run `py.test tests/test_*`
 
 
 ### Install current developer version
@@ -90,7 +90,7 @@ pip install -e path_to/pyrpipe
 #To build test_environment (This will download tools): 
 cd tests ; . ./build_test_env.sh
 #in same terminal
-py.test tests/
+py.test tests/test_*
 ```
 
 ## Setting NCBI SRA Toolkit
