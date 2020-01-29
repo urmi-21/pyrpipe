@@ -434,10 +434,29 @@ class Mikado(RNASeqTools):
                 
 
         
-    def runMikadoFull(self):
+    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run whole mikado pipeline
+        Output will be stored to out_dir/
         """
-        pass
+        
+        #run mikado config
+        config_file=self.runMikadoConfigure(listFile,genome,mode,scoring,junctions,config_out_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        if not pu.check_files_exist(config_file):
+            pu.print_boldred("Mikado configure failed")
+            return False
+        
+        #run mikado prep
+        self.runMikadoPrepare(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        
+        #run mikado ser
+        self.runMikadoSerialise(config_file,blast_targets,orfs, xml,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        
+        #run mikado pick
+        self.runMikadoPick(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        
+        #return dir containing mikado results
+        return out_dir
+        
     
     
     
@@ -518,6 +537,9 @@ class Mikado(RNASeqTools):
             conf_data = yaml.safe_load(f)
         tx=conf_data['serialise']['files']['transcripts']
         conf_data['serialise']['files']['transcripts']=os.path.join(out_dir,tx)
+        #update input to pick
+        gtf=conf_data['pick']['files']['input']
+        conf_data['pick']['files']['input']=os.path.join(out_dir,gtf)
         #write to file
         with open(yamlconf,'w') as f:
             yaml.dump(conf_data, f)
@@ -527,39 +549,50 @@ class Mikado(RNASeqTools):
         
         
         
-    def runMikadoSerialise(self,yamlconf,blastTargets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoSerialise(self,yamlconf,blast_targets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
-        if not pu.check_files_exist(blastTargets,orfs,xml):
+        if not pu.check_files_exist(blast_targets,orfs,xml):
             print("Please check the input to mikado.")
             return ""
         if not out_dir:
             out_dir=os.getcwd()
         
-        newOpts={"--json-conf":yamlconf,"--blast_targets":blastTargets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
+        newOpts={"--json-conf":yamlconf,"--blast_targets":blast_targets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}
         
         
-        #mikado serialize fails if executed out of directory
-        #confDir
-        #if not out_dir==os.getcwd()
+        
         status=self.runMikado("serialise",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
             print("Mikado serialise failed for:"+yamlconf)
             return ""
         
-        #check if bam file exists
+        #check if out path exists
         if not pu.check_paths_exist(out_dir):
             return ""
+        
+        #after running mikado serialize update the mikado config file to contain absolute path of mikafodb
+        #otherwise pick step will fail
+        #read the cofig.json file
+        with open(yamlconf) as f:
+            conf_data = yaml.safe_load(f)
+        db=conf_data['db_settings']['db']
+        conf_data['db_settings']['db']=os.path.join(out_dir,pu.get_filename(db))
+        
+        
+        #write to file
+        with open(yamlconf,'w') as f:
+            yaml.dump(conf_data, f)
         
         return out_dir
         
         
-    def runMikadoPick(self,yamlconf,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPick(self,yamlconf,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
@@ -569,7 +602,7 @@ class Mikado(RNASeqTools):
         if not out_dir:
             out_dir=os.getcwd()
         
-        newOpts={"--json-conf":yamlconf}
+        newOpts={"--json-conf":yamlconf,"--output-dir":out_dir}
         
         #merge with kwargs
         mergedOpts={**kwargs,**newOpts}

@@ -330,16 +330,21 @@ print(config)
 
 #run mikado
 
-mk.runMikadoPrepare(config,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutPrep")
+#mk.runMikadoPrepare(config,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutPrep")
 
 
 bt=mikadoDir+"/uniprot_sprot_plants.fasta"
 orfs=mikadoDir+"/mikado_prepared.fasta.transdecoder.bed"
 xml=mikadoDir+"/mikado.blast.xml.gz"
 
-mk.runMikadoSerialise(config,blastTargets=bt,orfs= orfs, xml=xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/ser",verbose=True)
+#mk.runMikadoSerialise(config,blast_targets=bt,orfs= orfs, xml=xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/ser",verbose=False)
 
-mk.runMikadoPick(config,)
+#mk.runMikadoPick(config,out_dir="/home/usingh/work/urmi/hoap/test/mkout/pick",verbose=False)
+
+#listfile=mk.createMikadoGTFlist("mylist","/home/usingh/work/urmi/hoap/test/mkout",mikadoDir)
+
+mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permissive",scoring,junc,"mkconf",bt,orfs,xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutNew",verbose=True)
+
 #bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
 #bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
          #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
