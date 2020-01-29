@@ -67,7 +67,8 @@ If above command fails due to dependency issues, try:
 To run tests:
 1. Download the [test set](https://github.com/urmi-21/pyrpipe/tree/master/tests) ([direct link](https://minhaskamal.github.io/DownGit/#/home?url=https://github.com/urmi-21/pyrpipe/tree/master/tests))
 2. `pip install pytest`
-3. Go one directory above `tests` and run `py.test tests/`
+3. To build test_environment (This will download tools): `cd tests && bash build_test_env.sh`
+4. Go one directory above `tests` and run `py.test tests/`
 
 
 ### Install current developer version
@@ -77,7 +78,8 @@ pip install -r pyrpipe/requirements.txt
 pip install -e path_to/pyrpipe
 
 #Running tests; From pyrpipe root perform
-
+#To build test_environment (This will download tools): 
+cd tests && bash build_test_env.sh
 py.test tests/
 ```
 
