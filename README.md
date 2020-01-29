@@ -48,7 +48,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 
 
 
-
+#### Read the documentation [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
 ## Installation
 Please follow these instruction 
