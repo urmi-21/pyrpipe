@@ -1,0 +1,4 @@
+id,fasterq-dump,hisat2,bbduk.sh,prefetch,samtools,stringtie,hisat2-build,total
+SRR971778,30.0,77.0,55.0,11.0,54.0,42.0,,269
+SRR976159,14.0,65.0,11.0,12.0,53.0,40.0,,195
+SRR978411,26.0,67.0,32.0,9.0,42.0,36.0,,212

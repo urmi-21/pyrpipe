@@ -1,4 +1,0 @@
-id,hisat2,fasterq-dump,prefetch,samtools,stringtie,hisat2-build,total
-SRR978411,65.0,24.0,11.0,45.0,38.0,,183
-SRR976159,72.0,24.0,11.0,50.0,48.0,,205
-SRR971778,84.0,31.0,12.0,60.0,41.0,,228

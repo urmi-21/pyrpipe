@@ -1,4 +1,4 @@
 Sample	Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate
-SRR971778_hisat2	89.46
-SRR976159_hisat2	97.94
-SRR978411_hisat2	97.82
+SRR971778_hisat2	89.58
+SRR976159_hisat2	98.09
+SRR978411_hisat2	97.93
