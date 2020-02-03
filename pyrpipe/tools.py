@@ -890,7 +890,16 @@ class Diamond(RNASeqTools):
         return False
         
         
+class Transdecoder(RNASeqTools):
+    def __init__(self,**kwargs):
+        self.programName="TransDecoder.LongOrfs"
+        self.dep_list=["TransDecoder.LongOrfs" ,"TransDecoder.Predict"]
+        #check if program exists
+        if not pe.check_dependencies(self.dep_list):
+            raise Exception("ERROR: "+ str(self.dep_list)+" not found.")
         
+        self.valid_args=[]        
+        self.passedArgumentDict=kwargs
         
         
         
