@@ -310,7 +310,7 @@ sob=sra.SRA('SRR5507495',testDir)
 sob.download_fastq(procs=8)
 """
 
-
+"""
 
 #test mikado
 #atRef="/home/usingh/work/urmi/hoap/test/athalData/ref/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa"
@@ -343,10 +343,21 @@ xml=mikadoDir+"/mikado.blast.xml.gz"
 
 #listfile=mk.createMikadoGTFlist("mylist","/home/usingh/work/urmi/hoap/test/mkout","/home/usingh/work/urmi/hoap/test/sample_data/")
 
-mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permissive",scoring,junc,"mkconf",bt,orfs,xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutNew",verbose=True)
 
-#bamList=searchFilesLocally("/home/usingh/work/urmi/hoap/test/athalData/sraData","*.bam")
-#bamList=["/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR971778/SRR971778_hisat2_sorted.bam",
-         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR978411/SRR978411_hisat2_sorted.bam",
-         #"/home/usingh/work/urmi/hoap/test/athalData/sraData/SRR976159/SRR976159_hisat2_sorted.bam"
-         #]
+mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permissive",scoring,junc,"mkconf",bt,orfs,xml,out_dir="/home/usingh/work/urmi/hoap/test/mkout/mkoutNew",verbose=True)
+"""
+
+
+#test diamond
+infa="/home/usingh/work/urmi/hoap/test/diamondtest/uniprot_sprot_plants.fasta"
+dm=tools.Diamond(index="")
+dm.build_index(infa,"pdb",out_dir=testDir,threads=4)
+query="/home/usingh/work/urmi/hoap/test/diamondtest/smallprot.fa"
+dm.run_align(query,"myout",command="pp",out_dir=testDir,threads=4)
+
+
+
+
+
+
+

@@ -448,6 +448,11 @@ class Mikado(RNASeqTools):
         #run mikado prep
         self.runMikadoPrepare(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
         
+        #run blast to get blast/diamond xml
+        
+        
+        #run transdecoder/prodigal to get orfs
+        
         #run mikado ser
         self.runMikadoSerialise(config_file,blast_targets,orfs, xml,out_dir,verbose,quiet,logs,objectid,**kwargs)
         
@@ -689,8 +694,175 @@ class Ribocode(RNASeqTools):
         
         
         
+class Diamond(RNASeqTools):
+    def __init__(self,index,**kwargs):
+        self.programName="diamond"
+        self.dep_list=[self.programName]
+        #check if program exists
+        if not pe.check_dependencies(self.dep_list):
+            raise Exception("ERROR: "+ self.programName+" not found.")
+        
+        self.valid_args=[]        
+        self.passedArgumentDict=kwargs
+        
+        #check index
+        if not self.check_index(index):
+            print("No valid index provided. Please build index..")
+        else:
+            self.index=index
+            
+    def build_index(self,in_fasta,dbname,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Build a diamond index and store its path in self
+        """
+        
+        #check input files
+        if not pu.check_files_exist(in_fasta):
+            pu.print_boldred("Input fasta: {} not found...\n diamond makedb failed".format(in_fasta))
+            return False
+        
+        #create out_dir
+        if not out_dir:
+            out_dir=os.getcwd()
+        if not pu.check_paths_exist(out_dir):
+            pu.mkdir(out_dir)
+        #check if index already exists
+        index_path=os.path.join(out_dir,dbname)
+        if self.check_index(index_path):
+            pu.print_green("Index exists, using it...")
+            self.index=index_path
+            return True
+        #default threads
+        if not threads:
+            threads=2
         
         
+        newOpts={"--in": in_fasta, "-d": index_path, "-p":str(threads)}
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call run_diamond
+        status=self.run_diamond("makedb",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            self.index=index_path
+            return True
+        
+        return False
+    
+    
+    def run_align(self,query,out_file,command=None,out_fmt=None,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """
+        Parameters
+        ----------
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
+            arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+
+        :return: Returns the status of diamond. True is passed, False if failed.
+        :rtype: bool
+        """
+        if not command:
+            command="blastx"
+        if command not in ['blastx','blastp']:
+            pu.print_boldred("Invalid command: {}. Exiting...".format(command))
+            return ""
+        
+        #check input
+        if not pu.check_files_exist(query):
+            pu.print_boldred("Input fasta query file: {} not found...\n diamond blastx failed".format(query))
+            return ""
+        if not out_dir:
+            out_dir=os.getcwd()
+        if not pu.check_paths_exist(out_dir):
+            pu.mkdir(out_dir)
+            
+        if not threads:
+            threads=2
+        if not out_fmt:
+            out_fmt=0
+        
+        
+        out_file_path=os.path.join(out_dir,out_file)
+        
+        newOpts={"-d": self.index, "-q": query, "-p":str(threads),"-o":out_file_path,"-f":str(out_fmt)}
+        
+        #add input files to kwargs, overwrite kwargs with newOpts
+        mergedOpts={**kwargs,**newOpts}
+        
+        #call run
+        status=self.run_diamond(command,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        
+        if status:
+            #check if sam file is present in the location directory of sra_object
+            if pu.check_files_exist(out_file_path):
+                return out_file_path
+        else:
+            return ""
+        
+        
+        
+    def run_diamond(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running diamond.
+        
+        Parameters
+        ----------
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
+            arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+
+        :return: Returns the status of diamond. True is passed, False if failed.
+        :rtype: bool
+        """
+        
+        #check for a valid index
+        if subcommand=="blastx" or subcommand=="blastp":
+            if not self.check_index(self.index):
+                raise Exception("ERROR: Invalid Diamond index. Please run build index to generate an index.")
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        diamond_cmd=['diamond',subcommand]
+        #add options
+        diamond_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
+        
+        #execute command
+        cmd_status=pe.execute_command(diamond_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        if not cmd_status:
+            print("Diamond failed:"+" ".join(diamond_cmd))
+     
+        #return status
+        return cmd_status
+    
+    
+    def check_index(self,index):
+        """Check a diamond index
+        """
+        
+        if pu.check_files_exist(index):
+            return True
+        
+        if pu.check_files_exist(index+".dmnd"):
+            return True
+        
+        return False
         
         
         
