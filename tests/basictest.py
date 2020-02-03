@@ -353,7 +353,7 @@ infa="/home/usingh/work/urmi/hoap/test/diamondtest/uniprot_sprot_plants.fasta"
 dm=tools.Diamond(index="")
 dm.build_index(infa,"pdb",out_dir=testDir,threads=4)
 query="/home/usingh/work/urmi/hoap/test/diamondtest/smallprot.fa"
-outfile=dm.run_align(query,"myout",command="blastp",out_dir=testDir,threads=4,quiet=False,verbose=True)
+outfile=dm.run_align(query,"myout",command="blastp",out_dir=testDir,threads=4,out_fmt=6,fmt_string="bitscore qseqid qlen",quiet=False,verbose=True)
 
 print(outfile)
 

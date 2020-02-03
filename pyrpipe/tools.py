@@ -751,10 +751,31 @@ class Diamond(RNASeqTools):
         return False
     
     
-    def run_align(self,query,out_file,command=None,out_fmt=None,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_align(self,query,out_file,command=None,out_fmt=None,fmt_string=None,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Parameters
         ----------
+        query: string
+            Path to query fasta file
+        out_file: string
+            name of output file
+        command: string
+            "blastx" or "blastp"
+        out_fmt: int
+            output format as specified by diamond: 
+                0 = BLAST pairwise
+                5 = BLAST XML
+                6 = BLAST tabular
+                100 = DIAMOND alignment archive (DAA)
+                101 = SAM
+        fmt_string: string
+             space-separated list of keywords for out format 6
+        out_dir: string
+            path to out_directory
+            Default: current working dir
+        threads: int
+            number of threads to use 
+            Default:2
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -789,6 +810,10 @@ class Diamond(RNASeqTools):
             threads=2
         if not out_fmt:
             out_fmt=0
+        if out_fmt ==6:
+            if not fmt_string:
+                fmt_string=""
+            out_fmt=str(out_fmt)+" "+fmt_string
         
         
         out_file_path=os.path.join(out_dir,out_file)
