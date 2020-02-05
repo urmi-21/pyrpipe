@@ -367,5 +367,3 @@ predout=txd.run_transdecoder_predict(infa,longorfs_dir=outdir,out_dir=poutdir)
 print(predout)
 
 
-
-
