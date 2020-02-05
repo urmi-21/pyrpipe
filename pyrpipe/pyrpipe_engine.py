@@ -501,11 +501,12 @@ def deleteMultipleFilesFromDisk(*args):
     
     return not(errorFlag)
 
-def move_file(source,destination):
+def move_file(source,destination,verbose=False):
     """perform mv command to move a file from sourc to destination
     Returns True if move is successful
     """
-    #print("MOV:"+source+"-->"+destination)
+    if verbose:
+        print("MOVING:"+source+"-->"+destination)
     mv_cmd=['mv',source,destination]
     if not getReturnStatus(mv_cmd):
         return False

@@ -362,8 +362,9 @@ infa="/Users/usingh/work/urmi/tests/txd/test.fa"
 outdir=txd.run_transdecoder_longorfs(infa,out_dir="/Users/usingh/work/urmi/tests/txd/mtout1")
 print(outdir)
 
-#out_dir="/Users/usingh/work/urmi/tests/txd/mypredout"
-txd.run_transdecoder_predict(infa,outdir)
+poutdir="/Users/usingh/work/urmi/tests/txd/mypredout"
+predout=txd.run_transdecoder_predict(infa,longorfs_dir=outdir,out_dir=poutdir)
+print(predout)
 
 
 

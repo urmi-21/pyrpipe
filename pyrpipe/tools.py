@@ -907,10 +907,10 @@ class Transdecoder(RNASeqTools):
         if not pu.check_files_exist(infasta):
             pu.print_boldred("Please check input file:"+infasta)
         
-        move_flag=False
+        
         if not out_dir:
             out_dir=os.getcwd()
-            move_flag=True
+            
             
         newOpts={"-t":infasta,"-O":out_dir}
         mergedOpts={**kwargs,**newOpts}
@@ -930,8 +930,14 @@ class Transdecoder(RNASeqTools):
             pu.print_boldred("Please check input file:"+infasta)
         if not pu.check_paths_exist(longorfs_dir):
             pu.print_boldred("Path {} doesn't exist".format(longorfs_dir))
+            
+        move_flag=True
         if not out_dir:
             out_dir=os.getcwd()
+            move_flag=False
+            
+        if not pu.check_paths_exist(out_dir):
+            pu.mkdir(out_dir)
             
         newOpts={"-t":infasta,"-O":longorfs_dir}
         mergedOpts={**kwargs,**newOpts}
@@ -943,11 +949,11 @@ class Transdecoder(RNASeqTools):
         
         #move output files to outdir
         if move_flag:
-            outfile_prefix=infasta+".transdecoder"
-            pe.move_file(outfile_prefix+".bed",os.path.join(out_dir,outfile_prefix+".bed"))
-            pe.move_file(outfile_prefix+".cds",os.path.join(out_dir,outfile_prefix+".cds"))
-            pe.move_file(outfile_prefix+".gff3",os.path.join(out_dir,outfile_prefix+".gff3"))
-            pe.move_file(outfile_prefix+".pep",os.path.join(out_dir,outfile_prefix+".pep"))
+            outfile_prefix=pu.get_filename(infasta)+".transdecoder"
+            pe.move_file(outfile_prefix+".bed",os.path.join(out_dir,outfile_prefix+".bed"),verbose)
+            pe.move_file(outfile_prefix+".cds",os.path.join(out_dir,outfile_prefix+".cds"),verbose)
+            pe.move_file(outfile_prefix+".gff3",os.path.join(out_dir,outfile_prefix+".gff3"),verbose)
+            pe.move_file(outfile_prefix+".pep",os.path.join(out_dir,outfile_prefix+".pep"),verbose)
         return out_dir
         
         
