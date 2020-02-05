@@ -902,4 +902,92 @@ class Transdecoder(RNASeqTools):
         self.passedArgumentDict=kwargs
         
         
+    def run_transdecoder_longorfs(self,infasta,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         
+        if not pu.check_files_exist(infasta):
+            pu.print_boldred("Please check input file:"+infasta)
+        
+        move_flag=False
+        if not out_dir:
+            out_dir=os.getcwd()
+            move_flag=True
+            
+        newOpts={"-t":infasta,"-O":out_dir}
+        mergedOpts={**kwargs,**newOpts}
+        
+        #execute LongOrfs
+        status=self.run_transdecoder('TransDecoder.LongOrfs',verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        if not status:
+            pu.print_boldred("Transdecoder failed")
+            return ""
+   
+        return out_dir
+        
+        
+    def run_transdecoder_predict(self,infasta,longorfs_dir,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        
+        if not pu.check_files_exist(infasta):
+            pu.print_boldred("Please check input file:"+infasta)
+        if not pu.check_paths_exist(longorfs_dir):
+            pu.print_boldred("Path {} doesn't exist".format(longorfs_dir))
+        if not out_dir:
+            out_dir=os.getcwd()
+            
+        newOpts={"-t":infasta,"-O":longorfs_dir}
+        mergedOpts={**kwargs,**newOpts}
+        #execute Predict
+        status=self.run_transdecoder('TransDecoder.Predict',verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        if not status:
+            pu.print_boldred("Transdecoder failed")
+            return ""
+        
+        #move output files to outdir
+        if move_flag:
+            outfile_prefix=infasta+".transdecoder"
+            pe.move_file(outfile_prefix+".bed",os.path.join(out_dir,outfile_prefix+".bed"))
+            pe.move_file(outfile_prefix+".cds",os.path.join(out_dir,outfile_prefix+".cds"))
+            pe.move_file(outfile_prefix+".gff3",os.path.join(out_dir,outfile_prefix+".gff3"))
+            pe.move_file(outfile_prefix+".pep",os.path.join(out_dir,outfile_prefix+".pep"))
+        return out_dir
+        
+        
+    
+    def run_transdecoder(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        """Wrapper for running transdecoder.
+        
+        Parameters
+        ----------
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
+        kwargs: dict
+            arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
+
+        :return: Returns the status of diamond. True is passed, False if failed.
+        :rtype: bool
+        """
+        
+        
+            
+        #override existing arguments
+        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
+        txd_cmd=[command]
+        #add options
+        txd_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
+        
+        #execute command
+        cmd_status=pe.execute_command(txd_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        if not cmd_status:
+            print("Transdecoder failed:"+" ".join(txd_cmd))
+     
+        #return status
+        return cmd_status
+
+

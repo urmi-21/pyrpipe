@@ -349,15 +349,21 @@ mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permis
 
 
 #test diamond
-infa="/home/usingh/work/urmi/hoap/test/diamondtest/uniprot_sprot_plants.fasta"
-dm=tools.Diamond(index="")
-dm.build_index(infa,"pdb",out_dir=testDir,threads=4)
-query="/home/usingh/work/urmi/hoap/test/diamondtest/smallprot.fa"
-outfile=dm.run_align(query,"myout",command="blastp",out_dir=testDir,threads=4,out_fmt=6,fmt_string="bitscore qseqid qlen")
+#infa="/home/usingh/work/urmi/hoap/test/diamondtest/uniprot_sprot_plants.fasta"
+#dm=tools.Diamond(index="")
+#dm.build_index(infa,"pdb",out_dir=testDir,threads=4)
+#query="/home/usingh/work/urmi/hoap/test/diamondtest/smallprot.fa"
+#outfile=dm.run_align(query,"myout",command="blastp",out_dir=testDir,threads=4,out_fmt=6,fmt_string="bitscore qseqid qlen")
 
-print(outfile)
+#print(outfile)
 
 txd=tools.Transdecoder()
+infa="/Users/usingh/work/urmi/tests/txd/test.fa"
+outdir=txd.run_transdecoder_longorfs(infa,out_dir="/Users/usingh/work/urmi/tests/txd/mtout1")
+print(outdir)
+
+#out_dir="/Users/usingh/work/urmi/tests/txd/mypredout"
+txd.run_transdecoder_predict(infa,outdir)
 
 
 
