@@ -434,7 +434,7 @@ class Mikado(RNASeqTools):
                 
 
         
-    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,threads,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run whole mikado pipeline
         Output will be stored to out_dir/
         """
@@ -448,10 +448,24 @@ class Mikado(RNASeqTools):
         #run mikado prep
         self.runMikadoPrepare(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
         
+        
+        mikado_prep_fa=os.path.join(out_dir,"mikado_prepared.fasta")
+        
         #run blast to get blast/diamond xml
         
+        xml=blastx_object.run_align(mikado_prep_fa,"mikado_prep_blast.xml",command="blastx",out_fmt=5,fmt_string=None,out_dir=out_dir,threads=threads,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        
+        print("XML:"+xml)
         
         #run transdecoder/prodigal to get orfs
+        
+        txd=tools.Transdecoder()
+        longOrfOut=txd.run_transdecoder_longorfs(mikado_prep_fa,out_dir=out_dir+"/longorfsout")
+        preddir=out_dir+"/predout"
+        predout=txd.run_transdecoder_predict(mikado_prep_fa,longOrfOut,out_dir=preddir)
+        print(predout)
+        
+        orfs=os.path.join(preddir,"mikado_prepared.fasta.transdecoder.bed")
         
         #run mikado ser
         self.runMikadoSerialise(config_file,blast_targets,orfs, xml,out_dir,verbose,quiet,logs,objectid,**kwargs)
