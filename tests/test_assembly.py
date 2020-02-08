@@ -38,7 +38,6 @@ def test_trinityBam():
     bam=testVars.hisatSortedBam
     tr_opts={"--genome_guided_bam":bam,
              "--genome_guided_max_intron":"10000",
-             "--max_memory": "2G",
             "--output":testVars.testDir+"/trinity_testoutbam",
             }
     st=tr.run_trinity(**tr_opts)
