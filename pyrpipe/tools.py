@@ -410,7 +410,7 @@ class Mikado(RNASeqTools):
         """Create a file to be used by mikado configure
         """
         
-        files=pe.find_files(searchPath,searchQuery)
+        files=pe.find_files(searchPath,searchQuery,recursive=True)
         args=files
         
         #create out dir
