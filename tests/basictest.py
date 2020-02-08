@@ -357,7 +357,7 @@ mk.runMikadoFull("/home/usingh/work/urmi/hoap/test/mkout/mylist.txt",ref,"permis
 
 #print(outfile)
 
-txd=tools.Transdecoder()
+"""txd=tools.Transdecoder()
 infa="/Users/usingh/work/urmi/tests/txd/test.fa"
 outdir=txd.run_transdecoder_longorfs(infa,out_dir="/Users/usingh/work/urmi/tests/txd/mtout1")
 print(outdir)
@@ -365,4 +365,25 @@ print(outdir)
 poutdir="/Users/usingh/work/urmi/tests/txd/mypredout"
 predout=txd.run_transdecoder_predict(infa,longorfs_dir=outdir,out_dir=poutdir)
 print(predout)
+"""
+
+#create diamond obj
+infa="/Users/usingh/work/urmi/tests/mikado/uniprot_sprot_plants.fasta"
+dm=tools.Diamond(index="")
+dm.build_index(infa,"diamondDB",out_dir="/Users/usingh/work/urmi/tests/mikado/dout",threads=8)
+
+
+listFile="/Users/usingh/work/urmi/tests/mikado/list.txt"
+genome="/Users/usingh/work/urmi/tests/mikado/chr5.fas"
+mode="permissive"
+scoring="plants.yaml"
+junctions="/Users/usingh/work/urmi/tests/mikado/junctions.bed"
+
+mk=tools.Mikado()
+mk.runMikadoFull(listFile,genome,mode,scoring,junctions,"mkconf",infa,dm,8,out_dir="/Users/usingh/work/urmi/tests/mikado/pyrout",verbose=False)
+
+
+
+
+
 

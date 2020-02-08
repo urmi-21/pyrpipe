@@ -459,7 +459,7 @@ class Mikado(RNASeqTools):
         
         #run transdecoder/prodigal to get orfs
         
-        txd=tools.Transdecoder()
+        txd=Transdecoder()
         longOrfOut=txd.run_transdecoder_longorfs(mikado_prep_fa,out_dir=out_dir+"/longorfsout")
         preddir=out_dir+"/predout"
         predout=txd.run_transdecoder_predict(mikado_prep_fa,longOrfOut,out_dir=preddir)
@@ -491,7 +491,7 @@ class Mikado(RNASeqTools):
         """
         
         #check all file exists
-        if not pu.check_files_exist(listFile,genome,junctions,scoring):
+        if not pu.check_files_exist(listFile,genome,junctions):
             print("Please check mikado input")
             return ""
         
