@@ -3,7 +3,7 @@ channels:
   - bioconda
  
 dependencies:
-  - python=3.7.5
+  - python=3.6.7
   - sra-tools=2.10.0
   - samtools=1.9
   - stringtie=2.1.1
@@ -12,3 +12,4 @@ dependencies:
   - diamond=0.9.29
   - TransDecoder=5.5.0
   - portcullis=1.1.2
+  - cufflinks=2.2.1
