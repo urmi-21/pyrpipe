@@ -10,7 +10,7 @@ examples/Maize_lncRNA_prediction/maize_out
 examples/Human_annotation_snakemake/out
 examples/Human_annotation_snakemake/human_data
 examples/Human_annotation_snakemake/hisat_index
-
+examples/Human_annotation_snakemake/.snakemake*
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
