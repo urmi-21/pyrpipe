@@ -8,6 +8,7 @@ examples/Athaliana_transcript_assembly/athal_out
 examples/Maize_lncRNA_prediction/maize_out
 examples/Human_annotation_snakemake/out
 examples/Human_annotation_snakemake/human_data
+examples/Human_annotation_snakemake/hisat_index
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
