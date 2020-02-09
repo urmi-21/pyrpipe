@@ -1,5 +1,6 @@
 import yaml
 import sys
+import os
 from pyrpipe import sra,qc,mapping,tools,assembly
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
@@ -13,6 +14,7 @@ THREADS=config['THREADS']
 ##check required files
 GENOME= config['genome']
 GTF=config['gtf']
+BLASTTARGET=config['blasttarget']
 if not pu.check_files_exist(GENOME):
 	pu.mkdir("human_data")
 	pe.execute_command('wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -O human_data/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz'.split(),logs=False)
@@ -21,8 +23,12 @@ if not pu.check_files_exist(GENOME):
 	pe.execute_command('wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.99.gtf.gz -O human_data/Homo_sapiens.GRCh38.99.gtf.gz'.split(),logs=False)
 	pe.execute_command('gunzip human_data/Homo_sapiens.GRCh38.99.gtf.gz'.split(),logs=False)
 
-if pu.check_files_exist(GENOME,GTF):
-	pu.print_green("Genome and GTF files...OK")
+if not pu.check_files_exist(BLASTTARGET):
+	pe.execute_command('wget ftp://ftp.uniprot.org/pub/databases/uniprot/current_release/knowledgebase/complete/uniprot_sprot.fasta.gz -O human_data/uniprot_sprot.fasta.gz'.split(),logs=False)
+	pe.execute_command('gunzip human_data/uniprot_sprot.fasta.gz'.split(),logs=False)
+
+if pu.check_files_exist(GENOME,GTF,BLASTTARGET):
+	pu.print_green("Genome, GTF, Uniprot files...OK")
 else:
 	pu.print_boldred("Genome and GTF files...NOT FOUND")
 	sys.exit(1)
@@ -83,9 +89,10 @@ rule all:
 		#expand("{wd}/{sample}/{sample}_1_bbduk.fastq",sample=SRR,wd=DIR,num=[1,2]),
 		#expand("{wd}/{sample}/{sample}_2_bbduk.fastq",sample=SRR,wd=DIR,num=[1,2])
 		#expand("{wd}/{sample}/{sample}_hisat2.sam",sample=SRR,wd=DIR,num=[1,2])
-		expand("{wd}/{sample}/{sample}_hisat2_sorted_cufflinks.gtf",sample=SRR,wd=DIR,num=[1,2]),
-		expand("{wd}/{sample}/{sample}_hisat2_sorted_stringtie.gtf",sample=SRR,wd=DIR,num=[1,2])
-
+		#expand("{wd}/{sample}/{sample}_hisat2_sorted_cufflinks.gtf",sample=SRR,wd=DIR,num=[1,2]),
+		#expand("{wd}/{sample}/{sample}_hisat2_sorted_stringtie.gtf",sample=SRR,wd=DIR,num=[1,2]),
+		#expand("{wd}/portout/3-filt/portcullis_filtered.pass.junctions.bed",wd=DIR)
+		expand("{wd}/mikadoout/mikado.loci.gff3",wd=DIR)
 
 
 rule download:
@@ -157,6 +164,83 @@ rule cufflinks:
 		f=str(output.gtf)
 		srr=pu.get_file_basename(f).split("_")[0]
 		CL.perform_assembly(input.bam, objectid=srr)
+
+
+
+rule mergebam:
+	input:
+		expand("{wd}/{sample}/{sample}_hisat2_sorted.bam",sample=SRR,wd=DIR)
+	output:
+	       	mergedbam="{wd}/merged.bam"
+		#expand("{wd}/merged.bam",wd=DIR)
+	threads: THREADS
+	run:
+		print (input)
+		input_bams=[ os.path.join(DIR,S,S+"_hisat2_sorted.bam") for S in SRR]
+		ST.merge_bam(*input_bams,out_file="merged",out_dir=DIR)
+		
+
+rule portcullis:
+	input:
+		bam="{wd}/merged.bam"
+	output:
+		junc="{wd}/portout/3-filt/portcullis_filtered.pass.junctions.bed"
+	threads: THREADS
+	run:
+		PC=tools.Portcullis()
+    		PC.run_portcullisFull(GENOME,input.bam,out_dir=DIR+"/portout",**{"--threads":str(threads)})
+		
+
+"""	
+rule mikado_config:
+	input:
+		list="{wd}/list.txt"
+"""
+
+
+rule create_GTFlist:
+	input:
+		g1=expand("{wd}/{sample}/{sample}_hisat2_sorted_cufflinks.gtf",sample=SRR,wd=DIR,num=[1,2]),
+                g2=expand("{wd}/{sample}/{sample}_hisat2_sorted_stringtie.gtf",sample=SRR,wd=DIR,num=[1,2]),
+	output:
+		"{wd}/list.txt"
+	run:
+		filepath=DIR+"/list.txt"
+		gtfs=[]
+		temp=input.g1+input.g2
+		for l in temp:
+			thisName=pu.get_file_basename(l)
+			if thisName:
+				gtfs.append("\t".join([l,thisName,"False"]))
+       
+		f=open(filepath,"w")
+		f.write("\n".join(gtfs))
+		f.close()
+		
+
+rule mikado:
+	input:
+		junctions="{wd}/portout/3-filt/portcullis_filtered.pass.junctions.bed",
+		listfile="{wd}/list.txt"
+	output:
+		mikadoout="{wd}/mikadoout/mikado.loci.gff3"
+
+	threads: THREADS
+	run:
+		dm=tools.Diamond(index="")
+		dm.build_index(BLASTTARGET,"diamondDB",out_dir=DIR+"/diamond_index",threads=THREADS)
+		mode="permissive"
+		scoring="human.yaml"
+		mk=tools.Mikado()
+		mk.runMikadoFull(input.listfile,GENOME,mode,scoring,input.junctions,"mkconf",BLASTTARGET,dm,THREADS,out_dir=DIR+"/mikadoout",verbose=False)	
+
+	
+
+
+
+
+
+
 
 
 
