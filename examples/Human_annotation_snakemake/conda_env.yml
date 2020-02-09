@@ -1,0 +1,14 @@
+name: pyrpipe_human
+channels:
+  - bioconda
+ 
+dependencies:
+  - python=3.7.5
+  - sra-tools=2.10.0
+  - samtools=1.9
+  - stringtie=2.1.1
+  - hisat2=2.1.0
+  - bbmap=38.73
+  - diamond=0.9.29
+  - TransDecoder=5.5.0
+  - portcullis=1.1.2

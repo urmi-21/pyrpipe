@@ -1,5 +1,5 @@
 DIR:
-        "test1"
+        "out"
 THREADS:
         25
 genome:
