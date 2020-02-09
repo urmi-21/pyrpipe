@@ -19,7 +19,8 @@ if not pu.check_files_exist(GENOME):
 	pu.mkdir("human_data")
 	pe.execute_command('wget ftp://ftp.ensembl.org/pub/release-99/fasta/homo_sapiens/dna/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz -O human_data/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz'.split(),logs=False)
 	pe.execute_command('gunzip human_data/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa.gz'.split(),logs=False)
-if not pu.check_files_exist(GENOME):
+
+if not pu.check_files_exist(GTF):
 	pe.execute_command('wget ftp://ftp.ensembl.org/pub/release-99/gtf/homo_sapiens/Homo_sapiens.GRCh38.99.gtf.gz -O human_data/Homo_sapiens.GRCh38.99.gtf.gz'.split(),logs=False)
 	pe.execute_command('gunzip human_data/Homo_sapiens.GRCh38.99.gtf.gz'.split(),logs=False)
 
