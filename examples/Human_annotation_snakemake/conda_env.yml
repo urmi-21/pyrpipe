@@ -120,7 +120,6 @@ dependencies:
     - configargparse==1.0
     - cssselect2==0.2.2
     - cycler==0.10.0
-    - cython==0.29.14
     - datrie==0.8
     - decorator==4.4.1
     - defusedxml==0.6.0
@@ -147,7 +146,6 @@ dependencies:
     - markdown==3.2
     - markupsafe==1.1.1
     - matplotlib==3.1.1
-    - mikado==1.2.4
     - multiqc==1.8
     - nbformat==5.0.4
     - networkx==2.4
