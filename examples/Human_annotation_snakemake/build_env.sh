@@ -8,6 +8,6 @@ conda activate pyrpipe_human
 pip3 install --user --upgrade pip
 pip install cython
 pip install -Iv mikado==1.2.4
-pip install git+https://github.com/urmi-21/pyrpipe.git
+pip install git+https://github.com/urmi-21/pyrpipe.git@6536130cc8222d3eab20ff7c5edee74c8736924b
 
 echo "Environment created. To activate, use: conda activate pyrpipe_human"
