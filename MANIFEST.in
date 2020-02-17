@@ -1,2 +1,3 @@
 include pyrpipe/report_templates/*
 include scripts/*
+include *.txt 
