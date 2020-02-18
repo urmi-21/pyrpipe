@@ -58,8 +58,9 @@ Please follow these instruction:
 2. `conda create -n pyrpipe python=3.7`
 3. `conda activate pyrpipe`
 
-**NOTE: You need to install the resto of the third-party tools to work with pyrpipe. We recomend installing these through conda where possible. 
-A recommended environment file, using python 2.7, is given [here](). To ensure reproducibility please ensure the release versions of each tool.**
+**NOTE: You need to install the third-party tools to work with pyrpipe. We recomend installing these through bioconda where possible. 
+A recommended environment file, using python 3.7, is given [here](https://github.com/urmi-21/pyrpipe/blob/master/tests/test_environment.yml). To ensure reproducibility of your analysis, please ensure the release versions of each tool.
+It is best to [share your conda environment files](https://stackoverflow.com/questions/41274007/anaconda-export-environment-file) with pyrpipe scripts to ensure reproducibility**
 
 ### Install latest stable version
 
