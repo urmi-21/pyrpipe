@@ -75,9 +75,10 @@ To run tests:
 3. To build test_environment (This will download tools): 
 ```
 cd tests 
-. ./build_test_env.sh
+bash build_test_env.sh
 ```
-4. Go one directory above (use same terminal used for `build_test_env.sh`) `tests` and run `py.test tests/test_*`
+See [this](https://github.com/urmi-21/pyrpipe/blob/master/tests/README.md)
+4. From pyrpipe root directory, run `py.test tests/test_*`
 
 
 ### Install current developer version
