@@ -58,6 +58,9 @@ Please follow these instruction:
 2. `conda create -n pyrpipe python=3.7`
 3. `conda activate pyrpipe`
 
+**NOTE: You need to install the resto of the third-party tools to work with pyrpipe. We recomend installing these through conda where possible. 
+A recommended environment file, using python 2.7, is given [here](). To ensure reproducibility please ensure the release versions of each tool.**
+
 ### Install latest stable version
 
 ```
