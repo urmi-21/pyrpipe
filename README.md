@@ -78,6 +78,7 @@ cd tests
 bash build_test_env.sh
 ```
 See [this](https://github.com/urmi-21/pyrpipe/blob/master/tests/README.md)
+
 4. From pyrpipe root directory, run `py.test tests/test_*`
 
 
