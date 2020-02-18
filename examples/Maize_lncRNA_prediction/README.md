@@ -7,3 +7,5 @@
 2. Switch to the environment:
 
     `conda activate pyrpipe_examples`
+
+3. Execute the code in `.ipynb` file
