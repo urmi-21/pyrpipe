@@ -21,3 +21,6 @@
 
 # Jupyter notebook
 *.ipynb  text
+
+* linguist-vendored
+*.js linguist-vendored=false
