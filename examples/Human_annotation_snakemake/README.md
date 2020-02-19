@@ -1,3 +1,12 @@
+# Introduction
+
+## Integrating pyrpipe scripts within a workflow management system (Snakemake)
+We embedded pyrpipe into the Snakemake workflow management system, using it to download human RNA-Seq data with SRAtools, 
+quality filter with BBDuk, align reads with Hisat2, assemble transcripts with StringTie and Cufflinks,
+and merge the multiple assemblies with Mikado.
+
+
+
 ## Running this example
 
 ### First build the environment

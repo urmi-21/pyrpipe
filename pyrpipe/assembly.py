@@ -59,7 +59,7 @@ class Stringtie(Assembly):
             self.reference_gtf=reference_gtf
             self.passed_args_dict['-G']=reference_gtf
         
-    def perform_assembly(self,bam_file,out_dir="",out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie using a bam file.
                 
         Parameters
