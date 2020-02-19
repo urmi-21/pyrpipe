@@ -1,4 +1,4 @@
-pyrpipe/report_templates/* linguist-vendored
+pyrpipe/report_templates/* linguist-documentation
 
 # Basic .gitattributes for a python repo.
 # Source files
