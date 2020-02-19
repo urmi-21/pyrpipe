@@ -15,3 +15,6 @@ and merge the multiple assemblies with Mikado.
 * Activate the environment: `conda activate pyrpipe_human`
 * Execute Snakemake workflow: `snakemake -j <num threads>`
  
+### To execute on a cluster with slurm
+
+`snakemake -j 5 --cluster-config cluster.json --cluster "sbatch -t {cluster.time} -c 28`
