@@ -60,7 +60,7 @@ Please follow these instruction:
 
 **NOTE: You need to install the third-party tools to work with pyrpipe. We recomend installing these through [bioconda](https://bioconda.github.io/) where possible. 
 A recommended environment file, using python 3.7, is given [here](https://github.com/urmi-21/pyrpipe/blob/master/tests/test_environment.yml).
-It is best to [share your conda environment files](https://stackoverflow.com/questions/41274007/anaconda-export-environment-file) with pyrpipe scripts to ensure reproducibility**
+It is best to [share your conda environment files](https://stackoverflow.com/questions/41274007/anaconda-export-environment-file) with pyrpipe scripts to ensure reproducibility.**
 
 ### Install latest stable version
 

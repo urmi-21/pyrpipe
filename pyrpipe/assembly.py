@@ -117,7 +117,7 @@ class Stringtie(Assembly):
         else:
             return ""
         
-    def stringtie_merge(self,*args,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def stringtie_merge(self,*args,out_dir=None,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
         
         Parameters
@@ -150,7 +150,10 @@ class Stringtie(Assembly):
         
         #create path to output sam file
         fname=pu.get_file_basename(args[0])
-        out_dir=pu.get_file_directory(args[0])
+        
+        if not out_dir:
+            out_dir=pu.get_file_directory(args[0])
+        
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         if not overwrite:
