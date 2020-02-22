@@ -1,17 +1,5 @@
 todo
-generate reports (pdf, md)
-diagnostic argument parser
-
-full documentation
-
+improve documentation
 add procs parametr for each class
-Add programs
-mikado
-blast
-
-write unit tests
-test bowtie2
-
-add multiqc reports
+handle overwrite in hisat2_build
 combine logs
-remove objectid param from functions depending on sraob e,g. performAssembly()
