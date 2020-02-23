@@ -76,9 +76,9 @@ def test_diamond():
 
 def test_transdecoder():
     td=tools.Transdecoder()
-    longOrfOut=td.run_transdecoder_longorfs(testVars.bbdukAdapters,out_dir=testVars.testDir+"/longorfsout")
+    longOrfOut=td.run_transdecoder_longorfs(testVars.cdna_small,out_dir=testVars.testDir+"/longorfsout")
     preddir=testVars.testDir+"/predout"
-    predout=td.run_transdecoder_predict(testVars.bbdukAdapters,longOrfOut,out_dir=preddir)
+    predout=td.run_transdecoder_predict(testVars.cdna_small,longOrfOut,out_dir=preddir)
     st=pu.check_paths_exist(predout)
     assert st==True, "TransDecoder failed" 
     

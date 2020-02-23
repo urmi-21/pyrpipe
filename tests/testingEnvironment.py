@@ -16,6 +16,7 @@ class testSpecs:
         self.genome=testfiles+"/genome/Arabidopsis_thaliana.TAIR10.dna.1and2.fa"
         self.gtf=testfiles+"/genome/Arabidopsis_thaliana.TAIR10.45_1and2.gtf"
         self.cdna=testfiles+"/genome/Arabidopsis_thaliana.TAIR10.cdna.5000.fa"
+        self.cdna_small=testfiles+"/genome/Arabidopsis_thaliana.TAIR10.cdna.50.fa"
         self.hisat2index=testfiles+"/hisat2index/athal"
         self.hisatSam=testfiles+"/mapping/hisat2.sam"
         self.hisatBam=testfiles+"/mapping/hisat2.bam"
