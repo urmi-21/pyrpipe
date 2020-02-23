@@ -426,6 +426,8 @@ def is_paired(sra_file):
         raise Exception("Error running fastq-dump: {}".format(str(e)));
 
 
+    
+
 def getProgramPath(programName):
     """
     Get path of installed program

@@ -11,6 +11,7 @@ Created on Sat Nov 23 15:45:26 2019
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os
+import statistics 
 
 
 class SRA:
@@ -34,7 +35,7 @@ class SRA:
         -----------
         
         """
-    def __init__(self,srr_accession=None, location=None):
+    def __init__(self,srr_accession=None, location=None, threads=None):
         
         if location is None and srr_accession is None:
             #pu.print_boldred("Please provide a valid srr accession or location, or both")
@@ -45,7 +46,10 @@ class SRA:
             #use the provided srr_accession
         self.init_from_accession(srr_accession,location)
         
-        ##check if sra, fastq files already exists
+        #default threads to use
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=str(threads)
     
     def init_from_path(self,path):
         if not pu.check_paths_exist(path):
@@ -169,7 +173,7 @@ class SRA:
             self.__dict__[name] = value
                 
     
-    def download_fastq(self,verbose=False,quiet=False,logs=True,procs=2,**kwargs):
+    def download_fastq(self,verbose=False,quiet=False,logs=True,threads=None,**kwargs):
         """Function to download fastq files
         """
         
@@ -177,6 +181,12 @@ class SRA:
         if self.fastqFilesExistsLocally():
             pu.print_green("Fastq files exist already")
             return True
+        
+        #overwrite threads
+        if not threads:
+            threads=self.threads
+        else:
+            threads=str(threads)
         
         
         fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V',
@@ -189,7 +199,7 @@ class SRA:
         fstrqd_Cmd.extend(['-O',self.location])
         #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
         fstrqd_Cmd.extend(['-o',self.srr_accession+".fastq"])
-        fstrqd_Cmd.extend(['-e',str(procs)])
+        fstrqd_Cmd.extend(['-e',str(threads)])
         if self.sraFileExistsLocally():
             fstrqd_Cmd.append(self.localSRAFilePath)
         else:
@@ -413,6 +423,7 @@ class SRA:
         
         fstrqd_Cmd=['fasterq-dump']
         fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
+        fstrqd_Cmd.extend(['-e',str(self.threads)])
         #add location
         fstrqd_Cmd.extend(['-O',self.location])
         #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
@@ -539,5 +550,60 @@ class SRA:
             return True
         return False
     
-    
+    def get_read_length(self,lines_to_examine=None):
+        """Examine first lines_to_examine lines and return the mode of read lengths
+        
+        """
+        if not lines_to_examine:
+            lines_to_examine=4*10000
+        else:
+            lines_to_examine=4*lines_to_examine
+            
+        if not self.fastqFilesExistsLocally():
+            pu.print_boldred("Fastq files don't exist")
+            return 0
+            
+        #check the read len
+        if self.layout=='SINGLE':
+            
+            with open(self.localfastqPath) as f:
+                data=[next(f) for x in range(lines_to_examine)]
+            reads_lens=[]
+            
+            for i in range(1,len(data),4):
+                reads_lens.append(len(data[i].strip()))
+                
+            return statistics.mode(reads_lens)
+        
+        if self.layout=='PAIRED':
+            reads_lens=[]
+            with open(self.localfastq1Path) as f:
+                data=[next(f) for x in range(lines_to_examine)]
+            #get lens from first file
+            for i in range(1,len(data),4):
+                reads_lens.append(len(data[i].strip()))
+            mode1=statistics.mode(reads_lens)
+            #print("Mode:",mode1)
+            
+            return mode1
+            """
+            Not sure how to deal with unqeual read lengths
+            
+            #read 2nd file
+            reads_lens=[]
+            with open(self.localfastq2Path) as f:
+                data=[next(f) for x in range(lines_to_examine)]
+            #get lens from second file
+            for i in range(1,len(data),4):
+                reads_lens.append(len(data[i].strip()))
+            
+            mode2=statistics.mode(reads_lens)
+            print("Mode:",mode2)
+            
+            return (mode1+mode2)/2
+            """
+            
+        return 0
+            
+        
     
