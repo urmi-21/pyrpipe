@@ -16,6 +16,7 @@ with pyrpipe, or can use the methods provided in the pyrpipe_engine module to in
 ### What it does
 Allows fast and easy development of bioinformatics pipelines in python by providing 
 * a high level api to popular bioinformatics tools
+* optimizes program parameters based on the data
 * a general api to execute any linux command from python (using the subprocess module)
 * comprehensive logging features to log all the commands, output and their return status
 * report generating features for easy sharing, reproducing, benchmarking and debugging
