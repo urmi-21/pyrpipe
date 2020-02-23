@@ -16,7 +16,7 @@ class RNASeqTools:
     
 
 class Samtools(RNASeqTools):
-    def __init__(self,**kwargs):
+    def __init__(self,threads=None,**kwargs):
         self.programName="samtools"
         #check if hisat2 exists
         if not pe.check_dependencies([self.programName]):
@@ -25,8 +25,15 @@ class Samtools(RNASeqTools):
         self.valid_args=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r',
                             '-R','-q','-l','-m','-f','-F','-G','-s','-M','-x','-B','-?','-S','-O','-T','-@']
         
-        self.passedArgumentDict=kwargs
         
+        
+        if '-@' not in kwargs:
+            #use max threads by default
+            if not threads:
+                threads=os.cpu_count()    
+            kwargs['-@']=str(threads)
+        
+        self.passedArgumentDict=kwargs
         
         
     def sam_to_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
@@ -275,19 +282,25 @@ class Samtools(RNASeqTools):
         
         
 class Portcullis(RNASeqTools):
-    def __init__(self,**kwargs):
+    def __init__(self,threads=None,**kwargs):
         self.programName="portcullis"
         self.dep_list=[self.programName]
         #check if program exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.valid_args=['-t','--threads','-v','--verbose','--help','-o','-b',
+        self.valid_args=['-t','-v','--verbose','--help','-o','-b',
                             '--bam_filter','--exon_gff','--intron_gff','--source',
                             '--force','--copy','--use_csi','--orientation','--strandedness',
                             '--separate','--extra','-r','--max_length','--canonical','--min_cov',
                             '--save_bad']
         
+        if '-t' not in kwargs:
+            #use max threads by default
+            if not threads:
+                threads=os.cpu_count()    
+            kwargs['-t']=str(threads)
+            
         self.passedArgumentDict=kwargs
         
         
@@ -394,14 +407,38 @@ class Portcullis(RNASeqTools):
         
 
 class Mikado(RNASeqTools):
-    def __init__(self,**kwargs):
+    def __init__(self,threads=None,**kwargs):
         self.programName="mikado"
         self.dep_list=[self.programName]
         #check if program exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.valid_args=[]        
+        #valid_args is a dict as different subprograms use differnt parameters
+        self.valid_args={}
+        
+        self.valid_args['configure']=['-h','--help','--full','--strand-specific','--no-files','--gff','--list','--reference','--strand-specific-assemblies','--labels','--external','-t','--threads','--skip-split','-j','--json','-od','--out-dir',
+                           '--scoring',' --copy-scoring','-i','--intron-range','--pad','--junctions','-bt','--blast_targets','--daijin','-bc','--blast-chunks','--use-blast','--use-transdecoder','--mode']
+        
+        self.valid_args['prepare']=['-h','--help','--fasta','-v','--verbose','-q','--quiet','--start-method','-s','--strand-specific','-sa','--strand-specific-assemblies','--list','-l','--log','--lenient',
+                       '-m','--minimum_length','-p','--procs','-scds','--strip_cds','--labels','--single','-od','--output-dir','-o','--out','-of','--out_fasta','--json-conf']
+        
+        self.valid_args['serialise']=['-h','--help','--start-method','-od','--output-dir','--orfs','--transcripts','-mr','--max-regression','--max_target_seqs','--blast_targets','--xml','-p','--procs','--single-thread',
+                               '--genome_fai','--junctions','--external-scores','-mo','--max-objects','-f','--force','--json-conf','-l','--log','-lv','--log_level','db']
+        self.valid_args['pick']=['-h','--help','--start-method','-p','--procs','--json-conf','--scoring-file','-i','--intron-range','--pad','--subloci_out','--monoloci_out','--loci_out','--prefix','--no_cds','--source','--flank','--purge','--cds-only',
+                               '--monoloci-from-simple-overlap','--consider-truncated-for-retained','-db','--sqlite-db','-od','--output-dir','--single','--mode','-l','--log','-v','--verbose','-nv','--noverbose','-lv','--log-level']
+        self.valid_args['compare']=['-h','--help','--distance','-pc','--protein-coding','-o','--out','--lenient','-eu','--exclude-utr','-n','--no-index','--no-save-index','-erm','--extended-refmap','-upa','--use-prediction-alias',
+                                   '-l','--log','-v','--verbose','-z','--gzip','-r','--reference','-p','--prediction','--self','--internal','--index']
+
+                
+        
+        #threads to use if not specified
+        if '-p' not in kwargs:
+            #use max threads by default
+            if not threads:
+                threads=os.cpu_count()    
+            kwargs['-p']=str(threads)
+            
         self.passedArgumentDict=kwargs
         
         
@@ -434,7 +471,7 @@ class Mikado(RNASeqTools):
                 
 
         
-    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,threads,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run whole mikado pipeline
         Output will be stored to out_dir/
         """
@@ -453,9 +490,9 @@ class Mikado(RNASeqTools):
         
         #run blast to get blast/diamond xml
         
-        xml=blastx_object.run_align(mikado_prep_fa,"mikado_prep_blast.xml",command="blastx",out_fmt=5,fmt_string=None,out_dir=out_dir,threads=threads,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        xml=blastx_object.run_align(mikado_prep_fa,"mikado_prep_blast.xml",command="blastx",out_fmt=5,fmt_string=None,out_dir=out_dir,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
-        print("XML:"+xml)
+        #print("XML:"+xml)
         
         #run transdecoder/prodigal to get orfs
         
@@ -463,7 +500,7 @@ class Mikado(RNASeqTools):
         longOrfOut=txd.run_transdecoder_longorfs(mikado_prep_fa,out_dir=out_dir+"/longorfsout")
         preddir=out_dir+"/predout"
         predout=txd.run_transdecoder_predict(mikado_prep_fa,longOrfOut,out_dir=preddir)
-        print(predout)
+        #print(predout)
         
         orfs=os.path.join(preddir,"mikado_prepared.fasta.transdecoder.bed")
         
@@ -642,13 +679,17 @@ class Mikado(RNASeqTools):
     def runMikado(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado
         """
+        valid_commands=['configure','prepare','serialise','pick','compare']
+        if sub_command not in valid_commands:
+            pu.print_boldred("Invalid command: "+sub_command+". Exiting...")
+            return False
         
         #override existing arguments
         mergedArgsDict={**self.passedArgumentDict,**kwargs}
        
         mikado_Cmd=['mikado',sub_command]
         #add options
-        mikado_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
+        mikado_Cmd.extend(pu.parse_unix_args(self.valid_args[sub_command],mergedArgsDict))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
@@ -709,48 +750,78 @@ class Ribocode(RNASeqTools):
         
         
 class Diamond(RNASeqTools):
-    def __init__(self,index,**kwargs):
+    def __init__(self,index,threads=None,mode=None,**kwargs):
         self.programName="diamond"
         self.dep_list=[self.programName]
         #check if program exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        self.valid_args=[]        
+        self.valid_args=['-p','--db','-d','--out','-o','--outfmt','-f','--verbose','--log','--quiet','--in','--query','-q','--strand','--un','--al','--unal','--max-target-seqs','-k','--top','--range-culling','--compress','--evalue','-e',
+                         '--min-score','--id','--query-cover','--subject-cover','--sensitive','--more-sensitive','--block-size','-b','--index-chunks','-c','--tmpdir','-t','--gapopen','--gapextend','--frameshift','-F','--long-reads','--matrix','--custom-matrix',
+                         '--lambda','--K','--comp-based-stats','--masking','--query-gencode','--salltitles','--sallseqid','--no-self-hits','--taxonmap','--taxonnodes','--taxonlist','--algo','--bin','--min-orf','-l','--freq-sd','--id2','--window','-w',
+                         '--xdrop','-x','--ungapped-score','--hit-band','--hit-score','--gapped-xdrop','-X','--band','--shapes','-s','--shape-mask','--index-mode','--rank-ratio','--rank-ratio2','--max-hsps','--range-cover','--dbsize','--no-auto-append',
+                         '--xml-blord-format','--daa','-a','--forwardonly','--seq']     
+        self.valid_commands=['makedb','blastp','blastx','view','help','version','getseq','dbinfo']
+        
+        
+        
+        #threads to use if not specified
+        if '-p' not in kwargs:
+            #use max threads by default
+            if not threads:
+                threads=os.cpu_count()    
+            kwargs['-p']=str(threads)
+            
+        #select mode
+        valid_modes=['fast','sensitive','more-sensitive']
+        if not mode:
+            mode='fast'
+        if mode in valid_modes:
+            if ('--fast' not in kwargs) and ('--sensitive' not in kwargs) and ('--more-sensitive' not in kwargs):
+                kwargs['--'+mode]=""
+                
+            
         self.passedArgumentDict=kwargs
         
+        
+        
         #check index
-        if not self.check_index(index):
+        self.index=index
+        if not self.check_index():
             print("No valid index provided. Please build index..")
         else:
             self.index=index
             
-    def build_index(self,in_fasta,dbname,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,in_fasta,dbname,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a diamond index and store its path in self
         """
+        
+        
+            
         
         #check input files
         if not pu.check_files_exist(in_fasta):
             pu.print_boldred("Input fasta: {} not found...\n diamond makedb failed".format(in_fasta))
             return False
-        
         #create out_dir
         if not out_dir:
             out_dir=os.getcwd()
         if not pu.check_paths_exist(out_dir):
             pu.mkdir(out_dir)
+        
+            
         #check if index already exists
         index_path=os.path.join(out_dir,dbname)
-        if self.check_index(index_path):
-            pu.print_green("Index exists, using it...")
+        self.index=index_path
+        if self.check_index():
+            pu.print_green("Diamond index: {} exists, using it...".format(self.index))
             self.index=index_path
             return True
-        #default threads
-        if not threads:
-            threads=2
         
         
-        newOpts={"--in": in_fasta, "-d": index_path, "-p":str(threads)}
+        
+        newOpts={"--in": in_fasta, "-d": index_path}
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
@@ -765,7 +836,7 @@ class Diamond(RNASeqTools):
         return False
     
     
-    def run_align(self,query,out_file,command=None,out_fmt=None,fmt_string=None,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_align(self,query,out_file,command=None,out_fmt=None,fmt_string=None,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Parameters
         ----------
@@ -820,8 +891,6 @@ class Diamond(RNASeqTools):
         if not pu.check_paths_exist(out_dir):
             pu.mkdir(out_dir)
             
-        if not threads:
-            threads=2
         if not out_fmt:
             out_fmt=0
         if out_fmt ==6:
@@ -832,7 +901,7 @@ class Diamond(RNASeqTools):
         
         out_file_path=os.path.join(out_dir,out_file)
         
-        newOpts={"-d": self.index, "-q": query, "-p":str(threads),"-o":out_file_path,"-f":str(out_fmt)}
+        newOpts={"-d": self.index, "-q": query, "-o":out_file_path,"-f":str(out_fmt)}
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**kwargs,**newOpts}
@@ -872,7 +941,7 @@ class Diamond(RNASeqTools):
         
         #check for a valid index
         if subcommand=="blastx" or subcommand=="blastp":
-            if not self.check_index(self.index):
+            if not self.check_index():
                 raise Exception("ERROR: Invalid Diamond index. Please run build index to generate an index.")
             
         #override existing arguments
@@ -890,15 +959,15 @@ class Diamond(RNASeqTools):
         #return status
         return cmd_status
     
-    
-    def check_index(self,index):
+        
+    def check_index(self):
         """Check a diamond index
         """
         
-        if pu.check_files_exist(index):
+        if pu.check_files_exist(self.index):
             return True
         
-        if pu.check_files_exist(index+".dmnd"):
+        if pu.check_files_exist(self.index+".dmnd"):
             return True
         
         return False

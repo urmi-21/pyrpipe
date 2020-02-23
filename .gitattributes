@@ -23,4 +23,3 @@ pyrpipe/report_templates/* linguist-documentation
 # Jupyter notebook
 *.ipynb  text
 
-

@@ -1,0 +1,1 @@
+/home/usingh/lib_urmi/softwares/TransDecoder-TransDecoder-v5.5.0/util/compute_base_probs.pl tests/testout/mikadoout/mikado_prepared.fasta 0 > tests/testout/mikadoout/longorfsout/base_freqs.dat

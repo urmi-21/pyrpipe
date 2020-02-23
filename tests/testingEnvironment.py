@@ -26,5 +26,6 @@ class testSpecs:
         self.mikadofiles="tests/test_files/athaliana/mikado"
         
         self.bbdukAdapters="tests/test_files/adapters2.fa"
+        self.uniprot="tests/test_files/uniprot_sprot_plants_1000.fasta"
         
         
