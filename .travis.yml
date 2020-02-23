@@ -113,6 +113,10 @@ install:
   - bash build_test_env.sh
   - conda activate pyrpipe_test
   - cd ..
+  - conda install -c bioconda transdecoder 
+  - conda install -c bioconda diamond
+  #use docker portculllis
+  - export PATH=$PATH:$PWD/portcullisDocker/
   
   
   
