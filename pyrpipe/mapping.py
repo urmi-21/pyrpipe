@@ -303,7 +303,7 @@ class Star(Aligner):
     Attributes
     ----------
     """ 
-    def __init__(self,star_index="",**kwargs):
+    def __init__(self,star_index="",threads=None,**kwargs):
         
         super().__init__() 
         self.programName="STAR"
@@ -330,6 +330,12 @@ class Star(Aligner):
                             '--chimOutType','--chimSegmentMin','--chimScoreMin','--chimScoreDropMax','--chimScoreSeparation','--chimScoreJunctionNonGTAG','--chimJunctionOverhangMin','--chimSegmentReadGapMax','--chimFilter','--chimMainSegmentMultNmax']
                 
        
+        if not threads:
+            threads=os.cpu_count()
+        
+        if '--runThreadN' not in kwargs:
+            kwargs['--runThreadN']=str(threads)
+            
         #initialize the passed arguments
         self.passedArgumentDict=kwargs
         
@@ -417,7 +423,7 @@ class Star(Aligner):
         
  
             
-    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",out_type=None,optimize=None,**kwargs):
         """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
@@ -438,6 +444,10 @@ class Star(Aligner):
             Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        out_type: str
+            Out type options for star
+        optimize: bool
+            If true optimize maping parameters based on read length
         kwargs: dict
             Options to pass to STAR. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         
