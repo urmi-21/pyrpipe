@@ -109,7 +109,7 @@ install:
 # command to run tests
 script:
   - ls
-  - travis_wait 40 coverage run -m pytest tests/
+  - travis_wait 60 coverage run -m pytest tests/
   #- coverage run -m pytest tests/
   - coverage report --show-missing  
 after_success:
