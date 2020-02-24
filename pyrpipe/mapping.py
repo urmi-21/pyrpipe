@@ -423,7 +423,7 @@ class Star(Aligner):
         
  
             
-    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",out_type=None,optimize=None,**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",out_type=None,optimize=None,threads=None,**kwargs):
         """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
@@ -445,9 +445,11 @@ class Star(Aligner):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         out_type: str
-            Out type options for star
+            Out type options for star: sam, sorted_bam, unsorted_bam [Default: sorted_bam]
         optimize: bool
-            If true optimize maping parameters based on read length
+            If true optimize maping parameters based on read length [Default: True]
+        threads: int
+            Num threads to use. If supplied will override threads supplied during __init__
         kwargs: dict
             Options to pass to STAR. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         
@@ -455,6 +457,7 @@ class Star(Aligner):
         :return: Return the path to the output dir
         :rtype: string
         """
+        
         
         if not out_dir:
             out_dir=sra_object.location
@@ -471,6 +474,10 @@ class Star(Aligner):
         
         #add out dir
         newOpts["--outFileNamePrefix"]=out_dir+"/"
+        
+        #determine threads
+        #use
+        
         
                
         #add input files to kwargs, overwrite kwargs with newOpts
