@@ -35,13 +35,14 @@ def test_cufflinks():
     
 def test_trinityBam():
     tr=assembly.Trinity()
-    bam=testVars.hisatSortedBam
+    #bam=testVars.hisatSortedBam
+    bam=testVars.portcullisBam
     tr_opts={"--genome_guided_bam":bam,
              "--genome_guided_max_intron":"10000",
             "--output":testVars.testDir+"/trinity_testoutbam",
             "--max_memory": "2G"
             }
-    st=tr.run_trinity(**tr_opts)
+    st=tr.run_trinity(verbose=True,**tr_opts)
     assert st==True, "Failed trinity with bam"
 
 def test_trinityFQ():

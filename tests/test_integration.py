@@ -82,7 +82,7 @@ def test_pipeline1():
     st=sl.build_index(index_path=testVars.testDir+"/salmonIndex",index_name="salIndex",fasta=testVars.cdna)
     assert st==True, "Failed to build salmon index"
     
-    st=sl.perform_quant(sraOb)
+    st=sl.perform_quant(sraOb,**{'--minAssignedFrags':'1'})
     assert os.path.isdir(st)==True, "Failed to run salmon"
     
     
