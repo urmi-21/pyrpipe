@@ -34,7 +34,7 @@ def test_samtools():
 #TODO check portcullis installation in travis    
 def test_portcullis():
     pc=tools.Portcullis()
-    port_out=pc.run_portcullisFull(testVars.genome,testVars.hisatSortedBam,out_dir=testVars.testDir)
+    port_out=pc.run_portcullisFull(testVars.genome,testVars.portcullisBam,out_dir=testVars.testDir)
     st=pu.check_paths_exist(port_out)
     
     assert st==True, "Failed portcullis run"

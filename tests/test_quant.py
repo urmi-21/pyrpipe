@@ -30,7 +30,7 @@ def test_kallisto():
 def test_salmon():
     sl=quant.Salmon(salmon_index="")
     assert sl.check_index()==False, "Failed salmon check_index"
-    st=sl.build_index(index_path=testVars.testDir+"/salmonIndex",index_name="salIndex",fasta=testVars.cdna)
+    st=sl.build_index(index_path=testVars.testDir+"/salmonIndex",index_name="salIndex",fasta=testVars.cdna_big)
     assert st==True, "Failed to build salmon index"
     opts={"-o":testVars.testDir+"/salOut",
           "-l":"A",
