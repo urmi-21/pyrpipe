@@ -419,11 +419,14 @@ class SRA:
             del kwargs['-o']
         
         
+        #determine threads if not specified
+        if '-e' not in kwargs:
+            kwargs['-e']=str(self.threads)
         #execute command
         
         fstrqd_Cmd=['fasterq-dump']
         fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
-        fstrqd_Cmd.extend(['-e',str(self.threads)])
+        
         #add location
         fstrqd_Cmd.extend(['-O',self.location])
         #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq

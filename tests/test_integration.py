@@ -28,7 +28,7 @@ def test_pipeline1():
     st=sraOb.download_sra()
     assert st==True,"SRA download failed"
     
-    st=sraOb.run_fasterqdump(delete_sra=False,**{"-e":"8","-f":"","-t":workingDir})
+    st=sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":workingDir})
     assert st==True,"fqdump failed"
     
     bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":testVars.bbdukAdapters}

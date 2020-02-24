@@ -109,6 +109,7 @@ install:
   - conda update -q conda
   # Useful for debugging any issues with conda
   - conda info -a
+  - conda activate base
   - conda install -c bioconda transdecoder 
   - conda install -c bioconda diamond
   
