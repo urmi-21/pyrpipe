@@ -17,4 +17,4 @@ and merge the multiple assemblies with Mikado.
  
 ### To execute on a cluster with slurm
 
-`snakemake -j 5 --cluster-config cluster.json --cluster "sbatch -t {cluster.time} -c 28`
+`snakemake -j 5 --cluster-config cluster.json --cluster "sbatch -t {cluster.time} -c 28 -C EGRESS`
