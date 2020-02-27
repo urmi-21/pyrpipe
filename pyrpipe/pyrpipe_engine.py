@@ -345,7 +345,12 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
     
         if exitCode==0:
             return True
-        return False
+        else:
+            #print the output
+            print("Following error occured executing above command (return code={}):".format(str(exitCode)))
+            print("STDOUT:\n"+stdout)
+            print("STDERR:\n"+stderr)
+            return False
     #handle exceptions
     except OSError as e:
         pu.print_boldred("OSError exception occured.\n"+str(e))
