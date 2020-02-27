@@ -14,4 +14,4 @@ Then, we used a third party tool, (PLncPRO), to predict lncRNAs in the assembled
 
     `conda activate pyrpipe_examples`
 
-3. Execute the code in `.ipynb` file
+3. Execute the code in `.ipynb` or `.py` file
