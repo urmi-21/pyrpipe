@@ -150,10 +150,10 @@ for i in range(len(gtfList)):
 
 
 #NOTE: Following commands are executed in shell, hence the ! before each command
-get_ipython().system('pyrpipe_diagnostic.py report pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
-get_ipython().system('pyrpipe_diagnostic.py benchmark pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
-get_ipython().system('pyrpipe_diagnostic.py shell pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
-get_ipython().system('pyrpipe_diagnostic.py multiqc -o ./multiqc_report pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
+#get_ipython().system('pyrpipe_diagnostic.py report pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
+#get_ipython().system('pyrpipe_diagnostic.py benchmark pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
+#get_ipython().system('pyrpipe_diagnostic.py shell pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
+#get_ipython().system('pyrpipe_diagnostic.py multiqc -o ./multiqc_report pyrpipe_logs/2020-01-22-18_14_47_pyrpipe.log')
 
 
 # In[ ]:
