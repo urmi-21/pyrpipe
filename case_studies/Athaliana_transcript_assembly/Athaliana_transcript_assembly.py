@@ -31,7 +31,8 @@ GTF=workingDir+"/Arabidopsis_thaliana.TAIR10.45.gtf"
 
 if not pu.check_files_exist(GENOME):
     print("Downloading genome fasta file")
-    wget="wget ftp://ftp.ensemblgenomes.org/pub/release-46/plants/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz -q -O "+GENOME+".gz"      pe.execute_command(wget.split(),verbose=True,logs=False)
+    wget="wget ftp://ftp.ensemblgenomes.org/pub/release-46/plants/fasta/arabidopsis_thaliana/dna/Arabidopsis_thaliana.TAIR10.dna.toplevel.fa.gz -q -O "+GENOME+".gz"      
+    pe.execute_command(wget.split(),verbose=True,logs=False)
     pe.execute_command(['gunzip',GENOME+".gz"],verbose=True,logs=False)
 
 if not pu.check_files_exist(GTF):
