@@ -16,7 +16,7 @@ class RNASeqTools:
     
 
 class Samtools(RNASeqTools):
-    def __init__(self,threads=None,**kwargs):
+    def __init__(self,threads=None):
         self.programName="samtools"
         #check if hisat2 exists
         if not pe.check_dependencies([self.programName]):
