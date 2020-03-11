@@ -36,7 +36,6 @@ class Samtools(RNASeqTools):
         if not self.threads:
             self.threads=os.cpu_count()
             
-        
         self.max_memory=max_memory
         
         
@@ -107,7 +106,7 @@ class Samtools(RNASeqTools):
         
         
     #sort bam file.output will be bam_file_sorted.bam
-    def sort_bam(self,bam_file,out_dir="",out_suffix="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sort_bam(self,bam_file,out_dir="",out_suffix="",threads=None,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         
         verbose: bool
@@ -135,8 +134,12 @@ class Samtools(RNASeqTools):
         #output will be out_bam
         outSortedbam_file=os.path.join(out_dir,fname+out_suffix+'_sorted.bam')
         
-        newOpts={"--":(bam_file,),"-o":outSortedbam_file}
-        mergedOpts={**kwargs,**newOpts}
+        #handle threads
+        if not threads:
+            threads=self.threads
+        
+        newOpts={"--":(bam_file,),"-o":outSortedbam_file,"-@":str(threads)}
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.run_samtools("sort",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
@@ -155,7 +158,7 @@ class Samtools(RNASeqTools):
         #return path to file
         return outSortedbam_file
     
-    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",threads=None,delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
         
         verbose: bool
@@ -173,13 +176,13 @@ class Samtools(RNASeqTools):
         :rtype: string
         """
         
-        sam2bam_file=self.sam_to_bam(sam_file,delete_sam=delete_sam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        sam2bam_file=self.sam_to_bam(sam_file,threads=threads,delete_sam=delete_sam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         if not sam2bam_file:
             return ""
             
 
-        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,threads=threads,delete_bam=delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         if not bamSorted:
             return ""
@@ -187,7 +190,7 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def merge_bam(self,*args,out_file="merged",out_dir="",delete_bams=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def merge_bam(self,*args,out_file="merged",out_dir="",threads=None,delete_bams=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Merge multiple bam files into a single file
         
         Parameters
@@ -213,7 +216,7 @@ class Samtools(RNASeqTools):
         :return: Returns the path to the merged bam file.
         :rtype: string
         """
-        
+               
         if len(args) < 2:
             print("Please supply at least 2 files to merge")
             return ""
@@ -226,9 +229,14 @@ class Samtools(RNASeqTools):
         
         outMergedFile=os.path.join(out_dir,out_file+".bam")
         
-        newOpts={"--":(outMergedFile,)+args}
+        #handle threads
+        if not threads:
+            threads=self.threads
         
-        mergedOpts={**kwargs,**newOpts}
+        newOpts={"-@":str(threads),"--":(outMergedFile,)+args}
+        
+        #override parameters by supplying as kwargs
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.run_samtools("merge",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         

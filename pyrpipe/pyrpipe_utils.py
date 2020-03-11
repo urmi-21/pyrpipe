@@ -371,8 +371,8 @@ def parse_unix_args(valid_args_list,passed_args):
     special_args=["--"]
     positional_args=[]
     
-    #empty list supplied consider all armunets valid
-    if len(valid_args_list)<1:
+    #empty list or None supplied consider all armunets valid
+    if not valid_args_list:
         valid_args_list=list(passed_args.keys())
         #above command will also add specialArgs, remove those
         for x in special_args:

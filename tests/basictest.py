@@ -368,6 +368,7 @@ print(predout)
 """
 
 #create diamond obj
+"""
 infa="/Users/usingh/work/urmi/tests/mikado/uniprot_sprot_plants.fasta"
 dm=tools.Diamond(index="")
 dm.build_index(infa,"diamondDB",out_dir="/Users/usingh/work/urmi/tests/mikado/dout",threads=8)
@@ -381,8 +382,12 @@ junctions="/Users/usingh/work/urmi/tests/mikado/junctions.bed"
 
 mk=tools.Mikado()
 mk.runMikadoFull(listFile,genome,mode,scoring,junctions,"mkconf",infa,dm,8,out_dir="/Users/usingh/work/urmi/tests/mikado/pyrout",verbose=False)
-
-
+"""
+#new tests
+# test samtools
+sam=testDir+"/test_files/athaliana/mapping/hisat2.sam"
+sm=tools.Samtools(threads=5)
+bam=sm.sam_sorted_bam(sam,delete_sam=False,delete_bam=False)
 
 
 
