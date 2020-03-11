@@ -305,29 +305,21 @@ class Samtools(RNASeqTools):
         
         
 class Portcullis(RNASeqTools):
-    def __init__(self,threads=None,**kwargs):
+    def __init__(self,threads=None,max_memory=None):
         self.programName="portcullis"
         self.dep_list=[self.programName]
         #check if program exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
-        
-        self.valid_args=['-t','-v','--verbose','--help','-o','-b',
-                            '--bam_filter','--exon_gff','--intron_gff','--source',
-                            '--force','--copy','--use_csi','--orientation','--strandedness',
-                            '--separate','--extra','-r','--max_length','--canonical','--min_cov',
-                            '--save_bad']
-        
-        if '-t' not in kwargs:
-            #use max threads by default
-            if not threads:
-                threads=os.cpu_count()    
-            kwargs['-t']=str(threads)
+               
+        #use max threads by default
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
             
-        self.passedArgumentDict=kwargs
         
         
-    def run_portcullisFull(self,reference_fasta,bam_file,out_dir="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_portcullisFull(self,reference_fasta,bam_file,threads=None,out_dir="",delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         run portculis full
         
@@ -358,15 +350,18 @@ class Portcullis(RNASeqTools):
             print ("Please check input for portcullis.")
             return ""
         
-        
-        newOpts={"--":(reference_fasta,bam_file)}
-        mergedOpts={**kwargs,**newOpts}
+        #handle threads
+        if not threads:
+            threads=self.threads
+            
         #add out dir path
         if not out_dir:
             out_dir=os.path.join(os.getcwd(),"portcullis_out")
-                  
-        mergedOpts={**mergedOpts,**{"-o":out_dir}}
+            
+        newOpts={"--":(reference_fasta,bam_file),"-t":str(threads),"-o":out_dir}
         
+        mergedOpts={**newOpts,**kwargs}
+                
         status=self.run_portcullis("full",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if not status:
@@ -383,7 +378,7 @@ class Portcullis(RNASeqTools):
         
         return out_dir
     
-    def run_portcullis(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_portcullis(self,sub_command,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         Wrapper to run portcullis.
         
@@ -392,6 +387,8 @@ class Portcullis(RNASeqTools):
         
         sub_command: string
             sub_command to pass to portcullis e.g. full, prep, junc etc.
+        valid_args: list
+            A list of valid arguments. Arguments outside this list will be ignored. If empty or None, accepts all arguments.
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -413,11 +410,8 @@ class Portcullis(RNASeqTools):
        
         portcullis_cmd=['portcullis',sub_command]
         #add options
-        portcullis_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
-                
-        #print("Executing:"+" ".join(portcullis_cmd))
-        
-        
+        portcullis_cmd.extend(pu.parse_unix_args(valid_args,mergedArgsDict))
+
         #start ececution
         status=pe.execute_command(portcullis_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
@@ -430,39 +424,19 @@ class Portcullis(RNASeqTools):
         
 
 class Mikado(RNASeqTools):
-    def __init__(self,threads=None,**kwargs):
+    def __init__(self,threads=None,max_memory=None):
         self.programName="mikado"
         self.dep_list=[self.programName]
         #check if program exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
-        
-        #valid_args is a dict as different subprograms use differnt parameters
-        self.valid_args={}
-        
-        self.valid_args['configure']=['-h','--help','--full','--strand-specific','--no-files','--gff','--list','--reference','--strand-specific-assemblies','--labels','--external','-t','--threads','--skip-split','-j','--json','-od','--out-dir',
-                           '--scoring',' --copy-scoring','-i','--intron-range','--pad','--junctions','-bt','--blast_targets','--daijin','-bc','--blast-chunks','--use-blast','--use-transdecoder','--mode']
-        
-        self.valid_args['prepare']=['-h','--help','--fasta','-v','--verbose','-q','--quiet','--start-method','-s','--strand-specific','-sa','--strand-specific-assemblies','--list','-l','--log','--lenient',
-                       '-m','--minimum_length','-p','--procs','-scds','--strip_cds','--labels','--single','-od','--output-dir','-o','--out','-of','--out_fasta','--json-conf']
-        
-        self.valid_args['serialise']=['-h','--help','--start-method','-od','--output-dir','--orfs','--transcripts','-mr','--max-regression','--max_target_seqs','--blast_targets','--xml','-p','--procs','--single-thread',
-                               '--genome_fai','--junctions','--external-scores','-mo','--max-objects','-f','--force','--json-conf','-l','--log','-lv','--log_level','db']
-        self.valid_args['pick']=['-h','--help','--start-method','-p','--procs','--json-conf','--scoring-file','-i','--intron-range','--pad','--subloci_out','--monoloci_out','--loci_out','--prefix','--no_cds','--source','--flank','--purge','--cds-only',
-                               '--monoloci-from-simple-overlap','--consider-truncated-for-retained','-db','--sqlite-db','-od','--output-dir','--single','--mode','-l','--log','-v','--verbose','-nv','--noverbose','-lv','--log-level']
-        self.valid_args['compare']=['-h','--help','--distance','-pc','--protein-coding','-o','--out','--lenient','-eu','--exclude-utr','-n','--no-index','--no-save-index','-erm','--extended-refmap','-upa','--use-prediction-alias',
-                                   '-l','--log','-v','--verbose','-z','--gzip','-r','--reference','-p','--prediction','--self','--internal','--index']
-
-                
-        
-        #threads to use if not specified
-        if '-p' not in kwargs:
-            #use max threads by default
-            if not threads:
-                threads=os.cpu_count()    
-            kwargs['-p']=str(threads)
+    
+       
+        #use max threads by default
+        if not threads:
+            threads=os.cpu_count()
             
-        self.passedArgumentDict=kwargs
+        self.threads=threads
         
         
  
@@ -494,10 +468,14 @@ class Mikado(RNASeqTools):
                 
 
         
-    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run whole mikado pipeline
         Output will be stored to out_dir/
         """
+        
+        #use threads if provided
+        if not threads:
+            threads=self.threads
         
         #run mikado config
         config_file=self.runMikadoConfigure(listFile,genome,mode,scoring,junctions,config_out_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
@@ -539,7 +517,7 @@ class Mikado(RNASeqTools):
     
     
     
-    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoConfigure(self,listFile,genome,mode,scoring,junctions,out_file,threads=None,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado configure
         Make sure the paths in list file are global.
         
@@ -564,10 +542,13 @@ class Mikado(RNASeqTools):
             
         outFilePath=os.path.join(out_dir,out_file+".yaml")
         
-        newOpts={"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--out-dir":out_dir,"--":(outFilePath,)}
+        if not threads:
+            threads=self.threads
+        
+        newOpts={"--threads":str(threads),"--list":listFile,"--reference":genome,"--mode":mode,"--scoring":scoring,"--junctions":junctions,"--out-dir":out_dir,"--":(outFilePath,)}
         
         #merge with kwargs
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.runMikado("configure",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
@@ -583,7 +564,7 @@ class Mikado(RNASeqTools):
         return outFilePath
         
     
-    def runMikadoPrepare(self,yamlconf, out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPrepare(self,yamlconf, threads=None,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado prepare
         """
         
@@ -593,11 +574,14 @@ class Mikado(RNASeqTools):
             return ""
         if not out_dir:
             out_dir=os.getcwd()
+            
+        if not threads:
+            threads=self.threads
 
-        newOpts={"--output-dir":out_dir,"--json-conf":yamlconf}
+        newOpts={"--procs":str(threads),"--output-dir":out_dir,"--json-conf":yamlconf}
         
         #merge with kwargs
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.runMikado("prepare",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
@@ -628,7 +612,7 @@ class Mikado(RNASeqTools):
         
         
         
-    def runMikadoSerialise(self,yamlconf,blast_targets,orfs,xml,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoSerialise(self,yamlconf,blast_targets,orfs,xml,threads=None,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado serialise
         """
         #check input files exist
@@ -638,10 +622,13 @@ class Mikado(RNASeqTools):
         if not out_dir:
             out_dir=os.getcwd()
         
-        newOpts={"--json-conf":yamlconf,"--blast_targets":blast_targets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
+        if not threads:
+            threads=self.threads
+        
+        newOpts={"--procs":str(threads),"--json-conf":yamlconf,"--blast_targets":blast_targets,"--xml":xml,"--orfs":orfs,"--output-dir":out_dir}
         
         #merge with kwargs
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         
         
@@ -655,7 +642,7 @@ class Mikado(RNASeqTools):
         if not pu.check_paths_exist(out_dir):
             return ""
         
-        #after running mikado serialize update the mikado config file to contain absolute path of mikafodb
+        #after running mikado serialize update the mikado config file to contain absolute path of mikadodb
         #otherwise pick step will fail
         #read the cofig.json file
         with open(yamlconf) as f:
@@ -671,7 +658,7 @@ class Mikado(RNASeqTools):
         return out_dir
         
         
-    def runMikadoPick(self,yamlconf,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikadoPick(self,yamlconf,threads=None,out_dir=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado pick
         """
         #check input files exist
@@ -680,11 +667,14 @@ class Mikado(RNASeqTools):
             return ""
         if not out_dir:
             out_dir=os.getcwd()
+            
+        if not threads:
+            threads=self.threads
         
-        newOpts={"--json-conf":yamlconf,"--output-dir":out_dir}
+        newOpts={"--procs":str(threads),"--json-conf":yamlconf,"--output-dir":out_dir}
         
         #merge with kwargs
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.runMikado("pick",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
@@ -699,7 +689,7 @@ class Mikado(RNASeqTools):
         return out_dir
         
         
-    def runMikado(self,sub_command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def runMikado(self,sub_command,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run mikado
         """
         valid_commands=['configure','prepare','serialise','pick','compare']
@@ -707,12 +697,10 @@ class Mikado(RNASeqTools):
             pu.print_boldred("Invalid command: "+sub_command+". Exiting...")
             return False
         
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
-       
+      
         mikado_Cmd=['mikado',sub_command]
         #add options
-        mikado_Cmd.extend(pu.parse_unix_args(self.valid_args[sub_command],mergedArgsDict))
+        mikado_Cmd.extend(pu.parse_unix_args(valid_args,kwargs))
                 
         #print("Executing:"+" ".join(mergedArgsDict))
         
