@@ -9,6 +9,7 @@ Created on Mon Nov 25 17:48:00 2019
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os
+import math
 
 class RNASeqQC:
     """This is an abstract parent class for fastq quality control programs.
@@ -28,7 +29,7 @@ class Trimgalore(RNASeqQC):
         kwargs:
             trim_galore arguments.
     """
-    def __init__(self,**kwargs):
+    def __init__(self,threads):
         """
         
         """
@@ -37,6 +38,8 @@ class Trimgalore(RNASeqQC):
         super().__init__() 
         self.programName="trim_galore"
         self.dep_list=[self.programName,'cutadapt']
+        
+        """
         self.valid_args=['--cores','-v','-q','--phred33','--phred64','--fastqc','--fastqc_args','-a','-a2',
                             '--illumina','--nextera','--small_rna','--consider_already_trimmed',
                             '--max_length','--stringency','-e','--gzip','--dont_gzip','--length',
@@ -45,16 +48,20 @@ class Trimgalore(RNASeqQC):
                             '--2colour','--path_to_cutadapt','--basename','-j','--hardtrim5','--hardtrim3',
                             '--clock','--polyA','--rrbs','--non_directional','--keep','--paired','-t',
                             '--retain_unpaired','-r1','-r2']
-        #check if hisat2 exists
+        """
+        #check if deps exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
         #initialize the passed arguments
-        self.passedArgumentDict=kwargs
+        if not threads:
+            #trimgalore recommends max 8 threads
+            threads=8
+        self.threads=threads
         
         
             
-    def perform_qc(self,sra_object,out_dir="",out_suffix="_trimgalore",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_qc(self,sra_object,out_dir="",out_suffix="_trimgalore",threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform qc using trimgalore.
         The function perform_qc() is consistent for all QC classess.
         
@@ -86,6 +93,9 @@ class Trimgalore(RNASeqQC):
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
         
+        if not threads:
+            threads=self.threads
+        
         #create new options based on parametrs
         newOpts={}
         #get layout
@@ -94,8 +104,8 @@ class Trimgalore(RNASeqQC):
             fq2=sra_object.localfastq2Path
             out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
             out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
-            newOpts={"--paired":"","--":(fq1,fq2),"-o":out_dir}
-            mergedOpts={**kwargs,**newOpts}
+            newOpts={"--paired":"","--":(fq1,fq2),"-o":out_dir,"--cores":str(threads)}
+            mergedOpts={**newOpts,**kwargs}
             #run trimgalore
             self.run_trimgalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
             """
@@ -117,10 +127,10 @@ class Trimgalore(RNASeqQC):
             fq=sra_object.localfastqPath
             out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
             #giving input arguments as a tuple "--":(fq,)
-            newOpts={"--":(fq,),"-o":out_dir}
-            #run trimgalore
-            mergedOpts={**kwargs,**newOpts}
+            newOpts={"--":(fq,),"-o":out_dir,"--cores":str(threads)}
             
+            mergedOpts={**newOpts,**kwargs}
+            #run trimgalore
             self.run_trimgalore(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
             """
             running trim galore will create one file named <input>_trimmed.fq
@@ -137,7 +147,7 @@ class Trimgalore(RNASeqQC):
         
         
             
-    def run_trimgalore(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_trimgalore(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running trimgalore
         
         Parameters
@@ -157,13 +167,11 @@ class Trimgalore(RNASeqQC):
         :return: Status of trimgalore command
         :rtype: bool
         """
-        
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+      
         
         #create command to run
         trimgalore_cmd=['trim_galore']
-        trimgalore_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
+        trimgalore_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
         
         
         #start ececution
@@ -181,7 +189,7 @@ class Trimgalore(RNASeqQC):
 class BBmap(RNASeqQC):
     """This class represents bbmap programs
     """
-    def __init__(self,**kwargs):
+    def __init__(self,threads=None,max_memory=None):
         """
         Parameters
         ----------
@@ -197,7 +205,7 @@ class BBmap(RNASeqQC):
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
             
-        
+        """
         self.valid_args=['in','in2','ref','literal','touppercase','interleaved','qin','reads','copyundefined',
                             'samplerate','samref','out','out2','outm','outm2','outs','stats','refstats','rpkm',
                             'dump','duk','nzo','overwrite','showspeed','ziplevel','fastawrap','qout','statscolumns',
@@ -216,12 +224,25 @@ class BBmap(RNASeqQC):
                             'trimpolygleft','trimpolygright','trimpolyg','filterpolyg','pratio','plen','entropy','entropywindow',
                             'entropyk','minbasefrequency','entropytrim','entropymask','entropymark','cardinality',
                             'cardinalityout','loglogk','loglogbuckets','-Xmx','-eoom','-da']
+        """
         
-        self.passedArgumentDict=kwargs
+        #use max threads by default
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
+        
+        #use floor(max available memory) by default
+        if not max_memory:
+            total_mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
+            total_mem_gib = total_mem_bytes/(1024.**3)
+            max_memory=math.floor(total_mem_gib)
+        
+        self.max_memory=max_memory
             
             
             
-    def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+            
+    def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",overwrite=True,optimize=True,threads=None,max_memory=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run bbduk on fastq files specified by the sra_object
         
         Parameters
@@ -258,6 +279,16 @@ class BBmap(RNASeqQC):
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
+                
+        if not threads:
+            threads=self.threads
+        if not max_memory:
+            max_memory=self.max_memory
+            
+        memory_flag="-Xmx"+str(max_memory)+"g"
+        
+        if optimize:
+            print("generating suggested parameters XXX TD")
                     
         if sra_object.layout=='PAIRED':
             fq1=sra_object.localfastq1Path
@@ -268,8 +299,8 @@ class BBmap(RNASeqQC):
             out_file1Path=os.path.join(out_dir,out_fileName1)
             out_file2Path=os.path.join(out_dir,out_fileName2)
             
-            newOpts={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path}
-            mergedOpts={**kwargs,**newOpts}
+            newOpts={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path,"--":(memory_flag,)}
+            mergedOpts={**newOpts,**kwargs}
             
             #run bbduk
             if self.run_bbduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
@@ -282,8 +313,8 @@ class BBmap(RNASeqQC):
             fq=sra_object.localfastqPath
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
             out_filePath=os.path.join(out_dir,out_fileName)
-            newOpts={"in":fq,"out":out_filePath}
-            mergedOpts={**kwargs,**newOpts}
+            newOpts={"in":fq,"out":out_filePath,"--":(memory_flag,)}
+            mergedOpts={**newOpts,**kwargs}
             
             #run bbduk
             if self.run_bbduk(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
@@ -295,17 +326,15 @@ class BBmap(RNASeqQC):
     
     
     
-    def run_bbduk(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bbduk(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run bbduk.sh
         """
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
-        
+              
         #create command to run
         bbduk_cmd=["bbduk.sh"]
         
         #bbduk.sh follows java style arguments
-        bbduk_cmd.extend(pu.parse_java_args(self.valid_args,mergedArgsDict))
+        bbduk_cmd.extend(pu.parse_java_args(valid_args,kwargs))
         
         
         #start ececution
@@ -439,15 +468,12 @@ class BBmap(RNASeqQC):
                           'qtrim','untrim','out_','basename','bs','scafstats',
                           'refstats','nzo','-Xmx','-eoom','-da']
         
-        #override existing arguments
-        #don't use class arguments
-        mergedArgsDict={**kwargs}
         
         #create command to run
         bbsp_cmd=["bbsplit.sh"]
         
         #bbduk.sh follows java style arguments
-        bbsp_cmd.extend(pu.parse_java_args(bbsplit_args,mergedArgsDict))
+        bbsp_cmd.extend(pu.parse_java_args(bbsplit_args,kwargs))
         
         
         #start ececution
