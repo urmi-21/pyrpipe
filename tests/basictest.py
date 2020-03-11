@@ -387,7 +387,11 @@ mk.runMikadoFull(listFile,genome,mode,scoring,junctions,"mkconf",infa,dm,8,out_d
 # test samtools
 sam=testDir+"/test_files/athaliana/mapping/hisat2.sam"
 sm=tools.Samtools(threads=5)
-bam=sm.sam_sorted_bam(sam,delete_sam=False,delete_bam=False)
+bam1=sm.sam_to_bam(sam,out_suffix="test2",threads=3, delete_sam=False,verbose=True,quiet=False,logs=True,objectid="NA",**{"-@":"4"})
+print(bam1)
+bam2=sm.sort_bam(bam1,out_suffix="test2",threads=2,delete_bam=False,verbose=True,quiet=False,logs=True,objectid="NA")
+print(bam2)
+#bam=sm.sam_sorted_bam(sam,delete_sam=False,delete_bam=False)
 
 
 
