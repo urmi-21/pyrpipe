@@ -238,14 +238,14 @@ class Salmon(Quant):
     kwargs: dict
         Options passed to salmon
     """      
-    def __init__(self,salmon_index,**kwargs):    
+    def __init__(self,salmon_index,threads=None):    
         super().__init__() 
         self.programName="salmon"
         self.dep_list=[self.programName]        
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        
+        """
         ##salmon index
         self.validArgsIndex=['-v','--version','-h','--help','-t','--transcripts','-k','--kmerLen','-i',
                              '--index','--gencode','--keepDuplicates','-p','--threads','--perfectHash',
@@ -280,21 +280,23 @@ class Salmon(Quant):
         self.validArgsQuantMerge=['--quants','--names','-c','--column','-o','--output']
 
         self.valid_args=pu.get_union(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
+        """
         
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
+       if not threads:
+           threads=os.cpu_count()
+         
+        self.threads=threads
         
         #if index is passed, update the passed arguments
         if len(salmon_index)>0 and pu.check_salmon_index(salmon_index):
             print("salmon index is: "+salmon_index)
             self.salmon_index=salmon_index
-            self.passedArgumentDict['-i']=self.salmon_index
         else:
             print("No salmon index provided. Please build index now to generate an index...")
             
             
             
-    def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,fasta,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """
         build salmon index and store the path to index in self
         
@@ -327,8 +329,13 @@ class Salmon(Quant):
                 print("ERROR in building hisat2 index. Failed to create index directory.")
                 return False
         indexOut=os.path.join(index_path,index_name)
-        newOpts={"-t":fasta,"-i":indexOut}
-        mergedOpts={**kwargs,**newOpts}
+        
+        if not threads:
+            threads=self.threads
+            
+        newOpts={"--threads":str(threads),"-t":fasta,"-i":indexOut}
+        
+        mergedOpts={**newOpts,**kwargs}
         
         #call salmon
         status=self.run_salmon("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
@@ -338,7 +345,6 @@ class Salmon(Quant):
             #if check_files_exist(os.path.join(indexOut,"versionInfo.json")): #not sure if this is reliable
             if pu.check_paths_exist(indexOut):
                 self.salmon_index=indexOut
-                self.passedArgumentDict['-i']=self.salmon_index
                 pu.print_green("salmon index is:"+self.salmon_index)
                 return True
         
@@ -347,7 +353,7 @@ class Salmon(Quant):
         
         
     
-    def perform_quant(self,sra_object,out_dir="",libType="A",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_quant(self,sra_object,out_dir="",libType=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """run salmon quant
         
         verbose: bool
@@ -364,20 +370,23 @@ class Salmon(Quant):
         :return: Path to salmon out directory
         :rtype: string
         """
-        
+        if not libType:
+            libType="A"
+            
         if not out_dir:
             out_dir=os.path.join(sra_object.location,"salmon_out")
         
-        
+        if not threads:
+            threads=self.threads
         
         if sra_object.layout == 'PAIRED':
-            newOpts={"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path}
         else:
-            newOpts={"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath}
         
         
-        #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**kwargs,**newOpts}
+        #add input files to kwargs, overwrite newOpts with kwargs
+        mergedOpts={**newOpts,**kwargs}
         
         #call salmon
         status=self.run_salmon("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
@@ -392,7 +401,7 @@ class Salmon(Quant):
         
         
         
-    def run_salmon(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_salmon(self,subcommand,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running salmon.
         
         Parameters
@@ -420,11 +429,9 @@ class Salmon(Quant):
             if not self.check_index():
                 raise Exception("ERROR: Invalid salmon index. Please run build index to generate an index.")
         
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
-            
+                   
         salmon_Cmd=['salmon',subcommand]
-        salmon_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
+        salmon_Cmd.extend(pu.parse_unix_args(valid_args,kwargs))
         
         #start ececution
         status=pe.execute_command(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
