@@ -42,14 +42,14 @@ class Kallisto(Quant):
         parametrs passed to kallisto
     """
     
-    def __init__(self,kallisto_index,**kwargs):
+    def __init__(self,kallisto_index,threads=None):
         super().__init__() 
         self.programName="kallisto"
         self.dep_list=[self.programName]        
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        
+        """
         ##kallisto index
         self.validArgsIndex=['-i','--index','-k','--kmer-size','--make-unique']
         ##kallisto quant
@@ -63,19 +63,20 @@ class Kallisto(Quant):
         self.validArgsh5dump=['-o','--output-dir']
         
         self.valid_args=pu.get_union(self.validArgsIndex,self.validArgsQuant,self.validArgsPseudo,self.validArgsh5dump)
+        """
         
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
         
         #if index is passed, update the passed arguments
         if len(kallisto_index)>0 and pu.check_files_exist(kallisto_index):
             print("kallisto index is: "+kallisto_index)
             self.kallisto_index=kallisto_index
-            self.passedArgumentDict['-i']=self.kallisto_index
         else:
             print("No kallisto index provided. Please use build_index() now to generate an index...")
             
-    def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,fasta,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to  build kallisto index
         
         index_path: str
@@ -109,24 +110,27 @@ class Kallisto(Quant):
                 return False
             
         indexOut=os.path.join(index_path,index_name)
-        newOpts={"--":(fasta,),"-i":indexOut}
-        mergedOpts={**kwargs,**newOpts}
         
-        #call salmon
+        if not threads:
+            threads=self.threads
+        
+        newOpts={"--":(fasta,),"-i":indexOut,'--threads':str(threads)}
+        mergedOpts={**newOpts,**kwargs}
+        
+        #call kallisto
         status=self.run_kallisto("index",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
         
         if status:
-            #check if sam file is present in the location directory of sra_object
+            #check if index file is present 
             if pu.check_files_exist(indexOut):
                 self.kallisto_index=indexOut
-                self.passedArgumentDict['-i']=self.kallisto_index
                 pu.print_green("kallisto_index is:"+self.kallisto_index)
                 return True
         else:
             pu.print_boldred("Failed to create kallisto index")
             return False
     
-    def perform_quant(self,sra_object,out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_quant(self,sra_object,out_dir="",threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run kallisto quant
         
         sra_object: SRA
@@ -153,18 +157,20 @@ class Kallisto(Quant):
         if not out_dir:
             out_dir=os.path.join(sra_object.location,"kallisto_out")
         
+        if not threads:
+            threads=self.threads
         
         
         if sra_object.layout == 'PAIRED':
-            newOpts={"-o":out_dir,"--":(sra_object.localfastq1Path,sra_object.localfastq2Path)}
+            newOpts={"--threads":str(threads),"-o":out_dir,"--":(sra_object.localfastq1Path,sra_object.localfastq2Path)}
         else:
-            newOpts={"-o":out_dir,"--single":"", "--":(sra_object.localfastqPath,)}
+            newOpts={"--threads":str(threads),"-o":out_dir,"--single":"", "--":(sra_object.localfastqPath,)}
         
         
-        #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**kwargs,**newOpts}
+        #add input files to kwargs, overwrite newOpts if kwargs is present
+        mergedOpts={**newOpts,**kwargs}
         
-        #call salmon
+        #call kallisto
         status=self.run_kallisto("quant",verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
         if status:
@@ -177,7 +183,7 @@ class Kallisto(Quant):
         
     
     
-    def run_kallisto(self,subcommand,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_kallisto(self,subcommand,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running kallisto.
         
         Parameters
@@ -205,11 +211,9 @@ class Kallisto(Quant):
             if not self.check_index():
                 raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
         
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
             
         kallisto_Cmd=['kallisto',subcommand]
-        kallisto_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
+        kallisto_Cmd.extend(pu.parse_unix_args(valid_args,kwargs))
         
         #start ececution
         status=pe.execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(kallisto_Cmd[0:2]))

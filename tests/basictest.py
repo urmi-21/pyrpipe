@@ -393,6 +393,16 @@ bam2=sm.sort_bam(bam1,out_suffix="test2",threads=2,delete_bam=False,verbose=True
 print(bam2)
 #bam=sm.sam_sorted_bam(sam,delete_sam=False,delete_bam=False)
 
+txd=tools.Transdecoder()
+infa="/Users/usingh/work/urmi/tests/txd/test.fa"
+outdir=txd.run_transdecoder_longorfs(infa,out_dir="/Users/usingh/work/urmi/tests/txd/mtout1")
+print(outdir)
+
+poutdir="/Users/usingh/work/urmi/tests/txd/mypredout"
+predout=txd.run_transdecoder_predict(infa,longorfs_dir=outdir,out_dir=poutdir)
+print(predout)
+
+
 
 
 
