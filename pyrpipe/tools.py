@@ -405,12 +405,9 @@ class Portcullis(RNASeqTools):
         """
         
         
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
-       
         portcullis_cmd=['portcullis',sub_command]
         #add options
-        portcullis_cmd.extend(pu.parse_unix_args(valid_args,mergedArgsDict))
+        portcullis_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
 
         #start ececution
         status=pe.execute_command(portcullis_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)

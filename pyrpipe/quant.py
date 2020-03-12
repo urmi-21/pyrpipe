@@ -76,7 +76,7 @@ class Kallisto(Quant):
         else:
             print("No kallisto index provided. Please use build_index() now to generate an index...")
             
-    def build_index(self,index_path,index_name,fasta,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,fasta,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to  build kallisto index
         
         index_path: str
@@ -111,10 +111,10 @@ class Kallisto(Quant):
             
         indexOut=os.path.join(index_path,index_name)
         
-        if not threads:
-            threads=self.threads
+        #if not threads:
+        #    threads=self.threads
         
-        newOpts={"--":(fasta,),"-i":indexOut,'--threads':str(threads)}
+        newOpts={"--":(fasta,),"-i":indexOut}
         mergedOpts={**newOpts,**kwargs}
         
         #call kallisto
@@ -282,7 +282,7 @@ class Salmon(Quant):
         self.valid_args=pu.get_union(self.validArgsIndex,self.validArgsQuantReads,self.validArgsQuantAlign,self.validArgsQuantMerge)
         """
         
-       if not threads:
+        if not threads:
            threads=os.cpu_count()
          
         self.threads=threads
@@ -380,9 +380,9 @@ class Salmon(Quant):
             threads=self.threads
         
         if sra_object.layout == 'PAIRED':
-            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-i":self.salmon_index}
         else:
-            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath,"-i":self.salmon_index}
         
         
         #add input files to kwargs, overwrite newOpts with kwargs

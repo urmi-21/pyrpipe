@@ -22,7 +22,7 @@ def test_kallisto():
     assert kl.check_index()==False, "Failed kallisto check_index"
     st=kl.build_index(index_path=testVars.testDir+"/kallistoIndex",index_name="kalIndex",fasta=testVars.cdna)
     assert st==True, "Failed to build kallisto index"
-    opts={"-o":testVars.testDir+"/kalOut","--":(testVars.fq1,testVars.fq2)}
+    opts={"-o":testVars.testDir+"/kalOut","--":(testVars.fq1,testVars.fq2),"-i":kl.kallisto_index}
     st=kl.run_kallisto("quant",**opts)
     assert st==True, "Failed to run kallisto"
     
@@ -35,7 +35,8 @@ def test_salmon():
     opts={"-o":testVars.testDir+"/salOut",
           "-l":"A",
           "-1":testVars.fq1,
-          "-2":testVars.fq2}
+          "-2":testVars.fq2,
+          "-i":sl.salmon_index}
     st=sl.run_salmon("quant",**opts)
     assert st==True, "Failed to run salmon"
     
