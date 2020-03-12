@@ -8,7 +8,7 @@ Created on Mon Nov 25 15:21:01 2019
 
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
-import os
+import os, math
 
 class Assembly:
     """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
@@ -40,26 +40,28 @@ class Stringtie(Assembly):
             Options passed to stringtie. Some of these could be overridden later when calling functions of this class.
             Format to pass the arguments:
         """
-    def __init__(self,reference_gtf="",**kwargs):
+    def __init__(self,threads=None):
         
         super().__init__()
         self.program_name="stringtie"
         #check if stringtie exists
         if not pe.check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
+            
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
+        
+        """
         self.valid_args_list=['-G','--version','--conservative','--rf','--fr','-o','-l',
                             '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
                             '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
+        """
         
-        #keep the passed arguments
-        self.passed_args_dict=kwargs
         
-        #check the reference GTF
-        if len(reference_gtf)>0 and pu.check_files_exist(reference_gtf):
-            self.reference_gtf=reference_gtf
-            self.passed_args_dict['-G']=reference_gtf
         
-    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        
+    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",reference_gtf=None,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie using a bam file.
                 
         Parameters
@@ -103,9 +105,20 @@ class Stringtie(Assembly):
                 print("The file "+out_gtf_file+" already exists. Exiting..")
                 return out_gtf_file
         
+        if not threads:
+            threads=self.threads
+        
         #Add output file name and input bam
-        new_opts={"-o":out_gtf_file,"--":(bam_file,)}
-        merged_opts={**kwargs,**new_opts}
+        new_opts={"-o":out_gtf_file,"--":(bam_file,),"-p":str(threads)}
+        
+        if reference_gtf:
+            if not pu.check_files_exist(reference_gtf):
+                pu.print_boldred("Error: Provided reference GTF {} doesn't exist. Exiting...".format(reference_gtf))
+                return ""
+            new_opts["-G"]=reference_gtf
+            
+        
+        merged_opts={**new_opts,**kwargs}
         
         #call stringtie
         status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
@@ -117,7 +130,7 @@ class Stringtie(Assembly):
         else:
             return ""
         
-    def stringtie_merge(self,*args,out_dir=None,out_suffix="_stringtieMerge",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def stringtie_merge(self,*args,out_dir=None,out_suffix="_stringtieMerge",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run stringtie merge.
         
         Parameters
@@ -162,10 +175,13 @@ class Stringtie(Assembly):
                 print("The file "+out_gtf_file+" already exists. Exiting..")
                 return out_gtf_file
         
+        if not threads:
+            threads=self.threads
+            
         #Add merge flag, output file name and input bam
-        new_opts={"--merge":"","-o":out_gtf_file,"--":args}
+        new_opts={"--merge":"","-o":out_gtf_file,"--":args,"-p":str(threads)}
         
-        merged_opts={**kwargs,**new_opts}
+        merged_opts={**new_opts,**kwargs}
         
         #call stringtie
         status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
@@ -181,7 +197,7 @@ class Stringtie(Assembly):
         
             
     
-    def run_stringtie(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_stringtie(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running stringtie. This can be used to run stringtie without using perform_assembly() function.
         
         Parameters
@@ -202,12 +218,11 @@ class Stringtie(Assembly):
         :rtype: bool
         """
             
-        #override existing arguments
-        merged_args_dict={**self.passed_args_dict,**kwargs}
+        
        
         stie_cmd=['stringtie']
         #add options
-        stie_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+        stie_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
         
                 
         #start ececution
@@ -226,7 +241,7 @@ class Cufflinks(Assembly):
     kwargs: dict
         Parameters passed to cufflinks
     """
-    def __init__(self,reference_gtf="",**kwargs):
+    def __init__(self,threads=None):
         
         super().__init__()
         self.program_name="cufflinks"
@@ -236,6 +251,7 @@ class Cufflinks(Assembly):
             
         
         #define valid arguments
+        """
         self.cufflinksArgsList=['-h','--help','-o','--output-dir','-p','--num-threads','--seed','-G','--GTF','-g','--GTF-guide','-M','--mask-file','-b','--frag-bias-correct','-u','--multi-read-correct','--library-type','--library-norm-method',
 '-m','--frag-len-mean','-s','--frag-len-std-dev','--max-mle-iterations','--compatible-hits-norm','--total-hits-norm','--num-frag-count-draws','--num-frag-assign-draws','--max-frag-multihits','--no-effective-length-correction',
 '--no-length-correction','-N','--upper-quartile-norm','--raw-mapped-norm','-L','--label','-F','--min-isoform-fraction','-j','--pre-mrna-fraction','-I','--max-intron-length','-a','--junc-alpha','-A','--small-anchor-fraction',
@@ -254,17 +270,17 @@ class Cufflinks(Assembly):
         self.cuffmergeArgsList=['h','--help','-o','-g','–-ref-gtf','-p','–-num-threads','-s','-–ref-sequence']
         
         self.valid_args_list=pu.get_union(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
+        """
         
-        #keep the passed arguments
-        self.passed_args_dict=kwargs
+        if not threads:
+            threads=os.cpu_count()
         
-        #check the reference GTF
-        if len(reference_gtf)>0 and pu.check_files_exist(reference_gtf):
-            self.reference_gtf=reference_gtf
-            self.passed_args_dict['-g']=reference_gtf
+        self.threads=threads
+        
+        
     
     
-    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",reference_gtf=None,threads=None,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run cufflinks with BAM file as input.
                 
         Parameters
@@ -309,10 +325,22 @@ class Cufflinks(Assembly):
             if os.path.isfile(out_gtf_file):
                 print("The file "+out_gtf_file+" already exists. Exiting..")
                 return out_gtf_file
+        
+        if not threads:
+            threads=self.threads
             
         #Add output file name and input bam
-        new_opts={"-o":out_dir,"--":(bam_file,)}
-        merged_opts={**kwargs,**new_opts}
+        new_opts={"-o":out_dir,"--":(bam_file,),"-p":str(threads)}
+        
+        #add ref gtf
+        if reference_gtf:
+            if not pu.check_files_exist(reference_gtf):
+                pu.print_boldred("Error: Provided reference GTF {} doesn't exist. Exiting...".format(reference_gtf))
+                return ""
+            
+            new_opts["-g"]=reference_gtf
+        
+        merged_opts={**new_opts,**kwargs}
         
         #call cufflinks
         status=self.run_cufflinks(verbose,quiet,logs,objectid,**merged_opts)
@@ -326,7 +354,7 @@ class Cufflinks(Assembly):
         else:
             return ""
     
-    def run_cuff(self,command,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_cuff(self,command,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cuff* commands
         
         Parameters
@@ -350,12 +378,10 @@ class Cufflinks(Assembly):
         """
         validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
         if command in validCommands:
-            #override existing arguments
-            merged_args_dict={**self.passed_args_dict,**kwargs}
-       
+                   
             cuff_cmd=[command]
             #add options
-            cuff_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+            cuff_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
                   
             #start ececution
             status=pe.execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -368,7 +394,7 @@ class Cufflinks(Assembly):
             return False
     
     
-    def run_cufflinks(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_cufflinks(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cufflinks
         
         Parameters
@@ -389,12 +415,10 @@ class Cufflinks(Assembly):
         :rtype: bool
         """
             
-        #override existing arguments
-        merged_args_dict={**self.passed_args_dict,**kwargs}
-       
+               
         cufflinks_cmd=['cufflinks']
         #add options
-        cufflinks_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+        cufflinks_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
         
         
         #start ececution
@@ -412,7 +436,7 @@ class Trinity(Assembly):
     kwargs: dict
         parametrs passed to Trinity
     """
-    def __init__(self,**kwargs):
+    def __init__(self,threads=None,max_memory=None):
         
         super().__init__()
         self.program_name="Trinity"
@@ -421,7 +445,7 @@ class Trinity(Assembly):
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.program_name+" not found.")
         
-        
+        """
         self.valid_args_list=['--seqType','--max_memory','--left','--right','--single','--SS_lib_type','--CPU','--min_contig_length',
                               '--long_reads','--genome_guided_bam','--jaccard_clip','--trimmomatic','--normalize_reads','--no_distributed_trinity_exec',
                               '--output','--full_cleanup','--cite','--verbose','--version','--show_full_usage_info','--KMER_SIZE','--prep','--no_cleanup',
@@ -431,13 +455,22 @@ class Trinity(Assembly):
                               '--bflyGCThreads','--bflyCPU','--bflyCalculateCPU','--bfly_jar','--quality_trimming_params','--normalize_max_read_cov',
                               '--normalize_by_read_set','--genome_guided_max_intron','--genome_guided_min_coverage','--genome_guided_min_reads_per_partition',
                               '--grid_conf','--grid_node_CPU','--grid_node_max_memory']
-
+        """
         
-        #keep the passed arguments
-        self.passed_args_dict=kwargs
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
+        
+        #use floor(max available memory) by default
+        if not max_memory:
+            total_mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
+            total_mem_gib = total_mem_bytes/(1024.**3)
+            max_memory=math.floor(total_mem_gib)
+        
+        self.max_memory=max_memory
     
     
-    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory="2G",max_intron=10000,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory=None,max_intron=10000,threads=None,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to run trinity with sra object or BAM file as input.
                 
         Parameters
@@ -474,27 +507,34 @@ class Trinity(Assembly):
         #add trinity to outdir
         if "trinity" not in out_dir:
             out_dir+="_trinity"
+            
+        if not threads:
+            threads=self.threads
         
+        if not max_memory:
+            max_memory=self.max_memory
+        
+            
         new_opts={}
         if sra_object is not None:
             parent_dir=sra_object.location
             out_dir=os.path.join(parent_dir,out_dir)
             if sra_object.layout == 'PAIRED':
-                new_opts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":max_memory}
+                new_opts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":str(max_memory)+"G","--CPU":str(threads)}
             else:
-                new_opts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":max_memory}
+                new_opts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":str(max_memory)+"G","--CPU":str(threads)}
         elif bam_file is not None:
             if not pu.check_files_exist(bam_file):
                 pu.print_boldred("Input to trinity does not exist:"+bam_file)
                 return ""
             parent_dir=pu.get_file_directory(bam_file)
             out_dir=os.path.join(parent_dir,out_dir)
-            new_opts={"--genome_guided_bam":bam_file,"--output":out_dir,"--max_memory":max_memory,"--genome_guided_max_intron":max_intron}
+            new_opts={"--genome_guided_bam":bam_file,"--output":out_dir,"--max_memory":str(max_memory)+"G","--CPU":str(threads),"--genome_guided_max_intron":max_intron}
         else:
             pu.print_boldred("Please provide valid input to run trinity")
             return ""
         
-        merged_opts={**kwargs,**new_opts}
+        merged_opts={**new_opts,**kwargs}
         
         #call trinity
         status=self.run_trinity(verbose,quiet,logs,objectid,**merged_opts)
@@ -508,7 +548,7 @@ class Trinity(Assembly):
 
     
     
-    def run_trinity(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_trinity(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running trinity
         
         Parameters
@@ -529,12 +569,10 @@ class Trinity(Assembly):
         :rtype: bool
         """
             
-        #override existing arguments
-        merged_args_dict={**self.passed_args_dict,**kwargs}
-       
+               
         trinity_cmd=['Trinity']
         #add options
-        trinity_cmd.extend(pu.parse_unix_args(self.valid_args_list,merged_args_dict))        
+        trinity_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
         
         
         #start ececution

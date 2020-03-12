@@ -21,16 +21,16 @@ def test_assembly():
 def test_stringtie():
     bam=testVars.hisatSortedBam
     gtf=testVars.gtf
-    stie=assembly.Stringtie(reference_gtf=gtf)
-    result=stie.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
+    stie=assembly.Stringtie()
+    result=stie.perform_assembly(bam,out_dir=testVars.testDir, objectid="test",reference_gtf=gtf)
     assert pu.check_files_exist(result)==True, "Failed stringtie"
     
 def test_cufflinks():
     bam=testVars.hisatSortedBam
     gtf=testVars.gtf
-    cl=assembly.Cufflinks(reference_gtf=gtf)
-    result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
-    assert pu.check_files_exist(result)==True, "Failed stringtie"
+    cl=assembly.Cufflinks()
+    result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test",reference_gtf=gtf)
+    assert pu.check_files_exist(result)==True, "Failed cufflinks"
     
     
 def test_trinityBam():
