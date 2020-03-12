@@ -317,7 +317,7 @@ class Star(Aligner):
     Attributes
     ----------
     """ 
-    def __init__(self,star_index="",threads=None,**kwargs):
+    def __init__(self,index="",threads=None):
         
         super().__init__() 
         self.programName="STAR"
@@ -326,7 +326,8 @@ class Star(Aligner):
         #check if star exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
-            
+        
+        """
         self.valid_args=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
                             '--genomeDir','--genomeLoad','--genomeFastaFiles','--genomeChrBinNbits','--genomeSAindexNbases','--genomeSAsparseD','--genomeSuffixLengthMax','--genomeChainFiles','--genomeFileSizes',
                             '--sjdbFileChrStartEnd','--sjdbGTFfile','--sjdbGTFchrPrefix','--sjdbGTFfeatureExon','--sjdbGTFtagExonParentTranscript','--sjdbGTFtagExonParentGene','--sjdbOverhang','--sjdbScore','--sjdbInsertSave',
@@ -342,28 +343,23 @@ class Star(Aligner):
                             '--alignSJoverhangMin','--alignSJstitchMismatchNmax','--alignSJDBoverhangMin','--alignSplicedMateMapLmin','--alignSplicedMateMapLminOverLmate','--alignWindowsPerReadNmax','--alignTranscriptsPerWindowNmax','--alignTranscriptsPerReadNmax',
                             '--alignEndsType','--alignEndsProtrude','--alignSoftClipAtReferenceEnds','--winAnchorMultimapNmax','--winBinNbits','--winAnchorDistNbins','--winFlankNbins','--winReadCoverageRelativeMin','--winReadCoverageBasesMin',
                             '--chimOutType','--chimSegmentMin','--chimScoreMin','--chimScoreDropMax','--chimScoreSeparation','--chimScoreJunctionNonGTAG','--chimJunctionOverhangMin','--chimSegmentReadGapMax','--chimFilter','--chimMainSegmentMultNmax']
-                
+        """
        
         if not threads:
             threads=os.cpu_count()
         
-        if '--runThreadN' not in kwargs:
-            kwargs['--runThreadN']=str(threads)
-            
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
+        self.threads=threads
         
         #if index is passed, update the passed arguments
-        if len(star_index)>0 and pu.check_starindex(star_index):
-            print("STAR index is: "+star_index)
-            self.star_index=star_index
-            self.passedArgumentDict['--genomeDir']=self.star_index
+        if index and pu.check_starindex(index):
+            print("STAR index is: "+index)
+            self.star_index=index
         else:
             print("No STAR index provided. Please build index now to generate an index using build_index()....")
             
     
     
-    def build_index(self,index_path,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a star index with given parameters and saves the new index to self.star_index.
         
         Parameters
@@ -391,11 +387,11 @@ class Star(Aligner):
         """
         
         #if index already exists then exit
-        if pu.check_starindex(index_path):
-            pu.print_green("STAR index already exists. Using it...")
-            self.star_index=index_path
-            self.passedArgumentDict['--genomeDir']=self.star_index
-            return True
+        if not overwrite:
+            if pu.check_starindex(index_path):
+                pu.print_green("STAR index already exists. Using it...")
+                self.star_index=index_path
+                return True
             
         
         #check input files
@@ -413,13 +409,16 @@ class Star(Aligner):
                 raise Exception("Error creating STAR index. Exiting.")
                 return False
         
-        #add runMode
-        newOpts={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":" ".join(args)}
+        if not threads:
+            threads=self.threads
         
-        mergedOpts={**kwargs,**newOpts}
+        #add runMode
+        newOpts={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":" ".join(args),"--runThreadN":str(threads)}
+        
+        mergedOpts={**newOpts,**kwargs}
         
         starbuild_Cmd=['STAR']
-        starbuild_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedOpts))
+        starbuild_Cmd.extend(pu.parse_unix_args(None,mergedOpts))
         
         #execute command
         status=pe.execute_command(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -429,7 +428,6 @@ class Star(Aligner):
             if pu.check_paths_exist(index_path):
                 #update object's index
                 self.star_index=index_path
-                self.passedArgumentDict['--genomeDir']=self.star_index
                 if self.check_index():
                     return True
         else:
@@ -437,7 +435,7 @@ class Star(Aligner):
         
  
             
-    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA",out_type=None,optimize=None,threads=None,**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
@@ -490,12 +488,16 @@ class Star(Aligner):
         newOpts["--outFileNamePrefix"]=out_dir+"/"
         
         #determine threads
-        #use
+        if not threads:
+            threads=self.threads
+        newOpts["--orunThreadN"]=str(threads)
         
+        #add index
+        newOpts["--genomeDir"]=self.star_index
         
                
         #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         #call star
         status=self.run_star(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
@@ -509,7 +511,7 @@ class Star(Aligner):
             return ""
         
     
-    def run_star(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_star(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running star.
         The self.star_index index used.
         
@@ -537,18 +539,17 @@ class Star(Aligner):
         if not self.check_index():
             raise Exception("ERROR: Invalid star index. Please run build index to generate an index.")
             
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+        
        
         star_cmd=['STAR']
         #add options
-        star_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
+        star_cmd.extend(pu.parse_unix_args(valid_args,kwargs))        
         
         #execute command
         cmd_status=pe.execute_command(star_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
         if not cmd_status:
-            print("STAR failed:"+" ".join(star_cmd))
+            pu.print_boldred("STAR failed:"+" ".join(star_cmd))
      
         #return status
         return cmd_status
@@ -577,7 +578,7 @@ class Bowtie2(Aligner):
        Attributes
        ----------
     """ 
-    def __init__(self,bowtie2_index,**kwargs):
+    def __init__(self,index=None,threads=None):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
         
@@ -587,6 +588,7 @@ class Bowtie2(Aligner):
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
+        """
         self.valid_args=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
                             '--trim-to','--phred33','--phred64','--int-quals','--very-fast','--fast',
                             '--sensitive','--very-sensitive','--very-fast-local','--fast-local',
@@ -600,20 +602,22 @@ class Bowtie2(Aligner):
                             '--omit-sec-seq','--sam-no-qname-trunc','--xeq','--soft-clipped-unmapped-tlen',
                             '-p','--threads','--reorder','--mm','--qc-filter','--seed','--non-deterministic',
                             '--version','-h','--help']
+        """
         
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
+        
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
         
         #if index is passed, update the passed arguments
-        if len(bowtie2_index)>0 and pu.check_bowtie2index(bowtie2_index):
-            print("Bowtie2 index is: "+bowtie2_index)
-            self.bowtie2_index=bowtie2_index
-            self.passedArgumentDict['-x']=self.bowtie2_index
+        if index and pu.check_bowtie2index(index):
+            print("Bowtie2 index is: "+index)
+            self.bowtie2_index=index
         else:
             print("No Bowtie2 index provided. Please build index now to generate an index...")
         
         
-    def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a bowtie2 index with given parameters and saves the new index to self.bowtie2_index.
         
         Parameters
@@ -651,13 +655,14 @@ class Bowtie2(Aligner):
             pu.print_boldred("Please check input reference sequences provided to bowtie2-build. Exiting")
             return False
             
-        overwrite=True
+        
         
         
         bowtie2_build_args=['-f','-c','--large-index','--debug','--sanitized','--verbose','-a',
                             '--noauto','-p','--packed','--bmax','--bmaxdivn','--dcv','--nodc',
                             '-r','--noref','-3','--justref','-o','--offrate','-t','--ftabchars',
                             '--threads','--seed','-q','--quiet','-h','--help','--usage','--version']
+        
         #create the out dir
         if not pu.check_paths_exist(index_path):
             if not pu.mkdir(index_path):
@@ -668,11 +673,19 @@ class Bowtie2(Aligner):
             #check if files exists
             if pu.check_bowtie2index(os.path.join(index_path,index_name)):
                 print("bowtie2 index with same name already exists. Exiting...")
+                self.bowtie2_index=os.path.join(index_path,index_name)
                 return True
-            
+        
+        
         bowtie2Build_Cmd=['bowtie2-build']
+        
+        if not threads:
+            threads=self.threads
+        newopts={"--threads":str(threads)}
+        mergedopts={**newopts,**kwargs}
+        
         #add options
-        bowtie2Build_Cmd.extend(pu.parse_unix_args(bowtie2_build_args,kwargs))
+        bowtie2Build_Cmd.extend(pu.parse_unix_args(bowtie2_build_args,mergedopts))
         #add input files
         bowtie2Build_Cmd.append(str(",".join(args)))
         #add dir/basenae
@@ -692,13 +705,12 @@ class Bowtie2(Aligner):
         
         #set the index path
         self.bowtie2_index=os.path.join(index_path,index_name)
-        self.passedArgumentDict['-x']=self.bowtie2_index
         
         #return status
         return True
         
     
-    def perform_alignment(self,sra_object,out_suffix="_bt2",out_dir="",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_bt2",out_dir="",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
@@ -734,21 +746,24 @@ class Bowtie2(Aligner):
         """
         Handle overwrite
         """
-        overwrite=True
         if not overwrite:
             #check if file exists. return if yes
             if os.path.isfile(outFile):
                 print("The file "+outFile+" already exists. Exiting..")
                 return outFile
+            
+        #handle threads
+        if not threads:
+            threads=self.threads
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outFile}
+            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outFile,"--threads":str(threads),"-x":self.bowtie2_index}
         else:
-            newOpts={"-U":sra_object.localfastqPath,"-S":outFile}
+            newOpts={"-U":sra_object.localfastqPath,"-S":outFile,"--threads":str(threads),"-x":self.bowtie2_index}
         
         #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         status=self.run_bowtie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
         
@@ -762,7 +777,7 @@ class Bowtie2(Aligner):
         
         
     
-    def run_bowtie2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bowtie2(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running bowtie2.
         
         
@@ -787,11 +802,9 @@ class Bowtie2(Aligner):
         if not self.check_index():
             raise Exception("ERROR: Invalid Bowtie2 index. Please run build index to generate an index.")
         
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
-            
+                    
         bowtie2_cmd=['bowtie2']
-        bowtie2_cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))
+        bowtie2_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
         
         #print("Executing:"+" ".join(bowtie2_cmd))
         

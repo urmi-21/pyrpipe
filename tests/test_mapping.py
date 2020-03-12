@@ -31,9 +31,9 @@ def test_hisat2():
     st=hs.run_hisat2(**hsMapOpts)
     assert st==True, "Failed to run hisat"
 
-"""
+
 def test_star():
-    star=mapping.Star(star_index="")
+    star=mapping.Star(index="",threads=2)
     assert star.check_index()==False, "Failed star check_index"
     #build index
     st=star.build_index(testVars.testDir+"/starIndex",testVars.genome)
@@ -47,6 +47,7 @@ def test_star():
             "--runThreadN":"8",
             "--outSAMtype": "BAM SortedByCoordinate",
             "--outFileNamePrefix":outdir+"/",
+            "--genomeDir":star.star_index,
             "--readFilesIn":testVars.fq1+" "+testVars.fq2
             }
     st=star.run_star(**opts)
@@ -55,12 +56,11 @@ def test_star():
 
 
 def test_bowtie():
-    bt=mapping.Bowtie2(bowtie2_index="")
+    bt=mapping.Bowtie2(index="")
     assert bt.check_index()==False, "Failed bowtie2 check_index"
     st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
     assert st==True, "Failed to build bowtie2 index"
-    opts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/bowtie2.sam"}
+    opts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/bowtie2.sam","-x":bt.bowtie2_index}
     st=bt.run_bowtie2(**opts)
     assert st==True, "Failed to run bowtie2"
 
-"""
