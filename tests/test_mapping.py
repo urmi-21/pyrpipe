@@ -27,7 +27,7 @@ def test_hisat2():
     st=hs.build_index(testVars.testDir,"hisatindex",testVars.genome)
     assert st==True, "Failed to build hisat2 index"
     #perform alignment without sraobject
-    hsMapOpts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/hisatTest.sam","--dta-cufflinks":"","-p":"10"}
+    hsMapOpts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/hisatTest.sam","--dta-cufflinks":"","-p":"10","-x":hs.hisat2_index}
     st=hs.run_hisat2(**hsMapOpts)
     assert st==True, "Failed to run hisat"
 

@@ -78,10 +78,10 @@ class Hisat2(Aligner):
         
         
         #if index is passed, update the passed arguments
-        if len(index)>0 and pu.check_hisatindex(index):
+        if index and pu.check_hisatindex(index):
             print("HISAT2 index is: "+index)
             self.hisat2_index=index
-            self.index=self.hisat2_index
+            #self.index=self.hisat2_index
         else:
             print("No Hisat2 index provided. Please build index now to generate an index using build_Index()....")
             
@@ -153,6 +153,7 @@ class Hisat2(Aligner):
             #check if files exists
             if pu.check_hisatindex(os.path.join(index_path,index_name)):
                 print("Hisat2 index with same name already exists. Exiting...")
+                self.hisat2_index=os.path.join(index_path,index_name)
                 return True
             
         #handle threads 
@@ -186,7 +187,7 @@ class Hisat2(Aligner):
         
         #set the index path
         self.hisat2_index=os.path.join(index_path,index_name)
-        self.passedArgumentDict['-x']=self.hisat2_index
+        
         
         #return status
         return True
