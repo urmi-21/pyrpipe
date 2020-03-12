@@ -21,17 +21,17 @@ def test_mapping():
 
 def test_hisat2():
     #test hisat build and hisat mapping
-    hsOpts={"--dta-cufflinks":"","-p":"10"}
-    hs=mapping.Hisat2(hisat2_index="",**hsOpts)
+    hs=mapping.Hisat2()
     assert hs.check_index()==False, "Failed hisat check_index"
     #build index
     st=hs.build_index(testVars.testDir,"hisatindex",testVars.genome)
     assert st==True, "Failed to build hisat2 index"
     #perform alignment without sraobject
-    hsMapOpts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/hisatTest.sam"}
+    hsMapOpts={"-1":testVars.fq1,"-2":testVars.fq2,"-S":testVars.testDir+"/hisatTest.sam","--dta-cufflinks":"","-p":"10"}
     st=hs.run_hisat2(**hsMapOpts)
     assert st==True, "Failed to run hisat"
 
+"""
 def test_star():
     star=mapping.Star(star_index="")
     assert star.check_index()==False, "Failed star check_index"
@@ -63,3 +63,4 @@ def test_bowtie():
     st=bt.run_bowtie2(**opts)
     assert st==True, "Failed to run bowtie2"
 
+"""

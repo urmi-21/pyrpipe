@@ -50,7 +50,7 @@ class Hisat2(Aligner):
     ----------
     
     """ 
-    def __init__(self,hisat2_index="",**kwargs):
+    def __init__(self,index=None,threads=None):
         
         super().__init__() 
         self.programName="hisat2"
@@ -58,6 +58,7 @@ class Hisat2(Aligner):
         if not pe.check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
+        """
         self.valid_args=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
                             '-u','-5','-3','--phred33','--phred64','--int-quals',
                             '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
@@ -72,24 +73,26 @@ class Hisat2(Aligner):
                             '--met','--no-head','--no-sq','--rg-id','--rgit-sec-seq','-o','-p',
                             '--reorder','--mm','--qc-filter','--seed','--non-deterministic',
                             '--remove-chrname','--add-chrname','--version']
+        """
         
         
-        #initialize the passed arguments
-        self.passedArgumentDict=kwargs
         
         #if index is passed, update the passed arguments
-        if len(hisat2_index)>0 and pu.check_hisatindex(hisat2_index):
-            print("HISAT2 index is: "+hisat2_index)
-            self.hisat2_index=hisat2_index
-            self.passedArgumentDict['-x']=self.hisat2_index
+        if len(index)>0 and pu.check_hisatindex(index):
+            print("HISAT2 index is: "+index)
+            self.hisat2_index=index
             self.index=self.hisat2_index
         else:
             print("No Hisat2 index provided. Please build index now to generate an index using build_Index()....")
             
+        if not threads:
+            threads=os.cpu_count()
+        self.threads=threads
+            
         
         
             
-    def build_index(self,index_path,index_name,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def build_index(self,index_path,index_name,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Build a hisat index with given parameters and saves the new index to self.hisat2_index.
         
         Parameters
@@ -134,7 +137,7 @@ class Hisat2(Aligner):
             pu.print_boldred("Please check input reference sequences provided to hisat2-build. Exiting")
             return False
             
-        overwrite=True
+        
         print("Building hisat index...")
         
         hisat2Buildvalid_args=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
@@ -151,10 +154,19 @@ class Hisat2(Aligner):
             if pu.check_hisatindex(os.path.join(index_path,index_name)):
                 print("Hisat2 index with same name already exists. Exiting...")
                 return True
+            
+        #handle threads 
+        if not threads:
+            threads=self.threads
+        
+        
         
         hisat2Build_Cmd=['hisat2-build']
+        newOpts={"-p":str(threads)}
+        mergedOpts={**newOpts,**kwargs}
+        
         #add options
-        hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,kwargs))
+        hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,mergedOpts))
         #add input files
         hisat2Build_Cmd.append(str(",".join(args)))
         #add dir/basenae
@@ -180,7 +192,7 @@ class Hisat2(Aligner):
         return True
         
         
-    def perform_alignment(self,sra_object,out_suffix="_hisat2",verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_hisat2",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Function to perform alignment using sra_object.
         
         Parameters
@@ -209,21 +221,23 @@ class Hisat2(Aligner):
         """
         Handle overwrite
         """
-        overwrite=True
         if not overwrite:
             #check if file exists. return if yes
             if os.path.isfile(outSamFile):
                 print("The file "+outSamFile+" already exists. Exiting..")
                 return outSamFile
+            
+        if not threads:
+            threads=self.threads
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile}
+            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile,"-p":str(threads)}
         else:
-            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile}
+            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile,"-p":str(threads)}
         
         #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**kwargs,**newOpts}
+        mergedOpts={**newOpts,**kwargs}
         
         #call run_hisat2
         status=self.run_hisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
@@ -236,7 +250,7 @@ class Hisat2(Aligner):
             return ""
             
         
-    def run_hisat2(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_hisat2(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running hisat2.
         
         Parameters
@@ -262,12 +276,11 @@ class Hisat2(Aligner):
         if not self.check_index():
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
-        #override existing arguments
-        mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
        
         hisat2_Cmd=['hisat2']
         #add options
-        hisat2_Cmd.extend(pu.parse_unix_args(self.valid_args,mergedArgsDict))        
+        hisat2_Cmd.extend(pu.parse_unix_args(valid_args,kwargs))        
         
         #execute command
         cmd_status=pe.execute_command(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
