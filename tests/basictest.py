@@ -403,6 +403,13 @@ predout=txd.run_transdecoder_predict(infa,longorfs_dir=outdir,out_dir=poutdir)
 print(predout)
 
 
+newSRA=sra.SRA('SRR5507343',testDir)
+newSRA.download_fastq()
+#run trimgalore
+tg=qc.Trimgalore(threads=4)  #specify to use 8 cores
+bd=qc.BBmap(threads=4,max_memory=1)
 
+newSRA.perform_qc(bd)
+#newSRA.perform_qc(tg)
 
 

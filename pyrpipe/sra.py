@@ -100,7 +100,7 @@ class SRA:
             return False
         
         if len(fq_files)>2:
-            pu.print_boldred("Can not determine .fastq. Exiting...")
+            pu.print_boldred("Can not determine .fastq. Downloading...")
             return False
         
         fq_files.sort()
@@ -193,6 +193,7 @@ class SRA:
                              '-L','-v','-q','-b','-m','-x','-S','-3','-P','-M',
                              '-B','--option-file','--strict','--table','--include-technical',
                              '--skip-technical','--concatenate-reads']
+        
         fstrqd_Cmd=['fasterq-dump']
         fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
         #add location
@@ -200,6 +201,7 @@ class SRA:
         #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
         fstrqd_Cmd.extend(['-o',self.srr_accession+".fastq"])
         fstrqd_Cmd.extend(['-e',str(threads)])
+        fstrqd_Cmd.extend(['-f'])
         if self.sraFileExistsLocally():
             fstrqd_Cmd.append(self.localSRAFilePath)
         else:

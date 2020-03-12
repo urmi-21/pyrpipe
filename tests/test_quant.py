@@ -22,7 +22,7 @@ def test_kallisto():
     assert kl.check_index()==False, "Failed kallisto check_index"
     st=kl.build_index(index_path=testVars.testDir+"/kallistoIndex",index_name="kalIndex",fasta=testVars.cdna)
     assert st==True, "Failed to build kallisto index"
-    opts={"-o":testVars.testDir+"/kalOut","--":(testVars.fq1,testVars.fq2),"-i":kl.kallisto_index}
+    opts={"-o":testVars.testDir+"/kalOut","--":(testVars.fq1,testVars.fq2),"-i":kl.kallisto_indexlaz}
     st=kl.run_kallisto("quant",**opts)
     assert st==True, "Failed to run kallisto"
     

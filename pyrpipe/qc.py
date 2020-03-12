@@ -29,7 +29,7 @@ class Trimgalore(RNASeqQC):
         kwargs:
             trim_galore arguments.
     """
-    def __init__(self,threads):
+    def __init__(self,threads=None):
         """
         
         """
@@ -242,7 +242,7 @@ class BBmap(RNASeqQC):
             
             
             
-    def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",overwrite=True,optimize=True,threads=None,max_memory=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",overwrite=True,threads=None,max_memory=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run bbduk on fastq files specified by the sra_object
         
         Parameters
@@ -287,8 +287,9 @@ class BBmap(RNASeqQC):
             
         memory_flag="-Xmx"+str(max_memory)+"g"
         
-        if optimize:
-            print("generating suggested parameters XXX TD")
+        #optimize parameters
+        #if optimize:
+        #    print("generating suggested parameters XXX TD")
                     
         if sra_object.layout=='PAIRED':
             fq1=sra_object.localfastq1Path
@@ -299,7 +300,7 @@ class BBmap(RNASeqQC):
             out_file1Path=os.path.join(out_dir,out_fileName1)
             out_file2Path=os.path.join(out_dir,out_fileName2)
             
-            newOpts={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path,"--":(memory_flag,)}
+            newOpts={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path,"--":(memory_flag,),"threads":str(threads)}
             mergedOpts={**newOpts,**kwargs}
             
             #run bbduk

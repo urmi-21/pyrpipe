@@ -316,8 +316,8 @@ def parse_java_args(valid_args_list,passed_args):
     positional_args=[]
     
     #empty list supplied consider all armunets valid
-    if len(valid_args_list)<1:
-        valid_args_list=passed_args.keys()
+    if not valid_args_list:
+        valid_args_list=list(passed_args.keys())
         #above command will also add specialArgs, remove those
         for x in special_args:
             if x in valid_args_list:

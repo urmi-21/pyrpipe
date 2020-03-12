@@ -22,7 +22,7 @@ def test_RNASeqQC():
     
     
 def test_trimgalore():
-    tg=qc.Trimgalore()
+    tg=qc.Trimgalore(threads=4)
     
     #run tg
     tgOpts={"--cores": "10", "-o":testVars.testDir, "--paired":"", "--": (fq1,fq2)}
