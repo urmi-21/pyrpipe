@@ -31,18 +31,18 @@ def test_pipeline1():
     st=sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":workingDir})
     assert st==True,"fqdump failed"
     
-    bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","--":("-Xmx2g",),"ref":testVars.bbdukAdapters}
-    bbdOb=qc.BBmap(**bbdOpts)
-    st=sraOb.perform_qc(bbdOb)
+    bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","ref":testVars.bbdukAdapters}
+    bbdOb=qc.BBmap(threads=4,max_memory=3)
+    st=sraOb.perform_qc(bbdOb,**bbdOpts)
     assert st==True,"bbduk failed"
     
-    tgOpts={"--cores": "10", "-o":testVars.testDir}
-    tg=qc.Trimgalore(**tgOpts)
+    
+    tg=qc.Trimgalore()
     st=sraOb.perform_qc(tg)
     assert st==True,"tg failed"
     
     #runbowtie2
-    bt=mapping.Bowtie2(bowtie2_index="")
+    bt=mapping.Bowtie2(index="")
     assert bt.check_index()==False, "Failed bowtie2 check_index"
     st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
     assert st==True, "Failed to build bowtie2 index"
@@ -50,24 +50,25 @@ def test_pipeline1():
     assert os.path.isfile(st)==True,"bowtie failed"
     
     hsOpts={"--dta-cufflinks":"","-p":"8"}
-    hs=mapping.Hisat2(hisat2_index="",**hsOpts)
+    hs=mapping.Hisat2(index="")
     st=hs.build_index(testVars.testDir,"hisatindex",testVars.genome)
     assert st==True, "Failed to build hisat2 index"
     #perform alignment with sraobject
-    st=hs.perform_alignment(sraOb)
+    st=hs.perform_alignment(sraOb,**hsOpts)
     assert os.path.isfile(st)==True,"hisat failed"
     
     hisatSam=st
-    samOb=tools.Samtools(**{"-@":"8"})
+    samOb=tools.Samtools(threads=2)
     bam=samOb.sam_sorted_bam(hisatSam,delete_sam=False,delete_bam=False)
+    print(bam)
     assert os.path.isfile(bam)==True,"sam to bam failed"
     
-    stie=assembly.Stringtie(reference_gtf=testVars.gtf)
-    result=stie.perform_assembly(bam,out_dir=testVars.testDir)
+    stie=assembly.Stringtie()
+    result=stie.perform_assembly(bam,out_dir=testVars.testDir,reference_gtf=testVars.gtf)
     assert pu.check_files_exist(result)==True, "Failed stringtie"
     
     tr=assembly.Trinity()
-    tr_out=tr.perform_assembly(sraOb,verbose=True)
+    tr_out=tr.perform_assembly(sraOb,threads=2,verbose=True)
     assert pu.check_paths_exist(tr_out)==True, "Failed trinity"
 
     kl=quant.Kallisto(kallisto_index="")

@@ -34,7 +34,7 @@ def test_cufflinks():
     
     
 def test_trinityBam():
-    tr=assembly.Trinity()
+    tr=assembly.Trinity(threads=4)
     #bam=testVars.hisatSortedBam
     bam=testVars.portcullisBam
     tr_opts={"--genome_guided_bam":bam,

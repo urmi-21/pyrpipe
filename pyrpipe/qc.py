@@ -115,8 +115,8 @@ class Trimgalore(RNASeqQC):
             oldFile1=os.path.join(out_dir,pu.get_file_basename(fq1)+"_val_1.fq")
             oldFile2=os.path.join(out_dir,pu.get_file_basename(fq2)+"_val_2.fq")
             
-            pe.move_file(oldFile1,out_file1)
-            pe.move_file(oldFile2,out_file2)
+            pe.move_file(oldFile1,out_file1,verbose=True)
+            pe.move_file(oldFile2,out_file2,verbose=True)
             
             if not pu.check_files_exist(out_file1,out_file2):
                 print("Trimgalore failed")
@@ -138,7 +138,7 @@ class Trimgalore(RNASeqQC):
             """
             oldFile=os.path.join(out_dir,pu.get_file_basename(fq)+"_trimmed.fq")
             
-            pe.move_file(oldFile,out_file)
+            pe.move_file(oldFile,out_file,verbose=True)
             
             if not pu.check_files_exist(out_file):
                 print("Trimgalore failed")

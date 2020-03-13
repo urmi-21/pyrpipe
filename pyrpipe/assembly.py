@@ -537,7 +537,7 @@ class Trinity(Assembly):
         merged_opts={**new_opts,**kwargs}
         
         #call trinity
-        status=self.run_trinity(verbose,quiet,logs,objectid,**merged_opts)
+        status=self.run_trinity(valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**merged_opts)
         
         if status:
             #check out dir

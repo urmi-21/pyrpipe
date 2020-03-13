@@ -233,9 +233,9 @@ class Hisat2(Aligner):
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile,"-p":str(threads)}
+            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile,"-p":str(threads),"-x":self.hisat2_index}
         else:
-            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile,"-p":str(threads)}
+            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile,"-p":str(threads),"-x":self.hisat2_index}
         
         #add input files to kwargs, overwrite kwargs with newOpts
         mergedOpts={**newOpts,**kwargs}

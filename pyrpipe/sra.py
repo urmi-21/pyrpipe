@@ -464,7 +464,7 @@ class SRA:
             
         return True
     
-    def perform_qc(self,qcObject,deleteRawFastq=False):
+    def perform_qc(self,qcObject,deleteRawFastq=False,**kwargs):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
         The qcObject should be initialized with all the parameters.
@@ -480,6 +480,9 @@ class SRA:
             
         deleteRawFastq: bool
             Delete the raw fastq files after QC
+        
+        kwargs: dict
+            Arguments to pass on to perform_qc function
 
         :return: Return status of the QC. True if successful download and False if failed.
         :rtype: bool
@@ -498,7 +501,7 @@ class SRA:
         self.QCObject=qcObject
         print("Performing QC using "+qcObject.programName)
         #each qcObject has a function run() to execute their method
-        qcStatus=qcObject.perform_qc(self,objectid=self.srr_accession)
+        qcStatus=qcObject.perform_qc(self,objectid=self.srr_accession,**kwargs)
         
         #if job failed
         if not qcStatus[0]:
