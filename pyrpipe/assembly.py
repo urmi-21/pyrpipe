@@ -343,7 +343,7 @@ class Cufflinks(Assembly):
         merged_opts={**new_opts,**kwargs}
         
         #call cufflinks
-        status=self.run_cufflinks(verbose,quiet,logs,objectid,**merged_opts)
+        status=self.run_cufflinks(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
         
         if status:
             #move out_dir/transcripts.gtf to outfile
