@@ -32,9 +32,9 @@ class Samtools(RNASeqTools):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
         self.threads=threads
-        #if threads are None use max
+        #Default: if threads are None use 80% of threads to avaoid memory issues
         if not self.threads:
-            self.threads=os.cpu_count()
+            self.threads=int(os.cpu_count()*0.8)
             
         self.max_memory=max_memory
         

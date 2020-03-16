@@ -461,11 +461,11 @@ class Trinity(Assembly):
             threads=os.cpu_count()
         self.threads=threads
         
-        #use floor(max available memory) by default
+        #use floor(80% max available memory) by default
         if not max_memory:
             total_mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
             total_mem_gib = total_mem_bytes/(1024.**3)
-            max_memory=math.floor(total_mem_gib)
+            max_memory=math.floor(total_mem_gib*0.8)
         
         self.max_memory=max_memory
     

@@ -162,9 +162,9 @@ class Kallisto(Quant):
         
         
         if sra_object.layout == 'PAIRED':
-            newOpts={"--threads":str(threads),"-o":out_dir,"--":(sra_object.localfastq1Path,sra_object.localfastq2Path)}
+            newOpts={"--threads":str(threads),"-o":out_dir,"--":(sra_object.localfastq1Path,sra_object.localfastq2Path),"-i":self.kallisto_index}
         else:
-            newOpts={"--threads":str(threads),"-o":out_dir,"--single":"", "--":(sra_object.localfastqPath,)}
+            newOpts={"--threads":str(threads),"-o":out_dir,"--single":"", "--":(sra_object.localfastqPath,),"-i":self.kallisto_index}
         
         
         #add input files to kwargs, overwrite newOpts if kwargs is present

@@ -76,6 +76,7 @@ def test_pipeline1():
     st=kl.build_index(index_path=testVars.testDir+"/kallistoIndex",index_name="kalIndex",fasta=testVars.cdna)
     assert st==True, "Failed to build kallisto index"
     st=kl.perform_quant(sraOb)
+    print("asdsa"+st)
     assert os.path.isdir(st)==True, "Failed to run kallisto"
     
     sl=quant.Salmon(salmon_index="")
