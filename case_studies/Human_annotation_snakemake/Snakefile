@@ -189,15 +189,8 @@ rule portcullis:
 	threads: THREADS
 	run:
 		PC=tools.Portcullis()
-    		PC.run_portcullisFull(GENOME,input.bam,out_dir=DIR+"/portout",**{"--threads":str(threads)})
+    		PC.run_portcullisFull(GENOME,input.bam,out_dir=DIR+"/portout")
 		
-
-"""	
-rule mikado_config:
-	input:
-		list="{wd}/list.txt"
-"""
-
 
 rule create_GTFlist:
 	input:
@@ -233,6 +226,7 @@ rule mikado:
 		mode="permissive"
 		scoring="human.yaml"
 		mk=tools.Mikado()
-		mk.runMikadoFull(input.listfile,GENOME,mode,scoring,input.junctions,"mkconf",BLASTTARGET,dm,THREADS,out_dir=DIR+"/mikadoout",verbose=False)	
+		mk.runMikadoFull(input.listfile,GENOME,mode,scoring,input.junctions,"mkconf",BLASTTARGET,dm, out_dir=DIR+"/mikadoout",verbose=True)	
 
+	
 
