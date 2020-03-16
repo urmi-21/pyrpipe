@@ -69,21 +69,21 @@ for s in SRR:
 	#OBLIST.append(sra.SRA(s,DIR))
 
 ##BBDUK##
-BBDUK=qc.BBmap(**bbduk_params)
+BBDUK=qc.BBmap()
 ##HISAT2##
-HISAT=mapping.Hisat2(hisat2_index="hisat_index/human_index",**hisat2_params)
+HISAT=mapping.Hisat2(index="hisat_index/human_index")
 if not HISAT.check_index():
 	#build hisat2 index
 	pu.print_green("Building Hisat2 index")
 	HISAT.build_index("hisat_index","human_index",GENOME,**{"-p":"25","-a":"","-q":""})
 ##SAMTOOLS
-ST=tools.Samtools(**{"-@":str(THREADS)})
+ST=tools.Samtools(threads=THREADS)
 
 ##StringTie##
-STIE=assembly.Stringtie(reference_gtf=GTF,**stringtie_params)
+STIE=assembly.Stringtie()
 
 ##CUFF##
-CL=assembly.Cufflinks(reference_gtf=GTF,**cuff_params)
+CL=assembly.Cufflinks()
 
 rule all:
 	input:
@@ -108,8 +108,8 @@ rule download:
 	run:
 		fqfile=str(output.f1)
 		srr=pu.get_file_basename(fqfile).split("_")[0]
-		SOBJS[srr].download_fastq(procs=int(threads))
-		SOBJS[srr].perform_qc(BBDUK,deleteRawFastq=True)
+		SOBJS[srr].download_fastq()
+		SOBJS[srr].perform_qc(BBDUK,deleteRawFastq=True,**bbduk_params)
 
 rule hisat:
 	input:
@@ -124,7 +124,7 @@ rule hisat:
 	run:
 		samfile=str(output.sam)
 		srr=pu.get_file_basename(samfile).split("_")[0]
-		HISAT.perform_alignment(SOBJS[srr],**{"-p":str(threads)})
+		HISAT.perform_alignment(SOBJS[srr],**hisat2_params)
 
 rule samtoBam:
 	input:
@@ -151,7 +151,7 @@ rule stringtie:
 	run:
 		f=str(output.gtf)
 		srr=pu.get_file_basename(f).split("_")[0]
-		STIE.perform_assembly(input.bam,objectid=srr)
+		STIE.perform_assembly(input.bam,reference_gtf=GTF,objectid=srr)
 
 rule cufflinks:
 	input:
@@ -164,7 +164,7 @@ rule cufflinks:
 	run:
 		f=str(output.gtf)
 		srr=pu.get_file_basename(f).split("_")[0]
-		CL.perform_assembly(input.bam, objectid=srr)
+		CL.perform_assembly(input.bam, reference_gtf=GTF, objectid=srr,**cuff_params)
 
 
 
@@ -234,18 +234,5 @@ rule mikado:
 		scoring="human.yaml"
 		mk=tools.Mikado()
 		mk.runMikadoFull(input.listfile,GENOME,mode,scoring,input.junctions,"mkconf",BLASTTARGET,dm,THREADS,out_dir=DIR+"/mikadoout",verbose=False)	
-
-	
-
-
-
-
-
-
-
-
-
-
-
 
 
