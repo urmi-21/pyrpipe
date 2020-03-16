@@ -1,0 +1,239 @@
+{
+    "report_data_sources": {
+        "Bowtie 2 / HiSAT2": {
+            "all_sections": {
+                "SRR971778_hisat2": "/home/usingh/work/urmi/hoap/pyrpipe/case_studies/Athaliana_transcript_assembly/tmp/SRR971778_hisat2.txt",
+                "SRR978411_hisat2": "/home/usingh/work/urmi/hoap/pyrpipe/case_studies/Athaliana_transcript_assembly/tmp/SRR978411_hisat2.txt",
+                "SRR976159_hisat2": "/home/usingh/work/urmi/hoap/pyrpipe/case_studies/Athaliana_transcript_assembly/tmp/SRR976159_hisat2.txt"
+            }
+        }
+    },
+    "report_general_stats_data": [
+        {
+            "SRR971778_hisat2": {
+                "total_reads": 5431800,
+                "paired_total": 5431800,
+                "paired_aligned_none": 643042,
+                "paired_aligned_one": 4607041,
+                "paired_aligned_multi": 181717,
+                "paired_aligned_discord_one": 17692,
+                "paired_aligned_mate_none": 1132021,
+                "paired_aligned_mate_one": 112866,
+                "paired_aligned_mate_multi": 5813,
+                "overall_alignment_rate": 89.58,
+                "paired_aligned_mate_multi_halved": 2906.5,
+                "paired_aligned_mate_none_halved": 566010.5,
+                "paired_aligned_mate_one_halved": 56433.0
+            },
+            "SRR978411_hisat2": {
+                "total_reads": 4200061,
+                "paired_total": 4200061,
+                "paired_aligned_none": 197395,
+                "paired_aligned_one": 3894710,
+                "paired_aligned_multi": 107956,
+                "paired_aligned_discord_one": 41081,
+                "paired_aligned_mate_none": 173942,
+                "paired_aligned_mate_one": 133563,
+                "paired_aligned_mate_multi": 5123,
+                "overall_alignment_rate": 97.93,
+                "paired_aligned_mate_multi_halved": 2561.5,
+                "paired_aligned_mate_none_halved": 86971.0,
+                "paired_aligned_mate_one_halved": 66781.5
+            },
+            "SRR976159_hisat2": {
+                "total_reads": 4728102,
+                "paired_total": 4728102,
+                "paired_aligned_none": 206355,
+                "paired_aligned_one": 4408674,
+                "paired_aligned_multi": 113073,
+                "paired_aligned_discord_one": 41812,
+                "paired_aligned_mate_none": 180236,
+                "paired_aligned_mate_one": 143903,
+                "paired_aligned_mate_multi": 4947,
+                "overall_alignment_rate": 98.09,
+                "paired_aligned_mate_multi_halved": 2473.5,
+                "paired_aligned_mate_none_halved": 90118.0,
+                "paired_aligned_mate_one_halved": 71951.5
+            }
+        }
+    ],
+    "report_general_stats_headers": [
+        {
+            "overall_alignment_rate": {
+                "title": "% Aligned",
+                "description": "overall alignment rate",
+                "max": 100,
+                "min": 0,
+                "suffix": "%",
+                "scale": "YlGn",
+                "namespace": "Bowtie 2 / HiSAT2",
+                "rid": "mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate",
+                "format": "{:,.1f}",
+                "colour": "55,126,184",
+                "hidden": null,
+                "ceiling": null,
+                "floor": null,
+                "minRange": null,
+                "shared_key": null,
+                "modify": null,
+                "placement": 1000.0,
+                "dmax": 100.0,
+                "dmin": 0.0
+            }
+        }
+    ],
+    "report_multiqc_command": "/home/usingh/anaconda3/envs/pyrpipeTest/bin/pyrpipe_diagnostic.py multiqc -r pyrpipe_logs/2020-03-16-14_33_21_pyrpipe.log",
+    "report_plot_data": {
+        "bowtie2_pe_plot": {
+            "plot_type": "bar_graph",
+            "samples": [
+                [
+                    "SRR971778_hisat2",
+                    "SRR976159_hisat2",
+                    "SRR978411_hisat2"
+                ]
+            ],
+            "datasets": [
+                [
+                    {
+                        "name": "PE mapped uniquely",
+                        "data": [
+                            4607041.0,
+                            4408674.0,
+                            3894710.0
+                        ],
+                        "color": "#20568f"
+                    },
+                    {
+                        "name": "PE mapped discordantly uniquely",
+                        "data": [
+                            17692.0,
+                            41812.0,
+                            41081.0
+                        ],
+                        "color": "#5c94ca"
+                    },
+                    {
+                        "name": "PE one mate mapped uniquely",
+                        "data": [
+                            56433.0,
+                            71951.5,
+                            66781.5
+                        ],
+                        "color": "#95ceff"
+                    },
+                    {
+                        "name": "PE multimapped",
+                        "data": [
+                            181717.0,
+                            113073.0,
+                            107956.0
+                        ],
+                        "color": "#f7a35c"
+                    },
+                    {
+                        "name": "PE one mate multimapped",
+                        "data": [
+                            2906.5,
+                            2473.5,
+                            2561.5
+                        ],
+                        "color": "#ffeb75"
+                    },
+                    {
+                        "name": "PE neither mate aligned",
+                        "data": [
+                            566010.5,
+                            90118.0,
+                            86971.0
+                        ],
+                        "color": "#981919"
+                    }
+                ]
+            ],
+            "config": {
+                "ylab": "# Reads",
+                "cpswitch_counts_label": "Number of Reads",
+                "id": "bowtie2_pe_plot",
+                "title": "Bowtie 2: PE Alignment Scores"
+            }
+        }
+    },
+    "report_saved_raw_data": {
+        "multiqc_qualimap_bamqc_genome_results": {},
+        "multiqc_bowtie2": {
+            "SRR971778_hisat2": {
+                "total_reads": 5431800,
+                "paired_total": 5431800,
+                "paired_aligned_none": 643042,
+                "paired_aligned_one": 4607041,
+                "paired_aligned_multi": 181717,
+                "paired_aligned_discord_one": 17692,
+                "paired_aligned_mate_none": 1132021,
+                "paired_aligned_mate_one": 112866,
+                "paired_aligned_mate_multi": 5813,
+                "overall_alignment_rate": 89.58,
+                "paired_aligned_mate_multi_halved": 2906.5,
+                "paired_aligned_mate_none_halved": 566010.5,
+                "paired_aligned_mate_one_halved": 56433.0
+            },
+            "SRR978411_hisat2": {
+                "total_reads": 4200061,
+                "paired_total": 4200061,
+                "paired_aligned_none": 197395,
+                "paired_aligned_one": 3894710,
+                "paired_aligned_multi": 107956,
+                "paired_aligned_discord_one": 41081,
+                "paired_aligned_mate_none": 173942,
+                "paired_aligned_mate_one": 133563,
+                "paired_aligned_mate_multi": 5123,
+                "overall_alignment_rate": 97.93,
+                "paired_aligned_mate_multi_halved": 2561.5,
+                "paired_aligned_mate_none_halved": 86971.0,
+                "paired_aligned_mate_one_halved": 66781.5
+            },
+            "SRR976159_hisat2": {
+                "total_reads": 4728102,
+                "paired_total": 4728102,
+                "paired_aligned_none": 206355,
+                "paired_aligned_one": 4408674,
+                "paired_aligned_multi": 113073,
+                "paired_aligned_discord_one": 41812,
+                "paired_aligned_mate_none": 180236,
+                "paired_aligned_mate_one": 143903,
+                "paired_aligned_mate_multi": 4947,
+                "overall_alignment_rate": 98.09,
+                "paired_aligned_mate_multi_halved": 2473.5,
+                "paired_aligned_mate_none_halved": 90118.0,
+                "paired_aligned_mate_one_halved": 71951.5
+            }
+        },
+        "multiqc_general_stats": {
+            "SRR971778_hisat2": {
+                "Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate": 89.58
+            },
+            "SRR978411_hisat2": {
+                "Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate": 97.93
+            },
+            "SRR976159_hisat2": {
+                "Bowtie 2 / HiSAT2_mqc-generalstats-bowtie_2_hisat2-overall_alignment_rate": 98.09
+            }
+        }
+    },
+    "config_analysis_dir_abs": [
+        "/home/usingh/work/urmi/hoap/pyrpipe/case_studies/Athaliana_transcript_assembly/tmp"
+    ],
+    "config_analysis_dir": [
+        "/home/usingh/work/urmi/hoap/pyrpipe/case_studies/Athaliana_transcript_assembly/tmp"
+    ],
+    "config_creation_date": "2020-03-16, 15:08",
+    "config_git_hash": null,
+    "config_intro_text": null,
+    "config_report_comment": null,
+    "config_report_header_info": null,
+    "config_script_path": "/home/usingh/anaconda3/envs/pyrpipeTest/lib/python3.7/site-packages/multiqc/utils",
+    "config_short_version": "1.8",
+    "config_subtitle": null,
+    "config_title": null,
+    "config_version": "1.8"
+}

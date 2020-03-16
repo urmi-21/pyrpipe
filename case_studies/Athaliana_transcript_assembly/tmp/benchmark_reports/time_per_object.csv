@@ -1,0 +1,4 @@
+id,bbduk.sh,hisat2,samtools,stringtie,fasterq-dump,total
+SRR976159,61,80,55,40,39,275
+SRR978411,49,70,46,33,41,239
+SRR971778,62,83,63,39,53,300
