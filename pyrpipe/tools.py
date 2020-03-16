@@ -475,13 +475,13 @@ class Mikado(RNASeqTools):
             threads=self.threads
         
         #run mikado config
-        config_file=self.runMikadoConfigure(listFile,genome,mode,scoring,junctions,config_out_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        config_file=self.runMikadoConfigure(listFile,genome,mode,scoring,junctions,config_out_file, threads=threads, out_dir=out_dir,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         if not pu.check_files_exist(config_file):
             pu.print_boldred("Mikado configure failed")
             return False
         
         #run mikado prep
-        self.runMikadoPrepare(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        self.runMikadoPrepare(config_file,threads=threads, out_dir=out_dir,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         
         mikado_prep_fa=os.path.join(out_dir,"mikado_prepared.fasta")
@@ -497,16 +497,16 @@ class Mikado(RNASeqTools):
         txd=Transdecoder()
         longOrfOut=txd.run_transdecoder_longorfs(mikado_prep_fa,out_dir=out_dir+"/longorfsout")
         preddir=out_dir+"/predout"
-        predout=txd.run_transdecoder_predict(mikado_prep_fa,longOrfOut,out_dir=preddir)
+        #predout=txd.run_transdecoder_predict(mikado_prep_fa,longOrfOut,out_dir=preddir)
         #print(predout)
         
         orfs=os.path.join(preddir,"mikado_prepared.fasta.transdecoder.bed")
         
         #run mikado ser
-        self.runMikadoSerialise(config_file,blast_targets,orfs, xml,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        self.runMikadoSerialise(config_file,blast_targets,orfs, xml,threads=threads,out_dir=out_dir,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         #run mikado pick
-        self.runMikadoPick(config_file,out_dir,verbose,quiet,logs,objectid,**kwargs)
+        self.runMikadoPick(config_file,threads=threads,out_dir=out_dir,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
         
         #return dir containing mikado results
         return out_dir
