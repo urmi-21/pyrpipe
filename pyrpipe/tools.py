@@ -358,7 +358,7 @@ class Portcullis(RNASeqTools):
         if not out_dir:
             out_dir=os.path.join(os.getcwd(),"portcullis_out")
             
-        newOpts={"--":(reference_fasta,bam_file),"-t":str(threads),"-o":out_dir}
+        newOpts={"--":(reference_fasta,bam_file),"--threads":str(threads),"-o":out_dir}
         
         mergedOpts={**newOpts,**kwargs}
                 
