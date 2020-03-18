@@ -108,7 +108,16 @@ class Samtools(RNASeqTools):
     #sort bam file.output will be bam_file_sorted.bam
     def sort_bam(self,bam_file,out_dir="",out_suffix="",threads=None,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
-        
+        bam_file: str
+            Path to the input bam file
+        out_dir: str
+            Path to output directory
+        out_suffix: str
+            Output file suffix
+        threads: int
+            Number of threads. Default: Use self.threads initialized in init().
+        delete_bam: bool
+            Delete input bam_file
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -160,7 +169,18 @@ class Samtools(RNASeqTools):
     
     def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",threads=None,delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
-        
+        sam_file: str
+            Path to the input sam file
+        out_dir: str
+            Path to output directory
+        out_suffix: str
+            Output file suffix
+        threads: int
+            Number of threads. Default: Use self.threads initialized in init().
+        delete_sam: bool
+            Delete input sam_file
+        delete_bam: bool
+            Delete the intermediate unsorted bam_file
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -195,13 +215,16 @@ class Samtools(RNASeqTools):
         
         Parameters
         ----------
-        
+        args: *args
+            Input bam files to merge
         out_file: string
             Output file name to save the results. .bam will be added at the end.
-        args:tuple
-            Paths to bam files to combine
         out_dir: string
             Path where to save the merged bam file. Default path is the same as the first bam_file's
+        threads: int
+            Number of threads. Default: Use self.threads initialized in init().
+        delete_bams: bool
+            Delete input bam files after merging.
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -269,7 +292,7 @@ class Samtools(RNASeqTools):
         valid_args: list
             A list containing valid parameters. Parameters in kwargs not in this list will be ignored. Default: None
         arg1: dict
-            arguments to pass to samtools. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            arguments to pass to samtools. 
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -285,8 +308,7 @@ class Samtools(RNASeqTools):
         :rtype: bool
         """
             
-        #override existing arguments
-        #mergedArgsDict={**self.passedArgumentDict,**kwargs}
+       
        
         samtools_cmd=['samtools',sub_command]
         #add options
@@ -330,9 +352,12 @@ class Portcullis(RNASeqTools):
             Path to the reference fasta file
         bam_file: string
             Path to input bam file
+        threads: int
+            Number of threads
         out_dir: string
             Path to the out put dir. current directory is not given.
-        
+        delete_bam: bool
+            delete input bam file        
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -398,7 +423,7 @@ class Portcullis(RNASeqTools):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            arguments to pass to portcullis. This will override parametrs already existing in the self.passedArgumentDict list but NOT replace them.
+            arguments to pass to portcullis. 
 
         :return: Returns the status of portcullis. True is passed, False if failed.
         :rtype: bool
@@ -421,6 +446,12 @@ class Portcullis(RNASeqTools):
         
 
 class Mikado(RNASeqTools):
+    """Mikado constructor
+    threads: int
+        Number of threads to use
+    max_memory: float
+        Max memory to use in (GB)
+    """
     def __init__(self,threads=None,max_memory=None):
         self.programName="mikado"
         self.dep_list=[self.programName]
@@ -439,6 +470,18 @@ class Mikado(RNASeqTools):
  
     def createMikadoGTFlist(self,out_file,out_dir,searchPath,searchQuery="*.gtf",strand=False):
         """Create a file to be used by mikado configure
+        out_file: str
+            outfile name
+        out_dir: str
+            path to out_dir
+        searchPath: str
+            Path where gtf/gff files will be searched
+        searchQuery: str
+            Query to perform search. Default: "*.gtf"
+        strand: bool
+            Stranded flag: Default false
+        
+            
         """
         
         files=pe.find_files(searchPath,searchQuery,recursive=True)
@@ -468,6 +511,38 @@ class Mikado(RNASeqTools):
     def runMikadoFull(self,listFile,genome,mode,scoring,junctions,config_out_file,blast_targets,blastx_object,out_dir=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Run whole mikado pipeline
         Output will be stored to out_dir/
+        
+        listFile: str
+            Input list file to mikado configure
+        genome: str
+            Path to gename fasta file
+        mode: str
+            mikado mode
+        scoring: str
+            scoring file
+        junctions: str
+            path to junctions file
+        config_out_file:str
+            path to output configure file
+        balst_targets: str
+            Path to blast targets
+        blastx_object: object
+            A pyrpipe object to use homology search e.g. Diamond
+        out_dir: str
+            path to out directory
+        threads: int
+            Number of threads to use
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            arguments to pass to mikado. 
+            
         """
         
         #use threads if provided
