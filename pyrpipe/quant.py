@@ -38,8 +38,8 @@ class Kallisto(Quant):
     
     kallisto_index: string
         path to kallisto index
-    kwargs: dict
-        parametrs passed to kallisto
+    threads: int
+        num threads to use
     """
     
     def __init__(self,kallisto_index,threads=None):
@@ -113,6 +113,7 @@ class Kallisto(Quant):
         
         #if not threads:
         #    threads=self.threads
+        #no threads in build index
         
         newOpts={"--":(fasta,),"-i":indexOut}
         mergedOpts={**newOpts,**kwargs}
@@ -139,6 +140,8 @@ class Kallisto(Quant):
             path to the output directory
         index_name: str
             index name
+        threads: int
+            Number of threads
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -191,6 +194,8 @@ class Kallisto(Quant):
         
         subcommand: str
             subcommand for kallisto
+        valid_args: list
+            List of valid arguments, arguments in kwargs not in this list will be ignored
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -235,8 +240,8 @@ class Salmon(Quant):
     
     salmon_index: string
         Path to salmon index
-    kwargs: dict
-        Options passed to salmon
+    threads: int
+        Number of threads
     """      
     def __init__(self,salmon_index,threads=None):    
         super().__init__() 
@@ -304,6 +309,10 @@ class Salmon(Quant):
             path to the output directory
         index_name: str
             index name
+        fasta: str
+            Path to fasta file
+        threads: int
+            Number of threads
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -353,9 +362,14 @@ class Salmon(Quant):
         
         
     
-    def perform_quant(self,sra_object,out_dir="",libType=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_quant(self,sra_object,out_dir="",lib_type=None,threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """run salmon quant
-        
+        sra_object: SRA
+            An SRA object with valid fastq files
+        lib_type: str
+            Library type. Default:A
+        threads: int
+            Num threads to use
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -370,8 +384,8 @@ class Salmon(Quant):
         :return: Path to salmon out directory
         :rtype: string
         """
-        if not libType:
-            libType="A"
+        if not lib_type:
+            lib_type="A"
             
         if not out_dir:
             out_dir=os.path.join(sra_object.location,"salmon_out")
@@ -380,9 +394,9 @@ class Salmon(Quant):
             threads=self.threads
         
         if sra_object.layout == 'PAIRED':
-            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-i":self.salmon_index}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":lib_type,"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-i":self.salmon_index}
         else:
-            newOpts={"--threads":str(threads),"-o":out_dir,"-l":libType,"-r":sra_object.localfastqPath,"-i":self.salmon_index}
+            newOpts={"--threads":str(threads),"-o":out_dir,"-l":lib_type,"-r":sra_object.localfastqPath,"-i":self.salmon_index}
         
         
         #add input files to kwargs, overwrite newOpts with kwargs
@@ -409,6 +423,8 @@ class Salmon(Quant):
         
         subcommand: str
             subcommand for salmon
+        valid_args: list
+            List of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
