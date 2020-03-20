@@ -43,8 +43,8 @@ class Hisat2(Aligner):
        hisat2_index: string
             path to the histat2 index. This index is stored with the object and will be used when hisat is invoked using this object.
             
-       **kwargs: dict
-            parameters passed to the hisat2 program. These parameters could be overridden later when running hisat.
+       threads: int
+            Num threads to use
             
     Attributes
     ----------
@@ -106,6 +106,8 @@ class Hisat2(Aligner):
             
         args: tuple
             Path to reference input files
+        threads: int
+            Num threads to use
             
         verbose : bool
             Print stdout and std error
@@ -203,6 +205,10 @@ class Hisat2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output sam file
+        threads: int
+            Num threads to use
+        overwrite: bool
+            Overwrite output sam if already exist
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -256,7 +262,8 @@ class Hisat2(Aligner):
         
         Parameters
         ----------
-        
+        valid_args: list
+            list of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -311,8 +318,8 @@ class Star(Aligner):
        
        star_index: string
             path to a star index. This index will be used when star is invoked using this object.
-       kwargs: dict
-            parameters passed to the star program. These parameters could be overridden later when running star.
+       threads: int
+            Num threads to use
             
     Attributes
     ----------
