@@ -31,7 +31,8 @@ class Trimgalore(RNASeqQC):
     """
     def __init__(self,threads=None):
         """
-        
+        threads: int
+            Num threads to use
         """
         
         #run super to inherit parent class properties
@@ -70,8 +71,12 @@ class Trimgalore(RNASeqQC):
         
         sra_object: SRA
             An SRA object whose fastq files will be used
+        out_dir: str
+            Path to output directory
         out_suffix: string
             Suffix for the output sam file
+        threads: int
+            Num threads to use
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -152,6 +157,8 @@ class Trimgalore(RNASeqQC):
         
         Parameters
         ----------
+        valid_args: list
+            List of valid args
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -194,8 +201,9 @@ class BBmap(RNASeqQC):
         Parameters
         ----------
         
-        kwargs:
-            bbduk.sh arguments.
+        threads: int
+            num threads to use
+        max_memory: Max memory to use in GB
         """
         #run super to inherit parent class properties
         super().__init__() 
@@ -256,6 +264,10 @@ class BBmap(RNASeqQC):
             Suffix for output file name
         overwrite: bool
             overwrite existing files
+        threads: int
+            Num threads to use
+        max_memory: float
+            Max memory to use in GB
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -329,6 +341,19 @@ class BBmap(RNASeqQC):
     
     def run_bbduk(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper to run bbduk.sh
+        valid_args: list
+            A list of valid arguments
+        verbose: bool
+            Print stdout and std error
+        quiet: bool
+            Print nothing
+        logs: bool
+            Log this command to pyrpipe logs
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        kwargs: dict
+            options passed to bbduk
+        
         """
               
         #create command to run
