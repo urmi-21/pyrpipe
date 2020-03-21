@@ -33,12 +33,8 @@ class Stringtie(Assembly):
         Parameters
         ----------
         
-        reference_gtf: string
-            Path to the reference gtf file. If a valid gtf file is provided the option -G will be set to the gtf file. This can't
-            be overriden later when calling functions of this class.
-        kwargs: dict
-            Options passed to stringtie. Some of these could be overridden later when calling functions of this class.
-            Format to pass the arguments:
+        threads: int
+            number of threads
         """
     def __init__(self,threads=None):
         
@@ -71,6 +67,10 @@ class Stringtie(Assembly):
             path to the bam file
         out_suffix: string
             Suffix for the output gtf file
+        reference_gtf: str
+            Path to the reference gtf used as guide
+        threads: int
+            Number of threads to use
         overwrite: bool
             Overwrite if output file already exists.
         verbose: bool
@@ -82,8 +82,7 @@ class Stringtie(Assembly):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
+            Options to pass to stringtie. 
         :return: Returns the path to output GTF file
         :rtype: string
         """
@@ -140,6 +139,8 @@ class Stringtie(Assembly):
             path to gtf files to merge
         out_suffix: string
             Suffix for output gtf file name
+        threads: int
+            Number of threads to use
         overwrite: bool
             Overwrite if output file already exists.
         verbose: bool
@@ -151,8 +152,7 @@ class Stringtie(Assembly):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-
+            Options to pass to stringtie. 
         :return: Returns the path to the merged GTF file
         :rtype: string
         """
@@ -202,7 +202,8 @@ class Stringtie(Assembly):
         
         Parameters
         ----------
-        
+        valid_args: list
+            List of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -212,8 +213,8 @@ class Stringtie(Assembly):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-
+            Options to pass to stringtie. 
+            
         :return: Returns the status of stringtie command.
         :rtype: bool
         """
@@ -238,8 +239,8 @@ class Stringtie(Assembly):
 class Cufflinks(Assembly):
     """This class represents cufflinks
     
-    kwargs: dict
-        Parameters passed to cufflinks
+    threads: int
+            Number of threads to use
     """
     def __init__(self,threads=None):
         
@@ -291,6 +292,10 @@ class Cufflinks(Assembly):
             output directory
         out_suffix: string
             Suffix for the output gtf file
+        reference_gtf: str
+            Path to reference gtf 
+        threads: int
+            Number of threads to use
         overwrite: bool
             Overwrite if output file already exists.
         verbose: bool
@@ -302,8 +307,8 @@ class Cufflinks(Assembly):
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession.
         kwargs: dict
-            Options to pass to cufflinks. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-
+            Options to pass to cufflinks. 
+            
         :return: Returns the path to output GTF file
         :rtype: string       
         """
@@ -362,6 +367,8 @@ class Cufflinks(Assembly):
         
         command: string
             the command name
+        valid_args: list
+            List of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -399,7 +406,8 @@ class Cufflinks(Assembly):
         
         Parameters
         ----------
-        
+        valid_args: list
+            Liast of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -433,8 +441,10 @@ class Cufflinks(Assembly):
 class Trinity(Assembly):
     """This class represents Trinity RNA-Seq assembler
     
-    kwargs: dict
-        parametrs passed to Trinity
+    threads: int
+            Number of threads to use
+    max_memory: int
+            Max memory in GB to use
     """
     def __init__(self,threads=None,max_memory=None):
         
@@ -486,6 +496,8 @@ class Trinity(Assembly):
             Max memory argument e.g. "2G"
         max_intron: int
             specify the "--genome_guided_max_intron" argument
+        threads: int
+            Number of threads to use
         overwrite: bool
             Overwrite if output file already exists
         verbose: bool
@@ -498,8 +510,8 @@ class Trinity(Assembly):
             Provide an id to attach with this command e.g. the SRR accession.
         
         kwargs: dict
-            Options to pass to Trinity. This will override the existing options self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-
+            Options to pass to Trinity. 
+            
         :return: Return the path to output GTF file
         :rtype: string
         """
@@ -553,7 +565,8 @@ class Trinity(Assembly):
         
         Parameters
         ----------
-        
+        valid_args: list
+            list of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
