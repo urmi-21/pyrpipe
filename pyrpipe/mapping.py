@@ -274,8 +274,7 @@ class Hisat2(Aligner):
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
         kwargs: dict
-            arguments to pass to hisat2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
-
+            arguments to pass to hisat2. 
         :return: Returns the status of hisat2. True is passed, False if failed.
         :rtype: bool
         """
@@ -374,9 +373,12 @@ class Star(Aligner):
         
         index_path: string
             Path where the index will be created
-        
         args: tuple
             Path to reference input files
+        threads: int
+            Num threads to use
+        overwrite: bool
+            Overwrite if index already exists
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -455,6 +457,8 @@ class Star(Aligner):
             Suffix for the output file
         out_dir: str
             outout directory default: sra_object.location
+        threads: int
+            Num threads to use
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -524,7 +528,8 @@ class Star(Aligner):
         
         Parameters
         ----------
-        
+        valid_args: list
+            List of valid arguments
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -536,8 +541,7 @@ class Star(Aligner):
         kwargs: dict
             Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         kwargs: dict
-            arguments to pass to star. This will override parametrs already existing in the self.passedArgumentList list but NOT replace all of them.
-            
+            arguments to pass to star. 
         :return: Returns the status of star. True is passed, False if failed.
         :rtype: bool
         """
@@ -577,10 +581,10 @@ class Bowtie2(Aligner):
        Parameters
        ----------
        
-       bowtie2_index: string
+       index: string
             path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
-       **kwargs: dict
-            parameters passed to the bowtie2 program. These parameters could be overridden later when running bowtie2.
+       threads: int
+            Num threads to use
             
        Attributes
        ----------
@@ -634,8 +638,12 @@ class Bowtie2(Aligner):
             Path where the index will be created
         index_name: string
             A name for the index
-        arg3: tuple
+        args: tuple
             Path to reference input files
+        threads: int
+            Num threads to use
+        overwrite: bool
+            Overwrite already existing index
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -727,6 +735,12 @@ class Bowtie2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output sam file
+        out_dir: str
+            Path to out dir
+        threads: int
+            Num threads to use
+        overwrite: bool
+            Overwrite sam file if exixts
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -788,7 +802,8 @@ class Bowtie2(Aligner):
         """Wrapper for running bowtie2.
         
         
-        
+        valid_args: list
+            list of valid args
         verbose: bool
             Print stdout and std error
         quiet: bool
@@ -799,8 +814,7 @@ class Bowtie2(Aligner):
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
         
         kwargs: dict
-            arguments to pass to bowtie2. This will override parametrs already existing in the self.passedArgumentList list but NOT replace them.
-            
+            arguments to pass to bowtie2. 
         :return: Returns the status of bowtie2. True is passed, False if failed.
         :rtype: bool
         """
