@@ -501,7 +501,7 @@ class Star(Aligner):
         #determine threads
         if not threads:
             threads=self.threads
-        newOpts["--orunThreadN"]=str(threads)
+        newOpts["--runThreadN"]=str(threads)
         
         #add index
         newOpts["--genomeDir"]=self.star_index
