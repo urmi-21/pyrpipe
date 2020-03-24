@@ -16,6 +16,8 @@ with pyrpipe, or can use the methods provided in the pyrpipe_engine module to in
 
 Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.925818v1)
 
+Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
+
 ### Note: pyrpipe version 0.0.4 and above is not compatible with lower versions due to changes in the API design.
 
 
