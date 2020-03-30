@@ -37,7 +37,7 @@ class SRA:
         """
     def __init__(self,srr_accession=None, location=None, threads=None):
         
-        if location is None and srr_accession is None:
+        if (location is None) and (srr_accession is None):
             #pu.print_boldred("Please provide a valid srr accession or location, or both")
             raise Exception("Please provide a valid srr accession or location, or both")
             #use the scan_path to create sra object

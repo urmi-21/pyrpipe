@@ -507,7 +507,7 @@ class Star(Aligner):
         newOpts["--genomeDir"]=self.star_index
         
                
-        #add input files to kwargs, overwrite kwargs with newOpts
+        #add input files to kwargs, overwrite newOpts with kwargs
         mergedOpts={**newOpts,**kwargs}
         
         #call star
