@@ -144,13 +144,23 @@ class PyrpipeLogger():
         pyver='Python ' + sys.version.replace('\n', '')
         #get cpu
         cpu=str(cpu_count())+' logical CPU cores'
+        #get conda env
+        condaenv_cmd='conda env export'
+        result = subprocess.Popen(condaenv_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
+        stdout,stderr = result.communicate()
+        condaenv=stdout.decode("utf-8") 
+        #remove prefix line       
+        condaenv='\n'.join([ x for x in condaenv.split('\n') if x and 'prefix' not in x ])
+        #print(condaenv)
+        
         
         envDesc={'now':str(datetime.now().strftime("%y-%m-%d %H:%M:%S")),
                  'python':pyver,
                  'os':osInfo,
                  'cpu':cpu,
                  'syspath':str(sys.path),
-                 'sysmodules':str(list(sys.modules.keys()))
+                 'sysmodules':str(list(sys.modules.keys())),
+                 'conda_env':str(condaenv)
                  }
         
         self.env_logger.debug(json.dumps(envDesc))
