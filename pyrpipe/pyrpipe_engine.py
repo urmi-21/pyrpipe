@@ -144,15 +144,17 @@ class PyrpipeLogger():
         pyver='Python ' + sys.version.replace('\n', '')
         #get cpu
         cpu=str(cpu_count())+' logical CPU cores'
-        #get conda env
+        #get current conda environment and dump to log
         condaenv_cmd='conda env export'
-        result = subprocess.Popen(condaenv_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
-        stdout,stderr = result.communicate()
-        condaenv=stdout.decode("utf-8") 
-        #remove prefix line       
-        condaenv='\n'.join([ x for x in condaenv.split('\n') if x and 'prefix' not in x ])
-        #print(condaenv)
-        
+        try:
+            result = subprocess.Popen(condaenv_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
+            stdout,stderr = result.communicate()
+            condaenv=stdout.decode("utf-8") 
+            #remove prefix line       
+            condaenv='\n'.join([ x for x in condaenv.split('\n') if x and 'prefix' not in x ])
+            #print(condaenv)
+        except:
+            condaenv='Conda not found'
         
         envDesc={'now':str(datetime.now().strftime("%y-%m-%d %H:%M:%S")),
                  'python':pyver,
