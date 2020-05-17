@@ -73,6 +73,14 @@ It is best to [share your conda environment files](https://stackoverflow.com/que
 
 ### Install latest stable version
 
+#### Through conda
+
+```
+conda install -c bioconda pyrpipe 
+ ```
+ 
+#### Through PIP
+
 ```
 pip install pyrpipe --upgrade
 ```
