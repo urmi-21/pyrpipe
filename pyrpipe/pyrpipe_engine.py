@@ -240,6 +240,10 @@ def getReturnStatus(cmd):
 #prints stdout in real time. optimal for huge stdout and no stderr
 def execute_commandRealtime(cmd):
     """Execute shell command and print stdout in realtime.
+    
+    Example:
+    for output in pe.execute_commandRealtime(['ping','-c','4','google.com']):
+        print (output)
     """
     popen = subprocess.Popen(cmd, stdout=subprocess.PIPE, universal_newlines=True)
     
