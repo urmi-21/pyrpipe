@@ -191,10 +191,21 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
 
-   
+def parse_cmd(cmd):
+    """This function converts a list to str.
+    If a command is passed as list it is converted to str.
+    For pyrpipe v0.0.5 onwards the getShellOutput function uses shell=True
+    """
+    if isinstance(cmd,list):
+        return " ".join(cmd)
+    
+    return cmd
+        
     
 def getShellOutput(cmd,verbose=False):
     """Function to run a shell command and return returncode, stdout and stderr
+    Currently (pyrpipe v 0.0.4) this function is called in 
+    getReturnStatus(), getProgramVersion(), find_files()
     
     Parameters
     ----------
@@ -208,11 +219,12 @@ def getShellOutput(cmd,verbose=False):
     :rtype: tuple
     """
     #not logging these commands
-    log_message=" ".join(cmd)
+    cmd=parse_cmd(cmd)
+    log_message=cmd
     if verbose:
         pu.print_blue("$ "+log_message)
     try:
-        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
         stdout,stderr = result.communicate()
         return(result.returncode,stdout,stderr)
     except:
@@ -499,16 +511,20 @@ def check_dependencies(dependencies):
         return False
     return True
 
-
+  
+    
 #TODO: Re-implement following using native python libraries and move to utils
-def deleteFileFromDisk(filePath):
+def deleteFileFromDisk(file_path):
     """Delete a given file from disk
-    Returns true if file is deleted or doesn't exist
+    Returns true if file is deleted or doesn't exist.
+    shell=True is not added to make this function secure.
     """
-    if pu.check_files_exist(filePath):
-        rm_Cmd=['rm',filePath]
-        rv= getReturnStatus(rm_Cmd)
+    if pu.check_files_exist(file_path):
+        rm_cmd=['rm',file_path]
+        rv= getReturnStatus(rm_cmd)
         return rv
+    else:
+        pu.print_boldred('Warning: File {} does not exist. Ignoring rm'.format(file_path))
     #if file doesn't exist return true
     return True
 
