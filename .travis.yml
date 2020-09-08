@@ -64,7 +64,7 @@ install:
   - export PATH=$PATH:$PWD/bin
   - cd ..  
   #install hisat2
-  - wget ftp://ftp.ccb.jhu.edu/pub/infphilo/hisat2/downloads/hisat2-2.1.0-Linux_x86_64.zip -O /tmp/hisat2.zip
+  - wget https://cloud.biohpc.swmed.edu/index.php/s/hisat2-210-Linux_x86_64/download -O /tmp/hisat2.zip
   - unzip /tmp/hisat2.zip
   - export PATH=$PATH:$PWD/hisat2-2.1.0/
   #install STAR
