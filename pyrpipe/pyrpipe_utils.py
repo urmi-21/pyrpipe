@@ -8,6 +8,8 @@ Created on Mon Oct 21 12:04:28 2019
 
 import os
 import datetime as dt
+import sys
+from colorama import Fore,Back,Style
 
 
 
@@ -39,7 +41,8 @@ def print_boldred(text):
         
     Returns:   None
     """
-    print (Colors.FAIL + Colors.BOLD+ text + Colors.ENDC)
+    #print (Colors.FAIL + Colors.BOLD+ text + Colors.ENDC)
+    print_error(text)
 
 def print_green(text):
     """Print in green font
@@ -52,7 +55,8 @@ def print_green(text):
         
     Returns:   None
     """
-    print (Colors.OKGREEN + text + Colors.ENDC)
+    #print (Colors.OKGREEN + text + Colors.ENDC)
+    print_success(text)
 
 def print_blue(text):
     """Print in blue font
@@ -65,19 +69,10 @@ def print_blue(text):
         
     Returns:   None
     """
-    print (Colors.OKBLUE + text + Colors.ENDC) 
+    #print (Colors.OKBLUE + text + Colors.ENDC) 
+    print_message(text)
 
-def print_magenta(text):
-    """Print in magenta font
-    
-    Parameters
-    ----------
-    
-    text(str): text to print
-    
-    Returns:   None
-    """
-    print (Colors.LightMagenta + text + Colors.ENDC) 
+
     
 def print_info(text):
     """Print an info message
@@ -90,7 +85,8 @@ def print_info(text):
 
     Returns:   None
     """
-    print_magenta(text)
+    #print_magenta(text)
+    print_information(text)
     
 def print_yellow(text):
     """Print in yellow font
@@ -103,7 +99,44 @@ def print_yellow(text):
         
     Returns:   None
     """
-    print (Colors.LightYellow + text + Colors.ENDC) 
+    #print (Colors.LightYellow + text + Colors.ENDC) 
+    print_notification(text)
+    
+
+def pyrpipe_print(color,*args,stderr=False,**kwargs):
+    if stderr:
+        print(color,file=sys.stderr,end="",**kwargs)
+        print(*args,file=sys.stderr,end="",**kwargs)
+        print(Style.RESET_ALL,file=sys.stderr,**kwargs)
+    else:
+        print(color,file=sys.stdout,end="",**kwargs)
+        print(*args,file=sys.stdout,end="",**kwargs)
+        print(Style.RESET_ALL,file=sys.stdout,**kwargs)
+    
+def print_notification(*args):
+    """Print message to stderr
+    """
+    pyrpipe_print(Fore.LIGHTYELLOW_EX,*args,stderr=True)
+
+def print_message(*args):
+    """Print message to stderr
+    """
+    pyrpipe_print(Fore.LIGHTCYAN_EX,*args,stderr=True)
+    
+def print_information(*args):
+    """Print message to stderr
+    """
+    pyrpipe_print(Fore.LIGHTMAGENTA_EX,*args,stderr=True)
+    
+def print_error(*args):
+    """Print message to stderr
+    """
+    pyrpipe_print(Fore.LIGHTRED_EX,*args,stderr=True)
+    
+def print_success(*args):
+    """Print message to stderr
+    """
+    pyrpipe_print(Fore.LIGHTGREEN_EX,*args,stderr=True)
 
 ######End color functions###################
 
