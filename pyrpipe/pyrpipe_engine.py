@@ -293,6 +293,11 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
     :return: Return status.True is returncode is 0
     :rtype: bool
     """
+    
+    #get current time
+    time_start = time.time()
+    starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
+    
     if not command_name:
         command_name=cmd[0]
     log_message=" ".join(cmd)
@@ -305,7 +310,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
         logDict={'cmd':log_message,
                  'exitcode':"0",
                  'runtime':"0",
-                 'starttime':"0",
+                 'starttime':str(starttime_str),
                  'stdout':"dryrun",
                  'stderr':"",
                  'objectid':objectid,
@@ -315,9 +320,9 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
         return True
     
     if not quiet:
-        pu.print_blue("$ "+log_message)
-    time_start = time.time()
-    starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        pu.print_blue("Start:"+starttime_str)
+        pu.print_blue("$ "+starttime_str+" "+log_message)
+    
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
         stdout,stderr = result.communicate()
@@ -331,7 +336,9 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
         else:
             stderr=""
         
-        timeDiff = round(time.time() - time_start) #round to remove microsecond term
+        endtime=time.time()
+        endtime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        timeDiff = round(endtime - time_start) #round to remove microsecond term
     
         if verbose:
             if stdout:
@@ -339,6 +346,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
             if stderr:
                 pu.print_boldred("STDERR:\n"+stderr)
         if not quiet:
+            pu.print_blue("End:"+endtime_str)
             pu.print_green("Time taken:"+str(timedelta(seconds=timeDiff)))
             
                 
