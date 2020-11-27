@@ -375,9 +375,9 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
             return True
         else:
             #print the output
-            print("Following error occured executing above command (return code={}):".format(str(exitCode)))
-            print("STDOUT:\n"+stdout)
-            print("STDERR:\n"+stderr)
+            pu.print_boldred("Following error occured executing above command (return code={}):".format(str(exitCode)))
+            pu.print_boldred("STDOUT:\n"+stdout)
+            pu.print_boldred("STDERR:\n"+stderr)
             return False
     #handle exceptions
     except OSError as e:
