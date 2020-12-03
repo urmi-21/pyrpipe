@@ -46,6 +46,11 @@ setuptools.setup(
     packages=setuptools.find_packages(),
     include_package_data=True,
     scripts=['scripts/pyrpipe_diagnostic.py'],
+    entry_points={
+            'console_scripts': [
+                    'pyrpipe = pyrpipe.__main__:main'                    
+                    ]
+            },
     install_requires=[line.rstrip() for line in open("requirements.txt", "rt")],
     tests_require=["pytest"],
     classifiers=[

@@ -20,6 +20,10 @@ from multiprocessing import cpu_count
 from pyrpipe import pyrpipe_utils as pu
 import json
 
+#import dryrun from Conf
+from pyrpipe import dryrun
+
+
 class LogFormatter():
     """
     A formatter for logs
@@ -68,7 +72,7 @@ class PyrpipeLogger():
     def __init__(self):
         self.__name__="pyrpipeLogger"
         #loggers
-        timestamp=str(datetime.now()).split(".")[0].replace(" ","-").replace(":","_")
+        timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
         self.logger_basename=timestamp+"_pyrpipe"
         self.logs_dir=os.path.join(os.getcwd(),"pyrpipe_logs")
         if not os.path.isdir(self.logs_dir):
@@ -191,18 +195,50 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
 
+#decorator function for dry runs
+def dryable(func):
+    """
+    decorator function for drying all functions capable of executing commands
+    """
+    
+    if not dryrun:
+        return func
+    def dried(cmd,*args,**kwargs):
+        #print, log and exit
+        starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
+        #convert cmd to string
+        cmd=parse_cmd(cmd)
+        command_name=cmd.split(' ')[0]
+        log_message=cmd
+        pu.print_blue("$ "+log_message)
+        #log
+        #create a dict and dump as json
+        logDict={'cmd':log_message,
+             'exitcode':"0",
+             'runtime':"0",
+             'starttime':str(starttime_str),
+             'stdout':"dryrun",
+             'stderr':"",
+             'objectid':'',
+             'commandname':command_name
+            }
+        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        return True
+    
+    return dried
+
 def parse_cmd(cmd):
     """This function converts a list to str.
     If a command is passed as list it is converted to str.
-    For pyrpipe v0.0.5 onwards the getShellOutput function uses shell=True
+    For pyrpipe v0.0.5 onwards the get_shell_output function uses shell=True
     """
     if isinstance(cmd,list):
         return " ".join(cmd)
     
     return cmd
         
-    
-def getShellOutput(cmd,verbose=False):
+@dryable
+def get_shell_output(cmd,verbose=False):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
     getReturnStatus(), getProgramVersion(), find_files()
@@ -216,21 +252,32 @@ def getShellOutput(cmd,verbose=False):
         to print messages
     
     :return: (returncode, stdout and stderr)
-    :rtype: tuple
+    :rtype: tuple: (int,str,str)
     """
     #not logging these commands
     cmd=parse_cmd(cmd)
     log_message=cmd
+    starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     if verbose:
+        pu.print_blue("Start:"+starttime_str)
         pu.print_blue("$ "+log_message)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
         stdout,stderr = result.communicate()
+        if stdout:
+            stdout=stdout.decode("utf-8")
+        else:
+            stdout=''
+        if stderr:
+            stderr=stderr.decode("utf-8")
+        else:
+            stderr=''
         return(result.returncode,stdout,stderr)
     except:
         return(-1,"","Command failed to execute")
 
-def getReturnStatus(cmd):
+@dryable
+def get_return_status(cmd):
     """
     run a shell command and get the return status
     
@@ -244,12 +291,13 @@ def getReturnStatus(cmd):
     :rtype: bool
     """
     #not logging these commands
-    status=getShellOutput(cmd)
+    status=get_shell_output(cmd)
     if status[0]==0:
         return True
     return False
 
 #prints stdout in real time. optimal for huge stdout and no stderr
+@dryable
 def execute_commandRealtime(cmd):
     """Execute shell command and print stdout in realtime.
     
@@ -267,8 +315,8 @@ def execute_commandRealtime(cmd):
     if return_code:
         raise subprocess.CalledProcessError(return_code, cmd)
 
-
-def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objectid="NA",command_name=""):
+@dryable
+def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
     """Function to execute commands using popen. 
     All commands executed by this function can be logged and saved to pyrpipe logs.
     
@@ -302,26 +350,10 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
         command_name=cmd[0]
     log_message=" ".join(cmd)
     
-    #dryrun: print and exit
-    if dryrun:
-        pu.print_blue("$ "+log_message)
-        #log
-        #create a dict and dump as json
-        logDict={'cmd':log_message,
-                 'exitcode':"0",
-                 'runtime':"0",
-                 'starttime':str(starttime_str),
-                 'stdout':"dryrun",
-                 'stderr':"",
-                 'objectid':objectid,
-                 'commandname':command_name
-                }
-        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
-        return True
     
     if not quiet:
         pu.print_blue("Start:"+starttime_str)
-        pu.print_blue("$ "+starttime_str+" "+log_message)
+        pu.print_blue("$ "+log_message)
     
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -361,8 +393,8 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,dryrun=False,objecti
                 #if subcommands are present use parent command
                 parent_command=cmd[0]
                 progDesc={'name':command_name,
-                          'version':getProgramVersion(parent_command).strip(),
-                          'path':getProgramPath(parent_command).strip()
+                          'version':get_program_version(parent_command).strip(),
+                          'path':get_program_path(parent_command).strip()
                           }
                 pyrpipeLoggerObject.env_logger.debug(json.dumps(progDesc))
                 pyrpipeLoggerObject.logged_programs.append(command_name)
@@ -455,6 +487,10 @@ def is_paired(sra_file):
     
     try:
         fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", sra_file]
+        if dryrun:
+            #if dry run 
+            print(' '.join(fastqdCmd))
+            return True
         output = subprocess.check_output(fastqdCmd,stderr=subprocess.DEVNULL);
         numLines=output.decode("utf-8").count("\n")
         if(numLines == 4):
@@ -469,7 +505,7 @@ def is_paired(sra_file):
 
     
 
-def getProgramPath(programName):
+def get_program_path(programName):
     """
     Get path of installed program
     Returns the path as string    
@@ -478,7 +514,7 @@ def getProgramPath(programName):
     out = subprocess.check_output(whichCmd,universal_newlines=True)
     return out
 
-def getProgramVersion(programName):
+def get_program_version(programName):
     """
     Get version of installed program
     return version as string
@@ -486,9 +522,9 @@ def getProgramVersion(programName):
     versionCommands=['--version','-version','--ver','-ver','-v','--v']
     for v in versionCommands:
         cmd=[programName,v]
-        out=getShellOutput(cmd)
+        out=get_shell_output(cmd)
         if out[0]==0:
-            return out[1].decode("utf-8")
+            return out[1]
     
     return ""
     
@@ -509,7 +545,7 @@ def check_dependencies(dependencies):
     for s in dependencies:
         #print_blue("Checking "+s+"...")
         thisCmd=['which',s]
-        if(getReturnStatus(thisCmd)):
+        if(get_return_status(thisCmd)):
             #print_green ("Found "+s)
             pass
         else:
@@ -523,13 +559,25 @@ def check_dependencies(dependencies):
     
 #TODO: Re-implement following using native python libraries and move to utils
 def deleteFileFromDisk(file_path):
-    """Delete a given file from disk
+    """
+    Delete a given file from disk
     Returns true if file is deleted or doesn't exist.
     shell=True is not added to make this function secure.
+
+    Parameters
+    ----------
+    file_path : String
+        Path to the file to be deleted
+    Returns
+    -------
+    TYPE
+        DESCRIPTION.
+
     """
+    
     if pu.check_files_exist(file_path):
         rm_cmd=['rm',file_path]
-        rv= getReturnStatus(rm_cmd)
+        rv= get_return_status(rm_cmd)
         return rv
     else:
         pu.print_boldred('Warning: File {} does not exist. Ignoring rm'.format(file_path))
@@ -555,7 +603,7 @@ def move_file(source,destination,verbose=False):
     if verbose:
         print("MOVING:"+source+"-->"+destination)
     mv_cmd=['mv',source,destination]
-    if not getReturnStatus(mv_cmd):
+    if not get_return_status(mv_cmd):
         return False
     return True
 
@@ -585,10 +633,12 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
         find_cmd=['find', search_path,'-maxdepth', '1','-type', 'f','-name',search_pattern] 
     if verbose:
         print("$ "+" ".join(find_cmd))
-    st=getShellOutput(find_cmd)
+    st=get_shell_output(find_cmd)
+    if dryrun:
+        return ''
     output=[]
     if st[0]==0:
-        output=st[1].decode("utf-8").split("\n")
+        output=st[1].split("\n")
     #remove empty strings
     if '' in output:
         output.remove('')

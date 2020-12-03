@@ -13,6 +13,8 @@ from pyrpipe import pyrpipe_engine as pe
 import os
 import statistics 
 
+#import dryrun from Conf
+from pyrpipe import dryrun
 
 class SRA:
     """This class represents an SRA object
@@ -126,6 +128,7 @@ class SRA:
         """Create SRA object using provided srr accession and location to save the data
         """
         self.dep_list=['prefetch',"fasterq-dump"]
+        #check if programs exist
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: Please install missing programs.")
         
@@ -233,9 +236,6 @@ class SRA:
             if not pu.check_files_exist(self.localfastq1Path,self.localfastq2Path):
                 pu.print_boldred("Error running fasterq-dump file. File "+self.localfastq1Path+" does not exist!!!")
                 return False
-        
-            
-            
             
         return True
         
@@ -281,7 +281,7 @@ class SRA:
             return True
             
         
-        pu.print_info("Downloading "+self.srr_accession+" ...")
+        #pu.print_info("Downloading "+self.srr_accession+" ...")
         
         #scan for prefetch arguments
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
@@ -304,6 +304,10 @@ class SRA:
         prefetch_Cmd.append(self.srr_accession)
                 
         cmdStatus=pe.execute_command(prefetch_Cmd,objectid=self.srr_accession)
+        
+        #return if dryrun
+        if dryrun: return True
+        
         if not cmdStatus:
             pu.print_boldred("prefetch failed for:"+self.srr_accession)
             return False
@@ -397,8 +401,8 @@ class SRA:
             pu.print_green("Fastq files exist already")
             return True
         
-        #first check is sra exists
-        if not self.sraFileExistsLocally():
+        #first check is sra exists only if not a dry run
+        if not self.sraFileExistsLocally() and not dryrun:
             pu.print_boldred("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
             return False
         #else directly run fasterq-dump on accession ?
@@ -441,6 +445,8 @@ class SRA:
             print("fasterqdump failed for:"+self.srr_accession)
             return False
         
+        #exit here if dry run
+        if dryrun: return True
         
         #check if fastq files are downloaded 
         if(self.layout=="SINGLE"):
@@ -538,6 +544,10 @@ class SRA:
         """Delte the fastq files from the disk.
         The files are referenced by self.localfastqPath or self.localfastq1Path and self.localfastq2Path
         """
+        if dryrun:
+            pu.print_blue('<**Delete fastq files**>')
+            return True
+        
         if self.layout=='PAIRED':
             if pe.deleteMultipleFilesFromDisk(self.localfastq1Path,self.localfastq2Path):
                 del self.localfastq1Path
