@@ -11,7 +11,18 @@ import datetime as dt
 import sys
 from colorama import Fore,Back,Style
 
+from pyrpipe import dryrun
 
+
+def skipable(func):
+    """
+    decorator function to skip some functions in dry run
+    """
+    if not dryrun:
+        return func
+    def skip(*args,**kwargs):
+        return 'True'
+    return skip
 
 
 def print_boldred(text):
@@ -143,6 +154,7 @@ def get_time_stamp(shorten=False):
     return timestamp
     
 
+#not used
 def get_sra_ftppath(srrid):
     """Return an ftp address to download sra files
     """
@@ -155,7 +167,7 @@ def get_sra_ftppath(srrid):
     return parent_path
     
 
-
+@skipable
 def check_paths_exist(*args):
     """Function to check if a directory exists.
     
@@ -176,7 +188,7 @@ def check_paths_exist(*args):
         return False
     return True
 
-
+@skipable
 def check_files_exist(*args):
     """Function to check if files exist.
     
@@ -199,6 +211,7 @@ def check_files_exist(*args):
         return False
     return True
 
+@skipable
 def check_hisatindex(index):
     """Function to check if hisat2 index is valid and exists.
     
@@ -213,6 +226,7 @@ def check_hisatindex(index):
     """
     return check_files_exist(index+".1.ht2")
 
+@skipable
 def check_salmonindex(index):
     """Function to check if salmon index is valid and exists.
     
@@ -229,6 +243,7 @@ def check_salmonindex(index):
         return False
     return True
 
+@skipable
 def check_starindex(index):
     """Function to check if star index is valid and exists.
     
@@ -255,6 +270,7 @@ def check_starindex(index):
     
     return False
 
+@skipable
 def check_bowtie2index(index):
     """Function to check if bowtie2 index is valid and exists.
     
@@ -288,7 +304,7 @@ def byte_to_readable(size_bytes):
             return "%3.1f %s" % (size_bytes, x)
         size_bytes /= 1024.0
 
-
+@skipable
 def get_file_size(file_path):
     """Returns file size in human readable format
     
@@ -377,9 +393,7 @@ def parse_unix_args(valid_args_list,passed_args):
         Unknown argument Attr2 XX. ignoring...
         ['-O', './test', 'IN1', 'IN2']
     """
-    
         
-    
     popen_args=[]
     """
     Define some special arguments.
@@ -476,7 +490,7 @@ def get_file_basename(file_path):
     
 
 
-
+@skipable
 def mkdir(dir_path):
     """Create a directory
 

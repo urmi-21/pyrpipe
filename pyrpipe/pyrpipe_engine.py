@@ -227,6 +227,16 @@ def dryable(func):
     
     return dried
 
+def skipable(func):
+    """
+    decorator function to skip some functions in dry run
+    """
+    if not dryrun:
+        return func
+    def skip(*args,**kwargs):
+        return 'True'
+    return skip
+
 def parse_cmd(cmd):
     """This function converts a list to str.
     If a command is passed as list it is converted to str.
@@ -489,7 +499,7 @@ def is_paired(sra_file):
         fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", sra_file]
         if dryrun:
             #if dry run 
-            print(' '.join(fastqdCmd))
+            #pu.print_blue(' '.join(fastqdCmd))
             return True
         output = subprocess.check_output(fastqdCmd,stderr=subprocess.DEVNULL);
         numLines=output.decode("utf-8").count("\n")
@@ -527,7 +537,8 @@ def get_program_version(programName):
             return out[1]
     
     return ""
-    
+
+@skipable
 def check_dependencies(dependencies):
     """Check whether specified programs exist in the environment.
     This uses the which command to test whether a program is present.
@@ -609,6 +620,7 @@ def move_file(source,destination,verbose=False):
 
 
 #TODO: use os.scandir
+@skipable
 def find_files(search_path,search_pattern,recursive=False,verbose=False):
     """Function to find files using find command and return as list
     Use global paths for safety

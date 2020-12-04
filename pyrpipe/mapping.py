@@ -10,6 +10,8 @@ contains classes of RNA-Seq alignment programs
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os
+#import dryrun from Conf
+from pyrpipe import dryrun
 
 class Aligner:
     """This is an abstract class for alignment programs.

@@ -102,7 +102,7 @@ class SRA:
             return False
         
         if len(fq_files)>2:
-            pu.print_boldred("Can not determine .fastq. Downloading...")
+            #pu.print_boldred("Can not determine .fastq. Downloading...")
             return False
         
         fq_files.sort()
@@ -150,7 +150,7 @@ class SRA:
         
         #check SRA file
         if pu.check_files_exist(os.path.join(self.location,self.srr_accession+".sra")):
-            pu.print_green(self.srr_accession+".sra exists.")
+            #pu.print_green(self.srr_accession+".sra already exists.")
             self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
             self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
             #test if file is paired or single end
@@ -159,7 +159,7 @@ class SRA:
             else:
                 self.layout="SINGLE"
         
-        #check fastq file
+        #check for fastq file
         self.search_fastq(self.location)
         
         
@@ -270,7 +270,7 @@ class SRA:
         self.localSRAFilePath=os.path.join(self.location,self.srr_accession+".sra")
         #check if already exists
         if pu.check_files_exist(self.localSRAFilePath):
-            pu.print_green("File already exists:"+self.localSRAFilePath)
+            #pu.print_green("File already exists:"+self.localSRAFilePath)
             #save file .sra file size
             self.sraFileSize=pu.get_file_size(self.localSRAFilePath)
             #test if file is paired or single end
