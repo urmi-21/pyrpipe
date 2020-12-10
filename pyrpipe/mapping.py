@@ -10,8 +10,12 @@ contains classes of RNA-Seq alignment programs
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os
-#import dryrun from Conf
-from pyrpipe import dryrun
+from pyrpipe import valid_args
+from pyrpipe import param_loader as pl
+from pyrpipe import _dryrun
+from pyrpipe import _threads
+from pyrpipe import _params_dir
+
 
 class Aligner:
     """This is an abstract class for alignment programs.
@@ -42,7 +46,7 @@ class Hisat2(Aligner):
        Parameters
        ----------       
        
-       hisat2_index: string
+       index: string
             path to the histat2 index. This index is stored with the object and will be used when hisat is invoked using this object.
             
        threads: int
@@ -52,50 +56,46 @@ class Hisat2(Aligner):
     ----------
     
     """ 
-    def __init__(self,index=None,threads=None):
+    def __init__(self,index,*args,genome=None,**kwargs):
         
         super().__init__() 
         self.programName="hisat2"
+        self.index=index
+        self.genome=genome
         #check if hisat2 exists
         if not pe.check_dependencies([self.programName]):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        """
-        self.valid_args=['-x','-1','-2','-U','--sra-acc','-S','-q','--qseq','-f','-r','-c','-s',
-                            '-u','-5','-3','--phred33','--phred64','--int-quals',
-                            '--sra-acc','--n-ceil','--ignore-quals','--nofw','--norc','--pen-cansplice',
-                            '--pen-noncansplice','--pen-canintronlen','--pen-noncanintronlen','--min-intronlen'
-                            ,'--max-intronlen','--known-splicesite-infile','--novel-splicesite-outfile',
-                            '--novel-splicesite-infile','--no-temp-splicesite','--no-spliced-alignment',
-                            '--rna-strandness','--tmo','--dta','--dta-cufflinks','--avoid-pseudogene',
-                            '--no-templatelen-adjustment','--mp','--sp','--no-softclip','--np','--rdg',
-                            '--rfg','--score-min','-k','-I','-X','--fr','--rf','--ff','--no-mixed',
-                            '--no-discordant','-t','--un','--al','--un-conc','--al-conc','--un-gz',
-                            '--summary-file','--new-summary','--quiet','--met-file','--met-stderr',
-                            '--met','--no-head','--no-sq','--rg-id','--rgit-sec-seq','-o','-p',
-                            '--reorder','--mm','--qc-filter','--seed','--non-deterministic',
-                            '--remove-chrname','--add-chrname','--version']
-        """
         
-        
-        
-        #if index is passed, update the passed arguments
-        if index and pu.check_hisatindex(index):
-            print("HISAT2 index is: "+index)
-            self.hisat2_index=index
-            #self.index=self.hisat2_index
+        #init the parameters for the object
+        if args:
+            self._args=args
         else:
-            print("No Hisat2 index provided. Please build index now to generate an index using build_Index()....")
-            
-        if not threads:
-            threads=os.cpu_count()
-        self.threads=threads
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'hisat2.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}
+        
+        #check index
+        if not pu.check_hisatindex(index):
+            if not (pu.check_files_exist(self.genome)):
+                raise Exception("Please provide a valid Hisat2 index or fasta file to generate the index")
+            else:
+                #call build index to generate index
+                self.build_index(index,self.genome)
             
         
-        
-            
-    def build_index(self,index_path,index_name,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Build a hisat index with given parameters and saves the new index to self.hisat2_index.
+    
+    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+        """Build a hisat index with given parameters and saves the new index to self.index.
         
         Parameters
         ----------
@@ -132,72 +132,63 @@ class Hisat2(Aligner):
         :rtype: bool
         """
         
-        #check input references
-        if len(args)<1:
-            pu.print_boldred("No reference sequence provided to hisat2-build. Exiting")
-            return False
-        
-        if not pu.check_files_exist(*args):
-            pu.print_boldred("Please check input reference sequences provided to hisat2-build. Exiting")
-            return False
+        #if index already exists then exit
+        if not overwrite:
+            #check if files exists
+            if pu.check_hisatindex(index_path):
+                pu.print_green("Hisat2 index {} already exists.".format(index_path))
+                self.index=os.path.join(index_path)
+                return True
             
+        #check input files
+        if not pu.check_files_exist(genome):
+            pu.print_boldred("Please provide a valid input fasta file to build Hisat2 index")
+            raise Exception("Please check input to hisat2 build index")
+            return False
         
-        print("Building hisat index...")
+        indexdir=pu.get_file_directory(index_path)
+        #create the out dir
+        if not pu.check_paths_exist(indexdir):
+            if not pu.mkdir(indexdir):
+                raise Exception("Error creating hisat2 index. Failed to create index directory.")
+                
         
         hisat2Buildvalid_args=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
                                   '-t','--localoffrate','--localftabchars','--snp','--haplotype','--ss','--exon',
                                   '--seed','-q','-h','--usage','--version']
-        #create the out dir
-        if not pu.check_paths_exist(index_path):
-            if not pu.mkdir(index_path):
-                print("ERROR in building hisat2 index. Failed to create index directory.")
-                return False
         
-        if not overwrite:
-            #check if files exists
-            if pu.check_hisatindex(os.path.join(index_path,index_name)):
-                print("Hisat2 index with same name already exists. Exiting...")
-                self.hisat2_index=os.path.join(index_path,index_name)
-                return True
+     
+        
+        args=(genome,index_path)
+        internal_kwargs={"-p":_threads}
+        #read build parameters
+        yamlfile=os.path.join(_params_dir,'hisat2_index.yaml')
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            internal_kwargs={**yaml_kwargs,**internal_kwargs}
             
-        #handle threads 
-        if not threads:
-            threads=self.threads
-        
-        
+        #add positional args
+        internal_kwargs['--']=args
         
         hisat2Build_Cmd=['hisat2-build']
-        newOpts={"-p":str(threads)}
-        mergedOpts={**newOpts,**kwargs}
+        hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,internal_kwargs))
         
-        #add options
-        hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,mergedOpts))
-        #add input files
-        hisat2Build_Cmd.append(str(",".join(args)))
-        #add dir/basenae
-        hisat2Build_Cmd.append(os.path.join(index_path,index_name))
-        #print("Executing:"+str(" ".join(hisat2Build_Cmd)))
-        
-        #start ececution
+        #execute command
         status=pe.execute_command(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        if not status:
-            pu.print_boldred("hisatBuild failed")
-            return False
         
-        #check index files
-        if not pu.check_hisatindex(os.path.join(index_path,index_name)):
-            pu.print_boldred("hisatBuild failed")
-            return False
+        if status:
+            if pu.check_hisatindex(index_path) and not _dryrun:
+                #update object's index
+                self.index=index_path
+                if self.check_index():
+                    return True
+        else:
+            raise Exception("Error building Hisat2 index")
         
-        #set the index path
-        self.hisat2_index=os.path.join(index_path,index_name)
-        
-        
-        #return status
         return True
         
-        
-    def perform_alignment(self,sra_object,out_suffix="_hisat2",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_hisat2",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to perform alignment using sra_object.
         
         Parameters
@@ -222,44 +213,36 @@ class Hisat2(Aligner):
         kwargs: dict
             Options to pass to hisat2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         """
-        
-        
-        #create path to output sam file
-        outSamFile=os.path.join(sra_object.location,sra_object.srr_accession+out_suffix+".sam")
-        
-        """
-        Handle overwrite
-        """
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(outSamFile):
-                print("The file "+outSamFile+" already exists. Exiting..")
-                return outSamFile
+        #check out dir
+        if not out_dir:
+            out_dir=sra_object.directory
+        else:
+            #create out_dir if not exists
+            if not pu.check_paths_exist(out_dir):
+                pu.mkdir(out_dir)
             
-        if not threads:
-            threads=self.threads
+        #create path to output sam file
+        outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
         
+ 
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outSamFile,"-p":str(threads),"-x":self.hisat2_index}
+            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
         else:
-            newOpts={"-U":sra_object.localfastqPath,"-S":outSamFile,"-p":str(threads),"-x":self.hisat2_index}
-        
-        #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**newOpts,**kwargs}
+            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
         
         #call run_hisat2
-        status=self.run_hisat2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
+        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
-            #check if sam file is present in the location directory of sra_object
-            if pu.check_files_exist(outSamFile):
-                return outSamFile
-        else:
-            return ""
+            if not pu.check_files_exist(outSamFile) and not _dryrun:
+                return ""
+            return outSamFile
+        
+        return ""
             
         
-    def run_hisat2(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running hisat2.
         
         Parameters
@@ -282,19 +265,28 @@ class Hisat2(Aligner):
         """
         
         #check for a valid index
-        if not self.check_index():
+        if not self.check_index() and not _dryrun:
             raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
             
-       
+       #override class kwargs by passed
+        kwargs={**self._kwargs,**kwargs}
+        #if no args provided use constructor
+        if not args:
+            args=self._args
+        #if args exist
+        #if args:
+            #add args
+        #    kwargs['--']=args
+        
        
         hisat2_Cmd=['hisat2']
         #add options
-        hisat2_Cmd.extend(pu.parse_unix_args(valid_args,kwargs))        
+        hisat2_Cmd.extend(pu.parse_unix_args(valid_args._args_HISAT2,kwargs))        
         
         #execute command
         cmd_status=pe.execute_command(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not cmd_status:
-            print("hisat2 failed:"+" ".join(hisat2_Cmd))
+            pu.print_boldred("hisat2 failed: "+" ".join(hisat2_Cmd))
      
         #return status
         return cmd_status
@@ -302,8 +294,8 @@ class Hisat2(Aligner):
         
     
     def check_index(self):
-        if hasattr(self,'hisat2_index'):
-            return(pu.check_hisatindex(self.hisat2_index))
+        if hasattr(self,'index'):
+            return(pu.check_hisatindex(self.index))
         else:
             return False
 
@@ -316,69 +308,67 @@ class Star(Aligner):
     
        Parameters
        ----------
-       
-       star_index: string
+       index: string
             path to a star index. This index will be used when star is invoked using this object.
-       threads: int
-            Num threads to use
+       genome: list
+           list of input fasta files to build index
+           it will automatically generate an index if doesn;t exist
+      
+        params: dict or path to yaml
+           parameters to be passed to star. These parameters are permanently associated with this object.
+           If none supplied, it will look for parameters under params/star.yaml
+           if params are not found in yaml default parameters will be used
+       
             
     Attributes
     ----------
     """ 
-    def __init__(self,index="",threads=None):
-        
+    def __init__(self,index,*args,genome=None,**kwargs):
         super().__init__() 
         self.programName="STAR"
+        self.index=index
+        self.genome=genome
         
         self.dep_list=[self.programName]        
         #check if star exists
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
         
-        """
-        self.valid_args=['--help','--parametersFiles','--sysShell','--runMode','--runThreadN','--runDirPerm','--runRNGseed','--quantMode','--quantTranscriptomeBAMcompression','--quantTranscriptomeBan','--twopassMode','--twopass1readsN',
-                            '--genomeDir','--genomeLoad','--genomeFastaFiles','--genomeChrBinNbits','--genomeSAindexNbases','--genomeSAsparseD','--genomeSuffixLengthMax','--genomeChainFiles','--genomeFileSizes',
-                            '--sjdbFileChrStartEnd','--sjdbGTFfile','--sjdbGTFchrPrefix','--sjdbGTFfeatureExon','--sjdbGTFtagExonParentTranscript','--sjdbGTFtagExonParentGene','--sjdbOverhang','--sjdbScore','--sjdbInsertSave',
-                            '--inputBAMfile','--readFilesIn','--readFilesCommand','--readMapNumber','--readMatesLengthsIn','--readNameSeparator','--clip3pNbases','--clip5pNbases','--clip3pAdapterSeq','--clip3pAdapterMMp','--clip3pAfterAdapterNbases',
-                            '--limitGenomeGenerateRAM','--limitIObufferSize','--limitOutSAMoneReadBytes','--limitOutSJoneRead','--limitOutSJcollapsed','--limitBAMsortRAM ','--limitSjdbInsertNsj','--outFileNamePrefix','--outTmpDir','--outTmpKeep',
-                            '--outStd','--outReadsUnmapped','--outQSconversionAdd','--outMultimapperOrder','--outSAMtype','--outSAMmode','--outSAMstrandField','--outSAMattributes','--outSAMattrIHstart','--outSAMunmapped','--outSAMorder',
-                            '--outSAMprimaryFlag','--outSAMreadID','--outSAMmapqUnique','--outSAMflagOR','--outSAMflagAND','--outSAMattrRGline','--outSAMheaderHD','--outSAMheaderPG','--outSAMheaderCommentFile','--outSAMfilter','--outSAMmultNmax',
-                            '--outBAMcompression','--outBAMsortingThreadN','--bamRemoveDuplicatesType','--bamRemoveDuplicatesMate2basesN','--outWigType','--outWigStrand','--outWigReferencesPrefix','--outWigNorm','--outFilterType',
-                            '--outFilterMultimapScoreRange','--outFilterMultimapNmax','--outFilterMismatchNmax','--outFilterMismatchNoverLmax','--outFilterMismatchNoverReadLmax','--outFilterScoreMin','--outFilterScoreMinOverLread',
-                            '--outFilterMatchNmin','--outFilterMatchNminOverLread','--outFilterIntronMotifs','--outSJfilterReads','--outSJfilterOverhangMin','--outSJfilterCountUniqueMin','--outSJfilterCountTotalMin','--outSJfilterDistToOtherSJmin',
-                            '--outSJfilterIntronMaxVsReadN','--scoreGap','--scoreGapNoncan','--scoreGapGCAG ','--scoreGapATAC','--scoreGenomicLengthLog2scale','--scoreDelOpen','--scoreDelBase','--scoreInsOpen','--scoreInsBase','--scoreStitchSJshift',
-                            '--seedSearchStartLmax','--seedSearchStartLmaxOverLread','--seedSearchLmax','--seedMultimapNmax','--seedPerReadNmax','--seedPerWindowNmax','--seedNoneLociPerWindow','--alignIntronMin','--alignIntronMax','--alignMatesGapMax',
-                            '--alignSJoverhangMin','--alignSJstitchMismatchNmax','--alignSJDBoverhangMin','--alignSplicedMateMapLmin','--alignSplicedMateMapLminOverLmate','--alignWindowsPerReadNmax','--alignTranscriptsPerWindowNmax','--alignTranscriptsPerReadNmax',
-                            '--alignEndsType','--alignEndsProtrude','--alignSoftClipAtReferenceEnds','--winAnchorMultimapNmax','--winBinNbits','--winAnchorDistNbins','--winFlankNbins','--winReadCoverageRelativeMin','--winReadCoverageBasesMin',
-                            '--chimOutType','--chimSegmentMin','--chimScoreMin','--chimScoreDropMax','--chimScoreSeparation','--chimScoreJunctionNonGTAG','--chimJunctionOverhangMin','--chimSegmentReadGapMax','--chimFilter','--chimMainSegmentMultNmax']
-        """
-       
-        if not threads:
-            threads=os.cpu_count()
-        
-        self.threads=threads
-        
-        #if index is passed, update the passed arguments
-        if index and pu.check_starindex(index):
-            print("STAR index is: "+index)
-            self.star_index=index
+        #init the parameters for the object
+        if args:
+            self._args=args
         else:
-            print("No STAR index provided. Please build index now to generate an index using build_index()....")
-            
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'star.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}
+                                    
+        #check index
+        if not pu.check_starindex(index):
+            if not (pu.check_files_exist(self.genome)):
+                raise Exception("Please provide a valid STAR index or fasta file to generate the index")
+            else:
+                #call build index to generate index
+                self.build_index(index,self.genome)
     
-    
-    def build_index(self,index_path,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Build a star index with given parameters and saves the new index to self.star_index.
+    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+        """Build a star index with given parameters and saves the new index to self.index.
         
         Parameters
         ----------
         
         index_path: string
             Path where the index will be created
-        args: tuple
+        genome: tuple
             Path to reference input files
-        threads: int
-            Num threads to use
         overwrite: bool
             Overwrite if index already exists
         verbose: bool
@@ -389,10 +379,7 @@ class Star(Aligner):
             Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        
-        kwargs: dict
-            Parameters for the star command
-
+            
         :return: Returns status of star command
         :rtype: bool
         """
@@ -400,53 +387,56 @@ class Star(Aligner):
         #if index already exists then exit
         if not overwrite:
             if pu.check_starindex(index_path):
-                pu.print_green("STAR index already exists. Using it...")
-                self.star_index=index_path
+                pu.print_green("STAR index {} already exists.".format(index_path))
+                self.index=index_path
                 return True
             
-        
         #check input files
-        if len(args)<1:
-            pu.print_boldred("Please provide input fasta file to build STAR index")
-            return False
+        if not (pu.check_files_exist(genome)):
+            pu.print_boldred("Please provide a valid input fasta file to build STAR index")
+            raise Exception("Please check input to build star index")
+            
         
-        if not pu.check_files_exist(*args):
-            raise Exception("Please check input to star index")
-            return False
-        
-        #create path if doesnt exist
+        #create index path if doesnt exist
         if not pu.check_paths_exist(index_path):
             if not pu.mkdir(index_path):
-                raise Exception("Error creating STAR index. Exiting.")
+                raise Exception("Error creating STAR index. Failed to create index directory.")
                 return False
         
-        if not threads:
-            threads=self.threads
         
-        #add runMode
-        newOpts={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":" ".join(args),"--runThreadN":str(threads)}
+        #determine parameters and execute cmd
+        #internal_args=()
+        internal_kwargs={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":genome,"--runThreadN":_threads}
         
-        mergedOpts={**newOpts,**kwargs}
+        #read build parameters
+        yamlfile=os.path.join(_params_dir,'star_index.yaml')
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            internal_kwargs={**yaml_kwargs,**internal_kwargs}
         
         starbuild_Cmd=['STAR']
-        starbuild_Cmd.extend(pu.parse_unix_args(None,mergedOpts))
+        starbuild_Cmd.extend(pu.parse_unix_args(valid_args._args_STAR,internal_kwargs))
         
         #execute command
         status=pe.execute_command(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         
         
+        
         if status:
-            if pu.check_paths_exist(index_path):
+            if pu.check_paths_exist(index_path) and not _dryrun:
                 #update object's index
-                self.star_index=index_path
+                self.index=index_path
                 if self.check_index():
                     return True
         else:
-            return False
+            raise Exception("Error building STAR index")
+        
+        return True
         
  
             
-    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",threads=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
@@ -458,7 +448,7 @@ class Star(Aligner):
         out_suffix: string
             Suffix for the output file
         out_dir: str
-            outout directory default: sra_object.location
+            outout directory default: sra_object.directory
         threads: int
             Num threads to use
         verbose: bool
@@ -481,11 +471,10 @@ class Star(Aligner):
 
         :return: Return the path to the output dir
         :rtype: string
-        """
-        
+        """        
         
         if not out_dir:
-            out_dir=sra_object.location
+            out_dir=sra_object.directory
         else:
             #create out_dir if not exists
             if not pu.check_paths_exist(out_dir):
@@ -493,40 +482,43 @@ class Star(Aligner):
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"--readFilesIn":sra_object.localfastq1Path+" "+sra_object.localfastq2Path}
+            internal_kwargs={"--readFilesIn":sra_object.fastq_path+" "+sra_object.fastq2_path}
         else:
-            newOpts={"--readFilesIn":sra_object.localfastqPath}
-        
+            internal_kwargs={"--readFilesIn":sra_object.fastq_path}
         #add out dir
-        newOpts["--outFileNamePrefix"]=out_dir+"/"
-        
-        #determine threads
-        if not threads:
-            threads=self.threads
-        newOpts["--runThreadN"]=str(threads)
-        
+        internal_kwargs["--outFileNamePrefix"]=out_dir+"/"
+        #threads
+        internal_kwargs["--runThreadN"]=_threads
         #add index
-        newOpts["--genomeDir"]=self.star_index
-        
-               
-        #add input files to kwargs, overwrite newOpts with kwargs
-        mergedOpts={**newOpts,**kwargs}
+        internal_kwargs["--genomeDir"]=self.index
         
         #call star
-        status=self.run_star(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
+        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
                 
         
         if status:
-            print("Star finished")
-            if pu.check_paths_exist(out_dir):
-                return out_dir
-        else:
-            return ""
+            #return rename the bam  file and return path
+            #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
+            #return sorted bam or unsorted bam which ever is present
+            bam=os.path.join(out_dir,'Aligned.out.bam')
+            if 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
+                bam=os.path.join(out_dir,'Aligned.sortedByCoord.out.bam')
+                
+            finalbam=bam.split('.bam')[0]+out_suffix+'.bam'
+            
+            if not _dryrun:
+                pe.move_file(bam,finalbam)
+                if not pu.check_files_exist(finalbam):
+                    return ""
+                
+            return finalbam
+        
+        return ""
         
     
-    def run_star(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running star.
-        The self.star_index index used.
+        The self.index index used.
         
         Parameters
         ----------
@@ -549,14 +541,24 @@ class Star(Aligner):
         """
         
         #check for a valid index
-        if not self.check_index():
+        if not self.check_index() and not _dryrun:
             raise Exception("ERROR: Invalid star index. Please run build index to generate an index.")
-            
+        
+        #override class kwargs by passed
+        kwargs={**self._kwargs,**kwargs}
+        #if no args provided use constructor
+        if not args:
+            args=self._args
+        #if args exist
+        #if args:
+        #    #add args
+        #    kwargs['--']=args
         
        
         star_cmd=['STAR']
         #add options
-        star_cmd.extend(pu.parse_unix_args(valid_args,kwargs))        
+        star_cmd.extend(pu.parse_unix_args(valid_args._args_STAR,kwargs))   
+        
         
         #execute command
         cmd_status=pe.execute_command(star_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -569,8 +571,8 @@ class Star(Aligner):
     
     
     def check_index(self):
-        if hasattr(self,'star_index'):
-            return(pu.check_starindex(self.star_index))
+        if hasattr(self,'index'):
+            return(pu.check_starindex(self.index))
         else:
             return False
             
@@ -591,47 +593,47 @@ class Bowtie2(Aligner):
        Attributes
        ----------
     """ 
-    def __init__(self,index=None,threads=None):
+    def __init__(self,index,*args,genome=None,**kwargs):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
         
         super().__init__() 
         self.programName="bowtie2"
+        self.index=index
+        self.genome=genome
+        
         self.dep_list=[self.programName]        
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.programName+" not found.")
-        
-        """
-        self.valid_args=['-x','-1','-2','-U','--interleaved','-S','-b','-q','--tab5','--tab6','--qseq','-f','-r','-F','-c','-s','-u','-5','-3',
-                            '--trim-to','--phred33','--phred64','--int-quals','--very-fast','--fast',
-                            '--sensitive','--very-sensitive','--very-fast-local','--fast-local',
-                            '--sensitive-local','--very-sensitive-local','-N','-L','-i','--n-ceil',
-                            '--dpad','--gbar','--ignore-quals','--nofw','--norc','--no-1mm-upfront',
-                            '--end-to-end','--local','--ma','--mp','--np','--rdg','--rfg','--score-min',
-                            '-k','-a','-D','-R','-I','-X','--fr','--rf','--ff','--no-mixed','--no-discordant',
-                            '--dovetail','--no-contain','--no-overlap','--align-paired-reads','--preserve-tags',
-                            '-t','--un','--al','--un-conc','--al-conc','--un-gz','--quiet','--met-file',
-                            '--met-stderr','--met','--no-unal','--no-head','--no-sq','--rg-id','--rg',
-                            '--omit-sec-seq','--sam-no-qname-trunc','--xeq','--soft-clipped-unmapped-tlen',
-                            '-p','--threads','--reorder','--mm','--qc-filter','--seed','--non-deterministic',
-                            '--version','-h','--help']
-        """
-        
-        
-        if not threads:
-            threads=os.cpu_count()
-        self.threads=threads
+                
+        #init the parameters for the object
+        if args:
+            self._args=args
+        else:
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'bowtie2.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}
         
         #if index is passed, update the passed arguments
-        if index and pu.check_bowtie2index(index):
-            print("Bowtie2 index is: "+index)
-            self.bowtie2_index=index
-        else:
-            print("No Bowtie2 index provided. Please build index now to generate an index...")
+        if not pu.check_bowtie2index(index):
+            if not (pu.check_files_exist(self.genome)):
+                raise Exception("Please provide a valid bowtie2 index or fasta file to generate the index")
+            else:
+                #call build index to generate index
+                self.build_index(index,self.genome)
+            
         
-        
-    def build_index(self,index_path,index_name,*args,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Build a bowtie2 index with given parameters and saves the new index to self.bowtie2_index.
+    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+        """Build a bowtie2 index with given parameters and saves the new index to self.index.
         
         Parameters
         ----------
@@ -664,50 +666,48 @@ class Bowtie2(Aligner):
         """
         
         #check input references
-        if len(args)<1:
-            pu.print_boldred("No reference sequence provided to bowtie2-build. Exiting")
-            return False
+        if not overwrite:
+            if pu.check_bowtie2index(index_path):
+                pu.print_green("bowtie index {} already exists.".format(index_path))
+                self.index=index_path
+                return True
         
-        if not pu.check_files_exist(*args):
-            pu.print_boldred("Please check input reference sequences provided to bowtie2-build. Exiting")
+        #check input files
+        if not (pu.check_files_exist(genome)):
+            pu.print_boldred("Please provide a valid input fasta file to build bowtie2 index")
+            raise Exception("Please check input to star build index")
             return False
-            
-        
         
         
         bowtie2_build_args=['-f','-c','--large-index','--debug','--sanitized','--verbose','-a',
                             '--noauto','-p','--packed','--bmax','--bmaxdivn','--dcv','--nodc',
                             '-r','--noref','-3','--justref','-o','--offrate','-t','--ftabchars',
-                            '--threads','--seed','-q','--quiet','-h','--help','--usage','--version']
+                            '--threads','--seed','-q','--quiet']
         
         #create the out dir
-        if not pu.check_paths_exist(index_path):
-            if not pu.mkdir(index_path):
-                print("ERROR in building bowtie2 index. Failed to create index directory.")
+        indexdir=pu.get_file_directory(index_path)
+        if not pu.check_paths_exist(indexdir):
+            if not pu.mkdir(indexdir):
+                raise Exception("Error creating bowtie2 index. Failed to create index directory.")
                 return False
         
-        if not overwrite:
-            #check if files exists
-            if pu.check_bowtie2index(os.path.join(index_path,index_name)):
-                print("bowtie2 index with same name already exists. Exiting...")
-                self.bowtie2_index=os.path.join(index_path,index_name)
-                return True
+        args=(genome,index_path)
+        internal_kwargs={"--threads":_threads}
         
+        #read build parameters
+        yamlfile=os.path.join(_params_dir,'bowtie2_index.yaml')
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            internal_kwargs={**yaml_kwargs,**internal_kwargs}
         
-        bowtie2Build_Cmd=['bowtie2-build']
+        #add positional args
+        internal_kwargs['--']=args
         
-        if not threads:
-            threads=self.threads
-        newopts={"--threads":str(threads)}
-        mergedopts={**newopts,**kwargs}
-        
+        bowtie2Build_Cmd=['bowtie2-build']       
         #add options
-        bowtie2Build_Cmd.extend(pu.parse_unix_args(bowtie2_build_args,mergedopts))
-        #add input files
-        bowtie2Build_Cmd.append(str(",".join(args)))
-        #add dir/basenae
-        bowtie2Build_Cmd.append(os.path.join(index_path,index_name))
-        #print("Executing:"+str(" ".join(hisat2Build_Cmd)))
+        bowtie2Build_Cmd.extend(pu.parse_unix_args(bowtie2_build_args,internal_kwargs))
+    
         
         #start ececution
         status=pe.execute_command(bowtie2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
@@ -715,19 +715,21 @@ class Bowtie2(Aligner):
             pu.print_boldred("bowtie2-build failed")
             return False
         
-        #check index files
-        if not pu.check_bowtie2index(os.path.join(index_path,index_name)):
-            pu.print_boldred("bowtie2-build failed")
-            return False
+        if status:
+            if pu.check_bowtie2index(index_path) and not _dryrun:
+                #update object's index
+                self.index=index_path
+                if self.check_index():
+                    return True
+        else:
+            raise Exception("Error building bowtie2 index")
+            
         
-        #set the index path
-        self.bowtie2_index=os.path.join(index_path,index_name)
-        
-        #return status
         return True
         
+        
     
-    def perform_alignment(self,sra_object,out_suffix="_bt2",out_dir="",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_alignment(self,sra_object,out_suffix="_bowtie2",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
@@ -758,49 +760,36 @@ class Bowtie2(Aligner):
         :rtype: string
         """
         if not out_dir:
-            out_dir=sra_object.location
+            out_dir=sra_object.directory
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
                 
         #create path to output sam file
-        outFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
+        outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
                     
-        """
-        Handle overwrite
-        """
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(outFile):
-                print("The file "+outFile+" already exists. Exiting..")
-                return outFile
-            
-        #handle threads
-        if not threads:
-            threads=self.threads
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            newOpts={"-1":sra_object.localfastq1Path,"-2":sra_object.localfastq2Path,"-S":outFile,"--threads":str(threads),"-x":self.bowtie2_index}
+            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile,"--threads":_threads,"-x":self.index}
         else:
-            newOpts={"-U":sra_object.localfastqPath,"-S":outFile,"--threads":str(threads),"-x":self.bowtie2_index}
+            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"--threads":_threads,"-x":self.index}
         
-        #add input files to kwargs, overwrite kwargs with newOpts
-        mergedOpts={**newOpts,**kwargs}
         
-        status=self.run_bowtie2(verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**mergedOpts)
+        
+        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
-            #check if sam file is present in the location directory of sra_object
-            if pu.check_files_exist(outFile):
-                return outFile
-        else:
-            return ""
+            if not pu.check_files_exist(outSamFile) and not _dryrun:
+                return ""
+            return outSamFile
+        
+        return ""
         
         
         
     
-    def run_bowtie2(self,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running bowtie2.
         
         
@@ -822,19 +811,27 @@ class Bowtie2(Aligner):
         """
         
         #check for a valid index
-        if not self.check_index():
+        if not self.check_index() and not _dryrun:
             raise Exception("ERROR: Invalid Bowtie2 index. Please run build index to generate an index.")
         
-                    
-        bowtie2_cmd=['bowtie2']
-        bowtie2_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
         
-        #print("Executing:"+" ".join(bowtie2_cmd))
+        #override class kwargs by passed
+        kwargs={**self._kwargs,**kwargs}
+        #if no args provided use constructor
+        if not args:
+            args=self._args
+        #if args exist
+        #if args:
+            #add args
+        #    kwargs['--']=args
+        
+        bowtie2_cmd=['bowtie2']
+        bowtie2_cmd.extend(pu.parse_unix_args(valid_args._args_BOWTIE2,kwargs))
         
         #start ececution
         status=pe.execute_command(bowtie2_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            pu.print_boldred("bowtie2 failed")
+            pu.print_boldred("bowtie2 failed"+" ".join(bowtie2_cmd))
         return status
     
     
@@ -842,8 +839,8 @@ class Bowtie2(Aligner):
         """Function to check bowtie index.
         Returns True is index exist on disk.
         """
-        if hasattr(self,'bowtie2_index'):
-            return(pu.check_bowtie2index(self.bowtie2_index))
+        if hasattr(self,'index'):
+            return(pu.check_bowtie2index(self.index))
         return False
 
 

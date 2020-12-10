@@ -21,7 +21,7 @@ from pyrpipe import pyrpipe_utils as pu
 import json
 
 #import dryrun from Conf
-from pyrpipe import dryrun
+from pyrpipe import _dryrun
 
 
 class LogFormatter():
@@ -201,7 +201,7 @@ def dryable(func):
     decorator function for drying all functions capable of executing commands
     """
     
-    if not dryrun:
+    if not _dryrun:
         return func
     def dried(cmd,*args,**kwargs):
         #print, log and exit
@@ -231,7 +231,7 @@ def skipable(func):
     """
     decorator function to skip some functions in dry run
     """
-    if not dryrun:
+    if not _dryrun:
         return func
     def skip(*args,**kwargs):
         return 'True'
@@ -497,7 +497,7 @@ def is_paired(sra_file):
     
     try:
         fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", sra_file]
-        if dryrun:
+        if _dryrun:
             #if dry run 
             #pu.print_blue(' '.join(fastqdCmd))
             return True
@@ -569,7 +569,7 @@ def check_dependencies(dependencies):
   
     
 #TODO: Re-implement following using native python libraries and move to utils
-def deleteFileFromDisk(file_path):
+def delete_file(file_path):
     """
     Delete a given file from disk
     Returns true if file is deleted or doesn't exist.
@@ -585,23 +585,25 @@ def deleteFileFromDisk(file_path):
         DESCRIPTION.
 
     """
+    #if none
+    if not file_path:
+        return True
     
-    if pu.check_files_exist(file_path):
-        rm_cmd=['rm',file_path]
-        rv= get_return_status(rm_cmd)
-        return rv
-    else:
-        pu.print_boldred('Warning: File {} does not exist. Ignoring rm'.format(file_path))
+    #if pu.check_files_exist(file_path):
+    rm_cmd=['rm',file_path]
+    rv= get_return_status(rm_cmd)
+    return rv
+    
     #if file doesn't exist return true
-    return True
+    #return True
 
-def deleteMultipleFilesFromDisk(*args):
+def delete_files(*args):
     """Delete multiple files passed as argument.
     returns true is all files a re deleted
     """
     errorFlag=False
     for filePath in args:
-        status=deleteFileFromDisk(filePath)
+        status=delete_file(filePath)
         if not status:
             errorFlag=True
     
@@ -619,10 +621,13 @@ def move_file(source,destination,verbose=False):
     return True
 
 
-#TODO: use os.scandir
-@skipable
+
+
+#TODO: use os.scandir; moved to utils
+#@skipable
+"""
 def find_files(search_path,search_pattern,recursive=False,verbose=False):
-    """Function to find files using find command and return as list
+    Function to find files using find command and return as list
     Use global paths for safety
     
     Parameters
@@ -637,7 +642,7 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
 
     :return: list containing the found paths
     :rtype: list
-    """
+    
     
     if recursive:
         find_cmd=['find', search_path,'-type', 'f','-name',search_pattern]   
@@ -646,7 +651,7 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
     if verbose:
         print("$ "+" ".join(find_cmd))
     st=get_shell_output(find_cmd)
-    if dryrun:
+    if _dryrun:
         return ''
     output=[]
     if st[0]==0:
@@ -656,6 +661,6 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
         output.remove('')
     return output
     
-
+"""
 
 

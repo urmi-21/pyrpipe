@@ -24,17 +24,20 @@ def main():
     print('pyrpipe version',ver)
     #set pyrpipe configuration
     conf={}
+    conf['threads']=1
+    conf['params_dir']='./params'
     if '--dry-run' in sys.argv:
         conf['dry']=True
     else:
         conf['dry']=False
         
     #write file
+    print('XXXXXXXX',conf)
     with open('pyrpipe.conf', 'w') as outfile:
         json.dump(conf, outfile)
     
     #execute
-    print('executing input file',sys.argv[1])
+    #print('executing input file',sys.argv[1])
     cmd=['python',sys.argv[1]]
     print('CMD',cmd)
     #result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)

@@ -10,15 +10,18 @@ import os
 import datetime as dt
 import sys
 from colorama import Fore,Back,Style
+import re
 
-from pyrpipe import dryrun
+
+from pyrpipe import _dryrun
 
 
 def skipable(func):
     """
     decorator function to skip some functions in dry run
     """
-    if not dryrun:
+    return func
+    if not _dryrun:
         return func
     def skip(*args,**kwargs):
         return 'True'
@@ -201,14 +204,12 @@ def check_files_exist(*args):
     :return: return true only if all files exist
     :rtype: bool
     """
-    fail_flag=False
     for path in args:
-        if not os.path.isfile(path):
-            #print_boldred("File not found: "+path)
-            fail_flag=True
-    
-    if fail_flag:
-        return False
+        if not path:
+            return False
+        elif not os.path.isfile(path):
+            return False
+            
     return True
 
 @skipable
@@ -224,7 +225,9 @@ def check_hisatindex(index):
     :return: Return true if index is valid
     :rtype: bool
     """
-    return check_files_exist(index+".1.ht2")
+    if not check_files_exist(index+".1.ht2"):
+        return check_files_exist(index+".1.ht2l")
+    return True
 
 @skipable
 def check_salmonindex(index):
@@ -283,7 +286,9 @@ def check_bowtie2index(index):
     :return: Return true if index is valid
     :rtype: bool
     """
-    return check_files_exist(index+".1.bt2")
+    if not check_files_exist(index+".1.bt2"):
+        return check_files_exist(index+".1.bt2l")
+    return True
     
 
 def byte_to_readable(size_bytes):
@@ -511,7 +516,27 @@ def get_union(*args):
     """
     return list(set().union(*args)) 
     
-#def scan_SRA_dir(path):
-#    pass
+def find_files(search_path,search_pattern,recursive=False,verbose=False):
+    result=[]
+    #if search path is not valid
+    if not check_paths_exist(search_path):
+        return result
+    
+    pattern = re.compile(search_pattern)
+    
+    if recursive:
+        for root, dirs, files in os.walk(search_path):
+            for file in files:
+                if bool(pattern.search(file)):
+                    result.append(os.path.join(search_path,file))
+        return result
+    
+    for file in os.listdir(search_path):
+        if bool(pattern.search(file)):
+            result.append(os.path.join(search_path,file))
+    
+    return result
+             
+            
 
 

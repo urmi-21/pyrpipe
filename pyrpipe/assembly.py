@@ -9,6 +9,11 @@ Created on Mon Nov 25 15:21:01 2019
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 import os, math
+from pyrpipe import valid_args
+from pyrpipe import param_loader as pl
+from pyrpipe import _dryrun
+from pyrpipe import _threads
+from pyrpipe import _params_dir
 
 class Assembly:
     """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
@@ -36,28 +41,33 @@ class Stringtie(Assembly):
         threads: int
             number of threads
         """
-    def __init__(self,threads=None):
+    def __init__(self,*args,**kwargs):
         
         super().__init__()
         self.program_name="stringtie"
         #check if stringtie exists
         if not pe.check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
-            
-        if not threads:
-            threads=os.cpu_count()
-        self.threads=threads
         
-        """
-        self.valid_args_list=['-G','--version','--conservative','--rf','--fr','-o','-l',
-                            '-f','-L','-m','-a','-j','-t','-c','-s','-v','-g','-M',
-                            '-p','-A','-B','-b','-e','-x','-u','-h','--merge','-F','-T','-i']
-        """
-        
-        
-        
-        
-    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",reference_gtf=None,threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+        #init the parameters for the object
+        if args:
+            self._args=args
+        else:
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'stringtie.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}
+
+                         
+    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to run stringtie using a bam file.
                 
         Parameters
@@ -92,112 +102,33 @@ class Stringtie(Assembly):
         
         if not out_dir:
             out_dir=pu.get_file_directory(bam_file)
+        
+        if not pu.check_paths_exist(out_dir):
+            pu.mkdir(out_dir)
             
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
-        """
-        Handle overwrite
-        """
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(out_gtf_file):
-                print("The file "+out_gtf_file+" already exists. Exiting..")
-                return out_gtf_file
-        
-        if not threads:
-            threads=self.threads
         
         #Add output file name and input bam
-        new_opts={"-o":out_gtf_file,"--":(bam_file,),"-p":str(threads)}
+        internal_args=(bam_file,)
+        internal_kwargs={"-o":out_gtf_file,"-p":_threads}
+        #add positional args
+        internal_kwargs['--']=internal_args
         
-        if reference_gtf:
-            if not pu.check_files_exist(reference_gtf):
-                pu.print_boldred("Error: Provided reference GTF {} doesn't exist. Exiting...".format(reference_gtf))
+        
+        #call stringtie
+        status=self.run(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**internal_kwargs)
+        
+        if status:
+            #check if sam file is present in the location directory of sraOb
+            if not pu.check_files_exist(out_gtf_file) and not _dryrun:
                 return ""
-            new_opts["-G"]=reference_gtf
-            
+            return out_gtf_file
         
-        merged_opts={**new_opts,**kwargs}
-        
-        #call stringtie
-        status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
-        
-        if status:
-            #check if sam file is present in the location directory of sraOb
-            if pu.check_files_exist(out_gtf_file):
-                return out_gtf_file
-        else:
-            return ""
-        
-    def stringtie_merge(self,*args,out_dir=None,out_suffix="_stringtieMerge",threads=None,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Function to run stringtie merge.
-        
-        Parameters
-        ----------
-        
-        args: tuple
-            path to gtf files to merge
-        out_suffix: string
-            Suffix for output gtf file name
-        threads: int
-            Number of threads to use
-        overwrite: bool
-            Overwrite if output file already exists.
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to stringtie. 
-        :return: Returns the path to the merged GTF file
-        :rtype: string
-        """
-        
-        if len(args) < 1:
-            print("ERROR: No input gtf for stringtie merge.")
-            return ""
-        
-        #create path to output sam file
-        fname=pu.get_file_basename(args[0])
-        
-        if not out_dir:
-            out_dir=pu.get_file_directory(args[0])
-        
-        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
-        
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(out_gtf_file):
-                print("The file "+out_gtf_file+" already exists. Exiting..")
-                return out_gtf_file
-        
-        if not threads:
-            threads=self.threads
-            
-        #Add merge flag, output file name and input bam
-        new_opts={"--merge":"","-o":out_gtf_file,"--":args,"-p":str(threads)}
-        
-        merged_opts={**new_opts,**kwargs}
-        
-        #call stringtie
-        status=self.run_stringtie(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
-        
-        if status:
-            #check if sam file is present in the location directory of sraOb
-            if pu.check_files_exist(out_gtf_file):
-                return out_gtf_file
-        else:
-            return ""
-        
-        
-        
+        return ""        
             
     
-    def run_stringtie(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running stringtie. This can be used to run stringtie without using perform_assembly() function.
         
         Parameters
@@ -219,17 +150,19 @@ class Stringtie(Assembly):
         :rtype: bool
         """
             
+        #override class kwargs by passed
+        kwargs={**self._kwargs,**kwargs}
         
        
         stie_cmd=['stringtie']
         #add options
-        stie_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
+        stie_cmd.extend(pu.parse_unix_args(valid_args._args_STRINGTIE,kwargs))        
         
                 
         #start ececution
         status=pe.execute_command(stie_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            pu.print_boldred("stringtie failed")
+            pu.print_boldred("stringtie failed: "+ " ".join(stie_cmd))
         
         #return status
         return status
@@ -242,46 +175,33 @@ class Cufflinks(Assembly):
     threads: int
             Number of threads to use
     """
-    def __init__(self,threads=None):
+    def __init__(self,*args,**kwargs):
         
         super().__init__()
         self.program_name="cufflinks"
         #check if stringtie exists
         if not pe.check_dependencies([self.program_name]):
             raise Exception("ERROR: "+ self.program_name+" not found.")
-            
-        
-        #define valid arguments
-        """
-        self.cufflinksArgsList=['-h','--help','-o','--output-dir','-p','--num-threads','--seed','-G','--GTF','-g','--GTF-guide','-M','--mask-file','-b','--frag-bias-correct','-u','--multi-read-correct','--library-type','--library-norm-method',
-'-m','--frag-len-mean','-s','--frag-len-std-dev','--max-mle-iterations','--compatible-hits-norm','--total-hits-norm','--num-frag-count-draws','--num-frag-assign-draws','--max-frag-multihits','--no-effective-length-correction',
-'--no-length-correction','-N','--upper-quartile-norm','--raw-mapped-norm','-L','--label','-F','--min-isoform-fraction','-j','--pre-mrna-fraction','-I','--max-intron-length','-a','--junc-alpha','-A','--small-anchor-fraction',
-'--min-frags-per-transfrag','--overhang-tolerance','--max-bundle-length','--max-bundle-frags','--min-intron-length','--trim-3-avgcov-thresh','--trim-3-dropoff-frac','--max-multiread-fraction','--overlap-radius',
-'--no-faux-reads','--3-overhang-tolerance','--intron-overhang-tolerance','-v','--verbose','-q','--quiet','--no-update-check']
-
-        self.cuffcompareArgsList=['-h','-i','-r','-R','-Q','-M','-N','-s','-e','-d','-p','-C','-F','-G','-T','-V']
-        self.cuffquantArgsList=['-o','--output-dir','-p','--num-threads','-M','--mask-file','-b','--frag-bias-correct','-u','--multi-read-correct','--library-type','-m','--frag-len-mean','-s','--frag-len-std-dev','-c','--min-alignment-count',
-'--max-mle-iterations','-v','--verbose','-q','--quiet','--seed','--no-update-check','--max-bundle-frags','--max-frag-multihits','--no-effective-length-correction','--no-length-correction','--read-skip-fraction',
-'--no-read-pairs','--trim-read-length','--no-scv-correction']
-        self.cuffdiffArgsList=['-o','--output-dir','-L','--labels','--FDR','-M','--mask-file','-C','--contrast-file','-b','--frag-bias-correct','-u','--multi-read-correct','-p','--num-threads','--no-diff','--no-js-tests','-T','--time-series',
-'--library-type','--dispersion-method','--library-norm-method','-m','--frag-len-mean','-s','--frag-len-std-dev','-c','--min-alignment-count','--max-mle-iterations','--compatible-hits-norm','--total-hits-norm',
-' -v','--verbose','-q','--quiet','--seed','--no-update-check','--emit-count-tables','--max-bundle-frags','--num-frag-count-draws','--num-frag-assign-draws','--max-frag-multihits','--min-outlier-p','--min-reps-for-js-test',
-'--no-effective-length-correction','--no-length-correction','-N','--upper-quartile-norm','--geometric-norm','--raw-mapped-norm','--poisson-dispersion','--read-skip-fraction','--no-read-pairs','--trim-read-length','--no-scv-correction']
-        self.cuffnormArgsList=['-o','--output-dir','-L','--labels','--norm-standards-file','-p','--num-threads','--library-type','--library-norm-method','--output-format','--compatible-hits-norm','--total-hits-norm','-v','--verbose','-q','--quiet','--seed','--no-update-check']
-        self.cuffmergeArgsList=['h','--help','-o','-g','–-ref-gtf','-p','–-num-threads','-s','-–ref-sequence']
-        
-        self.valid_args_list=pu.get_union(self.cufflinksArgsList,self.cuffcompareArgsList,self.cuffquantArgsList,self.cuffdiffArgsList,self.cuffnormArgsList,self.cuffmergeArgsList)
-        """
-        
-        if not threads:
-            threads=os.cpu_count()
-        
-        self.threads=threads
-        
+        #init the parameters for the object
+        if args:
+            self._args=args
+        else:
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'cufflinks.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}       
         
     
     
-    def perform_assembly(self,bam_file,out_dir="",out_suffix="_cufflinks",reference_gtf=None,threads=None,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_cufflinks",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to run cufflinks with BAM file as input.
                 
         Parameters
@@ -322,86 +242,33 @@ class Cufflinks(Assembly):
                 pu.mkdir(out_dir)
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
-        """
-        Handle overwrite
-        """
-        if not overwrite:
-            #check if file exists. return if yes
-            if os.path.isfile(out_gtf_file):
-                print("The file "+out_gtf_file+" already exists. Exiting..")
-                return out_gtf_file
-        
-        if not threads:
-            threads=self.threads
             
         #Add output file name and input bam
-        new_opts={"-o":out_dir,"--":(bam_file,),"-p":str(threads)}
-        
-        #add ref gtf
-        if reference_gtf:
-            if not pu.check_files_exist(reference_gtf):
-                pu.print_boldred("Error: Provided reference GTF {} doesn't exist. Exiting...".format(reference_gtf))
-                return ""
-            
-            new_opts["-g"]=reference_gtf
-        
-        merged_opts={**new_opts,**kwargs}
+        internal_args=(bam_file,)
+        internal_kwargs={"-o":out_dir,"-p":_threads}
+        #add positional args
+        internal_kwargs['--']=internal_args
         
         #call cufflinks
-        status=self.run_cufflinks(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**merged_opts)
+        status=self.run(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**internal_kwargs)
+        
         
         if status:
+            outfile=os.path.join(out_dir,"transcripts.gtf")
+            #if file exist
+            if not pu.check_files_exist(outfile) and not _dryrun:
+                return ""
+            
             #move out_dir/transcripts.gtf to outfile
-            pe.move_file(os.path.join(out_dir,"transcripts.gtf"),out_gtf_file)
-            #check if sam file is present in the location directory of sraOb
+            pe.move_file(outfile,out_gtf_file)
             if pu.check_files_exist(out_gtf_file):
                 return out_gtf_file
-        else:
-            return ""
+            else: return ""
+        return ""
     
-    def run_cuff(self,command,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running cuff* commands
-        
-        Parameters
-        ----------
-        
-        command: string
-            the command name
-        valid_args: list
-            List of valid arguments
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession.
-        kwargs: dict
-            Options passed to command
-        
-        :return: Returns the status of the command.
-        :rtype: bool
-        """
-        validCommands=['cuffcompare','cuffdiff', 'cufflinks', 'cuffmerge', 'cuffnorm', 'cuffquant']
-        if command in validCommands:
-                   
-            cuff_cmd=[command]
-            #add options
-            cuff_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
-                  
-            #start ececution
-            status=pe.execute_command(cuff_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-            if not status:
-                pu.print_boldred("cufflinks failed")
-                #return status
-            return status
-        else:
-            pu.print_boldred("Unknown command {}"+command)
-            return False
+      
     
-    
-    def run_cufflinks(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running cufflinks
         
         Parameters
@@ -423,16 +290,18 @@ class Cufflinks(Assembly):
         :rtype: bool
         """
             
-               
+        #override class kwargs by passed
+        kwargs={**self._kwargs,**kwargs}
+        
         cufflinks_cmd=['cufflinks']
         #add options
-        cufflinks_cmd.extend(pu.parse_unix_args(valid_args_list,kwargs))        
+        cufflinks_cmd.extend(pu.parse_unix_args(valid_args._args_CUFFLINKS,kwargs))        
         
         
         #start ececution
         status=pe.execute_command(cufflinks_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
         if not status:
-            pu.print_boldred("cufflinks failed")
+            pu.print_boldred("cufflinks failed: "+" ".join(cufflinks_cmd))
         #return status
         return status
     
@@ -446,7 +315,7 @@ class Trinity(Assembly):
     max_memory: int
             Max memory in GB to use
     """
-    def __init__(self,threads=None,max_memory=None):
+    def __init__(self,*args,**kwargs):
         
         super().__init__()
         self.program_name="Trinity"
@@ -455,32 +324,26 @@ class Trinity(Assembly):
         if not pe.check_dependencies(self.dep_list):
             raise Exception("ERROR: "+ self.program_name+" not found.")
         
-        """
-        self.valid_args_list=['--seqType','--max_memory','--left','--right','--single','--SS_lib_type','--CPU','--min_contig_length',
-                              '--long_reads','--genome_guided_bam','--jaccard_clip','--trimmomatic','--normalize_reads','--no_distributed_trinity_exec',
-                              '--output','--full_cleanup','--cite','--verbose','--version','--show_full_usage_info','--KMER_SIZE','--prep','--no_cleanup',
-                              '--no_version_check','--min_kmer_cov','--inchworm_cpu','--no_run_inchworm','--max_reads_per_graph','--min_glue','--no_bowtie',
-                              '--no_run_chrysalis','--bfly_opts','--PasaFly','--CuffFly','--group_pairs_distance','--path_reinforcement_distance','--no_path_merging',
-                              '--min_per_id_same_path','--max_diffs_same_path','--max_internal_gap_same_path','--bflyHeapSpaceMax','--bflyHeapSpaceInit',
-                              '--bflyGCThreads','--bflyCPU','--bflyCalculateCPU','--bfly_jar','--quality_trimming_params','--normalize_max_read_cov',
-                              '--normalize_by_read_set','--genome_guided_max_intron','--genome_guided_min_coverage','--genome_guided_min_reads_per_partition',
-                              '--grid_conf','--grid_node_CPU','--grid_node_max_memory']
-        """
+        #init the parameters for the object
+        if args:
+            self._args=args
+        else:
+            self._args=()
+        if kwargs:
+            self._kwargs=kwargs
+        else:
+            self._kwargs={}
+        #read yaml parameters
+        yamlfile=os.path.join(_params_dir,'trinity.yaml')
+        #override yaml parameters by kwargs
+        if pu.check_files_exist(yamlfile):
+            yaml_params=pl.YAML_loader(yamlfile)
+            yaml_kwargs=yaml_params.get_kwargs()
+            self._kwargs={**yaml_kwargs,**self._kwargs}
         
-        if not threads:
-            threads=os.cpu_count()
-        self.threads=threads
-        
-        #use floor(80% max available memory) by default
-        if not max_memory:
-            total_mem_bytes = os.sysconf('SC_PAGE_SIZE') * os.sysconf('SC_PHYS_PAGES')  
-            total_mem_gib = total_mem_bytes/(1024.**3)
-            max_memory=math.floor(total_mem_gib*0.8)
-        
-        self.max_memory=max_memory
     
     
-    def perform_assembly(self,sra_object=None,bam_file=None,out_dir="trinity_out_dir",max_memory=None,max_intron=10000,threads=None,overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_assembly(self,bam_file,out_dir=None,out_suffix="_trinity",verbose=False,quiet=False,logs=True,objectid="NA"):
         """Function to run trinity with sra object or BAM file as input.
                 
         Parameters
@@ -520,21 +383,14 @@ class Trinity(Assembly):
         if "trinity" not in out_dir:
             out_dir+="_trinity"
             
-        if not threads:
-            threads=self.threads
-        
-        if not max_memory:
-            max_memory=self.max_memory
-        
-            
         new_opts={}
         if sra_object is not None:
-            parent_dir=sra_object.location
+            parent_dir=sra_object.directory
             out_dir=os.path.join(parent_dir,out_dir)
             if sra_object.layout == 'PAIRED':
-                new_opts={"--seqType":"fq","--left":sra_object.localfastq1Path,"--right":sra_object.localfastq2Path,"--output":out_dir,"--max_memory":str(max_memory)+"G","--CPU":str(threads)}
+                new_opts={"--seqType":"fq","--left":sra_object.fastq_path,"--right":sra_object.fastq2_path,"--output":out_dir,"--CPU":_threads}
             else:
-                new_opts={"--seqType":"fq","--single":sra_object.localfastqPath,"--output":out_dir,"--max_memory":str(max_memory)+"G","--CPU":str(threads)}
+                new_opts={"--seqType":"fq","--single":sra_object.fastq_path,"--output":out_dir,"--CPU":_threads}
         elif bam_file is not None:
             if not pu.check_files_exist(bam_file):
                 pu.print_boldred("Input to trinity does not exist:"+bam_file)
@@ -560,7 +416,7 @@ class Trinity(Assembly):
 
     
     
-    def run_trinity(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run(self,valid_args_list=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
         """Wrapper for running trinity
         
         Parameters

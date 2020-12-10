@@ -14,20 +14,19 @@ import os
 #read pyrpipe.conf in current dir
 
 class Conf:
-    
     def __init__( self):
         self._dry = False
+        self._threads=4
+        self._params_dir='./params'
         conf_file_path='pyrpipe.conf'
         if os.path.exists(conf_file_path):
             with open(conf_file_path) as conf_file:
                 data = json.load(conf_file)
             self._dry=data['dry']
-        
-    #read conf file
-    @classmethod
-    def set( cls, value, label = 'default' ):
-        with open('pyrpipe.conf') as conf_file:
-            data = json.load(conf_file)
-        cls._dry=data['dry']
-        
-dryrun=Conf()._dry
+            self._threads=data['threads']
+            self._params_dir=data['params_dir']
+                
+conf=Conf()
+_dryrun=conf._dry
+_threads=str(conf._threads)
+_params_dir=conf._params_dir
