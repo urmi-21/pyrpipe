@@ -1,5 +1,0 @@
-todo
-improve documentation
-add procs parametr for each class
-handle overwrite in hisat2_build
-combine logs
