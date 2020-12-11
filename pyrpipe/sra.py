@@ -302,7 +302,7 @@ class SRA:
             else:            
                 return False
     
-    def perform_alignment(self,mapping_object,**kwargs):
+    def align(self,mapping_object,**kwargs):
         """
         
         """
@@ -318,7 +318,7 @@ class SRA:
         self.bam_path=status
         return self
     
-    def perform_assembly(self,assembly_object,**kwargs):
+    def assemble(self,assembly_object,**kwargs):
         """
         
         """
@@ -337,7 +337,7 @@ class SRA:
         return self
     
     
-    def perform_quant(self,quant_object,**kwargs):
+    def quant(self,quant_object,**kwargs):
         """
         
         """
@@ -353,7 +353,7 @@ class SRA:
         return self
         
     
-    def perform_qc(self,qc_object,delete_original=False,**kwargs):
+    def qc(self,qc_object,delete_original=False,**kwargs):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
         The qc_object should be initialized with all the parameters.
