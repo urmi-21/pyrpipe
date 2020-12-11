@@ -237,6 +237,7 @@ class Hisat2(Aligner):
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
                 return ""
+            #convert to bam before returning
             return outSamFile
         
         return ""

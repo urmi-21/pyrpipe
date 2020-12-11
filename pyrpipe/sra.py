@@ -302,47 +302,54 @@ class SRA:
             else:            
                 return False
     
-    def perform_mapping(self,mapping_object,delete_fastq=False,**kwargs):
+    def perform_alignment(self,mapping_object,**kwargs):
         """
-        Function to align the reads to a genome using a mapping object. The mapping object cointains information about target genome and index
-        The bam file generated will be stored with this SRA object.
-        Parameters
-        ----------
         
-        qcObject: RNASeqQC object
-            qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
-            
-        deleteRawFastq: bool
-            Delete the raw fastq files after QC
-        
-        kwargs: dict
-            Arguments to pass on to perform_qc function
-            
-        :return: Return status of the QC. True if successful download and False if failed.
-        :rtype: bool
         """
-        #check a valid qcObject
+        #check a valid mapping_object
         if not (hasattr(mapping_object,'category') and mapping_object.category=='Aligner'):
-            print ("Error: No valid QC object provided. Skipping QC for "+self.srr_accession)
-            return False
-        
+            raise Exception("Error: No valid mapping object provided for "+self.srr_accession)
+            
         status=mapping_object.perform_alignment(self,objectid=self.srr_accession,**kwargs)
+        if not status:
+            raise Exception("perform_mapping failed for: "+ self.srr_accession)
         
+        #save the bam file
+        self.bam_path=status
+        return self
+    
+    def perform_assembly(self,assembly_object,**kwargs):
+        """
+        
+        """
+        #check a valid mapping_object
+        if not (hasattr(assembly_object,'category') and assembly_object.category=='Assembler'):
+            raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
+            
+        #must have a bam file
+        if not self.bam_path:
+            raise Exception("No BAM file associated with "+ self.srr_accession)
+            
+        status=assembly_object.perform_assembly(self.bam_path,objectid=self.srr_accession,**kwargs)
+        if not status:
+            raise Exception("perform_mapping failed for: "+ self.srr_accession)
+            
+        return self
         
     
-    def perform_qc(self,qcObject,delete_original=False,**kwargs):
+    def perform_qc(self,qc_object,delete_original=False,**kwargs):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
-        The qcObject should be initialized with all the parameters.
+        The qc_object should be initialized with all the parameters.
         By default the trimmed/qc fastq files will be generated in the same directory as the original fastq files.
         After QC, this SRA object will update the fastq_path or fastq_path and fastq2_path variables to store the new fastq files.
-        New variables localRawfastqPath or localRawfastq1Path and localRawfastq2Path will be created to store the paths of original fastq files.
+        New variables localRawfastqPath or rawfastq_path and rawfastq2_path will be created to store the paths of original fastq files.
       
         Parameters
         ----------
         
-        qcObject: RNASeqQC object
-            qcObject specifying the program to be used. The object contains the necessary parametrs to execute the parameters
+        qc_object: RNASeqQC object
+            qc_object specifying the program to be used. The object contains the necessary parametrs to execute the parameters
             
         deleteRawFastq: bool
             Delete the raw fastq files after QC
@@ -358,21 +365,23 @@ class SRA:
         >>> object.perform_qc(qc.BBmap())
         True
         """
-        #check a valid qcObject
-        if not (hasattr(qcObject,'category') and qcObject.category=='RNASeqQC'):
+        #check a valid qc_object
+        if not (hasattr(qc_object,'category') and qc_object.category=='RNASeqQC'):
             print ("Error: No valid QC object provided. Skipping QC for "+self.srr_accession)
             return False
         
         #save thq qc object for later references
-        self.QCObject=qcObject
-        #print("Performing QC using "+qcObject.programName)
-        #each qcObject has a function run() to execute their method
-        qcStatus=qcObject.perform_qc(self,objectid=self.srr_accession,**kwargs)
+        #self.qc_object=qc_object
+        #print("Performing QC using "+qc_object.programName)
+        #each qc_object has a function run() to execute their method
+        qcStatus=qc_object.perform_qc(self,objectid=self.srr_accession,**kwargs)
         
         #if job failed
         if not qcStatus[0]:
-            print ("Error performing QC for "+self.srr_accession)
-            return False
+            #print ("Error performing QC for "+self.srr_accession)
+            #return False
+            raise Exception("perform_qc failed for: "+ self.srr_accession)
+            
         
         if self.layout=='PAIRED':
             
@@ -382,8 +391,8 @@ class SRA:
             
             else:
                 #create new fields to refer to older fastq files
-                self.localRawfastq1Path=self.fastq_path
-                self.localRawfastq2Path=self.fastq2_path
+                self.rawfastq_path=self.fastq_path
+                self.rawfastq2_path=self.fastq2_path
             
             ##update local fastq path
             self.fastq_path=qcStatus[0]    
@@ -396,9 +405,8 @@ class SRA:
                 
             self.fastq_path=qcStatus[0]
         
-        
-        
-        return True
+        #return True
+        return self
     
     def delete_fastq(self):
         """Delte the fastq files from the disk.

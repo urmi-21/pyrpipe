@@ -359,7 +359,7 @@ def parse_java_args(valid_args_list,passed_args):
             positional_args.extend(value)
         
         else:
-            print_info("Found unknown argument {0} {1}. Ignoring...".format(key, value))
+            print_info("Ignoring invalid argument '{0}: {1}'...".format(key, value))
     popen_args.extend(positional_args)
     return popen_args
     
@@ -415,7 +415,7 @@ def parse_unix_args(valid_args_list,passed_args):
         elif key in special_args:
             positional_args.extend(value)
         else:
-            print("Unknown argument {0} {1}. ignoring...".format(key, value))
+            print_info("Ignoring invalid argument '{0}: {1}'...".format(key, value))
     popen_args.extend(positional_args)
     return popen_args
     

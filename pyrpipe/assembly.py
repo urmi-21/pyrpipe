@@ -8,7 +8,7 @@ Created on Mon Nov 25 15:21:01 2019
 
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
-import os, math
+import os
 from pyrpipe import valid_args
 from pyrpipe import param_loader as pl
 from pyrpipe import _dryrun

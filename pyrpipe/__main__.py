@@ -56,9 +56,8 @@ def main():
     
         
     
-    #print(args)
+    
     #call main program
-    print(procs,mem,dryrun,safemode,paramdir)
     caller(procs,mem,dryrun,safemode,paramdir,infile)
     
     

@@ -17,11 +17,12 @@ import psutil
 
 class Conf:
     def __init__( self):
+        #if conf file is not present these default values will be used
         self._dry = False
         self._safe = False
         self._threads=multiprocessing.cpu_count()
         self._params_dir='./params'
-        self._memory=None
+        self._memory=psutil.virtual_memory()[0]/1000000000
         
         conf_file_path='pyrpipe.conf'
         if os.path.exists(conf_file_path):
@@ -33,9 +34,9 @@ class Conf:
             self._memory=data['memory']
             self._safe = data['safe']
             #check valid threads and mem
-            if not self._threads or self._threads.replace('.','',1).isdigit():
+            if not self._threads or not self._threads.replace('.','',1).isdigit():
                 self._threads=multiprocessing.cpu_count()
-            if not self._memory or self._memory.replace('.','',1).isdigit():
+            if not self._memory or not self._memory.replace('.','',1).isdigit():
                 self._memory=psutil.virtual_memory()[0]/1000000000
             
                 
@@ -45,5 +46,4 @@ _safe=conf._safe
 _threads=str(conf._threads)
 _mem=str(conf._memory)
 _params_dir=conf._params_dir
-
 
