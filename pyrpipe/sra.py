@@ -335,6 +335,22 @@ class SRA:
             raise Exception("perform_mapping failed for: "+ self.srr_accession)
             
         return self
+    
+    
+    def perform_quant(self,quant_object,**kwargs):
+        """
+        
+        """
+        #check a valid mapping_object
+        if not (hasattr(quant_object,'category') and quant_object.category=='Quantification'):
+            raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
+            
+                   
+        status=quant_object.perform_quant(self,objectid=self.srr_accession,**kwargs)
+        if not status:
+            raise Exception("perform_mapping failed for: "+ self.srr_accession)
+            
+        return self
         
     
     def perform_qc(self,qc_object,delete_original=False,**kwargs):
