@@ -137,9 +137,11 @@ class Kallisto(Quant):
         
         #add positional args
         internal_kwargs['--']=args
-                
+        
+        validArgsIndex=['-i','--index','-k','--kmer-size','--make-unique']
+        
         kallisto_cmd=['kallisto','index']
-        kallisto_cmd.extend(pu.parse_unix_args(None,internal_kwargs))
+        kallisto_cmd.extend(pu.parse_unix_args(validArgsIndex,internal_kwargs))
         
         #call kallisto
         status=pe.execute_command(kallisto_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)

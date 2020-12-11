@@ -14,42 +14,74 @@ import sys
 import os
 import json
 import pyrpipe.version
-import subprocess
 
 
 
 
 def main():
     ver=pyrpipe.version.__version__
-    print('pyrpipe version',ver)
-    #set pyrpipe configuration
-    conf={}
-    conf['threads']=1
-    conf['params_dir']='./params'
-    if '--dry-run' in sys.argv:
-        conf['dry']=True
-    else:
-        conf['dry']=False
+    parser = argparse.ArgumentParser(description='pyrpipe: A lightweight python package for RNA-Seq workflows (version {})'.format(ver),
+    usage="""
+    pyrpipe [<options>] <infile.py>
+    """)
+    parser.add_argument("--procs", help="Num processes/threads to use\nDefault:mp.cpu_count()")
+    parser.add_argument('--max-memory', help='Max memory to use (in GB)\ndefault: None',action="store",dest='mem')
+    parser.add_argument("--dry-run", help="Only print pyrpipe's commands and not execute anything through pyrpipe_engine module\nDefault: False",default=False,dest='dryrun', action='store_true')
+    parser.add_argument("--safe-mode", help="Disable file deletions through pyrpipe_engine module\nDefault: False",default=False,dest='safemode', action='store_true')
+    parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='./params')
+
+    parser.add_argument("--version", help="Print version information and exit",default=False,dest='versioninfo', action='store_true')
+    
+    parser.add_argument('infile', help='The input python script',action="store",nargs="?")
+    
+    args = parser.parse_args()
+    
+    
+    
+    if args.versioninfo:
+        print("pyrpipe version {}".format(ver))
+        sys.exit(0)
+           
+    infile=args.infile    
+    if not infile:
+        parser.print_help()
+        sys.exit(1)
+    
+    #threads
+    procs=args.procs
+    mem=args.mem
+    dryrun=args.dryrun
+    safemode=args.safemode
+    paramdir=args.paramdir
+    
         
-    #write file
-    print('XXXXXXXX',conf)
-    with open('pyrpipe.conf', 'w') as outfile:
-        json.dump(conf, outfile)
     
-    #execute
-    #print('executing input file',sys.argv[1])
-    cmd=['python',sys.argv[1]]
-    print('CMD',cmd)
-    #result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
-    #stdout,stderr = result.communicate()
-    
-    #print(result.returncode,stdout,stderr)
-    os.system(' '.join(cmd))
-    
-    print('Ending CMD',cmd)
-    
+    #print(args)
+    #call main program
+    print(procs,mem,dryrun,safemode,paramdir)
+    caller(procs,mem,dryrun,safemode,paramdir,infile)
     
     
     
 if __name__ == '__main__':
     main()
+
+def caller(procs,mem,dryrun,safemode,paramdir,infile):
+    #write pyrpipe configuration
+    #everything saved as str
+    conf={}
+    conf['threads']=procs
+    conf['memory']=mem
+    conf['params_dir']=paramdir
+    conf['dry']=dryrun
+    conf['safe']=safemode
+    
+    with open('pyrpipe.conf', 'w') as outfile:
+        json.dump(conf, outfile)
+    
+    #execute
+    cmd=['python',infile]
+    os.system(' '.join(cmd))
+    
+    
+    

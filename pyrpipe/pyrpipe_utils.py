@@ -11,21 +11,7 @@ import datetime as dt
 import sys
 from colorama import Fore,Back,Style
 import re
-
-
 from pyrpipe import _dryrun
-
-
-def skipable(func):
-    """
-    decorator function to skip some functions in dry run
-    """
-    return func
-    if not _dryrun:
-        return func
-    def skip(*args,**kwargs):
-        return 'True'
-    return skip
 
 
 def print_boldred(text):
@@ -170,7 +156,7 @@ def get_sra_ftppath(srrid):
     return parent_path
     
 
-@skipable
+
 def check_paths_exist(*args):
     """Function to check if a directory exists.
     
@@ -191,7 +177,7 @@ def check_paths_exist(*args):
         return False
     return True
 
-@skipable
+
 def check_files_exist(*args):
     """Function to check if files exist.
     
@@ -212,7 +198,7 @@ def check_files_exist(*args):
             
     return True
 
-@skipable
+
 def check_hisatindex(index):
     """Function to check if hisat2 index is valid and exists.
     
@@ -229,7 +215,7 @@ def check_hisatindex(index):
         return check_files_exist(index+".1.ht2l")
     return True
 
-@skipable
+
 def check_salmonindex(index):
     """Function to check if salmon index is valid and exists.
     
@@ -246,7 +232,7 @@ def check_salmonindex(index):
         return False
     return True
 
-@skipable
+
 def check_starindex(index):
     """Function to check if star index is valid and exists.
     
@@ -273,7 +259,7 @@ def check_starindex(index):
     
     return False
 
-@skipable
+
 def check_bowtie2index(index):
     """Function to check if bowtie2 index is valid and exists.
     
@@ -309,7 +295,7 @@ def byte_to_readable(size_bytes):
             return "%3.1f %s" % (size_bytes, x)
         size_bytes /= 1024.0
 
-@skipable
+
 def get_file_size(file_path):
     """Returns file size in human readable format
     
@@ -373,7 +359,7 @@ def parse_java_args(valid_args_list,passed_args):
             positional_args.extend(value)
         
         else:
-            print("Unknown argument {0} {1}. ignoring...".format(key, value))
+            print_info("Found unknown argument {0} {1}. Ignoring...".format(key, value))
     popen_args.extend(positional_args)
     return popen_args
     
@@ -495,7 +481,7 @@ def get_file_basename(file_path):
     
 
 
-@skipable
+
 def mkdir(dir_path):
     """Create a directory
 
