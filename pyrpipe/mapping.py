@@ -6,10 +6,11 @@ Created on Sun Nov 24 19:53:42 2019
 @author: usingh
 contains classes of RNA-Seq alignment programs
 """
-
+import os
+from pyrpipe.runnable import Runnable
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
-import os
+from pyrpipe import tools
 from pyrpipe import valid_args
 from pyrpipe import param_loader as pl
 from pyrpipe import _dryrun
@@ -17,23 +18,23 @@ from pyrpipe import _threads
 from pyrpipe import _params_dir
 
 
-class Aligner:
+class Aligner(Runnable):
     """This is an abstract class for alignment programs.
     """
-    def __init__(self,index=""):
-        self.category="Aligner"
-        self.passedArgumentDict={}
+    def __init__(self,*args,index=None,genome=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._category="Aligner"
+        self._command=None
         self.index=index
-        
+        self.genome=genome
+       
     def build_index(self):
         """function to create an index used by the aligner
         """
-        pass
-    
+        pass    
     def check_index(self):
         """Function to check if index of this object is valid and exists
-        """
-    
+        """   
     def perform_alignment(self,sra_object):
         """Function to perform alignment taking and sraobject as input
         
@@ -41,59 +42,38 @@ class Aligner:
         pass
 
 class Hisat2(Aligner):
-    """This class represents hisat2 program.
-    
-       Parameters
-       ----------       
-       
-       index: string
-            path to the histat2 index. This index is stored with the object and will be used when hisat is invoked using this object.
-            
-       threads: int
-            Num threads to use
-            
+    """
     Attributes
     ----------
     
     """ 
-    def __init__(self,index,*args,genome=None,**kwargs):
-        
-        super().__init__() 
-        self.programName="hisat2"
+    def __init__(self,*args,index=None,genome=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._command='hisat2'
+        self._deps=[self._command,'samtools']
         self.index=index
         self.genome=genome
-        #check if hisat2 exists
-        if not pe.check_dependencies([self.programName]):
-            raise Exception("ERROR: "+ self.programName+" not found.")
+        self._param_yaml='hisat2.yaml'
+        self._valid_args=valid_args._args_HISAT2
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)
         
-        
-        #init the parameters for the object
-        if args:
-            self._args=args
-        else:
-            self._args=()
-        if kwargs:
-            self._kwargs=kwargs
-        else:
-            self._kwargs={}
-        #read yaml parameters
-        yamlfile=os.path.join(_params_dir,'hisat2.yaml')
-        #override yaml parameters by kwargs
-        if pu.check_files_exist(yamlfile):
-            yaml_params=pl.YAML_loader(yamlfile)
-            yaml_kwargs=yaml_params.get_kwargs()
-            self._kwargs={**yaml_kwargs,**self._kwargs}
+        #check index flag in args
+        if not index and '-x' in self._kwargs:
+            self.index=self._kwargs['-x']
         
         #check index
-        if not pu.check_hisatindex(index):
+        if not self.check_index():
             if not (pu.check_files_exist(self.genome)):
-                raise Exception("Please provide a valid Hisat2 index or fasta file to generate the index")
+                pu.print_boldred("Hisat2 index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
+                raise Exception("Please provide a valid Hisat2 index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
-                self.build_index(index,self.genome)
-            
-        
-    
+                self.build_index(self.index,self.genome)
+                #set index 
+                self._kwargs['-x']=self.index
+                
+
     def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
         """Build a hisat index with given parameters and saves the new index to self.index.
         
@@ -157,8 +137,6 @@ class Hisat2(Aligner):
                                   '-t','--localoffrate','--localftabchars','--snp','--haplotype','--ss','--exon',
                                   '--seed','-q','-h','--usage','--version']
         
-     
-        
         args=(genome,index_path)
         internal_kwargs={"-p":_threads}
         #read build parameters
@@ -188,7 +166,7 @@ class Hisat2(Aligner):
         
         return True
         
-    def perform_alignment(self,sra_object,out_suffix="_hisat2",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
+    def perform_alignment(self,sra_object,out_suffix="_hisat2",out_dir="",objectid="NA"):
         """Function to perform alignment using sra_object.
         
         Parameters
@@ -232,67 +210,18 @@ class Hisat2(Aligner):
             internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
         
         #call run_hisat2
-        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
                 return ""
             #convert to bam before returning
-            return outSamFile
+            return tools.Samtools().sam_sorted_bam(outSamFile)
+            #return outSamFile
         
         return ""
             
-        
-    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running hisat2.
-        
-        Parameters
-        ----------
-        valid_args: list
-            list of valid arguments
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        
-        kwargs: dict
-            arguments to pass to hisat2. 
-        :return: Returns the status of hisat2. True is passed, False if failed.
-        :rtype: bool
-        """
-        
-        #check for a valid index
-        if not self.check_index() and not _dryrun:
-            raise Exception("ERROR: Invalid HISAT2 index. Please run build index to generate an index.")
-            
-       #override class kwargs by passed
-        kwargs={**self._kwargs,**kwargs}
-        #if no args provided use constructor
-        if not args:
-            args=self._args
-        #if args exist
-        #if args:
-            #add args
-        #    kwargs['--']=args
-        
-       
-        hisat2_Cmd=['hisat2']
-        #add options
-        hisat2_Cmd.extend(pu.parse_unix_args(valid_args._args_HISAT2,kwargs))        
-        
-        #execute command
-        cmd_status=pe.execute_command(hisat2_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        if not cmd_status:
-            pu.print_boldred("hisat2 failed: "+" ".join(hisat2_Cmd))
      
-        #return status
-        return cmd_status
-        
-        
     
     def check_index(self):
         if hasattr(self,'index'):
@@ -307,58 +236,34 @@ class Hisat2(Aligner):
 class Star(Aligner):
     """This class represents STAR program.
     
-       Parameters
-       ----------
-       index: string
-            path to a star index. This index will be used when star is invoked using this object.
-       genome: list
-           list of input fasta files to build index
-           it will automatically generate an index if doesn;t exist
-      
-        params: dict or path to yaml
-           parameters to be passed to star. These parameters are permanently associated with this object.
-           If none supplied, it will look for parameters under params/star.yaml
-           if params are not found in yaml default parameters will be used
-       
-            
     Attributes
     ----------
     """ 
-    def __init__(self,index,*args,genome=None,**kwargs):
-        super().__init__() 
-        self.programName="STAR"
+    def __init__(self,*args,index=None,genome=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._command='STAR'
+        self._deps=[self._command]
         self.index=index
         self.genome=genome
-        
-        self.dep_list=[self.programName]        
-        #check if star exists
-        if not pe.check_dependencies(self.dep_list):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-        
-        #init the parameters for the object
-        if args:
-            self._args=args
-        else:
-            self._args=()
-        if kwargs:
-            self._kwargs=kwargs
-        else:
-            self._kwargs={}
-        #read yaml parameters
-        yamlfile=os.path.join(_params_dir,'star.yaml')
-        #override yaml parameters by kwargs
-        if pu.check_files_exist(yamlfile):
-            yaml_params=pl.YAML_loader(yamlfile)
-            yaml_kwargs=yaml_params.get_kwargs()
-            self._kwargs={**yaml_kwargs,**self._kwargs}
-                                    
+        self._param_yaml='star.yaml'
+        self._valid_args=valid_args._args_STAR
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)
+               
+        #check index flag in args
+        if not index and '--genomeDir' in self._kwargs:
+            self.index=self._kwargs['--genomeDir']
+            
         #check index
         if not pu.check_starindex(index):
             if not (pu.check_files_exist(self.genome)):
-                raise Exception("Please provide a valid STAR index or fasta file to generate the index")
+                pu.print_boldred("STAR index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
+                raise Exception("Please provide a valid STAR index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
+                #set index 
+                self._kwargs['--genomeDir']=self.index
     
     def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
         """Build a star index with given parameters and saves the new index to self.index.
@@ -421,9 +326,6 @@ class Star(Aligner):
         
         #execute command
         status=pe.execute_command(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        
-        
-        
         if status:
             if pu.check_paths_exist(index_path) and not _dryrun:
                 #update object's index
@@ -434,10 +336,8 @@ class Star(Aligner):
             raise Exception("Error building STAR index")
         
         return True
-        
- 
             
-    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
+    def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",objectid="NA"):
         """Function to perform alignment using star and the provided SRA object.
         All star output will be written to the sra_object directory by default.
         
@@ -494,7 +394,7 @@ class Star(Aligner):
         internal_kwargs["--genomeDir"]=self.index
         
         #call star
-        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
                 
         
         if status:
@@ -515,70 +415,13 @@ class Star(Aligner):
             return finalbam
         
         return ""
-        
-    
-    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running star.
-        The self.index index used.
-        
-        Parameters
-        ----------
-        valid_args: list
-            List of valid arguments
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to stringtie. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        kwargs: dict
-            arguments to pass to star. 
-        :return: Returns the status of star. True is passed, False if failed.
-        :rtype: bool
-        """
-        
-        #check for a valid index
-        if not self.check_index() and not _dryrun:
-            raise Exception("ERROR: Invalid star index. Please run build index to generate an index.")
-        
-        #override class kwargs by passed
-        kwargs={**self._kwargs,**kwargs}
-        #if no args provided use constructor
-        if not args:
-            args=self._args
-        #if args exist
-        #if args:
-        #    #add args
-        #    kwargs['--']=args
-        
-       
-        star_cmd=['STAR']
-        #add options
-        star_cmd.extend(pu.parse_unix_args(valid_args._args_STAR,kwargs))   
-        
-        
-        #execute command
-        cmd_status=pe.execute_command(star_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        
-        if not cmd_status:
-            pu.print_boldred("STAR failed:"+" ".join(star_cmd))
-     
-        #return status
-        return cmd_status
-    
-    
+ 
     def check_index(self):
         if hasattr(self,'index'):
             return(pu.check_starindex(self.index))
         else:
             return False
             
-
-
 
 class Bowtie2(Aligner):
     """This class represents bowtie2 program.
@@ -594,43 +437,33 @@ class Bowtie2(Aligner):
        Attributes
        ----------
     """ 
-    def __init__(self,index,*args,genome=None,**kwargs):
+    def __init__(self,*args,index=None,genome=None,**kwargs):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
-        
-        super().__init__() 
-        self.programName="bowtie2"
+        super().__init__(*args,**kwargs)
+        self._command='bowtie2'
+        self._deps=[self._command]
         self.index=index
         self.genome=genome
-        
-        self.dep_list=[self.programName]        
-        if not pe.check_dependencies(self.dep_list):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-                
-        #init the parameters for the object
-        if args:
-            self._args=args
-        else:
-            self._args=()
-        if kwargs:
-            self._kwargs=kwargs
-        else:
-            self._kwargs={}
-        #read yaml parameters
-        yamlfile=os.path.join(_params_dir,'bowtie2.yaml')
-        #override yaml parameters by kwargs
-        if pu.check_files_exist(yamlfile):
-            yaml_params=pl.YAML_loader(yamlfile)
-            yaml_kwargs=yaml_params.get_kwargs()
-            self._kwargs={**yaml_kwargs,**self._kwargs}
+        self._param_yaml='bowtie2.yaml'
+        self._valid_args=valid_args._args_HISAT2
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)
+               
+        #check index flag in args
+        if not index and '-x' in self._kwargs:
+            self.index=self._kwargs['-x']
         
         #if index is passed, update the passed arguments
         if not pu.check_bowtie2index(index):
             if not (pu.check_files_exist(self.genome)):
-                raise Exception("Please provide a valid bowtie2 index or fasta file to generate the index")
+                pu.print_boldred("Bowtie2 index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
+                raise Exception("Please provide a valid Bowtie2 index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
+                #set index 
+                self._kwargs['-x']=self.index
             
         
     def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
@@ -730,7 +563,7 @@ class Bowtie2(Aligner):
         
         
     
-    def perform_alignment(self,sra_object,out_suffix="_bowtie2",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
+    def perform_alignment(self,sra_object,out_suffix="_bowtie2",out_dir="",objectid="NA"):
         """Function to perform alignment using self object and the provided sra_object.
         
         Parameters
@@ -778,7 +611,7 @@ class Bowtie2(Aligner):
         
         
         
-        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
@@ -786,55 +619,6 @@ class Bowtie2(Aligner):
             return outSamFile
         
         return ""
-        
-        
-        
-    
-    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running bowtie2.
-        
-        
-        valid_args: list
-            list of valid args
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        
-        kwargs: dict
-            arguments to pass to bowtie2. 
-        :return: Returns the status of bowtie2. True is passed, False if failed.
-        :rtype: bool
-        """
-        
-        #check for a valid index
-        if not self.check_index() and not _dryrun:
-            raise Exception("ERROR: Invalid Bowtie2 index. Please run build index to generate an index.")
-        
-        
-        #override class kwargs by passed
-        kwargs={**self._kwargs,**kwargs}
-        #if no args provided use constructor
-        if not args:
-            args=self._args
-        #if args exist
-        #if args:
-            #add args
-        #    kwargs['--']=args
-        
-        bowtie2_cmd=['bowtie2']
-        bowtie2_cmd.extend(pu.parse_unix_args(valid_args._args_BOWTIE2,kwargs))
-        
-        #start ececution
-        status=pe.execute_command(bowtie2_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
-        if not status:
-            pu.print_boldred("bowtie2 failed"+" ".join(bowtie2_cmd))
-        return status
-    
     
     def check_index(self):
         """Function to check bowtie index.

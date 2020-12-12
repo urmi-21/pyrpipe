@@ -5,7 +5,7 @@ Created on Thu Jan  2 18:20:41 2020
 
 @author: usingh
 """
-
+from pyrpipe.runnable import Runnable
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 from pyrpipe import valid_args
@@ -16,13 +16,15 @@ from pyrpipe import _params_dir
 import os
 
 
-class Quant:
+class Quant(Runnable):
     """This is an abstract class for quantification programs.
     """
-    def __init__(self,index=""):
-        self.category="Quantification"
-        self.passedArgumentDict={}
+    def __init__(self,*args,index=None,transcriptome=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._category="Quantification"
+        self._command=None
         self.index=index
+        self.transcriptome=transcriptome
         
     def build_index(self):
         """function to create an index used by the quantification program
@@ -35,7 +37,6 @@ class Quant:
     
     def perform_quant(self,sra_object):
         """Function to perform quant taking and sraobject as input
-        
         """
         pass
     
@@ -48,40 +49,32 @@ class Kallisto(Quant):
         num threads to use
     """
     
-    def __init__(self,index,*args,transcriptome=None,**kwargs):
-        super().__init__() 
-        self.programName="kallisto"
+    def __init__(self,*args,index=None,transcriptome=None,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._command=['kallisto','quant']
+        self._deps=['kallisto']
         self.index=index
         self.transcriptome=transcriptome
-        self.dep_list=[self.programName]        
-        if not pe.check_dependencies(self.dep_list):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-  
-        #init the parameters for the object
-        if args:
-            self._args=args
-        else:
-            self._args=()
-        if kwargs:
-            self._kwargs=kwargs
-        else:
-            self._kwargs={}
-        #read yaml parameters
-        yamlfile=os.path.join(_params_dir,'kallisto.yaml')
-        #override yaml parameters by kwargs
-        if pu.check_files_exist(yamlfile):
-            yaml_params=pl.YAML_loader(yamlfile)
-            yaml_kwargs=yaml_params.get_kwargs()
-            self._kwargs={**yaml_kwargs,**self._kwargs}
-               
+        self._param_yaml='kallisto.yaml'
+        self._valid_args=valid_args._args_KALLISTO
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)        
+        
+        #check index flag in args
+        if not index and '-i' in self._kwargs:
+            self.index=self._kwargs['-i']
+            
         #check index
         #kallisto index is a single file
         if not pu.check_files_exist(index):
             if not (pu.check_files_exist(self.transcriptome)):
-                raise Exception("Please provide a valid Kallisto index or fasta file to generate the index")
+                pu.print_boldred("Kallisto index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
+                raise Exception("Please provide a valid Kallisto index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
-                self.build_index(index,self.transcriptome)
+                self.build_index(self.index,self.transcriptome)
+                #set index 
+                self._kwargs['-i']=self.index
                 
             
     def build_index(self,index_path,transcriptome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
@@ -158,7 +151,7 @@ class Kallisto(Quant):
         return False
     
     
-    def perform_quant(self,sra_object,out_suffix="",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
+    def perform_quant(self,sra_object,out_suffix="",out_dir="",objectid="NA"):
         """Run kallisto quant
         
         sra_object: SRA
@@ -201,7 +194,7 @@ class Kallisto(Quant):
             
                       
         #call kallisto
-        status=self.run(*args,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(*args,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
             outfile=os.path.join(out_dir,"abundance.tsv")
@@ -214,63 +207,12 @@ class Kallisto(Quant):
             return newfile
         
         return ""
-        
-    
-    
-    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running kallisto.
-        
-        Parameters
-        ----------
-        
-        subcommand: str
-            subcommand for kallisto
-        valid_args: list
-            List of valid arguments, arguments in kwargs not in this list will be ignored
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to kallisto. This will override the existing options
-
-        :return: Returns the status of kallisto. True is passed, False if failed.
-        :rtype: bool
-        """
-        
-        #check for a valid index
-        if not self.check_index() and not _dryrun:
-            raise Exception("ERROR: Invalid kallisto index. Please run build index to generate an index.")
-        
-        #override class kwargs by passed
-        kwargs={**self._kwargs,**kwargs}
-        #if no args provided use constructor's
-        if not args[0]:
-            args=self._args
-        #if args exist
-        if args:
-            #add args
-            kwargs['--']=args
-        
-        kallisto_Cmd=['kallisto','quant']
-        kallisto_Cmd.extend(pu.parse_unix_args(valid_args._args_KALLISTO,kwargs))
-        
-        #start ececution
-        status=pe.execute_command(kallisto_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=kallisto_Cmd[0])
-        if not status:
-            pu.print_boldred("kallisto failed: "+ " ".join(kallisto_Cmd))
-            
-        return status       
     
     def check_index(self):
         """Check valid kallisto index
         """
         if hasattr(self,'index'):
-            return(pu.check_files_exist(self.index))
+            return(pu.check_kallistoindex(self.index))
         return False
             
 
@@ -283,42 +225,31 @@ class Salmon(Quant):
     threads: int
         Number of threads
     """      
-    def __init__(self,index,*args,transcriptome=None,**kwargs):    
-        super().__init__() 
-        self.programName="salmon"
+    def __init__(self,*args,index=None,transcriptome=None,**kwargs):  
+        super().__init__(*args,**kwargs)
+        self._command=['salmon','quant']
+        self._deps=['salmon']
         self.index=index
         self.transcriptome=transcriptome
-        self.dep_list=[self.programName]        
-        if not pe.check_dependencies(self.dep_list):
-            raise Exception("ERROR: "+ self.programName+" not found.")
-        
+        self._param_yaml='salmon.yaml'
+        self._valid_args=valid_args._args_SALMON
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)       
        
-        
-        #init the parameters for the object
-        if args:
-            self._args=args
-        else:
-            self._args=()
-        if kwargs:
-            self._kwargs=kwargs
-        else:
-            self._kwargs={}
-        #read yaml parameters
-        yamlfile=os.path.join(_params_dir,'salmon.yaml')
-        #override yaml parameters by kwargs
-        if pu.check_files_exist(yamlfile):
-            yaml_params=pl.YAML_loader(yamlfile)
-            yaml_kwargs=yaml_params.get_kwargs()
-            self._kwargs={**yaml_kwargs,**self._kwargs}
                
+        #check index flag in args
+        if not index and '-i' in self._kwargs:
+            self.index=self._kwargs['-i']
         #check index
         if not pu.check_salmonindex(index):
             if not (pu.check_files_exist(self.transcriptome)):
-                raise Exception("Please provide a valid Salmon index or fasta file to generate the index")
+                pu.print_boldred("Salmon index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
+                raise Exception("Please provide a valid Salmon index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
-                self.build_index(index,self.transcriptome)
-            
+                self.build_index(self.index,self.transcriptome)
+                #set index 
+                self._kwargs['-i']=self.index
             
     def build_index(self,index_path,transcriptome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
         """
@@ -400,7 +331,7 @@ class Salmon(Quant):
         
         
     
-    def perform_quant(self,sra_object,out_suffix="",out_dir="",verbose=False,quiet=False,logs=True,objectid="NA"):
+    def perform_quant(self,sra_object,out_suffix="",out_dir="",objectid="NA"):
         """run salmon quant
         sra_object: SRA
             An SRA object with valid fastq files
@@ -449,49 +380,6 @@ class Salmon(Quant):
             return newfile
         
         return ""
-        
-        
-        
-    def run(self,*args,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
-        """Wrapper for running salmon.
-        
-        Parameters
-        ----------
-        
-        subcommand: str
-            subcommand for salmon
-        valid_args: list
-            List of valid arguments
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to salmon. This will override the existing options
-
-        :return: Returns the status of salmon. True is passed, False if failed.
-        :rtype: bool
-        """
-        
-        #check for a valid index
-        if not self.check_index() and not _dryrun:
-            raise Exception("ERROR: Invalid salmon index. Please run build index to generate an index.")
-        
-        #override class kwargs by passed
-        kwargs={**self._kwargs,**kwargs}
-            
-        salmon_Cmd=['salmon','quant']
-        salmon_Cmd.extend(pu.parse_unix_args(valid_args._args_SALMON,kwargs))
-        
-        #start ececution
-        status=pe.execute_command(salmon_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,command_name=" ".join(salmon_Cmd[0:2]))
-        if not status:
-            pu.print_boldred("salmon failed: "+" ".join(salmon_Cmd))
-        return status 
 
     def check_index(self):
         if hasattr(self,'index'):

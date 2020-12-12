@@ -11,7 +11,6 @@ import datetime as dt
 import sys
 from colorama import Fore,Back,Style
 import re
-from pyrpipe import _dryrun
 
 
 def print_boldred(text):
@@ -211,10 +210,29 @@ def check_hisatindex(index):
     :return: Return true if index is valid
     :rtype: bool
     """
+    if not index:
+        return False
     if not check_files_exist(index+".1.ht2"):
         return check_files_exist(index+".1.ht2l")
     return True
 
+def check_kallistoindex(index):
+    """Function to check if salmon index is valid and exists.
+    
+    Parameters
+    ----------
+    
+    index: str
+        Path to the index 
+
+    :return: Return true if index is valid
+    :rtype: bool
+    """
+    if not index:
+        return False
+    if not check_files_exist(index):
+        return False
+    return True
 
 def check_salmonindex(index):
     """Function to check if salmon index is valid and exists.
@@ -228,6 +246,8 @@ def check_salmonindex(index):
     :return: Return true if index is valid
     :rtype: bool
     """
+    if not index:
+        return False
     if not check_paths_exist(index):
         return False
     return True
@@ -245,6 +265,9 @@ def check_starindex(index):
     :return: Return true if index is valid
     :rtype: bool
     """
+    if not index:
+        return False
+    
     if check_paths_exist(index):
         files_to_check=['chrLength.txt',
                       'chrNameLength.txt',
@@ -272,6 +295,8 @@ def check_bowtie2index(index):
     :return: Return true if index is valid
     :rtype: bool
     """
+    if not index:
+        return False
     if not check_files_exist(index+".1.bt2"):
         return check_files_exist(index+".1.bt2l")
     return True

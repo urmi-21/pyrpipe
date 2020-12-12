@@ -19,6 +19,7 @@ import platform
 from multiprocessing import cpu_count
 from pyrpipe import pyrpipe_utils as pu
 import json
+from shutil import which
 
 #import dryrun from Conf
 from pyrpipe import _dryrun
@@ -226,16 +227,6 @@ def dryable(func):
         return True
     
     return dried
-
-def skipable(func):
-    """
-    decorator function to skip some functions in dry run
-    """
-    if not _dryrun:
-        return func
-    def skip(*args,**kwargs):
-        return 'True'
-    return skip
 
 def parse_cmd(cmd):
     """This function converts a list to str.
@@ -538,7 +529,6 @@ def get_program_version(programName):
     
     return ""
 
-@skipable
 def check_dependencies(dependencies):
     """Check whether specified programs exist in the environment.
     This uses the which command to test whether a program is present.
@@ -552,18 +542,10 @@ def check_dependencies(dependencies):
     :return: True is all dependencies are satified, False otherwise.
     :rtype: bool
     """
-    errorFlag=False
-    for s in dependencies:
-        #print_blue("Checking "+s+"...")
-        thisCmd=['which',s]
-        if(get_return_status(thisCmd)):
-            #print_green ("Found "+s)
-            pass
-        else:
-            pu.print_boldred ("Can not find "+s)
-            errorFlag=True
-    if errorFlag:
-        return False
+    for tool in dependencies:
+        if not which(tool):
+            pu.print_boldred('ERROR. {} not found in path.'.format(tool))
+            return False
     return True
 
   
@@ -619,48 +601,3 @@ def move_file(source,destination,verbose=False):
     if not get_return_status(mv_cmd):
         return False
     return True
-
-
-
-
-#TODO: use os.scandir; moved to utils
-#@skipable
-"""
-def find_files(search_path,search_pattern,recursive=False,verbose=False):
-    Function to find files using find command and return as list
-    Use global paths for safety
-    
-    Parameters
-    ----------
-    
-    search_path: str
-        path to search under
-    search_pattern: str
-        pattern to search e.g. "*.bam"
-    recursive: bool
-        search all subdirs if true
-
-    :return: list containing the found paths
-    :rtype: list
-    
-    
-    if recursive:
-        find_cmd=['find', search_path,'-type', 'f','-name',search_pattern]   
-    else:
-        find_cmd=['find', search_path,'-maxdepth', '1','-type', 'f','-name',search_pattern] 
-    if verbose:
-        print("$ "+" ".join(find_cmd))
-    st=get_shell_output(find_cmd)
-    if _dryrun:
-        return ''
-    output=[]
-    if st[0]==0:
-        output=st[1].split("\n")
-    #remove empty strings
-    if '' in output:
-        output.remove('')
-    return output
-    
-"""
-
-

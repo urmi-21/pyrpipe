@@ -5,7 +5,7 @@ Created on Sun Nov 24 16:24:44 2019
 
 @author: usingh
 """
-import pytest
+
 from pyrpipe import assembly
 from pyrpipe import pyrpipe_utils as pu
 from testingEnvironment import testSpecs

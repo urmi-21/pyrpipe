@@ -44,6 +44,10 @@ class YAML_loader():
         """
         separate params into args and kwargs
         """
+        #if file is empty
+        if not self.__params:
+            self.__kwargs={}
+            return
         #create copy
         params=self.__params.copy()
         to_del=[]

@@ -307,7 +307,7 @@ class SRA:
         
         """
         #check a valid mapping_object
-        if not (hasattr(mapping_object,'category') and mapping_object.category=='Aligner'):
+        if not (hasattr(mapping_object,'_category') and mapping_object._category=='Aligner'):
             raise Exception("Error: No valid mapping object provided for "+self.srr_accession)
             
         status=mapping_object.perform_alignment(self,objectid=self.srr_accession,**kwargs)
@@ -323,7 +323,7 @@ class SRA:
         
         """
         #check a valid mapping_object
-        if not (hasattr(assembly_object,'category') and assembly_object.category=='Assembler'):
+        if not (hasattr(assembly_object,'_category') and assembly_object._category=='Assembler'):
             raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
             
         #must have a bam file
@@ -342,7 +342,7 @@ class SRA:
         
         """
         #check a valid mapping_object
-        if not (hasattr(quant_object,'category') and quant_object.category=='Quantification'):
+        if not (hasattr(quant_object,'_category') and quant_object._category=='Quantification'):
             raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
             
                    
@@ -382,7 +382,7 @@ class SRA:
         True
         """
         #check a valid qc_object
-        if not (hasattr(qc_object,'category') and qc_object.category=='RNASeqQC'):
+        if not (hasattr(qc_object,'_category') and qc_object._category=='RNASeqQC'):
             print ("Error: No valid QC object provided. Skipping QC for "+self.srr_accession)
             return False
         
