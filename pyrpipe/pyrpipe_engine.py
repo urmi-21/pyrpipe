@@ -8,187 +8,22 @@ Created on Tue Dec 10 16:26:02 2019
 Methods and classes related to execution and logging
 """
 
-import os
+
 import subprocess
 import time
-from datetime import datetime 
 from datetime import timedelta
-import logging
 import sys
-import platform
-from multiprocessing import cpu_count
 from pyrpipe import pyrpipe_utils as pu
 import json
 from shutil import which
 
 #import dryrun from Conf
 from pyrpipe import _dryrun
+from pyrpipe import pyrpipe_logger
 
-
-class LogFormatter():
-    """
-    A formatter for logs
-    """
-    def __init__(self):
-        self.start_time = time.time()
-    
-    def format(self, record):
-      
-        return "{}".format(record.getMessage())       
-        #time_now=str(datetime.now())
-        #elapsed_seconds = record.created - self.start_time
-        #hours, remainder = divmod(elapsed_seconds, 3600)
-        #minutes, seconds = divmod(remainder, 60)
-        
-        #message=record.getMessage()
-
-        """OLD
-        if record.name == "env":
-            return "{}".format(record.getMessage())
-        
-        if message.startswith("#"):
-            return "{}\t{}".format(record.getMessage(),time_now)
-        """
-        
-        """
-        if record.name == "cmd":
-            return "{}\nStart:{}\tDuration: {:02}:{:02}:{:02}".format(record.getMessage(),time_now, int(hours), int(minutes), int(seconds) )
-        elif record.name == "out":
-            return "STDOUT:\n{}".format(record.getMessage())
-        elif record.name == "err":      
-            return "STDERR:\n{}".format(record.getMessage())
-        """
-        
-
-class PyrpipeLogger():
-    """
-    Class to manage pyrpipe logs
-    
-    Attributes
-    -----------
-    
-    env_logger: logger to log the current environment
-    cmd_logger: logger to log the execution status, stdout, stderr and runtimes for each command run using execute_command()
-    """
-    def __init__(self):
-        self.__name__="pyrpipeLogger"
-        #loggers
-        timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
-        self.logger_basename=timestamp+"_pyrpipe"
-        self.logs_dir=os.path.join(os.getcwd(),"pyrpipe_logs")
-        if not os.path.isdir(self.logs_dir):
-            os.mkdir(self.logs_dir)
-        """
-        self.cmd_loggerPath=os.path.join(self.logs_dir,self.logger_basename+"CMD.log")
-        self.stdoutLoggerPath=os.path.join(self.logs_dir,self.logger_basename+"OUT.log")
-        self.stderrLoggerPath=os.path.join(self.logs_dir,self.logger_basename+"ERR.log")
-        """
-        self.log_path=os.path.join(self.logs_dir,self.logger_basename+".log")
-        self.envlog_path=os.path.join(self.logs_dir,self.logger_basename+"ENV.log")
-        
-        """
-        self.cmd_logger=self.create_logger("cmd",self.cmd_loggerPath,LogFormatter(),logging.DEBUG)
-        self.stdoutLogger=self.create_logger("out",self.stdoutLoggerPath,LogFormatter(),logging.DEBUG)
-        self.stderrLogger=self.create_logger("err",self.stderrLoggerPath,LogFormatter(),logging.DEBUG)
-        """
-        formatter=LogFormatter()
-        self.env_logger=self.create_logger("env",self.envlog_path,formatter,logging.DEBUG)
-        self.cmd_logger=self.create_logger("cmd",self.log_path,formatter,logging.DEBUG)
-        
-        #self.stdoutLogger=self.create_logger("out",self.log_path,formatter,logging.DEBUG)
-        #self.stderrLogger=self.create_logger("err",self.log_path,formatter,logging.DEBUG)
-        
-        #self.env_logger=self.create_logger("env",self.envlog_path,logging.Formatter("%(message)s"),logging.DEBUG)
-        
-        self.init_envlog()
-        self.init_cmdlog()
- 
-        
-    
-    def create_logger(self,name,logfile,formatter,level=logging.DEBUG):
-        """Creates a logger
-        
-        Parameters
-        ----------
-        
-        name: str
-            name of logger
-        logfile: str
-            file name to save logs
-        formatter: formatter object
-            formatter for log
-        
-        Returns: logger
-            A logger object
-        """
-        #Get different loggers
-        handler = logging.FileHandler(logfile)        
-        handler.setFormatter(formatter)
-        
-        logger = logging.getLogger(name)
-        logger.setLevel(level)
-        logger.addHandler(handler)
-        return logger
-    
-    def init_cmdlog(self):
-        """init the cmdlog
-        """
-        self.cmd_logger.debug("#START LOG")
-    
-
-    def init_envlog(self):
-        """init the envlog
-        """
-        self.env_logger.debug("#START LOG")
-        
-        #get current time
-        #sesstime='Session information collected on {}'.format(datetime.now().strftime('%Y-%m-%d %H:%M'))
-        #get os
-        osInfo=platform.platform()
-        #get python version
-        pyver='Python ' + sys.version.replace('\n', '')
-        #get cpu
-        cpu=str(cpu_count())+' logical CPU cores'
-        #get current conda environment and dump to log
-        condaenv_cmd='conda env export'
-        try:
-            result = subprocess.Popen(condaenv_cmd.split(),stdout=subprocess.PIPE,stderr=subprocess.STDOUT,)
-            stdout,stderr = result.communicate()
-            condaenv=stdout.decode("utf-8") 
-            #remove prefix line       
-            condaenv='\n'.join([ x for x in condaenv.split('\n') if x and 'prefix' not in x ])
-            #print(condaenv)
-        except:
-            condaenv='Conda not found'
-        
-        envDesc={'now':str(datetime.now().strftime("%y-%m-%d %H:%M:%S")),
-                 'python':pyver,
-                 'os':osInfo,
-                 'cpu':cpu,
-                 'syspath':str(sys.path),
-                 'sysmodules':str(list(sys.modules.keys())),
-                 'conda_env':str(condaenv)
-                 }
-        
-        self.env_logger.debug(json.dumps(envDesc))
-        """Old
-        self.env_logger.debug(sesstime)
-        self.env_logger.debug(pyver)
-        self.env_logger.debug(osInfo)
-        self.env_logger.debug(cpu)
-        self.env_logger.debug("#SYS PATH")
-        self.env_logger.debug("sys.path:"+str(sys.path))
-        self.env_logger.debug("#SYS MODULES")
-        self.env_logger.debug("sys.modules:"+str(sys.modules.keys()))
-        """
-        self.env_logger.debug("#PROGRAMS")
-        #a list of logged programs
-        self.logged_programs=[]
-        
 
 ###create logger
-pyrpipeLoggerObject=PyrpipeLogger()
-pu.print_yellow("Logs will be saved to {}.log".format(pyrpipeLoggerObject.logger_basename))
+pu.print_yellow("Logs will be saved to {}.log".format(pyrpipe_logger.logger_basename))
     
 """
 All functions that interact with shell are defined here. 
@@ -223,7 +58,7 @@ def dryable(func):
              'objectid':'',
              'commandname':command_name
             }
-        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
         return True
     
     return dried
@@ -389,7 +224,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         if logs:
 
             ##get the program used and log its path
-            if command_name not in pyrpipeLoggerObject.logged_programs:
+            if command_name not in pyrpipe_logger.logged_programs:
                 ##get which thisProgram
                 #if subcommands are present use parent command
                 parent_command=cmd[0]
@@ -397,8 +232,8 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                           'version':get_program_version(parent_command).strip(),
                           'path':get_program_path(parent_command).strip()
                           }
-                pyrpipeLoggerObject.env_logger.debug(json.dumps(progDesc))
-                pyrpipeLoggerObject.logged_programs.append(command_name)
+                pyrpipe_logger.env_logger.debug(json.dumps(progDesc))
+                pyrpipe_logger.logged_programs.append(command_name)
             
             #create a dict and dump as json
             logDict={'cmd':log_message,
@@ -410,7 +245,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                  'objectid':objectid,
                  'commandname':command_name
                 }
-            pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+            pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
     
         if exitCode==0:
             return True
@@ -434,7 +269,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                  'objectid':objectid,
                  'commandname':command_name                 
                 }
-        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
         return False
     except subprocess.CalledProcessError as e:
         pu.print_boldred("CalledProcessError exception occured.\n"+str(e))
@@ -449,7 +284,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                  'objectid':objectid,
                  'commandname':command_name                 
                 }
-        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
         return False
     except:
         pu.print_boldred("Fatal error occured during execution.\n"+str(sys.exc_info()[0]))
@@ -464,7 +299,7 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                  'objectid':objectid,
                  'commandname':command_name
                 }
-        pyrpipeLoggerObject.cmd_logger.debug(json.dumps(logDict))
+        pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
         return False
     
 

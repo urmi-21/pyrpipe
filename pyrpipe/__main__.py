@@ -24,10 +24,12 @@ def main():
     usage="""
     pyrpipe [<options>] <infile.py>
     """)
-    parser.add_argument("--procs", help="Num processes/threads to use\nDefault:mp.cpu_count()")
+    parser.add_argument("--threads", help="Num processes/threads to use\nDefault:mp.cpu_count()")
     parser.add_argument('--max-memory', help='Max memory to use (in GB)\ndefault: None',action="store",dest='mem')
+    parser.add_argument("--verbose", help="Print pyrpipe_engine's stdout and stderr\nDefault: False",default=False,dest='verbose', action='store_true')
     parser.add_argument("--dry-run", help="Only print pyrpipe's commands and not execute anything through pyrpipe_engine module\nDefault: False",default=False,dest='dryrun', action='store_true')
     parser.add_argument("--safe-mode", help="Disable file deletions through pyrpipe_engine module\nDefault: False",default=False,dest='safemode', action='store_true')
+    parser.add_argument("--no-logs", help="Disable pyrpipe logs\nDefault: False",default=False,dest='nologs', action='store_true')
     parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='./params')
     parser.add_argument("--logs-dir", help="Directory for saving log files\nDefault: ./pyrpipe_logs",dest='logsdir',default='./params')
 
@@ -49,11 +51,15 @@ def main():
         sys.exit(1)
     
     #threads
-    procs=args.procs
+    procs=args.threads
     mem=args.mem
     dryrun=args.dryrun
     safemode=args.safemode
     paramdir=args.paramdir
+    logsdir=args.logsdir
+    nologs=args.nologs
+    verbose=args.verbose
+    
     
         
     
