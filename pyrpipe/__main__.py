@@ -30,8 +30,8 @@ def main():
     parser.add_argument("--dry-run", help="Only print pyrpipe's commands and not execute anything through pyrpipe_engine module\nDefault: False",default=False,dest='dryrun', action='store_true')
     parser.add_argument("--safe-mode", help="Disable file deletions through pyrpipe_engine module\nDefault: False",default=False,dest='safemode', action='store_true')
     parser.add_argument("--no-logs", help="Disable pyrpipe logs\nDefault: False",default=False,dest='nologs', action='store_true')
-    parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='./params')
-    parser.add_argument("--logs-dir", help="Directory for saving log files\nDefault: ./pyrpipe_logs",dest='logsdir',default='./params')
+    parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='params')
+    parser.add_argument("--logs-dir", help="Directory for saving log files\nDefault: ./pyrpipe_logs",dest='logsdir',default='pyrpipe_logs')
 
     parser.add_argument("--version", help="Print version information and exit",default=False,dest='versioninfo', action='store_true')
     
@@ -65,14 +65,14 @@ def main():
     
     
     #call main program
-    caller(procs,mem,dryrun,safemode,paramdir,infile)
+    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,infile)
     
     
     
 if __name__ == '__main__':
     main()
 
-def caller(procs,mem,dryrun,safemode,paramdir,infile):
+def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,infile):
     #write pyrpipe configuration
     #everything saved as str
     conf={}
@@ -81,6 +81,9 @@ def caller(procs,mem,dryrun,safemode,paramdir,infile):
     conf['params_dir']=paramdir
     conf['dry']=dryrun
     conf['safe']=safemode
+    conf['logs_dir']=logsdir
+    conf['logging']= not nologs
+    conf['verbose']=verbose
     
     with open('pyrpipe.conf', 'w') as outfile:
         json.dump(conf, outfile)

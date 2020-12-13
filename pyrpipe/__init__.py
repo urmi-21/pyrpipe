@@ -30,8 +30,6 @@ class LogFormatter():
     def format(self, record):      
         return "{}".format(record.getMessage())       
 
-        
-
 class PyrpipeLogger():
     """
     Class to manage pyrpipe logs
@@ -41,14 +39,18 @@ class PyrpipeLogger():
     env_logger: logger to log the current environment
     cmd_logger: logger to log the execution status, stdout, stderr and runtimes for each command run using execute_command()
     """
-    def __init__(self):
+    def __init__(self,logdir=None):
         self.__name__="pyrpipeLogger"
         #loggers
         timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
         self.logger_basename=timestamp+"_pyrpipe"
-        self.logs_dir=os.path.join(os.getcwd(),"pyrpipe_logs")
+        if not logdir:
+            logdir="pyrpipe_logs"
+        self.logs_dir=os.path.join(os.getcwd(),logdir)
         if not os.path.isdir(self.logs_dir):
             os.mkdir(self.logs_dir)
+        self.logger_path=os.path.join(self.logs_dir,self.logger_basename+".log")
+        
 
         self.log_path=os.path.join(self.logs_dir,self.logger_basename+".log")
         self.envlog_path=os.path.join(self.logs_dir,self.logger_basename+"ENV.log")
@@ -56,8 +58,7 @@ class PyrpipeLogger():
         self.env_logger=self.create_logger("env",self.envlog_path,formatter,logging.DEBUG)
         self.cmd_logger=self.create_logger("cmd",self.log_path,formatter,logging.DEBUG)
         self.init_envlog()
-        self.init_cmdlog()
-        
+        self.init_cmdlog()        
     
     def create_logger(self,name,logfile,formatter,level=logging.DEBUG):
         """Creates a logger
@@ -87,8 +88,7 @@ class PyrpipeLogger():
     def init_cmdlog(self):
         """init the cmdlog
         """
-        self.cmd_logger.debug("#START LOG")
-    
+        self.cmd_logger.debug("#START LOG")    
 
     def init_envlog(self):
         """init the envlog
@@ -132,8 +132,11 @@ class Conf:
         self._dry = False
         self._safe = False
         self._threads=multiprocessing.cpu_count()
-        self._params_dir='./params'
+        self._params_dir='params'
         self._memory=psutil.virtual_memory()[0]/1000000000
+        self._logging=True
+        self._logs_dir='pyrpipe_logs'
+        self._verbose=False
         
         conf_file_path='pyrpipe.conf'
         if os.path.exists(conf_file_path):
@@ -160,6 +163,9 @@ _safe=conf._safe
 _threads=str(conf._threads)
 _mem=str(conf._memory)
 _params_dir=conf._params_dir
+_logs_dir=conf._logs_dir
+_logging=conf._logging
+_verbose=conf._verbose
 
 #create logger
-pyrpipe_logger=PyrpipeLogger()
+#pyrpipe_logger=PyrpipeLogger()

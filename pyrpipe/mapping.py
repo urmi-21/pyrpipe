@@ -446,7 +446,7 @@ class Bowtie2(Aligner):
         self.index=index
         self.genome=genome
         self._param_yaml='bowtie2.yaml'
-        self._valid_args=valid_args._args_HISAT2
+        self._valid_args=valid_args._args_BOWTIE2
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
                

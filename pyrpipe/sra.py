@@ -353,7 +353,7 @@ class SRA:
         return self
         
     
-    def qc(self,qc_object,delete_original=False,**kwargs):
+    def trim(self,qc_object,delete_original=False,**kwargs):
         """Function to perform quality control with specified qc object.
         A qc object refers to one of the RNA-Seq qc program like trim_galore oe bbduk.
         The qc_object should be initialized with all the parameters.
@@ -383,8 +383,7 @@ class SRA:
         """
         #check a valid qc_object
         if not (hasattr(qc_object,'_category') and qc_object._category=='RNASeqQC'):
-            print ("Error: No valid QC object provided. Skipping QC for "+self.srr_accession)
-            return False
+            raise Exception("Error: No valid QC object provided for "+self.srr_accession)
         
         #save thq qc object for later references
         #self.qc_object=qc_object

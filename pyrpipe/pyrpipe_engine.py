@@ -19,11 +19,16 @@ from shutil import which
 
 #import dryrun from Conf
 from pyrpipe import _dryrun
-from pyrpipe import pyrpipe_logger
-
+from pyrpipe import _safe
+from pyrpipe import _logs_dir
+from pyrpipe import _logging
+from pyrpipe import _verbose
+from pyrpipe import PyrpipeLogger
 
 ###create logger
-pu.print_yellow("Logs will be saved to {}.log".format(pyrpipe_logger.logger_basename))
+if _logging:
+    pyrpipe_logger=PyrpipeLogger(logdir=_logs_dir)
+    pu.print_yellow("Logs will be saved to {}".format(pyrpipe_logger.logger_path))
     
 """
 All functions that interact with shell are defined here. 
@@ -31,12 +36,19 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
 
+def skippable(func):
+    """
+    Skip a function execution
+    """
+    if not _safe:
+        return func
+    return True
+
 #decorator function for dry runs
 def dryable(func):
     """
     decorator function for drying all functions capable of executing commands
     """
-    
     if not _dryrun:
         return func
     def dried(cmd,*args,**kwargs):
@@ -58,7 +70,8 @@ def dryable(func):
              'objectid':'',
              'commandname':command_name
             }
-        pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
+        if _logging:
+            pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))
         return True
     
     return dried
@@ -74,7 +87,7 @@ def parse_cmd(cmd):
     return cmd
         
 @dryable
-def get_shell_output(cmd,verbose=False):
+def get_shell_output(cmd,verbose=_verbose):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
     getReturnStatus(), getProgramVersion(), find_files()
@@ -152,7 +165,7 @@ def execute_commandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 @dryable
-def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",command_name=""):
+def execute_command(cmd,verbose=_verbose,logs=_logging,objectid="NA",command_name=""):
     """Function to execute commands using popen. 
     All commands executed by this function can be logged and saved to pyrpipe logs.
     
@@ -163,8 +176,6 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
         command to execute via popen in a list
     verbose: bool
         Whether to print stdout and stderr. Default: False. All stdout and stderr will be saved to logs regardless of this flag.
-    quiet: bool
-        Absolutely no output on screen
     logs: bool
         Log the execution 
     dryrun: bool
@@ -187,9 +198,9 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
     log_message=" ".join(cmd)
     
     
-    if not quiet:
-        pu.print_blue("Start:"+starttime_str)
-        pu.print_blue("$ "+log_message)
+    
+    pu.print_blue("Start:"+starttime_str)
+    pu.print_blue("$ "+log_message)
     
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT)
@@ -213,9 +224,9 @@ def execute_command(cmd,verbose=False,quiet=False,logs=True,objectid="NA",comman
                 pu.print_blue("STDOUT:\n"+stdout)
             if stderr:
                 pu.print_boldred("STDERR:\n"+stderr)
-        if not quiet:
-            pu.print_blue("End:"+endtime_str)
-            pu.print_green("Time taken:"+str(timedelta(seconds=timeDiff)))
+        
+        pu.print_blue("End:"+endtime_str)
+        pu.print_green("Time taken:"+str(timedelta(seconds=timeDiff)))
             
                 
         exitCode=result.returncode
@@ -341,14 +352,12 @@ def is_paired(sra_file):
 
     
 
-def get_program_path(programName):
+def get_program_path(program):
     """
     Get path of installed program
     Returns the path as string    
     """
-    whichCmd=['which',programName]
-    out = subprocess.check_output(whichCmd,universal_newlines=True)
-    return out
+    return which(program)
 
 def get_program_version(programName):
     """
@@ -358,7 +367,7 @@ def get_program_version(programName):
     versionCommands=['--version','-version','--ver','-ver','-v','--v']
     for v in versionCommands:
         cmd=[programName,v]
-        out=get_shell_output(cmd)
+        out=get_shell_output(cmd,verbose=False)
         if out[0]==0:
             return out[1]
     

@@ -368,7 +368,7 @@ class Salmon(Quant):
             internal_kwargs={"--threads":_threads,"-o":out_dir,"-l":"A","-r":sra_object.fastq_path,"-i":self.index}
         
         #call salmon
-        status=self.run(None,verbose=verbose,quiet=quiet,logs=logs,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
         
         if status:
             outfile=os.path.join(out_dir,"quant.sf")

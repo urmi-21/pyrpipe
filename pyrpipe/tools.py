@@ -44,7 +44,7 @@ class Samtools(RNASeqTools):
         self.max_memory=max_memory
         
         
-    def sam_to_bam(self,sam_file,out_dir="",out_suffix="",threads=None, delete_sam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sam_to_bam(self,sam_file,out_dir="",out_suffix="",threads=None, delete_sam=False,objectid="NA",**kwargs):
         """Convert sam file to a bam file. 
         Output bam file will have same name as input sam.
         sam_file: string
@@ -89,7 +89,7 @@ class Samtools(RNASeqTools):
         #add (and override) any arguments provided via kwargs
         mergedOpts={**newOpts,**kwargs}
         
-        status=self.run_samtools("view",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("view",objectid=objectid,**mergedOpts)
                 
         if not status:
             print("Sam to bam failed for:"+sam_file)
@@ -111,7 +111,7 @@ class Samtools(RNASeqTools):
         
         
     #sort bam file.output will be bam_file_sorted.bam
-    def sort_bam(self,bam_file,out_dir="",out_suffix="",threads=None,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sort_bam(self,bam_file,out_dir="",out_suffix="",threads=None,delete_bam=False,objectid="NA",**kwargs):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         bam_file: str
             Path to the input bam file
@@ -155,7 +155,7 @@ class Samtools(RNASeqTools):
         newOpts={"--":(bam_file,),"-o":outSortedbam_file,"-@":str(threads)}
         mergedOpts={**newOpts,**kwargs}
         
-        status=self.run_samtools("sort",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("sort",objectid=objectid,**mergedOpts)
         
         if not status:
             print("Bam sort failed for:"+bam_file)
@@ -172,7 +172,7 @@ class Samtools(RNASeqTools):
         #return path to file
         return outSortedbam_file
     
-    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",threads=None,delete_sam=False,delete_bam=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",threads=None,delete_sam=False,delete_bam=False,objectid="NA",**kwargs):
         """Convert sam file to bam and sort the bam file.
         sam_file: str
             Path to the input sam file
@@ -201,13 +201,13 @@ class Samtools(RNASeqTools):
         :rtype: string
         """
         
-        sam2bam_file=self.sam_to_bam(sam_file,threads=threads,delete_sam=delete_sam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        sam2bam_file=self.sam_to_bam(sam_file,threads=threads,delete_sam=delete_sam,objectid=objectid,**kwargs)
         
         if not sam2bam_file:
             return ""
             
 
-        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,threads=threads,delete_bam=delete_bam,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**kwargs)
+        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,threads=threads,delete_bam=delete_bam,objectid=objectid,**kwargs)
         
         if not bamSorted:
             return ""
@@ -215,7 +215,7 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def merge_bam(self,*args,out_file="merged",out_dir="",threads=None,delete_bams=False,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def merge_bam(self,*args,out_file="merged",out_dir="",threads=None,delete_bams=False,objectid="NA",**kwargs):
         """Merge multiple bam files into a single file
         
         Parameters
@@ -266,7 +266,7 @@ class Samtools(RNASeqTools):
         #override parameters by supplying as kwargs
         mergedOpts={**newOpts,**kwargs}
         
-        status=self.run_samtools("merge",verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts)
+        status=self.run_samtools("merge",objectid=objectid,**mergedOpts)
         
         if not status:
             print("Bam merge failed for:"+outMergedFile)
@@ -286,7 +286,7 @@ class Samtools(RNASeqTools):
         
         
         
-    def run_samtools(self,sub_command,valid_args=None,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_samtools(self,sub_command,valid_args=None,objectid="NA",**kwargs):
         """A wrapper to run samtools.
         
         Parameters
@@ -317,7 +317,7 @@ class Samtools(RNASeqTools):
         samtools_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
                 
         #start ececution
-        status=pe.execute_command(samtools_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(samtools_cmd,objectid=objectid)
         if not status:
             pu.print_boldred("samtools failed")
         

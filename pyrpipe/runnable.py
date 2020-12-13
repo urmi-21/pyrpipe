@@ -76,7 +76,7 @@ class Runnable:
         #execute command
         cmd_status=pe.execute_command(cmd,objectid=objectid)
         if not cmd_status:
-            pu.print_boldred("{} failed: {}".format(self.name," ".join(cmd)))
+            pu.print_boldred("{} failed: {}".format(self._command," ".join(cmd)))
      
         #return status
         return cmd_status
