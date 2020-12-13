@@ -160,7 +160,7 @@ class SRA:
     
                 
     
-    def download_fastq(self,*args,verbose=False,quiet=False,logs=True,**kwargs):
+    def download_fastq(self,*args,**kwargs):
         """Function to download fastq files
         """
         

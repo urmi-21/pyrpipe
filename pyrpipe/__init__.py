@@ -19,6 +19,8 @@ import logging
 from datetime import datetime 
 import subprocess
 import time
+import pyrpipe.version
+
 
 ###logger
 class LogFormatter():
@@ -88,12 +90,14 @@ class PyrpipeLogger():
     def init_cmdlog(self):
         """init the cmdlog
         """
-        self.cmd_logger.debug("#START LOG")    
+        self.cmd_logger.debug("#Start Log")    
+        self.cmd_logger.debug("pyrpipe version: "+pyrpipe.version.__version__)    
 
     def init_envlog(self):
         """init the envlog
         """
-        self.env_logger.debug("#START LOG")
+        self.cmd_logger.debug("#Start Log")
+        self.cmd_logger.debug("pyrpipe version: "+pyrpipe.version.__version__)    
         osInfo=platform.platform()
         #get python version
         pyver='Python ' + sys.version.replace('\n', '')

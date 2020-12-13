@@ -9,14 +9,13 @@ Created on Sun Nov 24 16:24:44 2019
 from pyrpipe import assembly
 from pyrpipe import pyrpipe_utils as pu
 from testingEnvironment import testSpecs
-import os
 
 testVars=testSpecs()
 
 def test_assembly():
     #create assemble object
     aob=assembly.Assembly()
-    assert aob.category == "Assembler","Failed Assembly init"
+    assert aob._category == "Assembler","Failed Assembly init"
 
 def test_stringtie():
     bam=testVars.hisatSortedBam
@@ -33,25 +32,6 @@ def test_cufflinks():
     assert pu.check_files_exist(result)==True, "Failed cufflinks"
     
     
-def test_trinityBam():
-    tr=assembly.Trinity(threads=4)
-    #bam=testVars.hisatSortedBam
-    bam=testVars.portcullisBam
-    tr_opts={"--genome_guided_bam":bam,
-             "--genome_guided_max_intron":"10000",
-            "--output":testVars.testDir+"/trinity_testoutbam",
-            "--max_memory": "2G"
-            }
-    st=tr.run_trinity(verbose=True,**tr_opts)
-    assert st==True, "Failed trinity with bam"
 
-def test_trinityFQ():
-    tr=assembly.Trinity()
-    tr_opts={"--seqType":"fq","--left":testVars.fq1,
-            "--right":testVars.fq2,
-            "--output":testVars.testDir+"/trinity_testoutfq",
-            "--max_memory":"3G"}
-    st=tr.run_trinity(**tr_opts)
-    assert st==True, "Failed trinity with fq"
 
 

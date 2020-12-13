@@ -395,6 +395,7 @@ def check_dependencies(dependencies):
   
     
 #TODO: Re-implement following using native python libraries and move to utils
+@skippable
 def delete_file(file_path):
     """
     Delete a given file from disk
@@ -423,6 +424,7 @@ def delete_file(file_path):
     #if file doesn't exist return true
     #return True
 
+@skippable
 def delete_files(*args):
     """Delete multiple files passed as argument.
     returns true is all files a re deleted
