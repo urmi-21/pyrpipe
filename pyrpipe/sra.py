@@ -165,7 +165,7 @@ class SRA:
         """
         
         #check if fastq files exists already
-        if self.fastqFilesExistsLocally():
+        if self.fastq_exists():
             pu.print_green("Fastq files exist already")
             return True
         
@@ -265,7 +265,7 @@ class SRA:
         else:
             return False
         
-    def fastqFilesExistsLocally(self):
+    def fastq_exists(self):
         """Function to check if fastq file is present on disk
         """
         
@@ -466,7 +466,7 @@ class SRA:
         else:
             lines_to_examine=4*lines_to_examine
             
-        if not self.fastqFilesExistsLocally():
+        if not self.fastq_exists():
             pu.print_boldred("Fastq files don't exist")
             return 0
             
@@ -628,7 +628,7 @@ class SRA:
         True
         """
         #check if fastq files exists already
-        if self.fastqFilesExistsLocally():
+        if self.fastq_exists():
             pu.print_green("Fastq files exist already")
             return True
         

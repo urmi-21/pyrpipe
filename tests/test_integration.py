@@ -25,28 +25,22 @@ workingDir=testVars.testDir
     
 def test_pipeline1():
     sraOb=sra.SRA(srr,workingDir)
-    st=sraOb.download_sra()
-    assert st==True,"SRA download failed"
-    
-    st=sraOb.run_fasterqdump(delete_sra=False,**{"-f":"","-t":workingDir})
-    assert st==True,"fqdump failed"
-    
+    st=sraOb.fastq_exists()
+    assert st==True,"fasterq-dump failed"
     bbdOpts={"ktrim":"r","k":"23","mink":"11","qtrim":"'rl'","trimq":"10","ref":testVars.bbdukAdapters}
-    bbdOb=qc.BBmap(threads=4,max_memory=3)
-    st=sraOb.perform_qc(bbdOb,**bbdOpts)
+    bbdOb=qc.BBmap(None,**bbdOpts)
+    st=sraOb.trim(bbdOb)
     assert st==True,"bbduk failed"
     
     
     tg=qc.Trimgalore()
-    st=sraOb.perform_qc(tg)
+    st=sraOb.qc(tg)
     assert st==True,"tg failed"
     
     #runbowtie2
-    bt=mapping.Bowtie2(index="")
-    assert bt.check_index()==False, "Failed bowtie2 check_index"
-    st=bt.build_index(testVars.testDir+"/btIndex","bowtieIndex",testVars.genome)
-    assert st==True, "Failed to build bowtie2 index"
-    st=bt.perform_alignment(sraOb)
+    bt=mapping.Bowtie2(index=testVars.testDir+"/btIndex",genome=testVars.genome)
+    assert bt.check_index()==True, "Failed bowtie2 check_index"
+    st=bt.align(sraOb)
     assert os.path.isfile(st)==True,"bowtie failed"
     
     hsOpts={"--dta-cufflinks":"","-p":"8"}
