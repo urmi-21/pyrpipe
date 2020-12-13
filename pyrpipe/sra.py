@@ -513,7 +513,7 @@ class SRA:
     
     
     #To be removed
-    def download_sra(self,verbose=False,quiet=False,logs=True,**kwargs):
+    def download_sra(self,**kwargs):
         """This function downloads .sra file from NCBI SRA servers using the prefetch command.
 
         NCBI sra-toolkit 2.9 or higher must be installed on the system in order to use prefetch. 
@@ -600,7 +600,7 @@ class SRA:
         
         return True
     #to be removed
-    def run_fasterqdump(self,delete_sra=False,verbose=False,quiet=False,logs=True,**kwargs):
+    def run_fasterqdump(self,delete_sra=False,**kwargs):
         """Execute fasterq-dump to convert .sra file to fastq files.
         The fastq files will be stored in the same directory as the sra file. All fastq files should be consistently named
         using the extension .fastq

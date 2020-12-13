@@ -199,7 +199,7 @@ class BBmap(RNASeqQC):
                 
             return(out_filePath,) 
     
-    def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,objectid="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         
@@ -250,7 +250,7 @@ class BBmap(RNASeqQC):
                 newOpts={"ref_x":bbsplit_index,"path": pu.get_file_directory(bbsplit_index)}
                 mergedOpts={**kwargs,**newOpts}
                 #run bbduk
-                if not self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+                if not self.run_bbsplit(objectid=objectid,**mergedOpts):
                     print("Error creating bbsplit index.")
                     return ("",)
                 if not pu.check_paths_exist(indexPath):
@@ -285,7 +285,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbsplit
-            if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+            if self.run_bbsplit(objectid=objectid,**mergedOpts):
                 if pu.check_files_exist(out_file1Path,out_file2Path):
                     return(out_file1Path,out_file2Path)
             return("",)
@@ -301,7 +301,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbsplit
-            if self.run_bbsplit(verbose=verbose,quiet=quiet,logs=logs,objectid=objectid,**mergedOpts):
+            if self.run_bbsplit(objectid=objectid,**mergedOpts):
                 if pu.check_files_exist(out_filePath):
                     return(out_filePath,)
             
@@ -309,7 +309,7 @@ class BBmap(RNASeqQC):
     
     
     
-    def run_bbsplit(self,verbose=False,quiet=False,logs=True,objectid="NA",**kwargs):
+    def run_bbsplit(self,objectid="NA",**kwargs):
         """wrapper to run bbsplit
         
         :return: Status of bbsplit command
@@ -330,7 +330,7 @@ class BBmap(RNASeqQC):
         
         
         #start ececution
-        status=pe.execute_command(bbsp_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(bbsp_cmd,objectid=objectid)
         if not status:
             pu.print_boldred("bbsplit failed")
         #return status

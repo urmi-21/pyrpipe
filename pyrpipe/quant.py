@@ -77,7 +77,7 @@ class Kallisto(Quant):
                 self._kwargs['-i']=self.index
                 
             
-    def build_index(self,index_path,transcriptome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+    def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
         """Function to  build kallisto index
         
         index_path: str
@@ -137,7 +137,7 @@ class Kallisto(Quant):
         kallisto_cmd.extend(pu.parse_unix_args(validArgsIndex,internal_kwargs))
         
         #call kallisto
-        status=pe.execute_command(kallisto_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(kallisto_cmd,objectid=objectid)
                 
         if status:
             if pu.check_files_exist(index_path) and not _dryrun:
@@ -251,7 +251,7 @@ class Salmon(Quant):
                 #set index 
                 self._kwargs['-i']=self.index
             
-    def build_index(self,index_path,transcriptome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+    def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
         """
         build salmon index and store the path to index in self
         
@@ -315,7 +315,7 @@ class Salmon(Quant):
         salmon_cmd.extend(pu.parse_unix_args(validArgsIndex,internal_kwargs))
         
         #call salmon
-        status=pe.execute_command(salmon_cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(salmon_cmd,objectid=objectid)
         
         if status:
             if pu.check_salmonindex(index_path) and not _dryrun:

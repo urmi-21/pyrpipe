@@ -74,7 +74,7 @@ class Hisat2(Aligner):
                 self._kwargs['-x']=self.index
                 
 
-    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
         """Build a hisat index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -153,7 +153,7 @@ class Hisat2(Aligner):
         hisat2Build_Cmd.extend(pu.parse_unix_args(hisat2Buildvalid_args,internal_kwargs))
         
         #execute command
-        status=pe.execute_command(hisat2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(hisat2Build_Cmd,objectid=objectid)
         
         if status:
             if pu.check_hisatindex(index_path) and not _dryrun:
@@ -182,8 +182,6 @@ class Hisat2(Aligner):
             Overwrite output sam if already exist
         verbose: bool
             Print stdout and std error
-        quiet: bool
-            Print nothing
         logs: bool
             Log this command to pyrpipe logs
         objectid: str
@@ -265,7 +263,7 @@ class Star(Aligner):
                 #set index 
                 self._kwargs['--genomeDir']=self.index
     
-    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
         """Build a star index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -325,7 +323,7 @@ class Star(Aligner):
         starbuild_Cmd.extend(pu.parse_unix_args(valid_args._args_STAR,internal_kwargs))
         
         #execute command
-        status=pe.execute_command(starbuild_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(starbuild_Cmd,objectid=objectid)
         if status:
             if pu.check_paths_exist(index_path) and not _dryrun:
                 #update object's index
@@ -466,7 +464,7 @@ class Bowtie2(Aligner):
                 self._kwargs['-x']=self.index
             
         
-    def build_index(self,index_path,genome,overwrite=False,verbose=False,quiet=False,logs=True,objectid="NA"):
+    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
         """Build a bowtie2 index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -544,7 +542,7 @@ class Bowtie2(Aligner):
     
         
         #start ececution
-        status=pe.execute_command(bowtie2Build_Cmd,verbose=verbose,quiet=quiet,logs=logs,objectid=objectid)
+        status=pe.execute_command(bowtie2Build_Cmd,objectid=objectid)
         if not status:
             pu.print_boldred("bowtie2-build failed")
             return False
