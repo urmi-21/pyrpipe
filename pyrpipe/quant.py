@@ -192,17 +192,18 @@ class Kallisto(Quant):
             args=(sra_object.fastq_path,)
             internal_kwargs={"--threads":_threads,"-o":out_dir,"--single":"","-i":self.index}
             
-                      
+        
+        #targets
+        outfile=os.path.join(out_dir,"abundance.tsv")
+        newfile=os.path.join(out_dir,"abundance"+out_suffix+".tsv")
+        
         #call kallisto
-        status=self.run(*args,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(*args,objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
         
         if status:
-            outfile=os.path.join(out_dir,"abundance.tsv")
             if not pu.check_files_exist(outfile) and not _dryrun:
                 return ""
-            
             #move
-            newfile=os.path.join(out_dir,"abundance"+out_suffix+".tsv")
             pe.move_file(outfile,newfile)
             return newfile
         
@@ -367,15 +368,17 @@ class Salmon(Quant):
         else:
             internal_kwargs={"--threads":_threads,"-o":out_dir,"-l":"A","-r":sra_object.fastq_path,"-i":self.index}
         
+        #targets
+        outfile=os.path.join(out_dir,"quant.sf")
+        newfile=os.path.join(out_dir,"quant"+out_suffix+".sf")
         #call salmon
-        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
         
         if status:
-            outfile=os.path.join(out_dir,"quant.sf")
+            
             if not pu.check_files_exist(outfile) and not _dryrun:
                 return ""
             #move
-            newfile=os.path.join(out_dir,"quant"+out_suffix+".sf")
             pe.move_file(outfile,newfile)
             return newfile
         

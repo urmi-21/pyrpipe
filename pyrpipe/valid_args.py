@@ -127,3 +127,4 @@ _args_SALMON=['--help-reads','-i','--index','-l','--libType','-r','--unmatedRead
               '-x','--quasiCoverage']
 
 
+_args_SAMTOOLS=None

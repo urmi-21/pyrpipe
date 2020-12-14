@@ -85,14 +85,16 @@ class Trimgalore(RNASeqQC):
         if sra_object.layout=='PAIRED':
             fq1=sra_object.fastq_path
             fq2=sra_object.fastq2_path
-            out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
-            out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
             internal_args=(fq1,fq2)
             internal_kwargs={"--paired":"","-o":out_dir,"--cores":_threads}
-
+            
+            #targets
+            out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
+            out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
+            
             
             #run trimgalore
-            self.run(*internal_args,objectid=objectid,**internal_kwargs)
+            self.run(*internal_args,objectid=objectid,target=[out_file1,out_file2],**internal_kwargs)
             """
             running trim galore will create two files named <input>_val_1.fq and <input>_val_2.fq
             move these files to the specified out files
@@ -110,12 +112,14 @@ class Trimgalore(RNASeqQC):
             
         else:
             fq=sra_object.localfastqPath
-            out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
             internal_args=(fq,)
             internal_kwargs={"-o":out_dir,"--cores":_threads}
 
+            #target
+            out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
+            
             #run trimgalore
-            self.run(*internal_args,objectid=objectid,**internal_kwargs)
+            self.run(*internal_args,objectid=objectid,target=out_file,**internal_kwargs)
             """
             running trim galore will create one file named <input>_trimmed.fq
             move these files to the specified out files
@@ -175,7 +179,7 @@ class BBmap(RNASeqQC):
             internal_kwargs={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path,"threads":_threads}
                         
             #run bbduk
-            status=self.run(*internal_args,objectid=objectid,**internal_kwargs)
+            status=self.run(*internal_args,objectid=objectid,target=[out_file1Path,out_file2Path],**internal_kwargs)
             
             if status:
                 if not pu.check_files_exist(out_file1Path,out_file2Path) and not _dryrun:
@@ -192,7 +196,7 @@ class BBmap(RNASeqQC):
             internal_kwargs={"in":fq,"out":out_filePath,"threads":_threads}
             
             #run bbduk
-            status=self.run(*internal_args,objectid=objectid,**internal_kwargs)
+            status=self.run(*internal_args,objectid=objectid,target=out_filePath,**internal_kwargs)
             if status:
                 if not pu.check_files_exist(out_file1Path,out_file2Path) and not _dryrun:
                     return("",)
@@ -285,7 +289,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbsplit
-            if self.run_bbsplit(objectid=objectid,**mergedOpts):
+            if self.run_bbsplit(objectid=objectid,target=[out_file1Path,out_file2Path],**mergedOpts):
                 if pu.check_files_exist(out_file1Path,out_file2Path):
                     return(out_file1Path,out_file2Path)
             return("",)
@@ -301,7 +305,7 @@ class BBmap(RNASeqQC):
             mergedOpts={**kwargs,**newOpts}
             
             #run bbsplit
-            if self.run_bbsplit(objectid=objectid,**mergedOpts):
+            if self.run_bbsplit(objectid=objectid,target=out_filePath,**mergedOpts):
                 if pu.check_files_exist(out_filePath):
                     return(out_filePath,)
             

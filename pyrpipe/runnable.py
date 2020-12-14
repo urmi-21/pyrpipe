@@ -10,6 +10,8 @@ from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
 from pyrpipe import param_loader as pl
 from pyrpipe import _params_dir
+from pyrpipe import _dryrun
+from pyrpipe import _force
 
 class Runnable:
     """The runnable class
@@ -21,6 +23,7 @@ class Runnable:
         self._param_yaml=None
         self.init_parameters(*args,**kwargs)
         self._args_style='LINUX'
+        #valid_args can be None or a list, or a dict if subcommands are used
         self._valid_args=None
          
     def check_dependency(self):
@@ -47,8 +50,41 @@ class Runnable:
             yaml_params=pl.YAML_loader(yamlfile)
             yaml_kwargs=yaml_params.get_kwargs()
             self._kwargs={**yaml_kwargs,**self._kwargs}
+
+            
+    def verify_target(self,target,verbose=False):
+        if not pu.check_files_exist(target) and not _dryrun:
+            if verbose: pu.print_boldred("Error: target {} not found".format(target))
+            return False
+        return True
+    
+    def verify_target_list(self,target_list,verbose=False):
+        #nothing to verify
+        if not target_list:
+            return True
+        for target in target_list:
+            if not self.verify_target(target,verbose):
+                return False
+        return True
+            
         
-    def run(self,*args,objectid="NA",**kwargs):
+    def run(self,*args, subcommand=None, target=None, objectid=None, **kwargs):
+        
+        #create target list
+        target_list=None
+        if isinstance(target, str):
+            target_list=[target]
+        elif isinstance(target, list):
+            target_list=target
+        
+        #if target already and not overwrite exists then return
+        if not _force and not _dryrun and target_list:
+            if self.verify_target_list(target_list):
+                pu.print_green('Target files {} already exist.'.format(', '.join(target_list)))
+                return True
+            
+        
+        
         #override class kwargs by passed kwargs
         kwargs={**self._kwargs,**kwargs}
         #if no args provided use constructor's args
@@ -62,8 +98,18 @@ class Runnable:
             cmd=[self._command]
         else:
             cmd=self._command
+        
+        #if subcommand supplied
+        if subcommand:
+            if isinstance(subcommand, str):
+                subcommand=[subcommand]
+            #add to command
+            cmd.extend(subcommand)
+        
+        
             
-        #add options
+            
+        #parse and add parameters
         if self._args_style=='LINUX':
             cmd.extend(pu.parse_unix_args(self._valid_args,kwargs))      
         elif self._args_style=='JAVA':
@@ -78,5 +124,8 @@ class Runnable:
         if not cmd_status:
             pu.print_boldred("{} failed: {}".format(self._command," ".join(cmd)))
      
-        #return status
-        return cmd_status
+        if cmd_status and target_list:
+            return self.verify_target_list(target_list,verbose=True)
+        else:
+            #return status
+            return cmd_status

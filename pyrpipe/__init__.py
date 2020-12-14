@@ -135,9 +135,12 @@ class Conf:
         #if conf file is not present these default values will be used
         self._dry = False
         self._safe = False
-        self._threads=multiprocessing.cpu_count()
+        #roughly 80% of available cpu cores
+        self._threads=max(int(multiprocessing.cpu_count()*.8),1)
+        self._force=False
         self._params_dir='params'
-        self._memory=psutil.virtual_memory()[0]/1000000000
+        #roughly 80% of available memory
+        self._memory=psutil.virtual_memory()[0]/1000000000*0.8
         self._logging=True
         self._logs_dir='pyrpipe_logs'
         self._verbose=False
@@ -148,6 +151,7 @@ class Conf:
                 data = json.load(conf_file)
             self._dry=data['dry']
             self._threads=data['threads']
+            self._force=data['force']
             self._params_dir=data['params_dir']
             self._logging=data['logging']
             self._logs_dir=data['logs_dir']
@@ -156,9 +160,11 @@ class Conf:
             self._safe = data['safe']
             #check valid threads and mem
             if not self._threads or not self._threads.replace('.','',1).isdigit():
-                self._threads=multiprocessing.cpu_count()
+                self._threads=max(int(multiprocessing.cpu_count()*.8),1)
             if not self._memory or not self._memory.replace('.','',1).isdigit():
-                self._memory=psutil.virtual_memory()[0]/1000000000
+                self._memory=psutil.virtual_memory()[0]/1000000000*0.8
+                
+        #TODO: overwrite any arguments paased via cmd line
             
                 
 conf=Conf()
@@ -170,6 +176,7 @@ _params_dir=conf._params_dir
 _logs_dir=conf._logs_dir
 _logging=conf._logging
 _verbose=conf._verbose
+_force=conf._force
 
 #create logger
 #pyrpipe_logger=PyrpipeLogger()

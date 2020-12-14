@@ -24,6 +24,7 @@ srr='SRR4113368'
 workingDir=testVars.testDir
     
 def test_pipeline1():
+ 
     sraOb=sra.SRA(srr,workingDir)
     st=sraOb.fastq_exists()
     assert st==True,"fasterq-dump failed"

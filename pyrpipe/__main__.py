@@ -28,6 +28,7 @@ def main():
     parser.add_argument('--max-memory', help='Max memory to use (in GB)\ndefault: None',action="store",dest='mem')
     parser.add_argument("--verbose", help="Print pyrpipe_engine's stdout and stderr\nDefault: False",default=False,dest='verbose', action='store_true')
     parser.add_argument("--dry-run", help="Only print pyrpipe's commands and not execute anything through pyrpipe_engine module\nDefault: False",default=False,dest='dryrun', action='store_true')
+    parser.add_argument("--force", help="Force execution of commands if their target files already exist\nDefault: False",default=False,dest='force', action='store_true')
     parser.add_argument("--safe-mode", help="Disable file deletions through pyrpipe_engine module\nDefault: False",default=False,dest='safemode', action='store_true')
     parser.add_argument("--no-logs", help="Disable pyrpipe logs\nDefault: False",default=False,dest='nologs', action='store_true')
     parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='params')
@@ -62,20 +63,21 @@ def main():
     logsdir=args.logsdir
     nologs=args.nologs
     verbose=args.verbose
+    force=args.force
     
     
         
     
     
     #call main program
-    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,infile)
+    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile)
     
     
     
 if __name__ == '__main__':
     main()
 
-def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,infile):
+def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile):
     #write pyrpipe configuration
     #everything saved as str
     conf={}
@@ -83,13 +85,14 @@ def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,infile):
     conf['memory']=mem
     conf['params_dir']=paramdir
     conf['dry']=dryrun
+    conf['force']=force
     conf['safe']=safemode
     conf['logs_dir']=logsdir
     conf['logging']= not nologs
     conf['verbose']=verbose
     
     with open('pyrpipe.conf', 'w') as outfile:
-        json.dump(conf, outfile)
+        json.dump(conf, outfile,indent=4)
     
     #execute
     cmd=['python',infile]

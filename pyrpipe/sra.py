@@ -47,12 +47,7 @@ class SRA:
         self.sra_path=sra
         self.srr_accession=srr_accession
         self.layout=None
-        #paths to bam files after alignin reads can be accessed
-        self.bams={}
-        #path to quant files after quantification
-        self.quants={}
-        #path to tx assembly files after assembly
-        self.assembly={}
+        
         
         if not self.init_object(srr_accession, directory, fastq,fastq2,sra):
             pu.print_boldred("ERROR: Creating SRA object")

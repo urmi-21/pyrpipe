@@ -36,6 +36,7 @@ All functions that interact with shell are defined here.
     
 ##############Functions###########################
 
+#a decorator to skip functions in safe mode
 def skippable(func):
     """
     Skip a function execution
@@ -108,7 +109,7 @@ def get_shell_output(cmd,verbose=_verbose):
     log_message=cmd
     starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     if verbose:
-        pu.print_blue("Start:"+starttime_str)
+        pu.print_notification("Start:"+starttime_str)
         pu.print_blue("$ "+log_message)
     try:
         result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
@@ -165,7 +166,7 @@ def execute_commandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 @dryable
-def execute_command(cmd,verbose=_verbose,logs=_logging,objectid="NA",command_name=""):
+def execute_command(cmd,verbose=_verbose,logs=_logging,objectid=None,command_name=""):
     """Function to execute commands using popen. 
     All commands executed by this function can be logged and saved to pyrpipe logs.
     
@@ -199,7 +200,7 @@ def execute_command(cmd,verbose=_verbose,logs=_logging,objectid="NA",command_nam
     
     
     
-    pu.print_blue("Start:"+starttime_str)
+    pu.print_notification("Start:"+starttime_str)
     pu.print_blue("$ "+log_message)
     
     try:
@@ -225,7 +226,7 @@ def execute_command(cmd,verbose=_verbose,logs=_logging,objectid="NA",command_nam
             if stderr:
                 pu.print_boldred("STDERR:\n"+stderr)
         
-        pu.print_blue("End:"+endtime_str)
+        pu.print_notification("End:"+endtime_str)
         pu.print_green("Time taken:"+str(timedelta(seconds=timeDiff)))
             
                 
@@ -253,7 +254,7 @@ def execute_command(cmd,verbose=_verbose,logs=_logging,objectid="NA",command_nam
                  'starttime':str(starttime_str),
                  'stdout':stdout,
                  'stderr':stderr,
-                 'objectid':objectid,
+                 'objectid':str(objectid),
                  'commandname':command_name
                 }
             pyrpipe_logger.cmd_logger.debug(json.dumps(logDict))

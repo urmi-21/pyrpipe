@@ -98,7 +98,7 @@ class Stringtie(Assembly):
         internal_kwargs['--']=internal_args
 
         #call stringtie
-        status=self.run(None,objectid=objectid,**internal_kwargs)
+        status=self.run(None,objectid=objectid,target=out_gtf_file,**internal_kwargs)
         
         if status:
             #check if sam file is present in the location directory of sraOb
@@ -163,7 +163,6 @@ class Cufflinks(Assembly):
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
-        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
             
         #Add output file name and input bam
@@ -172,12 +171,17 @@ class Cufflinks(Assembly):
         #add positional args
         internal_kwargs['--']=internal_args
         
+        #targets
+        outfile=os.path.join(out_dir,"transcripts.gtf")
+        out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
+        
+        
         #call cufflinks
-        status=self.run(None,objectid=objectid,**internal_kwargs)
+        status=self.run(None,objectid=objectid,target=out_gtf_file,**internal_kwargs)
         
         
         if status:
-            outfile=os.path.join(out_dir,"transcripts.gtf")
+            
             #if file exist
             if not pu.check_files_exist(outfile) and not _dryrun:
                 return ""

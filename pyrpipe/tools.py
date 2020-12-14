@@ -9,7 +9,8 @@ import os
 from pyrpipe.runnable import Runnable
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import pyrpipe_engine as pe
-
+from pyrpipe import valid_args
+from pyrpipe import _threads
 
 
 class RNASeqTools(Runnable):
@@ -30,21 +31,17 @@ class Samtools(RNASeqTools):
         Max memory to use in GB
     
     """
-    def __init__(self,threads=None,max_memory=None):
-        self.programName="samtools"
-        #check if hisat2 exists
-        if not pe.check_dependencies([self.programName]):
-            raise Exception("ERROR: "+ self.programName+" not found.")
+    def __init__(self,*args,**kwargs):
+        super().__init__(*args,**kwargs)
+        self._command='samtools'
+        self._deps=[self._command]
+        self._param_yaml='samtools.yaml'
+        self._valid_args=valid_args._args_SAMTOOLS
+        self.check_dependency()
+        self.init_parameters(*args,**kwargs)
         
-        self.threads=threads
-        #Default: if threads are None use 80% of threads to avaoid memory issues
-        if not self.threads:
-            self.threads=int(os.cpu_count()*0.8)
-            
-        self.max_memory=max_memory
-        
-        
-    def sam_to_bam(self,sam_file,out_dir="",out_suffix="",threads=None, delete_sam=False,objectid="NA",**kwargs):
+
+    def sam_to_bam(self,sam_file,out_dir=None,out_suffix=None, delete_sam=False,objectid=None):
         """Convert sam file to a bam file. 
         Output bam file will have same name as input sam.
         sam_file: string
@@ -74,35 +71,28 @@ class Samtools(RNASeqTools):
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
+                
+        if not out_suffix:
+            out_suffix=""
         
         fname=pu.get_file_basename(sam_file)
         
-        #output will be out_bam
+        
+        #target: output will be out_bam
         out_bam=os.path.join(out_dir,fname+out_suffix+'.bam')
+        internal_args=(sam_file,)
+        internal_kwargs={"-o":out_bam,"-@":_threads,"-b":""}
         
-        #handle threads
-        if not threads:
-            threads=self.threads
         
-        newOpts={"--":(sam_file,),"-o":out_bam,"-@":str(threads),"-b":""}
-        
-        #add (and override) any arguments provided via kwargs
-        mergedOpts={**newOpts,**kwargs}
-        
-        status=self.run_samtools("view",objectid=objectid,**mergedOpts)
+        status=self.run(*internal_args,subcommand="view",target=out_bam,objectid=objectid,**internal_kwargs)
                 
         if not status:
-            print("Sam to bam failed for:"+sam_file)
-            return ""
-        
-        #check if bam file exists
-        if not pu.check_files_exist(out_bam):
             return ""
         
         #delete_sam_file
         if delete_sam:
             if not pe.deleteFileFromDisk(sam_file):
-                print("Error deleting sam file:"+sam_file)
+                pu.print_boldred("Error deleting sam file:"+sam_file)
                 
         #return path to file
         return out_bam
@@ -111,7 +101,7 @@ class Samtools(RNASeqTools):
         
         
     #sort bam file.output will be bam_file_sorted.bam
-    def sort_bam(self,bam_file,out_dir="",out_suffix="",threads=None,delete_bam=False,objectid="NA",**kwargs):
+    def sort_bam(self,bam_file,out_dir=None,out_suffix=None,delete_bam=False,objectid=None):
         """Sorts an input bam file. Outpufile will end in _sorted.bam
         bam_file: str
             Path to the input bam file
@@ -143,27 +133,25 @@ class Samtools(RNASeqTools):
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
+        if not out_suffix:
+            out_suffix=""
                 
         fname=pu.get_file_basename(bam_file)
         #output will be out_bam
         outSortedbam_file=os.path.join(out_dir,fname+out_suffix+'_sorted.bam')
         
-        #handle threads
-        if not threads:
-            threads=self.threads
         
-        newOpts={"--":(bam_file,),"-o":outSortedbam_file,"-@":str(threads)}
-        mergedOpts={**newOpts,**kwargs}
+        internal_args=(bam_file,)
         
-        status=self.run_samtools("sort",objectid=objectid,**mergedOpts)
+        internal_kwargs={"-o":outSortedbam_file,"-@":_threads}
+        
+        
+        status=self.run(*internal_args,subcommand="sort",target=outSortedbam_file,objectid=objectid,**internal_kwargs)
         
         if not status:
             print("Bam sort failed for:"+bam_file)
             return ""
         
-        #check if bam file exists
-        if not pu.check_files_exist(outSortedbam_file):
-            return ""
 
         if delete_bam:
             if not pe.deleteFileFromDisk(bam_file):
@@ -172,7 +160,7 @@ class Samtools(RNASeqTools):
         #return path to file
         return outSortedbam_file
     
-    def sam_sorted_bam(self,sam_file,out_dir="",out_suffix="",threads=None,delete_sam=False,delete_bam=False,objectid="NA",**kwargs):
+    def sam_sorted_bam(self,sam_file,out_dir=None,out_suffix=None,delete_sam=False,delete_bam=False,objectid=None):
         """Convert sam file to bam and sort the bam file.
         sam_file: str
             Path to the input sam file
@@ -201,13 +189,14 @@ class Samtools(RNASeqTools):
         :rtype: string
         """
         
-        sam2bam_file=self.sam_to_bam(sam_file,threads=threads,delete_sam=delete_sam,objectid=objectid,**kwargs)
+            
+        sam2bam_file=self.sam_to_bam(sam_file,delete_sam=delete_sam,objectid=objectid)
         
         if not sam2bam_file:
             return ""
             
 
-        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,threads=threads,delete_bam=delete_bam,objectid=objectid,**kwargs)
+        bamSorted=self.sort_bam(sam2bam_file,out_dir, out_suffix,delete_bam=delete_bam,objectid=objectid)
         
         if not bamSorted:
             return ""
@@ -215,7 +204,7 @@ class Samtools(RNASeqTools):
         return bamSorted
     
     
-    def merge_bam(self,*args,out_file="merged",out_dir="",threads=None,delete_bams=False,objectid="NA",**kwargs):
+    def merge_bam(self,bam_list,out_file="merged",out_dir=None,delete_bams=False,objectid=None):
         """Merge multiple bam files into a single file
         
         Parameters
@@ -245,28 +234,23 @@ class Samtools(RNASeqTools):
         :rtype: string
         """
                
-        if len(args) < 2:
-            print("Please supply at least 2 files to merge")
+        if len(bam_list) < 2:
+            pu.print_boldred("Error: Please supply at least 2 files to merge")
             return ""
         
         if not out_dir:
-            out_dir=pu.get_file_directory(args[0])
+            out_dir=pu.get_file_directory(bam_list[0])
         else:
             if not pu.check_paths_exist(out_dir):
                 pu.mkdir(out_dir)
         
         outMergedFile=os.path.join(out_dir,out_file+".bam")
         
-        #handle threads
-        if not threads:
-            threads=self.threads
+        internal_args=(outMergedFile,)+tuple(bam_list)        
+        internal_kwargs={"-@":_threads}
         
-        newOpts={"-@":str(threads),"--":(outMergedFile,)+args}
         
-        #override parameters by supplying as kwargs
-        mergedOpts={**newOpts,**kwargs}
-        
-        status=self.run_samtools("merge",objectid=objectid,**mergedOpts)
+        status=self.run(*internal_args,subcommand="merge",target=outMergedFile,objectid=objectid,**internal_kwargs)
         
         if not status:
             print("Bam merge failed for:"+outMergedFile)
@@ -278,51 +262,12 @@ class Samtools(RNASeqTools):
         
 
         if delete_bams:
-            for bam_file in args:
+            for bam_file in bam_list:
                 if not pe.deleteFileFromDisk(bam_file):
                     print("Error deleting sam file:"+bam_file)
                     
         return outMergedFile
         
-        
-        
-    def run_samtools(self,sub_command,valid_args=None,objectid="NA",**kwargs):
-        """A wrapper to run samtools.
-        
-        Parameters
-        ----------
-        
-        sub_command: string
-            sub_command to pass to samtools e.g. sort, merge etc
-        valid_args: list
-            A list containing valid parameters. Parameters in kwargs not in this list will be ignored. Default: None
-        arg1: dict
-            arguments to pass to samtools. 
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to samtools. This will override the existing options 
-
-        :return: Returns the status of samtools. True is passed, False if failed.
-        :rtype: bool
-        """
-        samtools_cmd=['samtools',sub_command]
-        #add options
-        samtools_cmd.extend(pu.parse_unix_args(valid_args,kwargs))
-                
-        #start ececution
-        status=pe.execute_command(samtools_cmd,objectid=objectid)
-        if not status:
-            pu.print_boldred("samtools failed")
-        
-        #return status
-        return status
     
     
     

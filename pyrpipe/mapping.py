@@ -199,6 +199,7 @@ class Hisat2(Aligner):
             
         #create path to output sam file
         outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
+        outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
         
  
         #find layout and fq file paths
@@ -208,7 +209,7 @@ class Hisat2(Aligner):
             internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
         
         #call run_hisat2
-        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=outBamFile,**internal_kwargs)
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
@@ -226,9 +227,6 @@ class Hisat2(Aligner):
             return(pu.check_hisatindex(self.index))
         else:
             return False
-
-    
-
 
 
 class Star(Aligner):
@@ -391,15 +389,16 @@ class Star(Aligner):
         #add index
         internal_kwargs["--genomeDir"]=self.index
         
+        #the expected out file
+        bam=os.path.join(out_dir,'Aligned.out.bam')
         #call star
-        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=bam,**internal_kwargs)
                 
         
         if status:
             #return rename the bam  file and return path
             #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
             #return sorted bam or unsorted bam which ever is present
-            bam=os.path.join(out_dir,'Aligned.out.bam')
             if 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
                 bam=os.path.join(out_dir,'Aligned.sortedByCoord.out.bam')
                 
@@ -599,6 +598,7 @@ class Bowtie2(Aligner):
                 
         #create path to output sam file
         outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
+        outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
                     
         
         #find layout and fq file paths
@@ -609,12 +609,17 @@ class Bowtie2(Aligner):
         
         
         
-        status=self.run(None,objectid=sra_object.srr_accession,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=outBamFile,**internal_kwargs)
+        
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
                 return ""
-            return outSamFile
+            #convert to bam before returning
+            return tools.Samtools().sam_sorted_bam(outSamFile)
+            #return outSamFile
+        
+        return ""
         
         return ""
     
