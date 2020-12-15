@@ -84,7 +84,6 @@ class Runnable:
                 return True
             
         
-        
         #override class kwargs by passed kwargs
         kwargs={**self._kwargs,**kwargs}
         #if no args provided use constructor's args
@@ -93,11 +92,14 @@ class Runnable:
         #if args are not None
         if args and args[0]:
             kwargs['--']=args
+            
         
-        if isinstance(self._command, str):
+        #make a copy of self._command
+        cmd=[]
+        if isinstance(self._command, list):
+            cmd=self._command.copy()            
+        elif isinstance(self._command, str):
             cmd=[self._command]
-        else:
-            cmd=self._command
         
         #if subcommand supplied
         if subcommand:
@@ -117,7 +119,6 @@ class Runnable:
         else: 
             pu.print_boldred("Unknown args style: {}".format(self._args_style))
             raise Exception("Unknown args style")
-            
             
         #execute command
         cmd_status=pe.execute_command(cmd,objectid=objectid)

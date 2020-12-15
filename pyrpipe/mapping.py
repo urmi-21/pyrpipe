@@ -201,6 +201,10 @@ class Hisat2(Aligner):
         #create path to output sam file
         outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
         outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
+        #check if final bam already exists
+        if not _force and pu.check_files_exist(outBamFile) and not _dryrun:
+            pu.print_green('Target files {} already exist.'.format(outBamFile))
+            return outBamFile
         
  
         #find layout and fq file paths
@@ -210,12 +214,12 @@ class Hisat2(Aligner):
             internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
         
         #call run_hisat2
-        status=self.run(None,objectid=sra_object.srr_accession,target=outBamFile,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=outSamFile,**internal_kwargs)
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
                 return ""
-            #convert to bam before returning
+            #convert to bam before returning; returns outBamFile
             return tools.Samtools().sam_sorted_bam(outSamFile)
             #return outSamFile
         
@@ -394,7 +398,11 @@ class Star(Aligner):
         #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
         #return sorted bam or unsorted bam which ever is present
         bam=os.path.join(out_dir,'Aligned.out.bam')
-        if 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
+        
+        #if outSAMtype is not specified make it bam by default
+        if not '--outSAMtype' in self._kwargs: self._kwargs['--outSAMtype']='BAM SortedByCoordinate'
+        
+        if '--outSAMtype' in self._kwargs and 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
                 bam=os.path.join(out_dir,'Aligned.sortedByCoord.out.bam')
         finalbam=bam.split('.bam')[0]+out_suffix+'.bam'
         

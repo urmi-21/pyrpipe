@@ -332,7 +332,7 @@ class SRA:
         return self
     
     
-    def quant(self,quant_object,**kwargs):
+    def quant(self,quant_object):
         """
         
         """
@@ -341,7 +341,7 @@ class SRA:
             raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
             
                    
-        status=quant_object.perform_quant(self,objectid=self.srr_accession,**kwargs)
+        status=quant_object.perform_quant(self,objectid=self.srr_accession)
         if not status:
             raise Exception("perform_mapping failed for: "+ self.srr_accession)
             

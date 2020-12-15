@@ -108,6 +108,17 @@ install:
   
 # command to run tests
 script:
+  - echo "{
+    "threads": "2",
+    "memory": null,
+    "params_dir": "params",
+    "dry": false,
+    "force": true,
+    "safe": false,
+    "logs_dir": "pyrpipe_logs",
+    "logging": true,
+    "verbose": false
+}" > pyrpipe.conf
   - ls
   - travis_wait 60 coverage run -m pytest tests/
   #- coverage run -m pytest tests/
