@@ -12,6 +12,7 @@ import os
 from pyrpipe import valid_args
 from pyrpipe import _dryrun
 from pyrpipe import _threads
+from pyrpipe import _force
 
 class Assembly(Runnable):
     """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
@@ -175,21 +176,24 @@ class Cufflinks(Assembly):
         outfile=os.path.join(out_dir,"transcripts.gtf")
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
+        #if final file already exists
+        if not _force and pu.check_files_exist(out_gtf_file) and not _dryrun:
+            pu.print_green('Target files {} already exist.'.format(out_gtf_file))
+            return out_gtf_file
+        
         
         #call cufflinks
-        status=self.run(None,objectid=objectid,target=out_gtf_file,**internal_kwargs)
+        status=self.run(None,objectid=objectid,target=outfile,**internal_kwargs)
         
         
         if status:
+            if not _dryrun:
+                pe.move_file(outfile,out_gtf_file)
+                if not pu.check_files_exist(out_gtf_file):
+                    return ""
+                
+            return out_gtf_file
             
-            #if file exist
-            if not pu.check_files_exist(outfile) and not _dryrun:
-                return ""
             
-            #move out_dir/transcripts.gtf to outfile
-            pe.move_file(outfile,out_gtf_file)
-            if pu.check_files_exist(out_gtf_file):
-                return out_gtf_file
-            else: return ""
         return ""
     

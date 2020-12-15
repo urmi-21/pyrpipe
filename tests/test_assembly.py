@@ -29,6 +29,7 @@ def test_cufflinks():
     gtf=testVars.gtf
     cl=assembly.Cufflinks()
     result=cl.perform_assembly(bam,out_dir=testVars.testDir, objectid="test")
+    print('RES:',result)
     assert pu.check_files_exist(result)==True, "Failed cufflinks"
     
     

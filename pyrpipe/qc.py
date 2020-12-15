@@ -12,6 +12,7 @@ from pyrpipe import pyrpipe_engine as pe
 from pyrpipe import valid_args
 from pyrpipe import _dryrun
 from pyrpipe import _threads
+from pyrpipe import _force
 
 
 class RNASeqQC(Runnable):
@@ -88,51 +89,68 @@ class Trimgalore(RNASeqQC):
             internal_args=(fq1,fq2)
             internal_kwargs={"--paired":"","-o":out_dir,"--cores":_threads}
             
-            #targets
-            out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
-            out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
             
-            
-            #run trimgalore
-            self.run(*internal_args,objectid=objectid,target=[out_file1,out_file2],**internal_kwargs)
             """
             running trim galore will create two files named <input>_val_1.fq and <input>_val_2.fq
             move these files to the specified out files
             """
-            oldFile1=os.path.join(out_dir,pu.get_file_basename(fq1)+"_val_1.fq")
-            oldFile2=os.path.join(out_dir,pu.get_file_basename(fq2)+"_val_2.fq")
+            file1=os.path.join(out_dir,pu.get_file_basename(fq1)+"_val_1.fq")
+            file2=os.path.join(out_dir,pu.get_file_basename(fq2)+"_val_2.fq")
+            #targets
+            out_file1=os.path.join(out_dir,pu.get_file_basename(fq1)+out_suffix+".fastq")
+            out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
             
-            pe.move_file(oldFile1,out_file1,verbose=False)
-            pe.move_file(oldFile2,out_file2,verbose=False)
+            #check if final files already exists
+            if not _force and pu.check_files_exist(out_file1,out_file2) and not _dryrun:
+                pu.print_green('Target files {}, {} already exist.'.format(out_file1,out_file2))
+                return out_file1,out_file2
             
-            if not _dryrun and not pu.check_files_exist(out_file1,out_file2):
-                print("Trimgalore failed")
-                return ("",)
-            return out_file1,out_file2
+            
+            #run trimgalore
+            status=self.run(*internal_args,objectid=objectid,target=[file1,file2],**internal_kwargs)
+            
+            if status:
+                #return rename the bam  file and return path
+                if not _dryrun:
+                    pe.move_file(file1,out_file1,verbose=False)
+                    pe.move_file(file2,out_file2,verbose=False)
+                    if not pu.check_files_exist(out_file1,out_file2):
+                        return ""
+                
+                return out_file1,out_file2
+            
+            return ("",)
+            
             
         else:
             fq=sra_object.localfastqPath
             internal_args=(fq,)
             internal_kwargs={"-o":out_dir,"--cores":_threads}
 
-            #target
-            out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
-            
-            #run trimgalore
-            self.run(*internal_args,objectid=objectid,target=out_file,**internal_kwargs)
             """
             running trim galore will create one file named <input>_trimmed.fq
             move these files to the specified out files
             """
-            oldFile=os.path.join(out_dir,pu.get_file_basename(fq)+"_trimmed.fq")
+            file=os.path.join(out_dir,pu.get_file_basename(fq)+"_trimmed.fq")
+            #target
+            out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
+            #check if final files already exists
+            if not _force and pu.check_files_exist(out_file) and not _dryrun:
+                pu.print_green('Target files {} already exist.'.format(out_file))
+                return (out_file,)
             
-            pe.move_file(oldFile,out_file)
+            #run trimgalore
+            status=self.run(*internal_args,objectid=objectid,target=file,**internal_kwargs)
+            if status:
+                #return rename the bam  file and return path
+                if not _dryrun:
+                    pe.move_file(file,out_file)
+                    if not pu.check_files_exist(out_file):
+                        return ""
+                
+                return (out_file1,)
             
-            if not _dryrun and not pu.check_files_exist(out_file):
-                print("Trimgalore failed")
-                return ("",)
-            
-            return (out_file,)
+            return ("",)
             
             
 
@@ -202,7 +220,9 @@ class BBmap(RNASeqQC):
                     return("",)
                 
             return(out_filePath,) 
-    
+        
+        
+    #TODO
     def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,objectid="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit

@@ -12,6 +12,7 @@ from pyrpipe import valid_args
 from pyrpipe import param_loader as pl
 from pyrpipe import _dryrun
 from pyrpipe import _threads
+from pyrpipe import _force
 from pyrpipe import _params_dir
 import os
 
@@ -196,15 +197,20 @@ class Kallisto(Quant):
         #targets
         outfile=os.path.join(out_dir,"abundance.tsv")
         newfile=os.path.join(out_dir,"abundance"+out_suffix+".tsv")
+        #check if final files already exists
+        if not _force and pu.check_files_exist(newfile) and not _dryrun:
+            pu.print_green('Target files {} already exist.'.format(newfile))
+            return newfile
         
         #call kallisto
-        status=self.run(*args,objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
+        status=self.run(*args,objectid=sra_object.srr_accession,target=outfile,**internal_kwargs)
         
         if status:
-            if not pu.check_files_exist(outfile) and not _dryrun:
-                return ""
-            #move
-            pe.move_file(outfile,newfile)
+            #return rename the bam  file and return path
+            if not _dryrun:
+                pe.move_file(outfile,newfile)
+                if not pu.check_files_exist(newfile):
+                    return ""            
             return newfile
         
         return ""
@@ -371,18 +377,24 @@ class Salmon(Quant):
         #targets
         outfile=os.path.join(out_dir,"quant.sf")
         newfile=os.path.join(out_dir,"quant"+out_suffix+".sf")
+        #check if final files already exists
+        if not _force and pu.check_files_exist(newfile) and not _dryrun:
+            pu.print_green('Target files {} already exist.'.format(newfile))
+            return newfile
+        
         #call salmon
         status=self.run(None,objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
         
         if status:
-            
-            if not pu.check_files_exist(outfile) and not _dryrun:
-                return ""
-            #move
-            pe.move_file(outfile,newfile)
+            #return rename the bam  file and return path
+            if not _dryrun:
+                pe.move_file(outfile,newfile)
+                if not pu.check_files_exist(newfile):
+                    return ""            
             return newfile
         
         return ""
+        
 
     def check_index(self):
         if hasattr(self,'index'):

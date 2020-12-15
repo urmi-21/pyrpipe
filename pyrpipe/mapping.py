@@ -15,6 +15,7 @@ from pyrpipe import valid_args
 from pyrpipe import param_loader as pl
 from pyrpipe import _dryrun
 from pyrpipe import _threads
+from pyrpipe import _force
 from pyrpipe import _params_dir
 
 
@@ -390,20 +391,24 @@ class Star(Aligner):
         internal_kwargs["--genomeDir"]=self.index
         
         #the expected out file
+        #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
+        #return sorted bam or unsorted bam which ever is present
         bam=os.path.join(out_dir,'Aligned.out.bam')
+        if 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
+                bam=os.path.join(out_dir,'Aligned.sortedByCoord.out.bam')
+        finalbam=bam.split('.bam')[0]+out_suffix+'.bam'
+        
+        #check if final bam already exists
+        if not _force and pu.check_files_exist(finalbam) and not _dryrun:
+            pu.print_green('Target files {} already exist.'.format(finalbam))
+            return finalbam
+            
         #call star
         status=self.run(None,objectid=sra_object.srr_accession,target=bam,**internal_kwargs)
                 
         
         if status:
             #return rename the bam  file and return path
-            #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
-            #return sorted bam or unsorted bam which ever is present
-            if 'SortedByCoordinate' in self._kwargs['--outSAMtype']:
-                bam=os.path.join(out_dir,'Aligned.sortedByCoord.out.bam')
-                
-            finalbam=bam.split('.bam')[0]+out_suffix+'.bam'
-            
             if not _dryrun:
                 pe.move_file(bam,finalbam)
                 if not pu.check_files_exist(finalbam):
