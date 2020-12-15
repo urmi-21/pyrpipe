@@ -102,13 +102,13 @@ install:
   - wget https://github.com/TransDecoder/TransDecoder/archive/TransDecoder-v5.5.0.tar.gz -O /tmp/txd
   - tar -xvzf /tmp/txd
   - export PATH=$PATH:$PWD/TransDecoder-TransDecoder-v5.5.0/
-  
+  #create conf
+  - echo '{"threads": "2","memory": null,"params_dir": "params","dry": false,"force": true,"safe": false,"logs_dir": "pyrpipe_logs","logging": true,"verbose": false}' > pyrpipe.conf
   
   
   
 # command to run tests
 script:
-  - echo '{"threads": "2","memory": null,"params_dir": "params","dry": false,"force": true,"safe": false,"logs_dir": "pyrpipe_logs","logging": true,"verbose": false}' > pyrpipe.conf
   - ls
   - travis_wait 60 coverage run -m pytest tests/
   #- coverage run -m pytest tests/
