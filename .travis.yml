@@ -103,7 +103,7 @@ install:
   - tar -xvzf /tmp/txd
   - export PATH=$PATH:$PWD/TransDecoder-TransDecoder-v5.5.0/
   #create conf
-  - echo '{"threads": "2","memory": null,"params_dir": "params","dry": false,"force": true,"safe": false,"logs_dir": "pyrpipe_logs","logging": true,"verbose": false}' > pyrpipe.conf
+  #- echo '{"threads": "2","memory": null,"params_dir": "params","dry": false,"force": true,"safe": false,"logs_dir": "pyrpipe_logs","logging": true,"verbose": false}' > pyrpipe.conf
   
   
   
