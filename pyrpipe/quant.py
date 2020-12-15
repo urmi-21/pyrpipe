@@ -74,8 +74,8 @@ class Kallisto(Quant):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
-                #set index 
-                self._kwargs['-i']=self.index
+        #set index 
+        self._kwargs['-i']=self.index
                 
             
     def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
@@ -255,8 +255,8 @@ class Salmon(Quant):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
-                #set index 
-                self._kwargs['-i']=self.index
+        #set index 
+        self._kwargs['-i']=self.index
             
     def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
         """

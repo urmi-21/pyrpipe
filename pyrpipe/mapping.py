@@ -71,8 +71,8 @@ class Hisat2(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.genome)
-                #set index 
-                self._kwargs['-x']=self.index
+        #set index 
+        self._kwargs['-x']=self.index
                 
 
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
@@ -259,8 +259,8 @@ class Star(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
-                #set index 
-                self._kwargs['--genomeDir']=self.index
+        #set index 
+        self._kwargs['--genomeDir']=self.index
     
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
         """Build a star index with given parameters and saves the new index to self.index.
@@ -464,8 +464,8 @@ class Bowtie2(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
-                #set index 
-                self._kwargs['-x']=self.index
+        #set index 
+        self._kwargs['-x']=self.index
             
         
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
