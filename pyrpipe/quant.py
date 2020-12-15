@@ -52,7 +52,7 @@ class Kallisto(Quant):
     
     def __init__(self,*args,index=None,transcriptome=None,**kwargs):
         super().__init__(*args,**kwargs)
-        self._command=['kallisto','quant']
+        self._command='kallisto'
         self._deps=['kallisto']
         self.index=index
         self.transcriptome=transcriptome
@@ -203,7 +203,7 @@ class Kallisto(Quant):
             return newfile
         
         #call kallisto
-        status=self.run(*args,objectid=sra_object.srr_accession,target=outfile,**internal_kwargs)
+        status=self.run(*args,subcommand='quant',objectid=sra_object.srr_accession,target=outfile,**internal_kwargs)
         
         if status:
             #return rename the bam  file and return path
@@ -234,7 +234,7 @@ class Salmon(Quant):
     """      
     def __init__(self,*args,index=None,transcriptome=None,**kwargs):  
         super().__init__(*args,**kwargs)
-        self._command=['salmon','quant']
+        self._command='salmon'
         self._deps=['salmon']
         self.index=index
         self.transcriptome=transcriptome
@@ -383,7 +383,7 @@ class Salmon(Quant):
             return newfile
         
         #call salmon
-        status=self.run(None,objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
+        status=self.run(None,subcommand='quant',objectid=sra_object.srr_accession,target=newfile,**internal_kwargs)
         
         if status:
             #return rename the bam  file and return path

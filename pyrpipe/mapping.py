@@ -19,6 +19,7 @@ from pyrpipe import _force
 from pyrpipe import _params_dir
 
 
+
 class Aligner(Runnable):
     """This is an abstract class for alignment programs.
     """
@@ -48,7 +49,7 @@ class Hisat2(Aligner):
     ----------
     
     """ 
-    def __init__(self,*args,index=None,genome=None,**kwargs):
+    def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='hisat2'
         self._deps=[self._command,'samtools']
@@ -58,6 +59,13 @@ class Hisat2(Aligner):
         self._valid_args=valid_args._args_HISAT2
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        
+        #check threads
+        if threads:
+            self._threads=str(threads)
+        else:
+            self._threads=str(_threads)
+        self._kwargs["-p"]=self._threads
         
         #check index flag in args
         if not index and '-x' in self._kwargs:
@@ -73,6 +81,7 @@ class Hisat2(Aligner):
                 self.build_index(self.index,self.genome)
         #set index 
         self._kwargs['-x']=self.index
+        print('HSXXX',self._kwargs)
                 
 
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
@@ -139,7 +148,7 @@ class Hisat2(Aligner):
                                   '--seed','-q','-h','--usage','--version']
         
         args=(genome,index_path)
-        internal_kwargs={"-p":_threads}
+        internal_kwargs={"-p":self._threads}
         #read build parameters
         yamlfile=os.path.join(_params_dir,'hisat2_index.yaml')
         if pu.check_files_exist(yamlfile):
@@ -209,9 +218,9 @@ class Hisat2(Aligner):
  
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
+            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile}
         else:
-            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"-p":_threads,"-x":self.index}
+            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile}
         
         #call run_hisat2
         status=self.run(None,objectid=sra_object.srr_accession,target=outSamFile,**internal_kwargs)
@@ -240,7 +249,7 @@ class Star(Aligner):
     Attributes
     ----------
     """ 
-    def __init__(self,*args,index=None,genome=None,**kwargs):
+    def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='STAR'
         self._deps=[self._command]
@@ -250,6 +259,13 @@ class Star(Aligner):
         self._valid_args=valid_args._args_STAR
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        
+        #check threads
+        if threads:
+            self._threads=str(threads)
+        else:
+            self._threads=str(_threads)
+        self._kwargs["--runThreadN"]=self._threads
                
         #check index flag in args
         if not index and '--genomeDir' in self._kwargs:
@@ -313,7 +329,7 @@ class Star(Aligner):
         
         #determine parameters and execute cmd
         #internal_args=()
-        internal_kwargs={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":genome,"--runThreadN":_threads}
+        internal_kwargs={"--runMode":"genomeGenerate","--genomeDir":index_path,"--genomeFastaFiles":genome,"--runThreadN":self._threads}
         
         #read build parameters
         yamlfile=os.path.join(_params_dir,'star_index.yaml')
@@ -390,9 +406,9 @@ class Star(Aligner):
         #add out dir
         internal_kwargs["--outFileNamePrefix"]=out_dir+"/"
         #threads
-        internal_kwargs["--runThreadN"]=_threads
+        #internal_kwargs["--runThreadN"]=_threads
         #add index
-        internal_kwargs["--genomeDir"]=self.index
+        #internal_kwargs["--genomeDir"]=self.index
         
         #the expected out file
         #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
@@ -447,7 +463,7 @@ class Bowtie2(Aligner):
        Attributes
        ----------
     """ 
-    def __init__(self,*args,index=None,genome=None,**kwargs):
+    def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
         """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
         """       
         super().__init__(*args,**kwargs)
@@ -459,6 +475,13 @@ class Bowtie2(Aligner):
         self._valid_args=valid_args._args_BOWTIE2
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        
+        #check threads
+        if threads:
+            self._threads=str(threads)
+        else:
+            self._threads=str(_threads)
+        self._kwargs["-p"]=self._threads
                
         #check index flag in args
         if not index and '-x' in self._kwargs:
@@ -616,9 +639,9 @@ class Bowtie2(Aligner):
         
         #find layout and fq file paths
         if sra_object.layout == 'PAIRED':
-            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile,"--threads":_threads,"-x":self.index}
+            internal_kwargs={"-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-S":outSamFile}
         else:
-            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile,"--threads":_threads,"-x":self.index}
+            internal_kwargs={"-U":sra_object.fastq_path,"-S":outSamFile}
         
         
         

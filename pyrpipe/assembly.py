@@ -14,6 +14,7 @@ from pyrpipe import _dryrun
 from pyrpipe import _threads
 from pyrpipe import _force
 
+
 class Assembly(Runnable):
     """This class represents an abstract parent class for all programs which can perfrom transcripts assembly.
     """
