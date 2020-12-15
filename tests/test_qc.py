@@ -7,9 +7,8 @@ Created on Sat Dec 28 01:18:25 2019
 """
 
 from pyrpipe import qc
-from pyrpipe import pyrpipe_utils as pu
 from testingEnvironment import testSpecs
-import os
+
 
 testVars=testSpecs()
 fq1=testVars.fq1
@@ -18,22 +17,23 @@ rRNAfasta=testVars.rRNAfa
     
 def test_RNASeqQC():
     ob=qc.RNASeqQC()
-    assert ob.category=="RNASeqQC", "RNASeqQC failed"
+    assert ob._category=="RNASeqQC", "RNASeqQC failed"
     
     
 def test_trimgalore():
-    tg=qc.Trimgalore(threads=4)
+    tg=qc.Trimgalore()
     
     #run tg
-    tgOpts={"--cores": "10", "-o":testVars.testDir, "--paired":"", "--": (fq1,fq2)}
+    args=(fq1,fq2)
+    kwargs={"--cores": "2", "-o":testVars.testDir, "--paired":""}
 	     #remove fastq files}
-    st=tg.run_trimgalore(**tgOpts)
+    st=tg.run(*args,**kwargs)
     assert st==True, "Trimgalore failed"
     
 def test_bbduk():
     bd=qc.BBmap()
     bdOpts={"in":fq1,"in2":fq2,"out":testVars.testDir+"/bdo1.fq","out2":testVars.testDir+"/bdo2.fq"}
-    st=bd.run_bbduk(**bdOpts)
+    st=bd.run(**bdOpts)
     assert st==True, "BBDUK failed"
     
 
