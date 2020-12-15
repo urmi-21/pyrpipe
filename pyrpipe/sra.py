@@ -653,7 +653,7 @@ class SRA:
         
         #determine threads if not specified
         if '-e' not in kwargs:
-            kwargs['-e']=str(self.threads)
+            kwargs['-e']=_threads
         #execute command
         
         fstrqd_Cmd=['fasterq-dump']

@@ -136,7 +136,7 @@ class Conf:
         self._dry = False
         self._safe = False
         #roughly 80% of available cpu cores
-        self._threads=max(int(multiprocessing.cpu_count()*.8),1)
+        self._threads=max(int(multiprocessing.cpu_count()*.5),1)
         self._force=False
         self._params_dir='params'
         #roughly 80% of available memory
