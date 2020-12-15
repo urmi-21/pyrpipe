@@ -166,7 +166,7 @@ class SRA:
         
         #internal_args are created by pyrpipe and will always replace external passed args
         #add the positional args
-        if self.sraFileExistsLocally():
+        if self.sra_exists():
             #fstrqd_Cmd.append(self.sra_path)
             internal_args=(self.sra_path,)
         else:
@@ -251,7 +251,7 @@ class SRA:
         
         
         
-    def sraFileExistsLocally(self):
+    def sra_exists(self):
         """Function to check if sra file is present on disk
         """
         if hasattr(self,'sra_path') and self.sra_path:
@@ -628,7 +628,7 @@ class SRA:
             return True
         
         #first check is sra exists only if not a dry run
-        if not self.sraFileExistsLocally() and not _dryrun:
+        if not self.sra_exists() and not _dryrun:
             pu.print_boldred("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
             return False
         #else directly run fasterq-dump on accession ?

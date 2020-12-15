@@ -18,10 +18,11 @@ def test_sra():
     newOb=sra.SRA(srrID,testDir+"/testsra")
     assert newOb.srr_accession==srrID,"Failed SRA init"
     assert newOb.download_sra()==True, "Failed to download SRA file"
-    assert newOb.sraFileExistsLocally()==True, "Failed to locate .sra file on disk"
+    assert newOb.sra_exists()==True, "Failed to locate .sra file on disk"
     ##test fasterq-dump
     assert newOb.run_fasterqdump(delete_sra=True,**{"-f":"","-t":testDir})==True, "Failed FQ dump"
-    assert newOb.fastqFilesExistsLocally()==True, "Failed to locate .fastq files on disk"
-    assert newOb.sraFileExistsLocally()!=True, "Failed to delete .sra files from disk"
+    assert newOb.fastq_exists()==True, "Failed to locate .fastq files on disk"
+    assert newOb.delete_sra()==True, "Failed to delete .sra files from disk"    
+    assert newOb.sra_exists()==False, "Deleted SRA file exists. "
     #delete downloaded files
     assert newOb.delete_fastq()==True, "Failed to delete .fastq files from disk"
