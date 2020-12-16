@@ -79,7 +79,12 @@ class Runnable:
             if not self.verify_target(target,verbose):
                 return False
         return True
-            
+    
+    def get_valid_parameters(self,subcommand):
+        if subcommand:
+            return self._valid_args[subcommand]
+        return self._valid_args
+        pass
         
     def run(self,*args, subcommand=None, target=None, objectid=None, **kwargs):
         
@@ -120,8 +125,6 @@ class Runnable:
                 subcommand=[subcommand]
             #add to command
             cmd.extend(subcommand)
-        
-        
             
             
         #parse and add parameters
