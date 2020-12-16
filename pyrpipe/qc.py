@@ -45,7 +45,7 @@ class Trimgalore(RNASeqQC):
         self._param_yaml='trim_galore.yaml'
         self._valid_args=valid_args._args_TRIM_GALORE
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("--cores",threads,_threads,'_threads')
             
@@ -170,7 +170,7 @@ class BBmap(RNASeqQC):
         self._param_yaml='bbmap.yaml'
         self._valid_args=valid_args._args_BBDUK
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("threads",threads,_threads,'_threads')
             

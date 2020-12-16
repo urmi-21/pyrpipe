@@ -21,7 +21,7 @@ class Runnable:
         self._command=None
         self._deps=None
         self._param_yaml=None
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         self._args_style='LINUX'
         #valid_args can be None or a list, or a dict if subcommands are used
         self._valid_args=None
@@ -44,7 +44,7 @@ class Runnable:
             if not pe.check_dependencies(self._deps):
                 raise Exception("ERROR. Please check dependencies for {}. Deps: {}".format(self._command," ".join(self._deps)))    
         
-    def init_parameters(self,*args,**kwargs):
+    def load_yaml(self,*args,**kwargs):
         #init the parameters for the object
         if args:
             self._args=args

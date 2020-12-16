@@ -59,7 +59,7 @@ class Hisat2(Aligner):
         self._param_yaml='hisat2.yaml'
         self._valid_args=valid_args._args_HISAT2
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
@@ -253,10 +253,9 @@ class Star(Aligner):
         self._param_yaml='star.yaml'
         self._valid_args=valid_args._args_STAR
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("--runThreadN",threads,_threads,'_threads')
-        
         #resolve index to use
         self.resolve_parameter("--genomeDir",index,index,'index')
             
@@ -459,7 +458,7 @@ class Bowtie2(Aligner):
         self._param_yaml='bowtie2.yaml'
         self._valid_args=valid_args._args_BOWTIE2
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
         #resolve index to use

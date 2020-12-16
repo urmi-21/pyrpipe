@@ -38,7 +38,7 @@ class Samtools(RNASeqTools):
         self._param_yaml='samtools.yaml'
         self._valid_args=valid_args._args_SAMTOOLS
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)
+        self.load_yaml(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("-@",threads,_threads,'_threads')
 

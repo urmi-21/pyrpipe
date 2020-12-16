@@ -21,7 +21,7 @@ def test_kallisto():
     assert kl.check_index()==True, "Failed kallisto build_index"
     args=(testVars.fq1,testVars.fq2)
     opts={"-o":testVars.testDir+"/kalOut"}
-    st=kl.run(*args,**opts)
+    st=kl.run(*args,subcommand='quant',target='tests/testout/kalOut/abundance.tsv',**opts)
     assert st==True, "Failed to run kallisto"
     
     
@@ -34,7 +34,7 @@ def test_salmon():
           "-1":testVars.fq1,
           "-2":testVars.fq2}
     
-    st=sl.run(**opts)
+    st=sl.run(subcommand='quant',target='tests/testout/salOut/quant.sf',**opts)
     assert st==True, "Failed to run salmon"
     
     

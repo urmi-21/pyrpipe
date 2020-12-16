@@ -59,7 +59,7 @@ class Kallisto(Quant):
         self._param_yaml='kallisto.yaml'
         self._valid_args=valid_args._args_KALLISTO
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)    
+        self.load_yaml(*args,**kwargs)    
         #resolve threads to use
         self.resolve_parameter("--threads",threads,_threads,'_threads')
         #resolve index to use
@@ -239,7 +239,7 @@ class Salmon(Quant):
         self._param_yaml='salmon.yaml'
         self._valid_args=valid_args._args_SALMON
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)       
+        self.load_yaml(*args,**kwargs)       
         #resolve threads to use
         self.resolve_parameter("--threads",threads,_threads,'_threads')
         #resolve index to use
