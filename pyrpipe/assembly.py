@@ -42,7 +42,7 @@ class Stringtie(Assembly):
         threads: int
             number of threads
         """
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,threads=None,guide=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='stringtie'
         self._deps=[self._command]
@@ -50,6 +50,10 @@ class Stringtie(Assembly):
         self._valid_args=valid_args._args_STRINGTIE
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        #resolve threads to use
+        self.resolve_parameter("-p",threads,_threads,'_threads')
+        self.resolve_parameter("-G",guide,None,'_guide')
+        
 
                          
     def perform_assembly(self,bam_file,out_dir=None,out_suffix="_stringtie",objectid="NA"):
@@ -95,7 +99,7 @@ class Stringtie(Assembly):
 
         #Add output file name and input bam
         internal_args=(bam_file,)
-        internal_kwargs={"-o":out_gtf_file,"-p":_threads}
+        internal_kwargs={"-o":out_gtf_file}
         #add positional args
         internal_kwargs['--']=internal_args
 
@@ -117,7 +121,7 @@ class Cufflinks(Assembly):
     threads: int
             Number of threads to use
     """
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,threads=None,guide=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='cufflinks'
         self._deps=[self._command]
@@ -125,6 +129,9 @@ class Cufflinks(Assembly):
         self._valid_args=valid_args._args_CUFFLINKS
         self.check_dependency()
         self.init_parameters(*args,**kwargs)    
+        #resolve threads to use
+        self.resolve_parameter("-p",threads,_threads,'_threads')
+        self.resolve_parameter("-G",guide,None,'_guide')
     
     def perform_assembly(self,bam_file,out_dir=None,out_suffix="_cufflinks",objectid="NA"):
         """Function to run cufflinks with BAM file as input.
@@ -169,7 +176,7 @@ class Cufflinks(Assembly):
             
         #Add output file name and input bam
         internal_args=(bam_file,)
-        internal_kwargs={"-o":out_dir,"-p":_threads}
+        internal_kwargs={"-o":out_dir}
         #add positional args
         internal_kwargs['--']=internal_args
         

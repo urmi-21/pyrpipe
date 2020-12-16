@@ -43,6 +43,7 @@ class Aligner(Runnable):
         """
         pass
 
+
 class Hisat2(Aligner):
     """
     Attributes
@@ -60,16 +61,10 @@ class Hisat2(Aligner):
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
         
-        #check threads
-        if threads:
-            self._threads=str(threads)
-        else:
-            self._threads=str(_threads)
-        self._kwargs["-p"]=self._threads
-        
-        #check index flag in args
-        if not index and '-x' in self._kwargs:
-            self.index=self._kwargs['-x']
+        #resolve threads to use
+        self.resolve_parameter("-p",threads,_threads,'_threads')
+        #resolve index to use
+        self.resolve_parameter("-x",index,index,'index')
         
         #check index
         if not self.check_index():
@@ -79,9 +74,9 @@ class Hisat2(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.genome)
-        #set index 
-        self._kwargs['-x']=self.index
-        print('HSXXX',self._kwargs)
+                #set index 
+                #self._kwargs['-x']=self.index
+        
                 
 
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
@@ -259,17 +254,10 @@ class Star(Aligner):
         self._valid_args=valid_args._args_STAR
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
-        
-        #check threads
-        if threads:
-            self._threads=str(threads)
-        else:
-            self._threads=str(_threads)
-        self._kwargs["--runThreadN"]=self._threads
-               
-        #check index flag in args
-        if not index and '--genomeDir' in self._kwargs:
-            self.index=self._kwargs['--genomeDir']
+        #resolve threads to use
+        self.resolve_parameter("--runThreadN",threads,_threads,'_threads')
+        #resolve index to use
+        self.resolve_parameter("--genomeDir",index,index,'index')
             
         #check index
         if not pu.check_starindex(index):
@@ -279,8 +267,7 @@ class Star(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
-        #set index 
-        self._kwargs['--genomeDir']=self.index
+
     
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
         """Build a star index with given parameters and saves the new index to self.index.
@@ -405,10 +392,7 @@ class Star(Aligner):
             internal_kwargs={"--readFilesIn":sra_object.fastq_path}
         #add out dir
         internal_kwargs["--outFileNamePrefix"]=out_dir+"/"
-        #threads
-        #internal_kwargs["--runThreadN"]=_threads
-        #add index
-        #internal_kwargs["--genomeDir"]=self.index
+       
         
         #the expected out file
         #star can return Aligned.sortedByCoord.out.bam Aligned.out.bam Aligned.toTranscriptome.out.bam  
@@ -475,17 +459,10 @@ class Bowtie2(Aligner):
         self._valid_args=valid_args._args_BOWTIE2
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
-        
-        #check threads
-        if threads:
-            self._threads=str(threads)
-        else:
-            self._threads=str(_threads)
-        self._kwargs["-p"]=self._threads
-               
-        #check index flag in args
-        if not index and '-x' in self._kwargs:
-            self.index=self._kwargs['-x']
+        #resolve threads to use
+        self.resolve_parameter("-p",threads,_threads,'_threads')
+        #resolve index to use
+        self.resolve_parameter("-x",index,index,'index')
         
         #if index is passed, update the passed arguments
         if not pu.check_bowtie2index(index):
@@ -495,8 +472,6 @@ class Bowtie2(Aligner):
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
-        #set index 
-        self._kwargs['-x']=self.index
             
         
     def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
@@ -559,7 +534,7 @@ class Bowtie2(Aligner):
                 return False
         
         args=(genome,index_path)
-        internal_kwargs={"--threads":_threads}
+        internal_kwargs={"--threads":self._threads}
         
         #read build parameters
         yamlfile=os.path.join(_params_dir,'bowtie2_index.yaml')

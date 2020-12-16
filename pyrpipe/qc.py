@@ -37,7 +37,7 @@ class Trimgalore(RNASeqQC):
         kwargs:
             trim_galore arguments.
     """
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,threads=None,**kwargs):
         #run super to inherit parent class properties
         super().__init__(*args,**kwargs)
         self._command='trim_galore'
@@ -46,6 +46,8 @@ class Trimgalore(RNASeqQC):
         self._valid_args=valid_args._args_TRIM_GALORE
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        #resolve threads to use
+        self.resolve_parameter("--cores",threads,_threads,'_threads')
             
     def perform_qc(self,sra_object,out_dir="",out_suffix="_trimgalore",objectid="NA"):
         """Function to perform qc using trimgalore.
@@ -87,7 +89,7 @@ class Trimgalore(RNASeqQC):
             fq1=sra_object.fastq_path
             fq2=sra_object.fastq2_path
             internal_args=(fq1,fq2)
-            internal_kwargs={"--paired":"","-o":out_dir,"--cores":_threads}
+            internal_kwargs={"--paired":"","-o":out_dir}
             
             
             """
@@ -125,7 +127,7 @@ class Trimgalore(RNASeqQC):
         else:
             fq=sra_object.localfastqPath
             internal_args=(fq,)
-            internal_kwargs={"-o":out_dir,"--cores":_threads}
+            internal_kwargs={"-o":out_dir}
 
             """
             running trim galore will create one file named <input>_trimmed.fq
@@ -157,7 +159,7 @@ class Trimgalore(RNASeqQC):
 class BBmap(RNASeqQC):
     """This class represents bbmap programs
     """
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,threads=None,**kwargs):
         """
         """
         #run super to inherit parent class properties
@@ -169,6 +171,8 @@ class BBmap(RNASeqQC):
         self._valid_args=valid_args._args_BBDUK
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
+        #resolve threads to use
+        self.resolve_parameter("threads",threads,_threads,'_threads')
             
             
     def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",objectid="NA"):
@@ -194,7 +198,7 @@ class BBmap(RNASeqQC):
             out_file2Path=os.path.join(out_dir,out_fileName2)
             
             internal_args=()
-            internal_kwargs={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path,"threads":_threads}
+            internal_kwargs={"in":fq1,"in2":fq2,"out":out_file1Path,"out2":out_file2Path}
                         
             #run bbduk
             status=self.run(*internal_args,objectid=objectid,target=[out_file1Path,out_file2Path],**internal_kwargs)
@@ -211,7 +215,7 @@ class BBmap(RNASeqQC):
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
             out_filePath=os.path.join(out_dir,out_fileName)
             internal_args=()
-            internal_kwargs={"in":fq,"out":out_filePath,"threads":_threads}
+            internal_kwargs={"in":fq,"out":out_filePath}
             
             #run bbduk
             status=self.run(*internal_args,objectid=objectid,target=out_filePath,**internal_kwargs)

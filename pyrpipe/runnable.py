@@ -25,6 +25,19 @@ class Runnable:
         self._args_style='LINUX'
         #valid_args can be None or a list, or a dict if subcommands are used
         self._valid_args=None
+        
+    
+    def resolve_parameter(self,parameter_key,passed_value,default_value,parameter_variable):
+        #First check the passed value; then the passed **kwargs
+        #None values will be ignored
+        if passed_value:
+            setattr(self, parameter_variable, str(passed_value))
+            self._kwargs[parameter_key]=str(passed_value)
+        elif parameter_key in self._kwargs and self._kwargs[parameter_key]:
+            setattr(self, parameter_variable, self._kwargs[parameter_key])
+        elif default_value:
+            setattr(self, parameter_variable, str(default_value))
+            self._kwargs[parameter_key]=str(default_value)
          
     def check_dependency(self):
         if self._deps:

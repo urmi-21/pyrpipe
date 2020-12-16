@@ -31,7 +31,7 @@ class Samtools(RNASeqTools):
         Max memory to use in GB
     
     """
-    def __init__(self,*args,**kwargs):
+    def __init__(self,*args,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='samtools'
         self._deps=[self._command]
@@ -39,7 +39,8 @@ class Samtools(RNASeqTools):
         self._valid_args=valid_args._args_SAMTOOLS
         self.check_dependency()
         self.init_parameters(*args,**kwargs)
-        
+        #resolve threads to use
+        self.resolve_parameter("-@",threads,_threads,'_threads')
 
     def sam_to_bam(self,sam_file,out_dir=None,out_suffix=None, delete_sam=False,objectid=None):
         """Convert sam file to a bam file. 
@@ -81,7 +82,7 @@ class Samtools(RNASeqTools):
         #target: output will be out_bam
         out_bam=os.path.join(out_dir,fname+out_suffix+'.bam')
         internal_args=(sam_file,)
-        internal_kwargs={"-o":out_bam,"-@":_threads,"-b":""}
+        internal_kwargs={"-o":out_bam,"-b":""}
         
         
         status=self.run(*internal_args,subcommand="view",target=out_bam,objectid=objectid,**internal_kwargs)
@@ -143,7 +144,7 @@ class Samtools(RNASeqTools):
         
         internal_args=(bam_file,)
         
-        internal_kwargs={"-o":outSortedbam_file,"-@":_threads}
+        internal_kwargs={"-o":outSortedbam_file}
         
         
         status=self.run(*internal_args,subcommand="sort",target=outSortedbam_file,objectid=objectid,**internal_kwargs)
@@ -247,7 +248,7 @@ class Samtools(RNASeqTools):
         outMergedFile=os.path.join(out_dir,out_file+".bam")
         
         internal_args=(outMergedFile,)+tuple(bam_list)        
-        internal_kwargs={"-@":_threads}
+        internal_kwargs={}
         
         
         status=self.run(*internal_args,subcommand="merge",target=outMergedFile,objectid=objectid,**internal_kwargs)

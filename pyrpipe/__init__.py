@@ -136,7 +136,7 @@ class Conf:
         self._dry = False
         self._safe = False
         #roughly 80% of available cpu cores
-        self._threads=max(int(multiprocessing.cpu_count()*.5),1)
+        self._threads=max(int(multiprocessing.cpu_count()*0.8),1)
         self._force=False
         self._params_dir='params'
         #roughly 80% of available memory
@@ -160,7 +160,7 @@ class Conf:
             self._safe = data['safe']
             #check valid threads and mem
             if not self._threads or not self._threads.replace('.','',1).isdigit():
-                self._threads=max(int(multiprocessing.cpu_count()*.8),1)
+                self._threads=max(int(multiprocessing.cpu_count()*0.8),1)
             if not self._memory or not self._memory.replace('.','',1).isdigit():
                 self._memory=psutil.virtual_memory()[0]/1000000000*0.8
                 

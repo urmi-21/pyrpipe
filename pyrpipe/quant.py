@@ -20,7 +20,7 @@ import os
 class Quant(Runnable):
     """This is an abstract class for quantification programs.
     """
-    def __init__(self,*args,index=None,transcriptome=None,**kwargs):
+    def __init__(self,*args,index=None,transcriptome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._category="Quantification"
         self._command=None
@@ -50,7 +50,7 @@ class Kallisto(Quant):
         num threads to use
     """
     
-    def __init__(self,*args,index=None,transcriptome=None,**kwargs):
+    def __init__(self,*args,index=None,transcriptome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='kallisto'
         self._deps=['kallisto']
@@ -59,11 +59,11 @@ class Kallisto(Quant):
         self._param_yaml='kallisto.yaml'
         self._valid_args=valid_args._args_KALLISTO
         self.check_dependency()
-        self.init_parameters(*args,**kwargs)        
-        
-        #check index flag in args
-        if not index and '-i' in self._kwargs:
-            self.index=self._kwargs['-i']
+        self.init_parameters(*args,**kwargs)    
+        #resolve threads to use
+        self.resolve_parameter("--threads",threads,_threads,'_threads')
+        #resolve index to use
+        self.resolve_parameter("-i",index,index,'index')
             
         #check index
         #kallisto index is a single file
@@ -74,8 +74,6 @@ class Kallisto(Quant):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
-        #set index 
-        self._kwargs['-i']=self.index
                 
             
     def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
@@ -188,10 +186,10 @@ class Kallisto(Quant):
         
         if sra_object.layout == 'PAIRED':
             args=(sra_object.fastq_path,sra_object.fastq2_path)
-            internal_kwargs={"--threads":_threads,"-o":out_dir,"-i":self.index}
+            internal_kwargs={"-o":out_dir,"-i":self.index}
         else:
             args=(sra_object.fastq_path,)
-            internal_kwargs={"--threads":_threads,"-o":out_dir,"--single":"","-i":self.index}
+            internal_kwargs={"-o":out_dir,"--single":"","-i":self.index}
             
         
         #targets
@@ -232,7 +230,7 @@ class Salmon(Quant):
     threads: int
         Number of threads
     """      
-    def __init__(self,*args,index=None,transcriptome=None,**kwargs):  
+    def __init__(self,*args,index=None,transcriptome=None,threads=None,**kwargs):  
         super().__init__(*args,**kwargs)
         self._command='salmon'
         self._deps=['salmon']
@@ -242,11 +240,11 @@ class Salmon(Quant):
         self._valid_args=valid_args._args_SALMON
         self.check_dependency()
         self.init_parameters(*args,**kwargs)       
-       
+        #resolve threads to use
+        self.resolve_parameter("--threads",threads,_threads,'_threads')
+        #resolve index to use
+        self.resolve_parameter("-i",index,index,'index')
                
-        #check index flag in args
-        if not index and '-i' in self._kwargs:
-            self.index=self._kwargs['-i']
         #check index
         if not pu.check_salmonindex(index):
             if not (pu.check_files_exist(self.transcriptome)):
@@ -255,8 +253,7 @@ class Salmon(Quant):
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
-        #set index 
-        self._kwargs['-i']=self.index
+
             
     def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
         """
@@ -370,9 +367,9 @@ class Salmon(Quant):
         
         
         if sra_object.layout == 'PAIRED':
-            internal_kwargs={"--threads":_threads,"-o":out_dir,"-l":"A","-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-i":self.index}
+            internal_kwargs={"-o":out_dir,"-l":"A","-1":sra_object.fastq_path,"-2":sra_object.fastq2_path,"-i":self.index}
         else:
-            internal_kwargs={"--threads":_threads,"-o":out_dir,"-l":"A","-r":sra_object.fastq_path,"-i":self.index}
+            internal_kwargs={"-o":out_dir,"-l":"A","-r":sra_object.fastq_path,"-i":self.index}
         
         #targets
         outfile=os.path.join(out_dir,"quant.sf")
