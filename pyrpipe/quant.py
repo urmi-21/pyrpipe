@@ -53,7 +53,6 @@ class Kallisto(Quant):
     def __init__(self,*args,index=None,transcriptome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._command='kallisto'
-        self._deps=['kallisto']
         self.index=index
         self.transcriptome=transcriptome
         self._param_yaml='kallisto.yaml'
@@ -233,7 +232,6 @@ class Salmon(Quant):
     def __init__(self,*args,index=None,transcriptome=None,threads=None,**kwargs):  
         super().__init__(*args,**kwargs)
         self._command='salmon'
-        self._deps=['salmon']
         self.index=index
         self.transcriptome=transcriptome
         self._param_yaml='salmon.yaml'

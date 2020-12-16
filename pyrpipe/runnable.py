@@ -12,6 +12,7 @@ from pyrpipe import param_loader as pl
 from pyrpipe import _params_dir
 from pyrpipe import _dryrun
 from pyrpipe import _force
+import tempfile 
 
 class Runnable:
     """The runnable class
@@ -102,13 +103,32 @@ class Runnable:
             yaml_params=pl.YAML_loader(yamlfile)
             yaml_kwargs=yaml_params.get_kwargs()
             self._kwargs={**yaml_kwargs,**self._kwargs}
-
+            
+            
+    def verify_integrity(self,target,verbose=False):
+        #check if lock exists
+        filepath=pu.get_file_directory(target)
+        filename=pu.get_filename(target)
+        pre='.*'
+        suff='.*\.Lock$'
+        pattern=pre+filename+suff
+        lock_files=pu.find_files(filepath,pattern)
+        if len(lock_files) >0:
+            #remove the target and locks
+            if pu.check_files_exist(target):
+                pu.print_notification("Found incomplete target {}. Restarting command...".format(target))
+                self.remove_locks(lock_files+[target])
+            else: self.remove_locks(lock_files)
+        
+        return True
             
     def verify_target(self,target,verbose=False):
-        if not pu.check_files_exist(target) and not _dryrun:
+        if not pu.check_files_exist(target):
             if verbose: pu.print_boldred("Error: target {} not found".format(target))
             return False
         return True
+        
+        
     
     def verify_target_list(self,target_list,verbose=False):
         #nothing to verify
@@ -119,6 +139,26 @@ class Runnable:
                 return False
         return True
     
+    def check_locked_files(self,target):
+        pass
+    
+    def create_lock(self,target_list):
+        templist=[]
+        for f in target_list:
+            temp_path=pu.get_file_directory(f)
+            if not pu.check_paths_exist(temp_path): pu.mkdir(temp_path)
+            prefix=pu.get_filename(f)+'_'
+            temp = tempfile.NamedTemporaryFile(prefix=prefix,suffix='.Lock', dir=temp_path,delete=False)
+
+            templist.append(temp.name)
+        return templist
+    
+    def remove_locks(self,file_list):
+        for f in file_list:
+            os.remove(f)
+            
+            
+    
     def get_valid_parameters(self,subcommand):
         if subcommand:
             return self._valid_args[subcommand]
@@ -128,18 +168,29 @@ class Runnable:
     def run(self,*args, subcommand=None, target=None, objectid=None, **kwargs):
         
         #create target list
-        target_list=None
+        target_list=[]
+        locks=[]
+        
         if isinstance(target, str):
             target_list=[target]
         elif isinstance(target, list):
             target_list=target
         
-        #if target already and not overwrite exists then return
-        if not _force and not _dryrun and target_list:
+        #ckeck for locks and remove previous locks and associated targets if exist
+        for target in target_list:
+            self.verify_integrity(target)        
+        
+        #if target already present and not overwrite exists then return
+        if not _force and target_list:
             if self.verify_target_list(target_list):
                 pu.print_green('Target files {} already exist.'.format(', '.join(target_list)))
                 return True
             
+        #create locks on target; locks indicate incomplete commands
+        if not _dryrun: locks=self.create_lock(target_list)
+        #raise Exception("EXXX")    
+        
+        
         
         #override class kwargs by passed kwargs
         kwargs={**self._kwargs,**kwargs}
@@ -181,11 +232,21 @@ class Runnable:
             
         #execute command
         cmd_status=pe.execute_command(cmd,objectid=objectid)
+        
+        # if command finished remove locks
+        self.remove_locks(locks)
+        
         if not cmd_status:
             pu.print_boldred("{} failed: {}".format(self._command," ".join(cmd)))
+            #remove target files
+            if not _dryrun and target_list:
+                pu.print_boldred("Removing target files {}: ".format(', '.join(target_list)))
+                pe.delete_files(*target_list)
+            return False
      
-        if cmd_status and target_list:
+        
+        if cmd_status and target_list and not _dryrun:
             return self.verify_target_list(target_list,verbose=True)
-        else:
-            #return status
-            return cmd_status
+        
+        #return status
+        return cmd_status
