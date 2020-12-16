@@ -23,7 +23,7 @@ from pyrpipe import _params_dir
 class Aligner(Runnable):
     """This is an abstract class for alignment programs.
     """
-    def __init__(self,*args,index=None,genome=None,**kwargs):
+    def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
         super().__init__(*args,**kwargs)
         self._category="Aligner"
         self._command=None
@@ -57,9 +57,7 @@ class Hisat2(Aligner):
         self.index=index
         self.genome=genome
         self._param_yaml='hisat2.yaml'
-        self._valid_args=valid_args._args_HISAT2
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+        self._valid_args=valid_args._args_HISAT2       
         
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
@@ -79,7 +77,7 @@ class Hisat2(Aligner):
         
                 
 
-    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
+    def build_index(self,index_path,genome,objectid="NA"):
         """Build a hisat index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -118,7 +116,7 @@ class Hisat2(Aligner):
         """
         
         #if index already exists then exit
-        if not overwrite:
+        if not _force:
             #check if files exists
             if pu.check_hisatindex(index_path):
                 pu.print_green("Hisat2 index {} already exists.".format(index_path))
@@ -252,8 +250,7 @@ class Star(Aligner):
         self.genome=genome
         self._param_yaml='star.yaml'
         self._valid_args=valid_args._args_STAR
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+        
         #resolve threads to use
         self.resolve_parameter("--runThreadN",threads,_threads,'_threads')
         #resolve index to use
@@ -269,7 +266,7 @@ class Star(Aligner):
                 self.build_index(index,self.genome)
 
     
-    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
+    def build_index(self,index_path,genome,objectid="NA"):
         """Build a star index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -295,7 +292,7 @@ class Star(Aligner):
         """
         
         #if index already exists then exit
-        if not overwrite:
+        if not _force:
             if pu.check_starindex(index_path):
                 pu.print_green("STAR index {} already exists.".format(index_path))
                 self.index=index_path
@@ -457,8 +454,8 @@ class Bowtie2(Aligner):
         self.genome=genome
         self._param_yaml='bowtie2.yaml'
         self._valid_args=valid_args._args_BOWTIE2
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+        
+        
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
         #resolve index to use
@@ -474,7 +471,7 @@ class Bowtie2(Aligner):
                 self.build_index(index,self.genome)
             
         
-    def build_index(self,index_path,genome,overwrite=False,objectid="NA"):
+    def build_index(self,index_path,genome,objectid="NA"):
         """Build a bowtie2 index with given parameters and saves the new index to self.index.
         
         Parameters
@@ -508,7 +505,7 @@ class Bowtie2(Aligner):
         """
         
         #check input references
-        if not overwrite:
+        if not _force:
             if pu.check_bowtie2index(index_path):
                 pu.print_green("bowtie index {} already exists.".format(index_path))
                 self.index=index_path

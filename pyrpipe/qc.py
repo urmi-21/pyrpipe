@@ -15,6 +15,7 @@ from pyrpipe import _threads
 from pyrpipe import _force
 
 
+
 class RNASeqQC(Runnable):
     """This is an abstract parent class for fastq quality control programs.
     """
@@ -44,8 +45,7 @@ class Trimgalore(RNASeqQC):
         self._deps=[self._command,'cutadapt']
         self._param_yaml='trim_galore.yaml'
         self._valid_args=valid_args._args_TRIM_GALORE
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+                
         #resolve threads to use
         self.resolve_parameter("--cores",threads,_threads,'_threads')
             
@@ -159,7 +159,7 @@ class Trimgalore(RNASeqQC):
 class BBmap(RNASeqQC):
     """This class represents bbmap programs
     """
-    def __init__(self,*args,threads=None,**kwargs):
+    def __init__(self,*args,threads=None,memory=None,**kwargs):
         """
         """
         #run super to inherit parent class properties
@@ -169,11 +169,18 @@ class BBmap(RNASeqQC):
         self._deps=[self._command]
         self._param_yaml='bbmap.yaml'
         self._valid_args=valid_args._args_BBDUK
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+        
+        
         #resolve threads to use
         self.resolve_parameter("threads",threads,_threads,'_threads')
-            
+        #handle memory
+        if memory:
+            memoryflag='-Xmx'+str(memory)+'g'
+            #add java flags ar args
+            if self._args and self._args[0]:
+                self._args=self._args+(memoryflag,)
+            else:
+                self._args=(memoryflag,)
             
     def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",objectid="NA"):
         """Run bbduk on fastq files specified by the sra_object
@@ -227,7 +234,7 @@ class BBmap(RNASeqQC):
         
         
     #TODO
-    def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",overwrite=True,objectid="NA",**kwargs):
+    def perform_cleaning(self,sra_object,bbsplit_index,out_dir="",out_suffix="_bbsplit",objectid="NA",**kwargs):
         """
         Remove contaminated reads mapping to given reference using bbsplit
         

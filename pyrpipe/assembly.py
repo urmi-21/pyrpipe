@@ -48,8 +48,7 @@ class Stringtie(Assembly):
         self._deps=[self._command]
         self._param_yaml='stringtie.yaml'
         self._valid_args=valid_args._args_STRINGTIE
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)
+        
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
         self.resolve_parameter("-G",guide,None,'_guide')
@@ -127,8 +126,8 @@ class Cufflinks(Assembly):
         self._deps=[self._command]
         self._param_yaml='cufflinks.yaml'
         self._valid_args=valid_args._args_CUFFLINKS
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)    
+        
+            
         #resolve threads to use
         self.resolve_parameter("-p",threads,_threads,'_threads')
         self.resolve_parameter("-G",guide,None,'_guide')

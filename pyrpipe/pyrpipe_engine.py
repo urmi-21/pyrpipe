@@ -389,7 +389,7 @@ def check_dependencies(dependencies):
     """
     for tool in dependencies:
         if not which(tool):
-            pu.print_boldred('ERROR. {} not found in path.'.format(tool))
+            pu.print_boldred("ERROR. {} command not found".format(tool))
             return False
     return True
 

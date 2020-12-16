@@ -21,10 +21,46 @@ class Runnable:
         self._command=None
         self._deps=None
         self._param_yaml=None
-        self.load_yaml(*args,**kwargs)
         self._args_style='LINUX'
         #valid_args can be None or a list, or a dict if subcommands are used
         self._valid_args=None
+        self.load_args(*args,**kwargs)
+        self.load_yaml()
+    
+            
+    
+    @property
+    def _param_yaml(self):
+        return self.__param_yaml
+    @_param_yaml.setter
+    def _param_yaml(self,value):
+        self.__param_yaml=value
+        self.load_yaml()
+        
+            
+            
+    @property
+    def _deps(self):
+        return self.__deps
+    @_deps.setter
+    def _deps(self,dep_list):
+        #validate command exists
+        if dep_list and self.check_dependency(dep_list):
+            self.__deps=dep_list
+     
+        
+    @property
+    def _command(self):
+        return self.__command
+    @_command.setter
+    def _command(self,value):
+        #if already exists
+        if hasattr(self,'_command') and self._command:
+            raise Exception("Can not modify _command")
+        
+        #validate command exists
+        if value and self.check_dependency([value]):
+            self.__command=value        
         
     
     def resolve_parameter(self,parameter_key,passed_value,default_value,parameter_variable):
@@ -39,12 +75,13 @@ class Runnable:
             setattr(self, parameter_variable, str(default_value))
             self._kwargs[parameter_key]=str(default_value)
          
-    def check_dependency(self):
-        if self._deps:
-            if not pe.check_dependencies(self._deps):
-                raise Exception("ERROR. Please check dependencies for {}. Deps: {}".format(self._command," ".join(self._deps)))    
-        
-    def load_yaml(self,*args,**kwargs):
+    def check_dependency(self,deps_list):
+            if deps_list and not pe.check_dependencies(deps_list):
+                #pu.print_boldred("ERROR. Please check dependencies for {}. Deps: {}".format(self._command," ".join(deps_list)))
+                raise Exception("CommandNotFoundException")
+            return True
+                
+    def load_args(self,*args,**kwargs):
         #init the parameters for the object
         if args:
             self._args=args
@@ -54,6 +91,8 @@ class Runnable:
             self._kwargs=kwargs
         else:
             self._kwargs={}
+        
+    def load_yaml(self):        
         #read yaml parameters
         if not self._param_yaml:
             return
@@ -113,6 +152,10 @@ class Runnable:
             
         
         #make a copy of self._command
+        if not self._command:
+            pu.print_boldred("Error: command can not be None or empty")
+            raise Exception("CommandNotFoundException")    
+            
         cmd=[]
         if isinstance(self._command, list):
             cmd=self._command.copy()            

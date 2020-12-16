@@ -58,8 +58,8 @@ class Kallisto(Quant):
         self.transcriptome=transcriptome
         self._param_yaml='kallisto.yaml'
         self._valid_args=valid_args._args_KALLISTO
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)    
+        
+            
         #resolve threads to use
         self.resolve_parameter("--threads",threads,_threads,'_threads')
         #resolve index to use
@@ -76,7 +76,7 @@ class Kallisto(Quant):
                 self.build_index(self.index,self.transcriptome)
                 
             
-    def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
+    def build_index(self,index_path,transcriptome,objectid="NA"):
         """Function to  build kallisto index
         
         index_path: str
@@ -98,7 +98,7 @@ class Kallisto(Quant):
         :rtype: bool
         """
         #if index already exists then exit
-        if not overwrite:
+        if not _force:
             #check if files exists
             if pu.check_files_exist(index_path):
                 pu.print_green("Kallisto index {} already exists.".format(index_path))
@@ -238,8 +238,8 @@ class Salmon(Quant):
         self.transcriptome=transcriptome
         self._param_yaml='salmon.yaml'
         self._valid_args=valid_args._args_SALMON
-        self.check_dependency()
-        self.load_yaml(*args,**kwargs)       
+        
+               
         #resolve threads to use
         self.resolve_parameter("--threads",threads,_threads,'_threads')
         #resolve index to use
@@ -255,7 +255,7 @@ class Salmon(Quant):
                 self.build_index(self.index,self.transcriptome)
 
             
-    def build_index(self,index_path,transcriptome,overwrite=False,objectid="NA"):
+    def build_index(self,index_path,transcriptome,objectid="NA"):
         """
         build salmon index and store the path to index in self
         
@@ -283,7 +283,7 @@ class Salmon(Quant):
         """
         
         #if index already exists then exit
-        if not overwrite:
+        if not _force:
             #check if files exists
             if pu.check_salmonindex(index_path):
                 pu.print_green("Salmon index {} already exists.".format(index_path))
