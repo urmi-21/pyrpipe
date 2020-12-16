@@ -256,6 +256,7 @@ class Star(Aligner):
         self.init_parameters(*args,**kwargs)
         #resolve threads to use
         self.resolve_parameter("--runThreadN",threads,_threads,'_threads')
+        
         #resolve index to use
         self.resolve_parameter("--genomeDir",index,index,'index')
             
