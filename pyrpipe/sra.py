@@ -246,7 +246,7 @@ class SRA:
             self.fastq2_path=os.path.join(self.directory,self.srr_accession+"_2.fastq")
             self.layout="PAIRED"
         #after downloading delete sra if exists
-        self.delete_sra()
+        #self.delete_sra()
         return True
         
         
@@ -326,9 +326,11 @@ class SRA:
             raise Exception("No BAM file associated with "+ self.srr_accession)
             
         status=assembly_object.perform_assembly(self.bam_path,objectid=self.srr_accession,**kwargs)
+        
         if not status:
             raise Exception("perform_mapping failed for: "+ self.srr_accession)
-            
+        
+        self.annotation=status    
         return self
     
     
@@ -443,7 +445,6 @@ class SRA:
         
         if not self.sra_path:
             return True
-        
         if(pe.delete_file(self.sra_path)):
             del self.sra_path
             return True

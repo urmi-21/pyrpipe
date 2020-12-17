@@ -17,9 +17,9 @@ import tempfile
 class Runnable:
     """The runnable class
     """
-    def __init__(self,*args,_command=None,**kwargs):
+    def __init__(self,*args,command=None,**kwargs):
         self._runnable=True
-        self._command=None
+        self._command=command
         self._deps=None
         self._param_yaml=None
         self._args_style='LINUX'
@@ -149,6 +149,7 @@ class Runnable:
             if not pu.check_paths_exist(temp_path): pu.mkdir(temp_path)
             prefix=pu.get_filename(f)+'_'
             temp = tempfile.NamedTemporaryFile(prefix=prefix,suffix='.Lock', dir=temp_path,delete=False)
+            #TODO: dump command in lock
 
             templist.append(temp.name)
         return templist
