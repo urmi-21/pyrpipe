@@ -25,13 +25,33 @@ Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 ### Note: pyrpipe version 0.0.5 and above is not compatible with lower versions due to changes in the API design.
 
 
-### What it does
+
+## Key Features
+* Import any UNIX command in python
+* Dry-run feature to check dependencies and commands before execution
+* Flexible and robust handling of options and arguments
+* Auto load command options from .yaml files
+* Easily override threads and memory options using global values
+* Extensive logging for all the commands
+* Automatically verify Integrity of output targets
+* Resume feature to restart pipelines/jobs from where interrupted
+* Create reports, MultiQC reports for bioinformatic pipelines
+* Easily integrated into workflow managers like Snakemake and NextFlow
+
+
+
+## What it does
 Allows fast and easy development of bioinformatics pipelines in python by providing 
-* a high level api to popular bioinformatics tools
+* a high level api to popular RNA-Seq processing tools -- downloading, trimming, alignment, quantificantion and assembly
 * optimizes program parameters based on the data
-* a general api to execute any linux command from python (using the subprocess module)
+* a general framework to execute any linux command from python
 * comprehensive logging features to log all the commands, output and their return status
 * report generating features for easy sharing, reproducing, benchmarking and debugging
+
+## What it CAN NOT do by itself
+* Schedule jobs
+* Scale jobs on HPC/cloud
+* Identify parallel steps in pipelines
 
 
 ## Prerequisites
@@ -39,7 +59,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * OS: Linux, Mac
 
 
-## pyrpipe RNA-Seq include:
+## pyrpipe RNA-Seq tools include:
 
 | Tool                                                                                 | Purpose             |
 |--------------------------------------------------------------------------------------|---------------------|
@@ -77,7 +97,7 @@ It is best to [share your conda environment files](https://stackoverflow.com/que
 
 ```
 conda install -c bioconda pyrpipe 
- ```
+```
  
 #### Through PIP
 
