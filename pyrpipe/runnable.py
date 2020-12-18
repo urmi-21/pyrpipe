@@ -177,12 +177,13 @@ class Runnable:
         locks=[]
         requires_list=[]
         
-        if isinstance(target, str):
-            target_list=[target]
-        elif isinstance(target, list):
-            target_list=target
-        else:
-            raise TypeError("target must be a string or a list object")
+        if target:
+            if isinstance(target, str):
+                target_list=[target]
+            elif isinstance(target, list):
+                target_list=target
+            else:
+                raise TypeError("target must be a string or a list object")
         
         #ckeck for locks and remove previous locks and associated targets if exist
         for target in target_list:
@@ -195,12 +196,13 @@ class Runnable:
                 return True
             
         #check if all requirements are satisfied
-        if isinstance(requires, str):
-            requires_list=[requires]
-        elif isinstance(requires, list):
-            requires_list=requires
-        else:
-            raise TypeError("requires must be a string or a list object")
+        if requires:
+            if isinstance(requires, str):
+                requires_list=[requires]
+            elif isinstance(requires, list):
+                requires_list=requires
+            else:
+                raise TypeError("requires must be a string or a list object")
         
         #Raise exception if requirements not satisfied
         if requires_list:

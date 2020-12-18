@@ -67,7 +67,7 @@ class SRA:
         
     def init_object(self,srr_accession,directory,fastq,fastq2,sra):
         
-        #if fastq and fastq are provided
+        #if fastq are provided
         if fastq and fastq2:
             if pu.check_files_exist(fastq,fastq2):
                 self.layout="PAIRED"
@@ -92,11 +92,60 @@ class SRA:
         #init from srr_accession and directory
         return self.init_from_accession(srr_accession,directory)
     
+    def init_from_accession(self,srr_accession,directory):
+        """
+        Create SRA object using provided srr accession and directory, where data is downloaded/saved
+        This functions inits srrid, and paths to srr/fastq if they already exist thus will not be downloaded again
+        """
+        #check if programs exist
+        self.dep_list=['prefetch',"fasterq-dump"]
+        if not pe.check_dependencies(self.dep_list):
+            raise OSError("ERROR: Please install missing programs.")
+        
+        if not srr_accession:
+            raise ValueError("Please provide a valid accession")
+            
+        if not directory:
+            directory=os.getcwd()
+        
+        #create a dir named <srr_accession> and use as directory
+        self.directory=os.path.join(directory,self.srr_accession)
+        
+        #sra file be stored here
+        #self.sra_path=os.path.join(self.directory,self.srr_accession+".sra")
+        
+        #check if fastq files exist
+        if not self.search_fastq(self.directory):
+            #download fastq file
+            return self.download_fastq()
+        
+        return True
+    
+    
         
     def search_fastq(self,path):
         """Search .fastq file under a dir and create SRA object
         Return True if found otherwise False
         """
+        
+        #check files with names <SRR>_1.fastq and <SRR>_2.fastq
+        fq=os.path.join(path,self.srr_accession+'_1.fastq')
+        fq2=os.path.join(path,self.srr_accession+'_2.fastq')
+        if pu.check_files_exist(fq,fq2):
+            self.fastq_path=fq
+            self.fastq2_path=fq2
+            pu.print_green("Found .fastq "+self.fastq_path+" "+self.fastq2_path)
+            self.layout="PAIRED"
+            return True
+        
+        #check single end file
+        fq=os.path.join(path,self.srr_accession+'.fastq')
+        if pu.check_files_exist(fq):
+            self.fastq_path=fq
+            pu.print_green("Found .fastq "+self.fastq_path)
+            self.layout="SINGLE"
+            return True       
+        
         #search files under the path
         #fq_files=pe.find_files(path,"*.fastq")
         fq_files=pu.find_files(path,".fastq$")
@@ -105,7 +154,6 @@ class SRA:
             return False
         
         if len(fq_files)>2:
-            #pu.print_boldred("Can not determine .fastq. Downloading...")
             return False
         
         fq_files.sort()
@@ -122,36 +170,7 @@ class SRA:
             pu.print_green("Found .fastq "+self.fastq_path+" "+self.fastq2_path)
             self.layout="PAIRED"
         
-        return True
-        
-    
-    def init_from_accession(self,srr_accession,directory):
-        """
-        Create SRA object using provided srr accession and directory, where data is downloaded/saved
-        This functions inits srrid, and paths to srr/fastq if they already exist thus will not be downloaded again
-        """
-        #check if programs exist
-        self.dep_list=['prefetch',"fasterq-dump"]
-        if not pe.check_dependencies(self.dep_list):
-            raise OSError("ERROR: Please install missing programs.")
-        
-        if srr_accession is None:
-            raise ValueError("Please provide a valid accession")
-            
-        if directory is None:
-            directory=os.getcwd()
-        
-        #create a dir named <srr_accession> and use as directory
-        self.directory=os.path.join(directory,self.srr_accession)
-        #sra file be stored here
-        self.sra_path=os.path.join(self.directory,self.srr_accession+".sra")
-        
-        #check if fastq files exist
-        if not self.search_fastq(self.directory):
-            #download fastq file
-            return self.download_fastq()
-        
-        return True
+        return True 
     
                 
     
@@ -197,9 +216,6 @@ class SRA:
             internal_kwargs={**yaml_kwargs,**internal_kwargs}
             #internal_args=tuple(set(yaml_args+internal_args))
             internal_kwargs['--']=internal_args
-            
-            
-        #merge yaml args and kwargs
         
         
         
@@ -211,44 +227,38 @@ class SRA:
         fstrqd_Cmd.extend(params_list)
         
         #execute command
-        cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)
-        
+        cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)        
         
         if not cmdStatus:
-            print("fasterqdump failed for:"+self.srr_accession)
+            pu.print_boldred("fasterqdump failed for:"+self.srr_accession)
             return False        
         
+        #self.search_fastq(self.directory)
         #determine layout
         self.layout='PAIRED'
-        fq_files=pu.find_files(self.directory,self.srr_accession+"fastq$")
-        if len(fq_files)==1:
-            self.layout='SINGLE'
-            self.fastq_path=os.path.join(self.directory,self.srr_accession+".fastq")
-        else:
-            self.layout='PAIRED'
-            self.fastq_path=os.path.join(self.directory,self.srr_accession+"_1.fastq")
-            self.fastq2_path=os.path.join(self.directory,self.srr_accession+"_2.fastq")
+        #check files with names <SRR>_1.fastq and <SRR>_2.fastq
+        fq=os.path.join(self.directory,self.srr_accession+'_1.fastq')
+        fq2=os.path.join(self.directory,self.srr_accession+'_2.fastq')
+        self.fastq_path=fq
+        self.fastq2_path=fq2
         
-        #if not dry run check if files are present
-        if not _dryrun:
-            if(self.layout=="SINGLE"):
-                if not pu.check_files_exist(self.fastq_path):
-                    pu.print_boldred("Error running fasterq-dump file. File "+self.fastq_path+" does not exist!!!")
-                    return False
-            else:
-                if not pu.check_files_exist(self.fastq_path,self.fastq2_path):
-                    pu.print_boldred("Error running fasterq-dump file. File "+self.fastq_path+" does not exist!!!")
-                    return False
+        #if dry run
+        if _dryrun: return True
         
-        #if dry run set fastq paths
-        if _dryrun:
-            self.fastq_path=os.path.join(self.directory,self.srr_accession+"_1.fastq")
-            self.fastq2_path=os.path.join(self.directory,self.srr_accession+"_2.fastq")
+        if pu.check_files_exist(fq,fq2):
+            self.fastq_path=fq
+            self.fastq2_path=fq2
             self.layout="PAIRED"
-        #after downloading delete sra if exists
-        #self.delete_sra()
-        return True
+            return True
         
+        #check single end file
+        fq=os.path.join(self.directory,self.srr_accession+'.fastq')
+        if pu.check_files_exist(fq):
+            self.fastq_path=fq
+            self.layout="SINGLE"
+            return True
+        
+        return False
         
         
     def sra_exists(self):

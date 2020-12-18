@@ -125,7 +125,7 @@ class Trimgalore(RNASeqQC):
             
             
         else:
-            fq=sra_object.localfastqPath
+            fq=sra_object.fastq_path
             internal_args=(fq,)
             internal_kwargs={"-o":out_dir}
 
@@ -150,7 +150,7 @@ class Trimgalore(RNASeqQC):
                     if not pu.check_files_exist(out_file):
                         return ""
                 
-                return (out_file1,)
+                return (out_file,)
             
             return ("",)
             
