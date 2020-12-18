@@ -10,15 +10,19 @@
 
 
 ## Introduction
-pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs in an object oriented manner.
-pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data. Users can use the easy-to-use APIs to popular bioinformatic tools provided
+pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop bioinformatic or any other computational pipeline. pyrpipe provides an easy-to-use framework for importing any UNIX command in python. 
+pyrpipe comes with specialized classes and functions to easily code RNA-Seq processing workflows in pure python.
+Pipelines in pyrpipe can be created and extended by integrating third-party tools, executable scripts or python libraries in an object oriented manner.
+pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
+
+Users can use the easy-to-use APIs to popular bioinformatic tools provided
 with pyrpipe, or can use the methods provided in the pyrpipe_engine module to integrate any other third-party program in their pipeline.
 
 Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.925818v3)
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-### Note: pyrpipe version 0.0.4 and above is not compatible with lower versions due to changes in the API design.
+### Note: pyrpipe version 0.0.5 and above is not compatible with lower versions due to changes in the API design.
 
 
 ### What it does
@@ -35,7 +39,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * OS: Linux, Mac
 
 
-## pyrpipe provides API to:
+## pyrpipe RNA-Seq include:
 
 | Tool                                                                                 | Purpose             |
 |--------------------------------------------------------------------------------------|---------------------|
@@ -49,11 +53,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 | [Salmon](https://combine-lab.github.io/salmon/)                                      | Quant               |
 | [Stringtie](https://github.com/gpertea/stringtie)                                    | Transcript Assembly |
 | [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)                           | Transcript Assembly |
-| [Trinity](https://github.com/trinityrnaseq/trinityrnaseq/wiki)                       | Transcript Assembly |
 | [Samtools](https://github.com/samtools/samtools)                                     | Tools               |
-| [Portcullis](https://github.com/maplesond/portcullis)                                | Tools               |
-| [Mikado](https://github.com/EI-CoreBioinformatics/mikado)                            | Tools               |
-
 
 
 
