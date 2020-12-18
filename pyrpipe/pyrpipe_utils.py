@@ -123,7 +123,7 @@ def print_success(*args):
 
 ######End color functions###################
 
-def get_time_stamp(shorten=False):
+def get_timestamp(shorten=False):
     """Function to return current timestamp.
     
     Parameters
@@ -529,6 +529,8 @@ def get_union(*args):
     
 def find_files(search_path,search_pattern,recursive=False,verbose=False):
     result=[]
+    if not search_path:
+        search_path='./'
     #if search path is not valid
     if not check_paths_exist(search_path):
         return result

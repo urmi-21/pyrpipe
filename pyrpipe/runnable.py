@@ -17,17 +17,16 @@ import tempfile
 class Runnable:
     """The runnable class
     """
-    def __init__(self,*args,command=None,**kwargs):
+    def __init__(self,*args,command=None,yaml=None,style='LINUX',deps=None,valid_args=None,**kwargs):
         self._runnable=True
         self._command=command
-        self._deps=None
-        self._param_yaml=None
-        self._args_style='LINUX'
+        self._deps=deps
+        self._param_yaml=yaml
+        self._args_style=style
         #valid_args can be None or a list, or a dict if subcommands are used
-        self._valid_args=None
+        self._valid_args=valid_args
         self.load_args(*args,**kwargs)
         self.load_yaml()
-    
             
     
     @property
@@ -37,7 +36,6 @@ class Runnable:
     def _param_yaml(self,value):
         self.__param_yaml=value
         self.load_yaml()
-        
             
             
     @property
@@ -107,12 +105,7 @@ class Runnable:
             
     def verify_integrity(self,target,verbose=False):
         #check if lock exists
-        filepath=pu.get_file_directory(target)
-        filename=pu.get_filename(target)
-        pre='.*'
-        suff='.*\.Lock$'
-        pattern=pre+filename+suff
-        lock_files=pu.find_files(filepath,pattern)
+        lock_files=self.get_lock_files(target)
         if len(lock_files) >0:
             #remove the target and locks
             if pu.check_files_exist(target):
@@ -121,6 +114,17 @@ class Runnable:
             else: self.remove_locks(lock_files)
         
         return True
+    
+    def get_lock_files(self,target):
+        #check if lock exists
+        filepath=pu.get_file_directory(target)
+        filename=pu.get_filename(target)
+        pre='.*'
+        suff='.*\.Lock$'
+        pattern=pre+filename+suff
+        lock_files=pu.find_files(filepath,pattern)
+        return lock_files
+        
             
     def verify_target(self,target,verbose=False):
         if not pu.check_files_exist(target):
@@ -139,10 +143,8 @@ class Runnable:
                 return False
         return True
     
-    def check_locked_files(self,target):
-        pass
     
-    def create_lock(self,target_list):
+    def create_lock(self,target_list,message):
         templist=[]
         for f in target_list:
             temp_path=pu.get_file_directory(f)
@@ -150,6 +152,8 @@ class Runnable:
             prefix=pu.get_filename(f)+'_'
             temp = tempfile.NamedTemporaryFile(prefix=prefix,suffix='.Lock', dir=temp_path,delete=False)
             #TODO: dump command in lock
+            timestamp=pu.get_timestamp()
+            temp.write(str.encode(timestamp+'\t'+message))
 
             templist.append(temp.name)
         return templist
@@ -166,11 +170,12 @@ class Runnable:
         return self._valid_args
         pass
         
-    def run(self,*args, subcommand=None, target=None, objectid=None, **kwargs):
+    def run(self,*args, subcommand=None, target=None, requires=None, objectid=None, **kwargs):
         
         #create target list
         target_list=[]
         locks=[]
+        requires_list=[]
         
         if isinstance(target, str):
             target_list=[target]
@@ -187,10 +192,21 @@ class Runnable:
                 pu.print_green('Target files {} already exist.'.format(', '.join(target_list)))
                 return True
             
-        #create locks on target; locks indicate incomplete commands
-        if not _dryrun: locks=self.create_lock(target_list)
-        #raise Exception("EXXX")    
-        
+        #check if all requirements are satisfied
+        if isinstance(requires, str):
+            requires_list=[requires]
+        elif isinstance(requires, list):
+            requires_list=requires
+        #Raise exception if requirements not satisfied
+        if requires_list:
+            if not self.verify_target_list(requires_list):
+                pu.print_boldred('Required files {} fot found.'.format(', '.join(requires_list)))
+                raise Exception("ReqNotSatisfied")
+            #check if any required file had lock
+            for file in requires_list:
+                if len(self.get_lock_files(file)):
+                    pu.print_boldred('Required file {} is corrupt. Please verify file is correct and remove any .Lock files'.format(', '.join(requires_list)))
+                    raise Exception("ReqNotSatisfied")        
         
         
         #override class kwargs by passed kwargs
@@ -230,6 +246,10 @@ class Runnable:
         else: 
             pu.print_boldred("Unknown args style: {}".format(self._args_style))
             raise Exception("Unknown args style")
+            
+        
+        #create locks on target; locks indicate incomplete commands
+        if not _dryrun: locks=self.create_lock(target_list,' '.join(cmd))
             
         #execute command
         cmd_status=pe.execute_command(cmd,objectid=objectid)
