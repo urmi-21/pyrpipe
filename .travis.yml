@@ -2,20 +2,8 @@ language: python
 python:
   - "3.6"      # current default Python on Travis CI
   - "3.7"
-
-services:
-  - docker
-
-before_install:
-  #could not get portcullis to work from source this is docker version
-  #little dirty
-  - docker pull maplesond/portcullis
-  #create an executable for portcullis, this will call portcullis from docker
-  - mkdir portcullisDocker
-  - echo '#!/bin/bash' > portcullisDocker/portcullis
-  - echo 'docker run --rm -v' $(pwd)':/data maplesond/portcullis portcullis "$@"' >> portcullisDocker/portcullis
-  - chmod +x portcullisDocker/portcullis
-  - export PATH=$PATH:$PWD/portcullisDocker/
+  - "3.8"
+  - "3.9"
 
 # install dependencies
 install:
@@ -47,22 +35,6 @@ install:
   - wget http://cole-trapnell-lab.github.io/cufflinks/assets/downloads/cufflinks-2.2.1.Linux_x86_64.tar.gz -O /tmp/cuff.tar.gz
   - tar -xvzf /tmp/cuff.tar.gz
   - export PATH=$PATH:$PWD/cufflinks-2.2.1.Linux_x86_64/
-  #install Trinity
-  - wget https://github.com/trinityrnaseq/trinityrnaseq/releases/download/v2.9.0/trinityrnaseq-v2.9.0.FULL.tar.gz -O /tmp/trin.tar.gz
-  - tar -xvzf /tmp/trin.tar.gz
-  - cd trinityrnaseq-v2.9.0
-  - make
-  - export TRINITY_HOME=$(pwd)
-  - cd ..
-  - export PATH=$PATH:$PWD/trinityrnaseq-v2.9.0
-  #install jellyfish
-  - wget https://github.com/gmarcais/Jellyfish/releases/download/v2.3.0/jellyfish-2.3.0.tar.gz -O /tmp/jfish.tar.gz
-  - tar -xvzf /tmp/jfish.tar.gz
-  - cd jellyfish-2.3.0
-  - ./configure --prefix=$(pwd)
-  - make && make install
-  - export PATH=$PATH:$PWD/bin
-  - cd ..  
   #install hisat2
   - wget https://cloud.biohpc.swmed.edu/index.php/s/hisat2-210-Linux_x86_64/download -O /tmp/hisat2.zip
   - unzip /tmp/hisat2.zip
@@ -93,17 +65,8 @@ install:
   - wget https://sourceforge.net/projects/bbmap/files/BBMap_38.73.tar.gz/download -O /tmp/bbtools.tar.gz
   - tar -xvzf /tmp/bbtools.tar.gz
   - export PATH=$PATH:$PWD/bbmap/
-  #install diamond
-  - wget https://github.com/bbuchfink/diamond/releases/download/v0.9.30/diamond-linux64.tar.gz -O /tmp/diamond.tar.gz
-  - mkdir -p diamond
-  - tar -xvzf /tmp/diamond.tar.gz -C diamond
-  - export PATH=$PATH:$PWD/diamond/
-  #install transdecoder
-  - wget https://github.com/TransDecoder/TransDecoder/archive/TransDecoder-v5.5.0.tar.gz -O /tmp/txd
-  - tar -xvzf /tmp/txd
-  - export PATH=$PATH:$PWD/TransDecoder-TransDecoder-v5.5.0/
-  #create conf
-  #- echo '{"threads": "2","memory": null,"params_dir": "params","dry": false,"force": true,"safe": false,"logs_dir": "pyrpipe_logs","logging": true,"verbose": false}' > pyrpipe.conf
+  #install orfipy
+  - pip install orfipy --upgrade
   
   
   
