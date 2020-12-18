@@ -51,7 +51,7 @@ class SRA:
         
         if not self.init_object(srr_accession, directory, fastq,fastq2,sra):
             pu.print_boldred("ERROR: Creating SRA object")
-            raise Exception("Please check fastq files {} {}".format(fastq,fastq2))
+            raise ValueError("Please check fastq files {} {}".format(fastq,fastq2))
             
     def __setattr__(self, name, value):
         """
@@ -60,7 +60,7 @@ class SRA:
         immutableFields=['srr_accession','directory']
         
         if (name in immutableFields and name in self.__dict__):
-            raise Exception("Can not modify "+name)
+            raise TypeError("Can not modify "+name)
         else:
             self.__dict__[name] = value
         
@@ -76,8 +76,8 @@ class SRA:
                 return True
             else:
                 pu.print_boldred("ERROR: File not found")
-                raise Exception("Please check fastq files {} {}".format(fastq,fastq2))
-                return False
+                raise ValueError("Please check fastq files {} {}".format(fastq,fastq2))
+                
         #if only one fastq (single)
         if fastq:
             if pu.check_files_exist(fastq):
@@ -86,7 +86,7 @@ class SRA:
                 return True
             else:
                 pu.print_boldred("ERROR: File not found")
-                raise Exception("Please check fastq files {}".format(fastq))
+                raise ValueError("Please check fastq files {}".format(fastq))
                 return False
     
         #init from srr_accession and directory
@@ -133,10 +133,10 @@ class SRA:
         #check if programs exist
         self.dep_list=['prefetch',"fasterq-dump"]
         if not pe.check_dependencies(self.dep_list):
-            raise Exception("ERROR: Please install missing programs.")
+            raise OSError("ERROR: Please install missing programs.")
         
         if srr_accession is None:
-            raise Exception("Please provide a valid accession")
+            raise ValueError("Please provide a valid accession")
             
         if directory is None:
             directory=os.getcwd()
@@ -303,11 +303,11 @@ class SRA:
         """
         #check a valid mapping_object
         if not (hasattr(mapping_object,'_category') and mapping_object._category=='Aligner'):
-            raise Exception("Error: No valid mapping object provided for "+self.srr_accession)
+            raise TypeError("Error: No valid mapping object provided for "+self.srr_accession)
             
         status=mapping_object.perform_alignment(self,objectid=self.srr_accession,**kwargs)
         if not status:
-            raise Exception("perform_mapping failed for: "+ self.srr_accession)
+            raise OSError("perform_mapping failed for: "+ self.srr_accession)
         
         #save the bam file
         self.bam_path=status
@@ -319,16 +319,16 @@ class SRA:
         """
         #check a valid mapping_object
         if not (hasattr(assembly_object,'_category') and assembly_object._category=='Assembler'):
-            raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
+            raise TypeError("Error: No valid assembly object provided for "+self.srr_accession)
             
         #must have a bam file
         if not self.bam_path:
-            raise Exception("No BAM file associated with "+ self.srr_accession)
+            raise ValueError("No BAM file associated with "+ self.srr_accession)
             
         status=assembly_object.perform_assembly(self.bam_path,objectid=self.srr_accession,**kwargs)
         
         if not status:
-            raise Exception("perform_mapping failed for: "+ self.srr_accession)
+            raise OSError("perform_mapping failed for: "+ self.srr_accession)
         
         self.annotation=status    
         return self
@@ -340,12 +340,12 @@ class SRA:
         """
         #check a valid mapping_object
         if not (hasattr(quant_object,'_category') and quant_object._category=='Quantification'):
-            raise Exception("Error: No valid assembly object provided for "+self.srr_accession)
+            raise ValueError("Error: No valid assembly object provided for "+self.srr_accession)
             
                    
         status=quant_object.perform_quant(self,objectid=self.srr_accession)
         if not status:
-            raise Exception("perform_mapping failed for: "+ self.srr_accession)
+            raise OSError("perform_mapping failed for: "+ self.srr_accession)
             
         return self
         
@@ -380,7 +380,7 @@ class SRA:
         """
         #check a valid qc_object
         if not (hasattr(qc_object,'_category') and qc_object._category=='RNASeqQC'):
-            raise Exception("Error: No valid QC object provided for "+self.srr_accession)
+            raise ValueError("Error: No valid QC object provided for "+self.srr_accession)
         
         #save thq qc object for later references
         #self.qc_object=qc_object
@@ -392,7 +392,7 @@ class SRA:
         if not qcStatus[0]:
             #print ("Error performing QC for "+self.srr_accession)
             #return False
-            raise Exception("perform_qc failed for: "+ self.srr_accession)
+            raise OSError("perform_qc failed for: "+ self.srr_accession)
             
         
         if self.layout=='PAIRED':

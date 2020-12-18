@@ -513,9 +513,7 @@ def mkdir(dir_path):
     :return: true is directory created
     :rtype: bool
     """
-    #print("creating Dir:"+dir_path)
     try:
-        #os.mkdir(dir_path)
         os.makedirs(dir_path)
     except OSError:
         return False

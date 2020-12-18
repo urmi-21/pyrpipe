@@ -55,7 +55,7 @@ class Runnable:
     def _command(self,value):
         #if already exists
         if hasattr(self,'_command') and self._command:
-            raise Exception("Can not modify _command")
+            raise TypeError("Can not modify _command")
         
         #validate command exists
         if value and self.check_dependency([value]):
@@ -77,7 +77,7 @@ class Runnable:
     def check_dependency(self,deps_list):
             if deps_list and not pe.check_dependencies(deps_list):
                 #pu.print_boldred("ERROR. Please check dependencies for {}. Deps: {}".format(self._command," ".join(deps_list)))
-                raise Exception("CommandNotFoundException")
+                raise OSError("CommandNotFoundException")
             return True
                 
     def load_args(self,*args,**kwargs):
@@ -181,6 +181,8 @@ class Runnable:
             target_list=[target]
         elif isinstance(target, list):
             target_list=target
+        else:
+            raise TypeError("target must be a string or a list object")
         
         #ckeck for locks and remove previous locks and associated targets if exist
         for target in target_list:
@@ -197,16 +199,19 @@ class Runnable:
             requires_list=[requires]
         elif isinstance(requires, list):
             requires_list=requires
+        else:
+            raise TypeError("requires must be a string or a list object")
+        
         #Raise exception if requirements not satisfied
         if requires_list:
             if not self.verify_target_list(requires_list):
                 pu.print_boldred('Required files {} fot found.'.format(', '.join(requires_list)))
-                raise Exception("ReqNotSatisfied")
+                raise FileNotFoundError("FilesNotFound")
             #check if any required file had lock
             for file in requires_list:
                 if len(self.get_lock_files(file)):
                     pu.print_boldred('Required file {} is corrupt. Please verify file is correct and remove any .Lock files'.format(', '.join(requires_list)))
-                    raise Exception("ReqNotSatisfied")        
+                    raise FileNotFoundError("FilesNotFound")        
         
         
         #override class kwargs by passed kwargs
@@ -222,7 +227,7 @@ class Runnable:
         #make a copy of self._command
         if not self._command:
             pu.print_boldred("Error: command can not be None or empty")
-            raise Exception("CommandNotFoundException")    
+            raise OSError("CommandNotFoundException")    
             
         cmd=[]
         if isinstance(self._command, list):
@@ -245,7 +250,7 @@ class Runnable:
             cmd.extend(pu.parse_java_args(self._valid_args,kwargs))
         else: 
             pu.print_boldred("Unknown args style: {}".format(self._args_style))
-            raise Exception("Unknown args style")
+            raise ValueError("Unknown args style")
             
         
         #create locks on target; locks indicate incomplete commands

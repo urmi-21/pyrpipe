@@ -331,7 +331,7 @@ def is_paired(sra_file):
     :rtype: bool
     """
     if not pu.check_files_exist(sra_file):
-        raise Exception("Error checking layout. {0} doesn't exist".format(sra_file));
+        raise ValueError("Error checking layout. {0} doesn't exist".format(sra_file));
     
     try:
         fastqdCmd=["fastq-dump","-X","1","-Z","--split-spot", sra_file]
@@ -346,9 +346,9 @@ def is_paired(sra_file):
         elif(numLines == 8):
             return True
         else:
-            raise Exception("Unexpected output from fast-dump");
+            raise ValueError("Unexpected output from fast-dump");
     except subprocess.CalledProcessError as e:
-        raise Exception("Error running fastq-dump: {}".format(str(e)));
+        raise OSError("Error running fastq-dump: {}".format(str(e)));
 
 
     

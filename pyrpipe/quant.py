@@ -69,7 +69,7 @@ class Kallisto(Quant):
         if not pu.check_files_exist(index):
             if not (pu.check_files_exist(self.transcriptome)):
                 pu.print_boldred("Kallisto index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
-                raise Exception("Please provide a valid Kallisto index, or a valid fasta file to generate the index")
+                raise ValueError("Please provide a valid Kallisto index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
@@ -107,7 +107,7 @@ class Kallisto(Quant):
         #check input
         if not pu.check_files_exist(transcriptome):
             pu.print_boldred("{} does not exist. Exiting".format(transcriptome))
-            raise Exception("Please check input to kallisto index")
+            raise ValueError("Please check input to kallisto index")
             
         
         #create out dir
@@ -115,7 +115,7 @@ class Kallisto(Quant):
         #create the out dir
         if not pu.check_paths_exist(indexdir):
             if not pu.mkdir(indexdir):
-                raise Exception("Error creating kallisto index. Failed to create index directory.")
+                raise OSError("Error creating kallisto index. Failed to create index directory.")
         
         args=(transcriptome,)
         internal_kwargs={"-i":index_path}
@@ -144,7 +144,7 @@ class Kallisto(Quant):
                 if self.check_index():
                     return True
         else:
-            raise Exception("Error building kallisto index")
+            raise OSError("Error building kallisto index")
         
         return False
     
@@ -247,7 +247,7 @@ class Salmon(Quant):
         if not pu.check_salmonindex(index):
             if not (pu.check_files_exist(self.transcriptome)):
                 pu.print_boldred("Salmon index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
-                raise Exception("Please provide a valid Salmon index, or a valid fasta file to generate the index")
+                raise ValueError("Please provide a valid Salmon index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.transcriptome)
@@ -298,7 +298,7 @@ class Salmon(Quant):
         #create the out dir
         if not pu.check_paths_exist(indexdir):
             if not pu.mkdir(indexdir):
-                raise Exception("Error creating salmon index. Failed to create index directory.")
+                raise OSError("Error creating salmon index. Failed to create index directory.")
         
         
         validArgsIndex=['-v','--version','-h','--help','-t','--transcripts','-k','--kmerLen','-i',
@@ -326,7 +326,7 @@ class Salmon(Quant):
                 if self.check_index():
                     return True
         else:
-            raise Exception("Error building salmon index")
+            raise OSError("Error building salmon index")
         
         return False
         

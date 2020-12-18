@@ -35,7 +35,7 @@ class Benchmark:
         
         
         if not pu.check_files_exist(log_file,env_log):
-            raise Exception("Please check input for benchmark report. {} {}".format(log_file,env_log))
+            raise FileNotFoundError("Please check input for benchmark report. {} {}".format(log_file,env_log))
         if not out_dir:
             out_dir=os.getcwd()
         self.log_file=log_file
@@ -50,7 +50,7 @@ class Benchmark:
         self.benchmark_dir=os.path.join(out_dir,'benchmark_reports')
         if not pu.check_paths_exist(self.benchmark_dir):
             if not pu.mkdir(self.benchmark_dir):
-                raise Exception("Error running benchmarks. Can not create output directory {}".format(self.benchmark_dir))
+                raise OSError("Error running benchmarks. Can not create output directory {}".format(self.benchmark_dir))
             
         
         

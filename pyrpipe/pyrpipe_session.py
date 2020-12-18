@@ -58,8 +58,7 @@ def save_session(filename,add_timestamp=True,out_dir=""):
         print("Session saved to: "+outFile)
         return True
     except Exception:
-        raise Exception("Failed to save session")
-        return False
+        raise OSError("Failed to save session")
 
 
 def restore_session(file):

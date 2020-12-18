@@ -68,7 +68,7 @@ class Hisat2(Aligner):
         if not self.check_index():
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("Hisat2 index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
-                raise Exception("Please provide a valid Hisat2 index, or a valid fasta file to generate the index")
+                raise ValueError("Please provide a valid Hisat2 index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(self.index,self.genome)
@@ -126,14 +126,13 @@ class Hisat2(Aligner):
         #check input files
         if not pu.check_files_exist(genome):
             pu.print_boldred("Please provide a valid input fasta file to build Hisat2 index")
-            raise Exception("Please check input to hisat2 build index")
-            return False
+            raise ValueError("Please check input to hisat2 build index")
         
         indexdir=pu.get_file_directory(index_path)
         #create the out dir
         if not pu.check_paths_exist(indexdir):
             if not pu.mkdir(indexdir):
-                raise Exception("Error creating hisat2 index. Failed to create index directory.")
+                raise OSError("Error creating hisat2 index. Failed to create index directory.")
                 
         
         hisat2Buildvalid_args=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
@@ -165,7 +164,7 @@ class Hisat2(Aligner):
                 if self.check_index():
                     return True
         else:
-            raise Exception("Error building Hisat2 index")
+            raise OSError("Error building Hisat2 index")
         
         return True
         
@@ -226,7 +225,6 @@ class Hisat2(Aligner):
             #return outSamFile
         
         return ""
-            
      
     
     def check_index(self):
@@ -260,7 +258,7 @@ class Star(Aligner):
         if not pu.check_starindex(index):
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("STAR index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
-                raise Exception("Please provide a valid STAR index, or a valid fasta file to generate the index")
+                raise ValueError("Please provide a valid STAR index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
@@ -301,13 +299,13 @@ class Star(Aligner):
         #check input files
         if not (pu.check_files_exist(genome)):
             pu.print_boldred("Please provide a valid input fasta file to build STAR index")
-            raise Exception("Please check input to build star index")
+            raise ValueError("Please check input to build star index")
             
         
         #create index path if doesnt exist
         if not pu.check_paths_exist(index_path):
             if not pu.mkdir(index_path):
-                raise Exception("Error creating STAR index. Failed to create index directory.")
+                raise OSError("Error creating STAR index. Failed to create index directory.")
                 return False
         
         
@@ -334,7 +332,7 @@ class Star(Aligner):
                 if self.check_index():
                     return True
         else:
-            raise Exception("Error building STAR index")
+            raise OSError("Error building STAR index")
         
         return True
             
@@ -465,7 +463,7 @@ class Bowtie2(Aligner):
         if not pu.check_bowtie2index(index):
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("Bowtie2 index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
-                raise Exception("Please provide a valid Bowtie2 index, or a valid fasta file to generate the index")
+                raise ValueError("Please provide a valid Bowtie2 index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
                 self.build_index(index,self.genome)
@@ -514,7 +512,7 @@ class Bowtie2(Aligner):
         #check input files
         if not (pu.check_files_exist(genome)):
             pu.print_boldred("Please provide a valid input fasta file to build bowtie2 index")
-            raise Exception("Please check input to star build index")
+            raise ValueError("Please check input to star build index")
             return False
         
         
@@ -527,7 +525,7 @@ class Bowtie2(Aligner):
         indexdir=pu.get_file_directory(index_path)
         if not pu.check_paths_exist(indexdir):
             if not pu.mkdir(indexdir):
-                raise Exception("Error creating bowtie2 index. Failed to create index directory.")
+                raise OSError("Error creating bowtie2 index. Failed to create index directory.")
                 return False
         
         args=(genome,index_path)
@@ -561,7 +559,7 @@ class Bowtie2(Aligner):
                 if self.check_index():
                     return True
         else:
-            raise Exception("Error building bowtie2 index")
+            raise OSError("Error building bowtie2 index")
             
         
         return True

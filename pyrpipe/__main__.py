@@ -41,8 +41,8 @@ def main():
     
     parser.add_argument('infile', help='The input python script',action="store",nargs="?")
     
-    args = parser.parse_args()
-    
+    #args = parser.parse_args()
+    args, unknownargs = parser.parse_known_args()   
     
     
     if args.versioninfo:
@@ -70,14 +70,14 @@ def main():
     
     
     #call main program
-    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile)
+    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs)
     
     
     
 if __name__ == '__main__':
     main()
 
-def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile):
+def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs):
     #write pyrpipe configuration
     #everything saved as str
     conf={}
@@ -95,7 +95,7 @@ def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infil
         json.dump(conf, outfile,indent=4)
     
     #execute
-    cmd=['python',infile]
+    cmd=['python',infile]+unknownargs
     os.system(' '.join(cmd))
     
     
