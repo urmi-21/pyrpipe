@@ -227,7 +227,7 @@ class BBmap(RNASeqQC):
             #run bbduk
             status=self.run(*internal_args,objectid=objectid,target=out_filePath,**internal_kwargs)
             if status:
-                if not pu.check_files_exist(out_file1Path,out_file2Path) and not _dryrun:
+                if not pu.check_files_exist(out_filePath) and not _dryrun:
                     return("",)
                 
             return(out_filePath,) 

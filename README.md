@@ -29,7 +29,7 @@ Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 ## Key Features
 * Import any UNIX command in python
 * Dry-run feature to check dependencies and commands before execution
-* Flexible and robust handling of options and arguments
+* Flexible and robust handling of options and arguments (both Linux and Java style options)
 * Auto load command options from .yaml files
 * Easily override threads and memory options using global values
 * Extensive logging for all the commands
