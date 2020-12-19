@@ -20,9 +20,6 @@ install:
   - make && make install
   - cd ..
   - export PATH=$PATH:$PWD/samtools-1.10/bin/
-  #install mikado
-  - pip install Cython
-  - pip install mikado
   #install sratoolkit
   - wget https://ftp-trace.ncbi.nlm.nih.gov/sra/sdk/2.9.6-1/sratoolkit.2.9.6-1-ubuntu64.tar.gz -O /tmp/sratools.tar.gz
   - tar -xvzf /tmp/sratools.tar.gz
@@ -75,6 +72,8 @@ script:
   - ls
   - travis_wait 60 coverage run -m pytest tests/
   #- coverage run -m pytest tests/
+  - cp -r tests/test_files/params .
+  - travis_wait 60 coverage run -m pytest tests/
   - coverage report --show-missing  
 after_success:
   - coveralls

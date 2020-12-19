@@ -218,7 +218,7 @@ class BBmap(RNASeqQC):
             
             
         else:
-            fq=sra_object.localfastqPath
+            fq=sra_object.fastq_path
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"
             out_filePath=os.path.join(out_dir,out_fileName)
             internal_args=()
@@ -327,7 +327,7 @@ class BBmap(RNASeqQC):
             
             
         else:
-            fq=sra_object.localfastqPath
+            fq=sra_object.fastq_path
             #append input and output options
            
             out_fileName=pu.get_file_basename(fq)+out_suffix+".fastq"

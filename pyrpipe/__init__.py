@@ -20,6 +20,7 @@ from datetime import datetime
 import subprocess
 import time
 import pyrpipe.version
+import pyrpipe.arg_parser
 
 
 ###logger
@@ -165,6 +166,25 @@ class Conf:
                 self._memory=psutil.virtual_memory()[0]/1000000000*0.8
                 
         #TODO: overwrite any arguments paased via cmd line
+        #self.init_sys_args()
+        
+    #Not used    
+    def init_sys_args(self):
+        args, unknownargs = pyrpipe.arg_parser.parser.parse_known_args() 
+        if args.threads:
+            self._threads=args.threads
+        if args.mem:
+            self._memory=args.mem
+        self._dry=args.dryrun
+        self._safe=args.safemode
+        if args.paramdir:
+            self._params_dir=args.paramdir
+        if args.logsdir:
+            self._logs_dir=args.logsdir
+        self._logging=not args.nologs
+        self._verbose=args.verbose
+        self._force=args.force
+        
             
                 
 conf=Conf()
