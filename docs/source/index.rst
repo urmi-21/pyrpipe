@@ -8,11 +8,34 @@ pyrpipe: python RNA-Seq pipelines
 *************
 Introduction
 *************
-pyrpipe (Pronounced as "pyre-pipe") is a python package to easily develop RNA-Seq analyses workflow by integrating popular RNA-Seq analysis programs.
-pyrpipe allows coding RNA-Seq workflows in pure python in an object oriented manner. pyrpipe provides a high level API to many popular RNA-Seq tools for easier and faster development.
+pyrpipe (pronounced as "pyre-pipe") is a python package to easily develop computational pipelines in pure python. pyrpipe provides an easy-to-use object oriented framework to import any UNIX command or tool in python. All commands executed via pyrpipe are automatically logged extensively. pyrpipe also provides automatic handling of tool options and parameters.
+pyrpipe comes with specialized classes for easy implementation of RNA-Seq analysis pipelines. These classes provide high level APIs to many popular RNA-Seq tools for easier and faster development of pipelines.
 pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
 
-To install the latest release, type::
+
+Key Features
+#############
+
+- Import any UNIX command in python
+- Dry-run feature to check dependencies and commands before execution
+- Flexible and robust handling of options and arguments
+- Auto load command options from .yaml files
+- Easily override threads and memory options using global values
+- Extensive logging for all the commands
+- Automatically verify Integrity of output targets
+- Resume feature to restart pipelines/jobs from where interrupted
+- Create reports, MultiQC reports for bioinformatic pipelines
+- Easily integrated into workflow managers like Snakemake and NextFlow
+
+
+
+To install the latest stable release, type::
+	
+	conda install -c bioconda pyrpipe 
+	or
+	pip install pyrpipe --upgrade
+
+Install latest development version ::
 
 	git clone https://github.com/urmi-21/pyrpipe.git
 	pip install -r pyrpipe/requirements.txt
