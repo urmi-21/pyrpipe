@@ -55,22 +55,6 @@ def print_blue(text):
     #print (Colors.OKBLUE + text + Colors.ENDC) 
     print_message(text)
 
-
-    
-def print_info(text):
-    """Print an info message
-    
-    Parameters
-    ----------
-    
-    text: str
-        text to print
-
-    Returns:   None
-    """
-    #print_magenta(text)
-    print_information(text)
-    
 def print_yellow(text):
     """Print in yellow font
     
@@ -99,6 +83,7 @@ def pyrpipe_print(color,*args,stderr=False,**kwargs):
 def print_notification(*args):
     """Print message to stderr
     """
+    #args=('[pyrpipe notification]',)+args
     pyrpipe_print(Fore.LIGHTYELLOW_EX,*args,stderr=True)
 
 def print_message(*args):
@@ -106,9 +91,10 @@ def print_message(*args):
     """
     pyrpipe_print(Fore.LIGHTCYAN_EX,*args,stderr=True)
     
-def print_information(*args):
+def print_warning(*args):
     """Print message to stderr
     """
+    args=('WARNING:',)+args
     pyrpipe_print(Fore.LIGHTMAGENTA_EX,*args,stderr=True)
     
 def print_error(*args):
@@ -384,7 +370,7 @@ def parse_java_args(valid_args_list,passed_args):
             positional_args.extend(value)
         
         else:
-            print_info("Ignoring invalid argument '{0}: {1}'...".format(key, value))
+            print_warning("Ignoring invalid argument '{0}: {1}'...".format(key, value))
     popen_args.extend(positional_args)
     return popen_args
     
@@ -440,7 +426,7 @@ def parse_unix_args(valid_args_list,passed_args):
         elif key in special_args:
             positional_args.extend(value)
         else:
-            print_info("Ignoring invalid argument '{0}: {1}'...".format(key, value))
+            print_warning("Ignoring invalid argument '{0}: {1}'...".format(key, value))
     popen_args.extend(positional_args)
     return popen_args
     
