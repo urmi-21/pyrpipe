@@ -2,6 +2,11 @@
 Installation
 ======================
 .. _installation:
+
+pyrpipe is available through bioconda could be installed via::
+
+	conda install -c bioconda pyrpipe
+
 pyrpipe is available on PyPI and could be installed via pip::
 
 	pip install pyrpipe

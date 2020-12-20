@@ -1,4 +1,4 @@
-pyrpipe: python RNA-Seq pipelines
+pyrpipe: A python package for RNA-Seq workflows
 ==================================
 
 :Author: Urminder Singh
@@ -8,35 +8,41 @@ pyrpipe: python RNA-Seq pipelines
 *************
 Introduction
 *************
-pyrpipe (pronounced as "pyre-pipe") is a python package to easily develop computational pipelines in pure python. pyrpipe provides an easy-to-use object oriented framework to import any UNIX command or tool in python. All commands executed via pyrpipe are automatically logged extensively. pyrpipe also provides automatic handling of tool options and parameters.
-pyrpipe comes with specialized classes for easy implementation of RNA-Seq analysis pipelines. These classes provide high level APIs to many popular RNA-Seq tools for easier and faster development of pipelines.
-pyrpipe can be used on local computers or on HPC environments to manage analysis of RNA-Seq data.
+pyrpipe (pronounced as "pyre-pipe") is a python package to easily develop computational pipelines in pure python, in an object-oriented manner. 
+pyrpipe provides an easy-to-use object oriented framework to import any UNIX command or tool in python. ,
+All commands executed via pyrpipe are automatically logged extensively. 
+pyrpipe also provides flexible and easy handling of tool options and parameters. pyrpipe can automatically load the tool parameters from .yaml files.
+This framework minimizes the commands user has to write, rather the tools are available as objects and are fully re-usable.
+
+To enable easy and fast processing of RNA-Seq data, we have implemented specialized classes build on top of pyrpipe framework.
+These classes provide high level APIs to many popular RNA-Seq tools for easier and faster development of RNA-Seq pipelines.
+These pipelines are fully customizable and users can easily add/replace the tools used using the pyrpipe framework.
+Finally, pyrpipe can be used on local computers or on HPC environments and pyrpipe scripts can be easily integrated into workflow management systems such as Snakemake and Nextflow.
 
 
 Key Features
 #############
 
 - Import any UNIX command in python
-- Dry-run feature to check dependencies and commands before execution
+- Dry-runnable pipelines to check dependencies and commands before execution
 - Flexible and robust handling of options and arguments
 - Auto load command options from .yaml files
 - Easily override threads and memory options using global values
 - Extensive logging for all the commands
 - Automatically verify Integrity of output targets
-- Resume feature to restart pipelines/jobs from where interrupted
-- Create reports, MultiQC reports for bioinformatic pipelines
+- Automatically resume pipelines/jobs from where interrupted
+- Detailed reports with MultiQC reports for bioinformatic pipelines
 - Easily integrated into workflow managers like Snakemake and NextFlow
 
 
 
-To install the latest stable release, type::
-	
+To install the latest stable release via conda::
 	conda install -c bioconda pyrpipe 
-	or
+
+To install the latest stable release via pip::
 	pip install pyrpipe --upgrade
 
 Install latest development version ::
-
 	git clone https://github.com/urmi-21/pyrpipe.git
 	pip install -r pyrpipe/requirements.txt
 	pip install -e path_to/pyrpipe
@@ -44,20 +50,12 @@ Install latest development version ::
 See the :ref:`Installation notes <installation>` for details.
 
 
-*****************************
-Examples and Case-Studies
-*****************************
-Example usage and case-studies with real data is provided at `GitHub <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)>`_.
-
-- Arabidopsis thaliana transcript assembly using pyrpipe checkpoints. `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Athaliana_transcript_assembly>`_.
-- Prediction of long non-coding RNAs (lncRNAs) in Zea mays by supplementing pyrpipe with a third-party tool. `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Maize_lncRNA_prediction>`_.
-- Integrating pyrpipe scripts within a workflow management system (Snakemake). `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Human_annotation_snakemake>`_.
-- Guide for integrating third-party tools into pyrpipe. `Link <https://github.com/urmi-21/pyrpipe/blob/master/examples(case-studies)/Integrating%20third-party%20tools.ipynb>`_.
- 
 
 ***********
 Philosophy
 ***********
+pyrpipe's framework allows any UNIX command to be imported in python. This can be used to build computational pipelines in pure python.
+
 pyrpipe provides dedicated high-level APIs to bioinformatic tools for easy development of workflows.
 pyrpipe follows an object oriented approach in which the tools, its parameters and data are encapsulated as classes.
 Objects of these classes can be the used to build workflows. Each class representing a tool has a `run()` method to invoke the tool by providing all necessary parameters.
@@ -101,6 +99,16 @@ For example::
 	obj=Samtools(threads=8) #init object
 	obj.run_samtools("sort",**{"-o":"out.bam","-@":"4","--":("in.bam",)})
 
+*****************************
+Examples and Case-Studies
+*****************************
+Example usage and case-studies with real data is provided at `GitHub <https://github.com/urmi-21/pyrpipe/tree/imp/case_studies>`_.
+
+- Arabidopsis thaliana transcript assembly using pyrpipe checkpoints. `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Athaliana_transcript_assembly>`_.
+- Prediction of long non-coding RNAs (lncRNAs) in Zea mays by supplementing pyrpipe with a third-party tool. `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Maize_lncRNA_prediction>`_.
+- Integrating pyrpipe scripts within a workflow management system (Snakemake). `Link <https://github.com/urmi-21/pyrpipe/tree/master/examples(case-studies)/Human_annotation_snakemake>`_.
+- Guide for integrating third-party tools into pyrpipe. `Link <https://github.com/urmi-21/pyrpipe/blob/master/examples(case-studies)/Integrating%20third-party%20tools.ipynb>`_.
+ 
 Contents
 --------
 
@@ -108,6 +116,8 @@ Contents
    :maxdepth: 2
 
    installation.rst
+   tutorial.rst
+   cookbook.rst
    usage.rst
    api.rst
 ..  faq.rst

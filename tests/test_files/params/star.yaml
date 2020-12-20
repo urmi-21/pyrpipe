@@ -1,4 +1,4 @@
---runThreadN: 5
+--runThreadN: 2
 --twopassMode: Basic
 --outFilterMultimapNmax: 20
 --alignSJoverhangMin: 8
