@@ -70,9 +70,7 @@ install:
 # command to run tests
 script:
   - ls
-  - travis_wait 60 coverage run -m pytest tests/
   #- coverage run -m pytest tests/
-  - rm -rf tests/testout/
   - cp -r tests/test_files/params .
   - travis_wait 60 coverage run -m pytest tests/
   - coverage report --show-missing  
