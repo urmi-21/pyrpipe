@@ -8,8 +8,6 @@ Created on Thu Dec  3 11:22:06 2020
 This is the main entry point into pyrpipe
 """
 
-
-import argparse
 import sys
 import os
 import json
