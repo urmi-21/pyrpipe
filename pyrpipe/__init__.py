@@ -13,6 +13,7 @@ import json
 import os
 import multiprocessing
 import psutil
+import shutil
 import platform
 from multiprocessing import cpu_count
 import logging
@@ -23,6 +24,7 @@ import pyrpipe.version
 import pyrpipe.arg_parser
 import atexit 
 from pyrpipe import pyrpipe_utils as pu
+
 
 
 ###logger
@@ -95,7 +97,16 @@ class PyrpipeLogger():
         """
         self.cmd_logger.debug("# Start Log")    
         self.cmd_logger.debug("# pyrpipe version: "+pyrpipe.version.__version__)    
+        self.cmd_logger.debug("# Script file: "+_scriptfile)    
+        self.cmd_logger.debug("# MD5 checksum: "+_md5)    
         #log command line
+        self.cmd_logger.debug("# Full command: "+_full_command)    
+        #log script commands
+        self.cmd_logger.debug("# Script options: "+_script_opts)    
+        #write mdf for any input files
+        for k,v in _optsmd5.items():
+            self.cmd_logger.debug("# Input MD5 checksum {}:{}".format(k,v))    
+        
         #TODO
 
     def init_envlog(self):
@@ -153,6 +164,7 @@ class Conf:
         #if conf file is present use it
         conf_file_path='pyrpipe.conf'
         if os.path.exists(conf_file_path):
+            pu.print_yellow('Reading from pyrpipe.conf')
             with open(conf_file_path) as conf_file:
                 data = json.load(conf_file)
             self._dry=data['dry']
@@ -165,6 +177,7 @@ class Conf:
             self._memory=data['memory']
             self._safe = data['safe']
             self.init_threads_mem()
+            
         #else use arguments passed
         else:
             args, unknownargs = pyrpipe.arg_parser.parser.parse_known_args()
@@ -183,7 +196,6 @@ class Conf:
                 #invoked using python file.py [opts]
                 #update sys.argv to ignore all pyrpipe specific args
                 sys.argv=[sys.argv[0]]+unknownargs
-                #print('MODified sys',sys.argv)
             
             #threads
             self._threads=args.threads
@@ -227,9 +239,15 @@ class Conf:
         
             
 #if pyrpipe_diagnostic is invoked
-if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic' :
+if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic':
+    #will go to __diagnostic__.main
+    pass
+elif sys.argv[0].split('/')[-1]=='pyrpipe':
+    #will go to __main__.main
     pass
 else:
+    #this will execute in command was like python <script.py> [opts]
+    _full_command='python '+' '.join(sys.argv)
     conf=Conf()
     _dryrun=conf._dry
     _safe=conf._safe
@@ -242,8 +260,43 @@ else:
     _logging=conf._logging
     _verbose=conf._verbose
     _force=conf._force
+    _scriptfile=sys.argv[0]
+    _md5=pu.get_mdf(_scriptfile)
+    _configuration_path='.pyrpipe'
+    _script_opts=','.join(sys.argv)
+    
+    #create a copy of the script under .pyrpipe folder
+    if not pu.check_paths_exist(_configuration_path):
+        pu.mkdir(_configuration_path)
+    #name: _pyrpipe_hash_filename
+    target='_pyrpipe_'+_md5+'_'+pu.get_filename(_scriptfile)
+    target=os.path.join(_configuration_path,target)
+    #if file not already exist
+    if not pu.check_files_exist(target):
+        shutil.copyfile(_scriptfile, target)
+        pu.print_yellow('Creating script backup: '+target)
+    
+    #compute has of any arguments if they are files
+    _optsmd5={}
+    for s in sys.argv[1:]:
+        if pu.check_files_exist(s):
+            _optsmd5[s]=pu.get_mdf(s)
+    
 
-    #@atexit.register 
-    #def goodbye(): 
-    #    pu.print_yellow("Logs will be saved to {}".format(_log_name))
-    #    print("GoodBye.") 
+    @atexit.register 
+    def goodbye(): 
+        if _dryrun:
+            pu.print_yellow("This was a dry run. Logs were saved to {}".format(os.path.join(_logs_dir,_log_name+'.log')))
+            return
+        pu.print_yellow("Logs were saved to {}".format(os.path.join(_logs_dir,_log_name+'.log')))
+        #get summary from log
+        
+        #export shell commands
+        
+        #run reports/multiqc if specified
+        
+    
+    
+    
+    
+    

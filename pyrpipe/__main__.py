@@ -5,7 +5,7 @@ Created on Thu Dec  3 11:22:06 2020
 
 @author: usingh
 
-This is the main entry point into pyrpipe
+This is the main entry point into pyrpipe when invoked with pyrpipe comand
 """
 
 import sys

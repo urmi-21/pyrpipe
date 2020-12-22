@@ -11,6 +11,7 @@ import datetime as dt
 import sys
 from colorama import Fore,Back,Style
 import re
+import hashlib
 
 
 def print_boldred(text):
@@ -534,6 +535,17 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
     
     return result
              
-            
+
+def get_mdf(filename):
+    if not check_files_exist(filename):
+        print_boldred('Error calculating MD5. File {} not found'.format(filename))
+        return None
+    with open(filename,"rb") as f:
+    # read contents
+        data = f.read()    
+        # pipe contents of the file through
+    md5 = hashlib.md5(data).hexdigest()
+    return md5
+    
 
 
