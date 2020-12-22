@@ -24,6 +24,7 @@ import pyrpipe.version
 import pyrpipe.arg_parser
 import atexit 
 from pyrpipe import pyrpipe_utils as pu
+from pyrpipe import reports
 
 
 
@@ -285,13 +286,22 @@ else:
 
     @atexit.register 
     def goodbye(): 
+        logfile=os.path.join(_logs_dir,_log_name+'.log')
         if _dryrun:
-            pu.print_yellow("This was a dry run. Logs were saved to {}".format(os.path.join(_logs_dir,_log_name+'.log')))
+            pu.print_yellow("This was a dry run. Logs were saved to {}".format(logfile))
             return
-        pu.print_yellow("Logs were saved to {}".format(os.path.join(_logs_dir,_log_name+'.log')))
+        pu.print_yellow("Logs were saved to {}".format(logfile))
+        
         #get summary from log
+        envlog=logfile.replace('.log','ENV.log')
+        reports.generate_summary(logfile,envlog)
         
         #export shell commands
+        out_cmds=logfile+'_commands'
+        reports.generateBashScript(logfile,out_cmds,None)
+        out_cmds=logfile+'_failed'
+        reports.generateBashScript(logfile,out_cmds,None,coverage='i')
+        
         
         #run reports/multiqc if specified
         
