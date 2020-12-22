@@ -135,3 +135,9 @@ Use  ```vdb-config -i``` to configure SRA Toolkit. Make sure that:
 * Under the **TOOLS** tab, prefetch downloads to is set to public user-repository
 * Under the **CACHE** tab, location of public user-repository is not empty
 
+## Funding
+
+This work is funded in part by the National Science Foundation award IOS 1546858, "Orphan Genes: An Untapped Genetic Reservoir of Novel Traits".
+
+
+
