@@ -375,7 +375,36 @@ def checkEnvLog(logFile):
         sys.exit(1)
     return envLog
 
-def generateMultiqcReport(logFile,filterList,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
+
+
+def generate_multiqc(directory,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
+    #searg all _pyrpipe.log files under current directory
+    print('Findd',directory,".*_pyrpipe\.log$")
+    files=pu.find_files(directory,".*_pyrpipe\.log$",recursive=True)
+    #extract stdout from each file and save to temp
+    if not outDir:
+        outDir='MultiQC_out'
+    #create tempdir
+    if not pu.check_paths_exist(tempDir):
+        pu.mkdir(tempDir)
+    for f in files:
+        #dump stdout from logs to temp directory
+        stdout=getStdoutFromLog(f,None,coverage)
+        fid=f.split('_pyrpipe')[0].split('_')[-1]
+        for o in stdout:
+            thisName=o+"_"+fid+".txt"
+            tempFile=os.path.join(tempDir,thisName)
+            f=open(tempFile,"w")
+            f.write(stdout[o])
+            print('written',tempFile)
+            f.close()
+            
+    #run multiqc
+    mc.run(analysis_dir=directory,outdir=outDir)
+        
+    pass
+
+def generate_multiqc_from_log(logFile,filterList,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
     #dump stdout from logs to temp directory
     stdout=getStdoutFromLog(logFile,filterList,coverage)
     
@@ -489,11 +518,11 @@ def generate_summary(cmdLog,envLog,coverage='a'):
     
     pu.print_message('\n=========Summary=========')
     pu.print_message('Time start: {}     \nTime end: {}      \nTotal runtime: {}'.format(str(startTime),str(endTime), str(endTime-startTime)))
-    pu.print_message('Total commands: {}'.format(numCommands))
+    pu.print_message('Total commands run: {}'.format(numCommands))
     pu.print_green('Passed commands: {}'.format(passedCommands))
     pu.print_boldred('Failed commands: {}'.format(failedCommands))
-    pu.print_message('Total commands: {}'.format(numPrograms))
-    pu.print_message('Command list: {}'.format(",".join(progNames)))
+    pu.print_message('Total unique commands/tools: {}'.format(numPrograms))
+    pu.print_message('Command/tools list: {}'.format(",".join(progNames)))
     
     
         

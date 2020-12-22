@@ -25,6 +25,7 @@ import pyrpipe.arg_parser
 import atexit 
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import reports
+import uuid
 
 
 
@@ -106,7 +107,7 @@ class PyrpipeLogger():
         self.cmd_logger.debug("# Script options: "+_script_opts)    
         #write mdf for any input files
         for k,v in _optsmd5.items():
-            self.cmd_logger.debug("# Input MD5 checksum {}:{}".format(k,v))    
+            self.cmd_logger.debug("# Input MD5 checksum {}: {}".format(k,v))    
         
         #TODO
 
@@ -161,6 +162,7 @@ class Conf:
         self._logging=True
         self._logs_dir='pyrpipe_logs'
         self._verbose=False
+        self._multiqc=False
         
         #if conf file is present use it
         conf_file_path='pyrpipe.conf'
@@ -208,6 +210,7 @@ class Conf:
             self._logging=not args.nologs
             self._verbose=args.verbose
             self._force=args.force
+            self._multiqc=args.multiqc
             self.init_threads_mem()
             
                 
@@ -257,10 +260,12 @@ else:
     _params_dir=conf._params_dir
     _logs_dir=conf._logs_dir
     _timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
-    _log_name=_timestamp+"_pyrpipe"
+    _uuid=uuid.uuid4().hex[:5]
+    _log_name=_timestamp+"_"+_uuid+"_pyrpipe"
     _logging=conf._logging
     _verbose=conf._verbose
     _force=conf._force
+    _multiqc=conf._multiqc
     _scriptfile=sys.argv[0]
     _md5=pu.get_mdf(_scriptfile)
     _configuration_path='.pyrpipe'
@@ -290,7 +295,9 @@ else:
         if _dryrun:
             pu.print_yellow("This was a dry run. Logs were saved to {}".format(logfile))
             return
+        
         pu.print_yellow("Logs were saved to {}".format(logfile))
+        pu.print_yellow("A copy of script is saved to {} with md5 checksum {}".format(target,_md5))
         
         #get summary from log
         envlog=logfile.replace('.log','ENV.log')
@@ -304,7 +311,7 @@ else:
         
         
         #run reports/multiqc if specified
-        
+        reports.generate_multiqc(os.getcwd(),'mctemp')
     
     
     

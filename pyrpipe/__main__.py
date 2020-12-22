@@ -49,6 +49,7 @@ def args_to_list(args):
     nologs=args.nologs
     verbose=args.verbose
     force=args.force
+    multiqc=args.multiqc
     
     args_list=[]
     
@@ -75,6 +76,8 @@ def args_to_list(args):
         args_list.append('--safe-mode')
     if nologs:
         args_list.append('--no-logs')
+    if multiqc:
+        args_list.append('--multiqc')
     
     #args_list.append('--build-tools')   
     

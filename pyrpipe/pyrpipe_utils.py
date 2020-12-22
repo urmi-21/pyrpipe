@@ -513,6 +513,27 @@ def get_union(*args):
     return list(set().union(*args)) 
     
 def find_files(search_path,search_pattern,recursive=False,verbose=False):
+    """
+    Example: find_files(path,".fastq$")
+
+    Parameters
+    ----------
+    search_path : TYPE
+        DESCRIPTION.
+    search_pattern : TYPE
+        DESCRIPTION.
+    recursive : TYPE, optional
+        DESCRIPTION. The default is False.
+    verbose : TYPE, optional
+        DESCRIPTION. The default is False.
+
+    Returns
+    -------
+    result : TYPE
+        DESCRIPTION.
+
+    """
+    
     result=[]
     if not search_path:
         search_path='./'
@@ -526,7 +547,7 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
         for root, dirs, files in os.walk(search_path):
             for file in files:
                 if bool(pattern.search(file)):
-                    result.append(os.path.join(search_path,file))
+                    result.append(os.path.join(search_path,root,file))
         return result
     
     for file in os.listdir(search_path):
