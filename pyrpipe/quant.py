@@ -195,7 +195,7 @@ class Kallisto(Quant):
         outfile=os.path.join(out_dir,"abundance.tsv")
         newfile=os.path.join(out_dir,"abundance"+out_suffix+".tsv")
         #check if final files already exists
-        if not _force and pu.check_files_exist(newfile) and not _dryrun:
+        if not _force and pu.check_files_exist(newfile):
             pu.print_green('Target files {} already exist.'.format(newfile))
             return newfile
         
@@ -255,29 +255,26 @@ class Salmon(Quant):
             
     def build_index(self,index_path,transcriptome,objectid="NA"):
         """
-        build salmon index and store the path to index in self
-        
-        index_path: str
-            path to the output directory
-        index_name: str
-            index name
-        fasta: str
-            Path to fasta file
-        threads: int
-            Number of threads
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to salmon. This will override the existing options
-            
-        :return: status of salmon index
-        :rtype: bool
+
+        Parameters
+        ----------
+        index_path : TYPE
+            DESCRIPTION.
+        transcriptome : TYPE
+            DESCRIPTION.
+        objectid : TYPE, optional
+            DESCRIPTION. The default is "NA".
+
+        Raises
+        ------
+        OSError
+            DESCRIPTION.
+
+        Returns
+        -------
+        bool
+            DESCRIPTION.
+
         """
         
         #if index already exists then exit
@@ -373,7 +370,7 @@ class Salmon(Quant):
         outfile=os.path.join(out_dir,"quant.sf")
         newfile=os.path.join(out_dir,"quant"+out_suffix+".sf")
         #check if final files already exists
-        if not _force and pu.check_files_exist(newfile) and not _dryrun:
+        if not _force and pu.check_files_exist(newfile):
             pu.print_green('Target files {} already exist.'.format(newfile))
             return newfile
         

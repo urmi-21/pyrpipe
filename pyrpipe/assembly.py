@@ -184,7 +184,7 @@ class Cufflinks(Assembly):
         out_gtf_file=os.path.join(out_dir,fname+out_suffix+".gtf")
         
         #if final file already exists
-        if not _force and pu.check_files_exist(out_gtf_file) and not _dryrun:
+        if not _force and pu.check_files_exist(out_gtf_file):
             pu.print_green('Target files {} already exist.'.format(out_gtf_file))
             return out_gtf_file
         

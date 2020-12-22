@@ -133,7 +133,7 @@ class PyrpipeLogger():
 #read pyrpipe.conf in current dir
 class Conf:
     def __init__( self):
-        #if conf file is not present these default values will be used
+        #init default values to use
         self._dry = False
         self._safe = False
         #roughly 80% of available cpu cores
@@ -146,6 +146,7 @@ class Conf:
         self._logs_dir='pyrpipe_logs'
         self._verbose=False
         
+        #if conf file is present use it
         conf_file_path='pyrpipe.conf'
         if os.path.exists(conf_file_path):
             with open(conf_file_path) as conf_file:
@@ -159,14 +160,49 @@ class Conf:
             self._verbose=data['verbose']
             self._memory=data['memory']
             self._safe = data['safe']
-            #check valid threads and mem
-            if not self._threads or not self._threads.replace('.','',1).isdigit():
-                self._threads=max(int(multiprocessing.cpu_count()*0.8),1)
-            if not self._memory or not self._memory.replace('.','',1).isdigit():
-                self._memory=psutil.virtual_memory()[0]/1000000000*0.8
+            self.init_threads_mem()
+        #else use arguments passed
+        else:
+            args, unknownargs = pyrpipe.arg_parser.parser.parse_known_args()
+            if args.versioninfo:
+                ver=pyrpipe.version.__version__
+                print("pyrpipe version {}".format(ver))
+                sys.exit(0)
+
+            infile=args.infile
+            """
+            if infile is present implies invoked via pyrpipe command and control will go to the __main__ module
+            If infile is absent, it was invoked using python script.py command. In this case all pyrpipe options are read
+            and removed from the argv parameters so that passed argv  are available to the script.py
+            """
+            if not infile:
+                #invoked using python file.py [opts]
+                #update sys.argv to ignore all pyrpipe specific args
+                sys.argv=[sys.argv[0]]+unknownargs
+                #print('MODified sys',sys.argv)
+            
+            #threads
+            self._threads=args.threads
+            self._memory=args.mem
+            self._dry=args.dryrun
+            self._safe=args.safemode
+            self._params_dir=args.paramdir
+            self._logs_dir=args.logsdir
+            self._logging=not args.nologs
+            self._verbose=args.verbose
+            self._force=args.force
+            self.init_threads_mem()
+            
                 
         #TODO: overwrite any arguments paased via cmd line
         #self.init_sys_args()
+    
+    def init_threads_mem(self):
+        #check valid threads and mem
+        if not self._threads or not self._threads.replace('.','',1).isdigit():
+            self._threads=max(int(multiprocessing.cpu_count()*0.8),1)
+        if not self._memory or not self._memory.replace('.','',1).isdigit():
+            self._memory=psutil.virtual_memory()[0]/1000000000*0.8
         
     #Not used    
     def init_sys_args(self):
@@ -198,5 +234,4 @@ _logging=conf._logging
 _verbose=conf._verbose
 _force=conf._force
 
-#create logger
-#pyrpipe_logger=PyrpipeLogger()
+

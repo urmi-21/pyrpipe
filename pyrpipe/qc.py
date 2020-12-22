@@ -103,7 +103,7 @@ class Trimgalore(RNASeqQC):
             out_file2=os.path.join(out_dir,pu.get_file_basename(fq2)+out_suffix+".fastq")
             
             #check if final files already exists
-            if not _force and pu.check_files_exist(out_file1,out_file2) and not _dryrun:
+            if not _force and pu.check_files_exist(out_file1,out_file2):
                 pu.print_green('Target files {}, {} already exist.'.format(out_file1,out_file2))
                 return out_file1,out_file2
             
@@ -137,7 +137,7 @@ class Trimgalore(RNASeqQC):
             #target
             out_file=os.path.join(out_dir, pu.get_file_basename(fq)+out_suffix+".fastq")
             #check if final files already exists
-            if not _force and pu.check_files_exist(out_file) and not _dryrun:
+            if not _force and pu.check_files_exist(out_file):
                 pu.print_green('Target files {} already exist.'.format(out_file))
                 return (out_file,)
             

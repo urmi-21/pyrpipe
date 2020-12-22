@@ -203,7 +203,7 @@ class Hisat2(Aligner):
         outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
         outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
         #check if final bam already exists
-        if not _force and pu.check_files_exist(outBamFile) and not _dryrun:
+        if not _force and pu.check_files_exist(outBamFile):
             pu.print_green('Target files {} already exist.'.format(outBamFile))
             return outBamFile
         
@@ -402,7 +402,7 @@ class Star(Aligner):
         finalbam=bam.split('.bam')[0]+out_suffix+'.bam'
         
         #check if final bam already exists
-        if not _force and pu.check_files_exist(finalbam) and not _dryrun:
+        if not _force and pu.check_files_exist(finalbam):
             pu.print_green('Target files {} already exist.'.format(finalbam))
             return finalbam
             

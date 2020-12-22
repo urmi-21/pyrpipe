@@ -14,6 +14,8 @@ parser = argparse.ArgumentParser(description='pyrpipe: A lightweight python pack
 usage="""
 pyrpipe [<options>] <infile.py>
 """)
+
+
 parser.add_argument("--threads", help="Num processes/threads to use\nDefault:mp.cpu_count()")
 parser.add_argument('--max-memory', help='Max memory to use (in GB)\ndefault: None',action="store",dest='mem')
 parser.add_argument("--verbose", help="Print pyrpipe_engine's stdout and stderr\nDefault: False",default=False,dest='verbose', action='store_true')
@@ -29,4 +31,6 @@ parser.add_argument("--test-sratools", help="Test if NCBI SRA-Tools is woking.",
 
 parser.add_argument("--version", help="Print version information and exit",default=False,dest='versioninfo', action='store_true')
 
-parser.add_argument('infile', help='The input python script',action="store",nargs="?")
+#parser.add_argument('infile', help='The input python script',action="store",nargs="?")
+required_input = parser.add_argument_group('Required input file if invoking via pyrpipe command')
+required_input.add_argument('--in', help='The input python script', required=False,dest='infile')

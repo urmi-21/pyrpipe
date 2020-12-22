@@ -10,19 +10,13 @@ This is the main entry point into pyrpipe
 
 import sys
 import os
-import json
 import pyrpipe.arg_parser
 import pyrpipe.version
 
 
-
-
 def main():
     ver=pyrpipe.version.__version__
-    #args = parser.parse_args()
-    args, unknownargs = pyrpipe.arg_parser.parser.parse_known_args()
-    
-    
+    args, unknownargs = pyrpipe.arg_parser.parser.parse_known_args()   
     
     if args.versioninfo:
         print("pyrpipe version {}".format(ver))
@@ -33,34 +27,71 @@ def main():
         pyrpipe.arg_parser.parser.print_help()
         sys.exit(1)
     
+    
+    
+        
+    args_list=args_to_list(args)
+    
+    cmd=['python',infile]+args_list+unknownargs
+    
+    print('CMD',' '.join(cmd))
+    
+    os.system(' '.join(cmd))
+    
+    #perform auto reports    
+    
+    
+def args_to_list(args):
     #threads
-    procs=args.threads
+    threads=args.threads
     mem=args.mem
-    dryrun=args.dryrun
-    safemode=args.safemode
     paramdir=args.paramdir
     logsdir=args.logsdir
+    dryrun=args.dryrun
+    safemode=args.safemode
     nologs=args.nologs
     verbose=args.verbose
     force=args.force
     
+    args_list=[]
     
-        
+    if threads:
+        args_list.append('--threads')
+        args_list.append(threads)
+    if mem:
+        args_list.append('--max-memory')
+        args_list.append(mem)
+    if paramdir:
+        args_list.append('--param-dir')
+        args_list.append(paramdir)
+    if logsdir:
+        args_list.append('--logs-dir')
+        args_list.append(logsdir)
     
+    if verbose:
+        args_list.append('--verbose')
+    if dryrun:
+        args_list.append('--dry-run')
+    if force:
+        args_list.append('--force')
+    if safemode:
+        args_list.append('--safe-mode')
+    if nologs:
+        args_list.append('--no-logs')
     
-    #call main program
-    caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs)
+    #args_list.append('--build-tools')   
     
+    return args_list
     
     
 if __name__ == '__main__':
     main()
 
-def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs):
+def caller(threads,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs):
     #write pyrpipe configuration
     #everything saved as str
     conf={}
-    conf['threads']=procs
+    conf['threads']=threads
     conf['memory']=mem
     conf['params_dir']=paramdir
     conf['dry']=dryrun
@@ -70,11 +101,12 @@ def caller(procs,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infil
     conf['logging']= not nologs
     conf['verbose']=verbose
     
-    with open('pyrpipe.conf', 'w') as outfile:
-        json.dump(conf, outfile,indent=4)
-    
+    #with open('pyrpipe.conf', 'w') as outfile:
+    #    json.dump(conf, outfile,indent=4)
     #execute
     cmd=['python',infile]+unknownargs
+    print('MAININFILE',infile,unknownargs)
+    print('CMD',' '.join(cmd))
     os.system(' '.join(cmd))
     
     
