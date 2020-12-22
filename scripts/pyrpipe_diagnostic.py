@@ -41,7 +41,8 @@ def parseEnvLog(envLog):
                 sysInfo=json.loads(l)
             else:
                 thisProgram=json.loads(l)
-                progList[thisProgram['name']]=thisProgram
+                if 'name' in thisProgram:
+                    progList[thisProgram['name']]=thisProgram
     return sysInfo,progList
 
 def generateEnvReportTable(sysInfo,progList):

@@ -21,13 +21,14 @@ from shutil import which
 from pyrpipe import _dryrun
 from pyrpipe import _safe
 from pyrpipe import _logs_dir
+from pyrpipe import _log_name
 from pyrpipe import _logging
 from pyrpipe import _verbose
 from pyrpipe import PyrpipeLogger
 
 ###create logger
 if _logging:
-    pyrpipe_logger=PyrpipeLogger(logdir=_logs_dir)
+    pyrpipe_logger=PyrpipeLogger(_log_name,logdir=_logs_dir)
     pu.print_yellow("Logs will be saved to {}".format(pyrpipe_logger.logger_path))
     
 """

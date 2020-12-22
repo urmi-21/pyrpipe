@@ -21,6 +21,8 @@ import subprocess
 import time
 import pyrpipe.version
 import pyrpipe.arg_parser
+import atexit 
+from pyrpipe import pyrpipe_utils as pu
 
 
 ###logger
@@ -42,11 +44,11 @@ class PyrpipeLogger():
     env_logger: logger to log the current environment
     cmd_logger: logger to log the execution status, stdout, stderr and runtimes for each command run using execute_command()
     """
-    def __init__(self,logdir=None):
+    def __init__(self,name,logdir=None):
         self.__name__="pyrpipeLogger"
         #loggers
-        timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
-        self.logger_basename=timestamp+"_pyrpipe"
+        #timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
+        self.logger_basename=name
         if not logdir:
             logdir="pyrpipe_logs"
         self.logs_dir=os.path.join(os.getcwd(),logdir)
@@ -230,8 +232,14 @@ _threads=str(conf._threads)
 _mem=str(conf._memory)
 _params_dir=conf._params_dir
 _logs_dir=conf._logs_dir
+_timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
+_log_name=_timestamp+"_pyrpipe"
 _logging=conf._logging
 _verbose=conf._verbose
 _force=conf._force
 
 
+#@atexit.register 
+#def goodbye(): 
+#    pu.print_yellow("Logs will be saved to {}".format(_log_name))
+#    print("GoodBye.") 

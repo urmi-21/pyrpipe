@@ -26,15 +26,12 @@ def main():
     if not infile:
         pyrpipe.arg_parser.parser.print_help()
         sys.exit(1)
-    
-    
-    
         
     args_list=args_to_list(args)
     
     cmd=['python',infile]+args_list+unknownargs
     
-    print('CMD',' '.join(cmd))
+    #print('CMD',' '.join(cmd))
     
     os.system(' '.join(cmd))
     
