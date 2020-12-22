@@ -12,7 +12,9 @@ import pyrpipe.version
 ver=pyrpipe.version.__version__
 parser = argparse.ArgumentParser(description='pyrpipe: A lightweight python package for RNA-Seq workflows (version {})'.format(ver),
 usage="""
-pyrpipe [<options>] <infile.py>
+pyrpipe [<pyrpipe options>] --in <script.py> [<script options>]
+OR
+python <script.py> [<pyrpipe options>] [<script options>]
 """)
 
 

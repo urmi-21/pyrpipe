@@ -95,6 +95,8 @@ class PyrpipeLogger():
         """
         self.cmd_logger.debug("# Start Log")    
         self.cmd_logger.debug("# pyrpipe version: "+pyrpipe.version.__version__)    
+        #log command line
+        #TODO
 
     def init_envlog(self):
         """init the envlog
@@ -224,22 +226,24 @@ class Conf:
         self._force=args.force
         
             
-                
-conf=Conf()
-_dryrun=conf._dry
-_safe=conf._safe
-_threads=str(conf._threads)
-_mem=str(conf._memory)
-_params_dir=conf._params_dir
-_logs_dir=conf._logs_dir
-_timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
-_log_name=_timestamp+"_pyrpipe"
-_logging=conf._logging
-_verbose=conf._verbose
-_force=conf._force
+#if pyrpipe_diagnostic is invoked
+if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic' :
+    pass
+else:
+    conf=Conf()
+    _dryrun=conf._dry
+    _safe=conf._safe
+    _threads=str(conf._threads)
+    _mem=str(conf._memory)
+    _params_dir=conf._params_dir
+    _logs_dir=conf._logs_dir
+    _timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
+    _log_name=_timestamp+"_pyrpipe"
+    _logging=conf._logging
+    _verbose=conf._verbose
+    _force=conf._force
 
-
-#@atexit.register 
-#def goodbye(): 
-#    pu.print_yellow("Logs will be saved to {}".format(_log_name))
-#    print("GoodBye.") 
+    #@atexit.register 
+    #def goodbye(): 
+    #    pu.print_yellow("Logs will be saved to {}".format(_log_name))
+    #    print("GoodBye.") 
