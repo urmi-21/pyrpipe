@@ -16,7 +16,6 @@ from html import escape
 import datetime as dt
 import multiqc as mc
 from pyrpipe import benchmark as bm
-from pyrpipe import pyrpipe_utils as pu
 
 try:
     import importlib.resources as pkg_resources
@@ -379,7 +378,6 @@ def checkEnvLog(logFile):
 
 def generate_multiqc(directory,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
     #searg all _pyrpipe.log files under current directory
-    print('Findd',directory,".*_pyrpipe\.log$")
     files=pu.find_files(directory,".*_pyrpipe\.log$",recursive=True)
     #extract stdout from each file and save to temp
     if not outDir:
@@ -396,7 +394,7 @@ def generate_multiqc(directory,tempDir,outDir="",coverage='a',verbose=False,clea
             tempFile=os.path.join(tempDir,thisName)
             f=open(tempFile,"w")
             f.write(stdout[o])
-            print('written',tempFile)
+            #print('written',tempFile)
             f.close()
             
     #run multiqc

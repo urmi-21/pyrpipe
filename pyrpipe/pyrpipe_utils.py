@@ -544,12 +544,13 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
         for root, dirs, files in os.walk(search_path):
             for file in files:
                 if bool(pattern.search(file)):
-                    result.append(os.path.join(search_path,root,file))
+                    result.append(os.path.join(root,file))
         return result
     
     for file in os.listdir(search_path):
         if bool(pattern.search(file)):
             result.append(os.path.join(search_path,file))
+    
     
     return result
              

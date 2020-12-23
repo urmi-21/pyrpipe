@@ -187,8 +187,8 @@ def multiqc():
     #if log file is used
     if pu.check_files_exist(logFile):
         reports.generate_multiqc_from_log(logFile,filters,tempDir,outDir=outDir,coverage=args.c,verbose=args.v,cleanup=args.r)
-        
-    reports.generate_multiqc(os.getcwd(),'mctemp')
+    else:
+        reports.generate_multiqc(logFile,tempDir,outDir=outDir,coverage=args.c,verbose=args.v,cleanup=args.r)
 
 
 def main():

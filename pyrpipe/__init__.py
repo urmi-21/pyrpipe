@@ -302,6 +302,10 @@ else:
         @atexit.register 
         def goodbye(): 
             logfile=os.path.join(_logs_dir,_log_name+'.log')
+            #if log was created
+            if not pu.check_files_exist(logfile):
+                pu.print_yellow("No logs written")
+                return
             if _dryrun:
                 pu.print_yellow("This was a dry run. Logs were saved to {}".format(logfile))
                 return
@@ -319,7 +323,7 @@ else:
             out_cmds=logfile+'_failed'
             reports.generateBashScript(logfile,out_cmds,None,coverage='i')             
             #run reports/multiqc if specified
-            if _multiqc: reports.generate_multiqc(os.getcwd(),'mctemp')
+            if _multiqc: reports.generate_multiqc(directory=os.getcwd(),tempDir='MultiQC_temp',outDir='MultiQC_out')
     
 
     
