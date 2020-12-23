@@ -264,8 +264,6 @@ elif sys.argv[0].split('/')[-1]=='pyrpipe':
     pass
 else:
     
-    print('SYSYSSS',sys.argv)
-    
     run_py=False
     _full_command=' '.join(sys.argv)
     #this will execute in command was like python <script.py> [opts]
