@@ -98,7 +98,7 @@ def caller(threads,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,inf
     conf['force']=force
     conf['safe']=safemode
     conf['logs_dir']=logsdir
-    conf['logging']= not nologs
+    conf['logs']= not nologs
     conf['verbose']=verbose
     
     #with open('pyrpipe.conf', 'w') as outfile:

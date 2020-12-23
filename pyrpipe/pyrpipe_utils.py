@@ -557,7 +557,7 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
 
 def get_mdf(filename):
     if not check_files_exist(filename):
-        print_boldred('Error calculating MD5. File {} not found'.format(filename))
+        #print_boldred('Error calculating MD5. File {} not found'.format(filename))
         return None
     with open(filename,"rb") as f:
     # read contents

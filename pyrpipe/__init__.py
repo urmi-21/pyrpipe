@@ -9,6 +9,7 @@ Read pyrpipe configuration
 """
 
 import sys
+import yaml
 import json
 import os
 import multiprocessing
@@ -100,7 +101,7 @@ class PyrpipeLogger():
         self.cmd_logger.debug("# Start Log")    
         self.cmd_logger.debug("# pyrpipe version: "+pyrpipe.version.__version__)    
         self.cmd_logger.debug("# Script file: "+_scriptfile)    
-        self.cmd_logger.debug("# MD5 checksum: "+_md5)    
+        self.cmd_logger.debug("# MD5 checksum: "+str(_md5))    
         #log command line
         self.cmd_logger.debug("# Full command: "+_full_command)    
         #log script commands
@@ -154,32 +155,38 @@ class Conf:
         self._dry = False
         self._safe = False
         #roughly 80% of available cpu cores
-        self._threads=max(int(multiprocessing.cpu_count()*0.8),1)
+        self._threads=str(max(int(multiprocessing.cpu_count()*0.8),1))
         self._force=False
         self._params_dir='params'
         #roughly 80% of available memory
-        self._memory=psutil.virtual_memory()[0]/1000000000*0.8
+        self._memory=str(psutil.virtual_memory()[0]/1000000000*0.8)
         self._logging=True
         self._logs_dir='pyrpipe_logs'
         self._verbose=False
         self._multiqc=False
         
         #if conf file is present use it
-        conf_file_path='pyrpipe.conf'
+        conf_file_path='pyrpipe_conf.yaml'
         if os.path.exists(conf_file_path):
-            pu.print_yellow('Reading from pyrpipe.conf')
-            with open(conf_file_path) as conf_file:
-                data = json.load(conf_file)
-            self._dry=data['dry']
-            self._threads=data['threads']
-            self._force=data['force']
-            self._params_dir=data['params_dir']
-            self._logging=data['logging']
-            self._logs_dir=data['logs_dir']
-            self._verbose=data['verbose']
-            self._memory=data['memory']
-            self._safe = data['safe']
+            pu.print_yellow('Reading configuration from pyrpipe_conf.yaml')                    
+            #load yaml
+            with open(conf_file_path) as f:
+                data=yaml.full_load(f)
+                
+            #boolean values are not converted to str
+            if 'dry' in data: self._dry=data['dry']
+            if 'threads' in data: self._threads=str(data['threads'])
+            if 'force' in data: self._force=data['force']
+            if 'params_dir' in data: self._params_dir=str(data['params_dir'])
+            if 'logs' in data: self._logging=data['logs']
+            if 'logs_dir' in data: self._logs_dir=data['logs_dir']
+            if 'verbose' in data: self._verbose=data['verbose']
+            if 'memory' in data: self._memory=str(data['memory'])
+            if 'safe' in data: self._safe=data['safe']
+            if 'multiqc' in data: self._multiqc=data['multiqc']
+            
             self.init_threads_mem()
+            
             
         #else use arguments passed
         else:
@@ -190,11 +197,7 @@ class Conf:
                 sys.exit(0)
 
             infile=args.infile
-            """
-            if infile is present implies invoked via pyrpipe command and control will go to the __main__ module
-            If infile is absent, it was invoked using python script.py command. In this case all pyrpipe options are read
-            and removed from the argv parameters so that passed argv  are available to the script.py
-            """
+            
             if not infile:
                 #invoked using python file.py [opts]
                 #update sys.argv to ignore all pyrpipe specific args
@@ -212,6 +215,7 @@ class Conf:
             self._force=args.force
             self._multiqc=args.multiqc
             self.init_threads_mem()
+            
             
                 
         #TODO: overwrite any arguments paased via cmd line
@@ -241,7 +245,16 @@ class Conf:
         self._verbose=args.verbose
         self._force=args.force
         
-            
+
+"""
+Decide what to run based on how pyrpipe was invoked
+
+There are multiple ways to execute a python script containing pyrpipe code
+
+if infile is present implies invoked via pyrpipe command and control will go to the __main__ module
+If infile is absent, it was invoked using python script.py command. In this case all pyrpipe options are read
+and removed from the argv parameters so that passed argv  are available to the script.py
+"""
 #if pyrpipe_diagnostic is invoked
 if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic':
     #will go to __diagnostic__.main
@@ -250,6 +263,8 @@ elif sys.argv[0].split('/')[-1]=='pyrpipe':
     #will go to __main__.main
     pass
 else:
+    
+    print('SYSYSSS',sys.argv)
     
     run_py=False
     _full_command=' '.join(sys.argv)
@@ -274,15 +289,19 @@ else:
     _verbose=conf._verbose
     _force=conf._force
     _multiqc=conf._multiqc
-    _scriptfile=sys.argv[0]
-    _md5=pu.get_mdf(_scriptfile)
     _configuration_path='.pyrpipe'
     _script_opts=','.join(sys.argv)
     
+    #default values
     _optsmd5={}
     target=''
-    #if a script was executed using python command
-    if run_py:
+    #compute md5 on input script
+    _scriptfile=sys.argv[0]
+    _md5=pu.get_mdf(_scriptfile)
+    
+    #if a script was executed using python command e.g. python script.py or pyrpipe --in file.py
+    #this block will not get executed if script is called by pytest or snakemake etc
+    if run_py:        
         #create a copy of the script under .pyrpipe folder
         if not pu.check_paths_exist(_configuration_path):
             pu.mkdir(_configuration_path)
@@ -294,7 +313,7 @@ else:
             shutil.copyfile(_scriptfile, target)
             pu.print_yellow('Creating script backup: '+target)
     
-        #compute has of any arguments if they are files
+        #compute md5sum of any arguments if they are files
         for s in sys.argv[1:]:
             if pu.check_files_exist(s):
                 _optsmd5[s]=pu.get_mdf(s)

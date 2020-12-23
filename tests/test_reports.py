@@ -43,9 +43,7 @@ def test_multiqc2():
     
 def test_multiqc3():    
     reports.generate_multiqc(directory='tests/testout',tempDir='tests/testout/mqctmp3',outDir='tests/testout/mqcout3')
-    
-def test_multiqc4():    
-    reports. generate_multiqc_from_log(logfile,None,'tests/testout/mqctmp4',outDir='tests/testout/mqcout4')
+      
     
 def test_report2():
     reports.generateBenchmarkReport(logfile,envlogfile,None,'tests/testout/mqctmp',outFile="",verbose=False)
@@ -69,7 +67,10 @@ def test_HTMLReport():
     reports.generateHTMLReport('simpleDiv.html',logfile,envlogfile,coverage='f')
     
     
-    
+def test_multiqc4():
+    cmd="rm -r tests/testout"
+    assert pe.execute_command(cmd.split(),objectid="",command_name="")==True,'removing failed'
+    #reports.generate_multiqc_from_log(logfile,None,'tests/testout/mqctmp4',outDir='tests/testout/mqcout4')   
     
     
     
