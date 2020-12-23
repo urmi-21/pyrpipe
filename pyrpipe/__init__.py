@@ -295,12 +295,10 @@ else:
             pu.print_yellow('Creating script backup: '+target)
     
         #compute has of any arguments if they are files
-        
         for s in sys.argv[1:]:
             if pu.check_files_exist(s):
                 _optsmd5[s]=pu.get_mdf(s)
     
-
         @atexit.register 
         def goodbye(): 
             logfile=os.path.join(_logs_dir,_log_name+'.log')
@@ -321,7 +319,7 @@ else:
             out_cmds=logfile+'_failed'
             reports.generateBashScript(logfile,out_cmds,None,coverage='i')             
             #run reports/multiqc if specified
-            reports.generate_multiqc(os.getcwd(),'mctemp')
+            if _multiqc: reports.generate_multiqc(os.getcwd(),'mctemp')
     
 
     
