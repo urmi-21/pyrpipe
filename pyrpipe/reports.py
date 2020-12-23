@@ -405,7 +405,8 @@ def generate_multiqc(directory,tempDir,outDir="",coverage='a',verbose=False,clea
 def generate_multiqc_from_log(logFile,filterList,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
     #dump stdout from logs to temp directory
     stdout=getStdoutFromLog(logFile,filterList,coverage)
-    
+    #create tmpdir
+    pu.mkdir(tempDir)
     flist=[]
     for o in stdout:
         thisName=o+".txt"
