@@ -135,10 +135,8 @@ def get_sra_ftppath(srrid):
     """
     if len(srrid) <6:
         return None
-    
     parent_path="anonftp@ftp.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/"
     parent_path=parent_path+srrid[0:3]+"/"+srrid[0:6]+"/"+srrid+"/"+srrid+".sra"
-    
     return parent_path
     
 
@@ -491,7 +489,6 @@ def get_file_basename(file_path):
     """
     return os.path.splitext(get_filename(file_path))[0]
     
-
 
 
 def mkdir(dir_path):

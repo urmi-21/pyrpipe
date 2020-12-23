@@ -250,8 +250,16 @@ elif sys.argv[0].split('/')[-1]=='pyrpipe':
     #will go to __main__.main
     pass
 else:
+    
+    run_py=False
+    _full_command=' '.join(sys.argv)
     #this will execute in command was like python <script.py> [opts]
-    _full_command='python '+' '.join(sys.argv)
+    if sys.argv[0].endswith('.py'):
+        run_py=True
+        _full_command='python '+' '.join(sys.argv)
+    
+    
+    
     conf=Conf()
     _dryrun=conf._dry
     _safe=conf._safe
@@ -271,49 +279,51 @@ else:
     _configuration_path='.pyrpipe'
     _script_opts=','.join(sys.argv)
     
-    #create a copy of the script under .pyrpipe folder
-    if not pu.check_paths_exist(_configuration_path):
-        pu.mkdir(_configuration_path)
-    #name: _pyrpipe_hash_filename
-    target='_pyrpipe_'+_md5+'_'+pu.get_filename(_scriptfile)
-    target=os.path.join(_configuration_path,target)
-    #if file not already exist
-    if not pu.check_files_exist(target):
-        shutil.copyfile(_scriptfile, target)
-        pu.print_yellow('Creating script backup: '+target)
-    
-    #compute has of any arguments if they are files
     _optsmd5={}
-    for s in sys.argv[1:]:
-        if pu.check_files_exist(s):
-            _optsmd5[s]=pu.get_mdf(s)
+    target=''
+    #if a script was executed using python command
+    if run_py:
+        #create a copy of the script under .pyrpipe folder
+        if not pu.check_paths_exist(_configuration_path):
+            pu.mkdir(_configuration_path)
+        #name: _pyrpipe_hash_filename
+        target='_pyrpipe_'+_md5+'_'+pu.get_filename(_scriptfile)
+        target=os.path.join(_configuration_path,target)
+        #if file not already exist
+        if not pu.check_files_exist(target):
+            shutil.copyfile(_scriptfile, target)
+            pu.print_yellow('Creating script backup: '+target)
+    
+        #compute has of any arguments if they are files
+        
+        for s in sys.argv[1:]:
+            if pu.check_files_exist(s):
+                _optsmd5[s]=pu.get_mdf(s)
     
 
-    @atexit.register 
-    def goodbye(): 
-        logfile=os.path.join(_logs_dir,_log_name+'.log')
-        if _dryrun:
-            pu.print_yellow("This was a dry run. Logs were saved to {}".format(logfile))
-            return
-        
-        pu.print_yellow("Logs were saved to {}".format(logfile))
-        pu.print_yellow("A copy of script is saved to {} with md5 checksum {}".format(target,_md5))
-        
-        #get summary from log
-        envlog=logfile.replace('.log','ENV.log')
-        reports.generate_summary(logfile,envlog)
-        
-        #export shell commands
-        out_cmds=logfile+'_commands'
-        reports.generateBashScript(logfile,out_cmds,None)
-        out_cmds=logfile+'_failed'
-        reports.generateBashScript(logfile,out_cmds,None,coverage='i')
-        
-        
-        #run reports/multiqc if specified
-        reports.generate_multiqc(os.getcwd(),'mctemp')
+        @atexit.register 
+        def goodbye(): 
+            logfile=os.path.join(_logs_dir,_log_name+'.log')
+            if _dryrun:
+                pu.print_yellow("This was a dry run. Logs were saved to {}".format(logfile))
+                return
+            
+            pu.print_yellow("Logs were saved to {}".format(logfile))
+            pu.print_yellow("A copy of script is saved to {} with md5 checksum {}".format(target,_md5))
+            
+            #get summary from log
+            envlog=logfile.replace('.log','ENV.log')
+            reports.generate_summary(logfile,envlog)
+            
+            #export shell commands
+            out_cmds=logfile+'_commands'
+            reports.generateBashScript(logfile,out_cmds,None)
+            out_cmds=logfile+'_failed'
+            reports.generateBashScript(logfile,out_cmds,None,coverage='i')             
+            #run reports/multiqc if specified
+            reports.generate_multiqc(os.getcwd(),'mctemp')
     
-    
+
     
     
     
