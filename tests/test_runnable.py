@@ -14,7 +14,7 @@ testVars=testSpecs()
 cdna=testVars.cdna_big
 workingDir=testVars.testDir
 outdir=os.path.join(workingDir,'orfipy_out')
-param={'--outdir':outdir,'--procs':'3','--dna':'orfs.fa','--bed':'orfs.bed'}
+param={'--outdir':outdir,'--procs':'1','--dna':'orfs.fa','--bed':'orfs.bed'}
 
 
 def test_basic():
