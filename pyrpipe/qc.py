@@ -370,10 +370,3 @@ class BBmap(RNASeqQC):
             pu.print_boldred("bbsplit failed")
         #return status
         return status
-    
-    
-    
-    
-    
-    
-        

@@ -320,7 +320,6 @@ def execute_command(cmd,verbose=_verbose,logs=_logging,objectid=None,command_nam
 
 
 
-#modified from https://www.biostars.org/p/139422/
 def is_paired(sra_file):
     """Function to test wheather a .sra file is paired or single.
     
