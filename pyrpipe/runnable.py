@@ -191,22 +191,22 @@ class Runnable:
          
     def check_dependency(self,deps_list):
         """
-        
+        Check depndencies of a tool/command.
 
         Parameters
         ----------
-        deps_list : TYPE
-            DESCRIPTION.
+        deps_list : List
+            List of command to check.
 
         Raises
         ------
         OSError
-            DESCRIPTION.
+            If a command is not found raise OSError.
 
         Returns
         -------
         bool
-            DESCRIPTION.
+            Returns true is all commands are found.
 
         """
         if deps_list and not pe.check_dependencies(deps_list):
@@ -216,7 +216,8 @@ class Runnable:
                 
     def load_args(self,*args,**kwargs):
         """
-        
+        Initializes the args (positonial arguments) and kwargs (options) passed during object creation.
+        These are sored in self._args and self._kwargs for all future references.
 
         Parameters
         ----------
@@ -242,7 +243,7 @@ class Runnable:
         
     def load_yaml(self):        
         """
-        
+        Loads a .yaml file containing tool options/parameters
 
         Returns
         -------
@@ -262,19 +263,19 @@ class Runnable:
             
     def verify_integrity(self,target,verbose=False):
         """
-        
+        Verify target file is present and is not LOCKED i.e. .Lock file is not present.
 
         Parameters
         ----------
-        target : TYPE
-            DESCRIPTION.
-        verbose : TYPE, optional
-            DESCRIPTION. The default is False.
+        target : Str
+            The target file.
+        verbose : bool, optional
+            Print additional messages. The default is False.
 
         Returns
         -------
         bool
-            DESCRIPTION.
+            Return True is target is present and not Locked.
 
         """
         #check if lock exists
@@ -290,17 +291,17 @@ class Runnable:
     
     def get_lock_files(self,target):
         """
-        
+        Returns .Lock files associated with a target
 
         Parameters
         ----------
-        target : TYPE
-            DESCRIPTION.
+        target : Str
+            Target file name.
 
         Returns
         -------
-        lock_files : TYPE
-            DESCRIPTION.
+        lock_files : List
+            List of .Lock files present.
 
         """
         #check if lock exists
@@ -315,19 +316,19 @@ class Runnable:
             
     def verify_target(self,target,verbose=False):
         """
-        
+        Verify a single target file is present
 
         Parameters
         ----------
-        target : TYPE
-            DESCRIPTION.
-        verbose : TYPE, optional
-            DESCRIPTION. The default is False.
+        target : Str
+            target file name.
+        verbose : bool, optional
+            Print additional messages. The default is False.
 
         Returns
         -------
         bool
-            DESCRIPTION.
+            True is target file is presetn.
 
         """
         if not pu.check_files_exist(target):
@@ -339,19 +340,19 @@ class Runnable:
     
     def verify_target_list(self,target_list,verbose=False):
         """
-        
+        Verify a list of target files are present.
 
         Parameters
         ----------
-        target_list : TYPE
-            DESCRIPTION.
-        verbose : TYPE, optional
-            DESCRIPTION. The default is False.
+        target_list : List
+            List of target files.
+        verbose : bool, optional
+            Print additional messages. The default is False.
 
         Returns
         -------
         bool
-            DESCRIPTION.
+            True is all targets are present.
 
         """
         #nothing to verify
@@ -365,19 +366,19 @@ class Runnable:
     
     def create_lock(self,target_list,message):
         """
-        
+        Cretes a temporary .Lock file associated with a target file and write a message in it.
 
         Parameters
         ----------
-        target_list : TYPE
-            DESCRIPTION.
-        message : TYPE
-            DESCRIPTION.
+        target_list : List
+            List of target files.
+        message : Str
+            Message to write in file.
 
         Returns
         -------
-        templist : TYPE
-            DESCRIPTION.
+        templist : List
+            A list of .Lock file names coressponding to the target files.
 
         """
         templist=[]
@@ -395,12 +396,12 @@ class Runnable:
     
     def remove_locks(self,file_list):
         """
-        
+        Take a list of file names and removes them using os.remove
 
         Parameters
         ----------
-        file_list : TYPE
-            DESCRIPTION.
+        file_list : List
+            List of file names ending with .Lock.
 
         Returns
         -------
@@ -414,17 +415,17 @@ class Runnable:
     
     def get_valid_parameters(self,subcommand):
         """
-        
+        Returns th evalid parameter list for a command subcommand after looking up the self_valid_args dictionary.
 
         Parameters
         ----------
-        subcommand : TYPE
-            DESCRIPTION.
+        subcommand : Str
+            The subcommand name
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        List
+            Returns the list of valid options for the subcommand.
 
         """
         if subcommand:
