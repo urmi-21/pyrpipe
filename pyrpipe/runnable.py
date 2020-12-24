@@ -16,6 +16,20 @@ import tempfile
 
 class Runnable:
     """The runnable class
+    
+    Attributes
+    ----------
+    _runnable : bool
+        Boolean indicating the runnable command
+    _command : str
+        Name of the unix command
+    _param_yaml : str
+        the name/path of .yaml file contating tool/command options (relative to the --param-dir)
+    _args_style : str
+        Style of commands: --key value(LINUX) or key=value(JAVA)
+    _valid_args : dict or list
+        A dict containing valid arguments for command subcommand, accessible as _valid_args[subcommand], or a list of valid options for command.
+        
     """
     def __init__(self,*args,command=None,yaml=None,style='LINUX',deps=None,valid_args=None,**kwargs):
         """
