@@ -25,6 +25,7 @@ def report():
                     
                     ''')    
     parser.add_argument('-o', help='out file \ndefault: same as input logfile',action="store")
+    parser.add_argument('-s','--summary', help='Print quick summary and exit',default=False,dest='summary', action='store_true')
     parser.add_argument('-e', help='report output type: [md,pdf,html] \ndefault: pdf',default='pdf',action="store")
     parser.add_argument('-c',help='Report options [(f)ull,fa(i)l,(p)ass]\ndefault: f',default='f',action="store")
     parser.add_argument('-v',help='verbose',action="store_true")
@@ -34,9 +35,16 @@ def report():
     logFile=args.logfile
     envLog=reports.checkEnvLog(logFile)    
     #parse args
+    if args.summary:
+        #print summary
+        reports.generate_summary(logFile,envLog,coverage='a')
+        return
+    
     vFlag=args.v
     if vFlag:
         print("Generating report")
+        
+        
     outFile=""
     if args.o is None:
         outFile=pu.get_file_basename(args.logfile)
