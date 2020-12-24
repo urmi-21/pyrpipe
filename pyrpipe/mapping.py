@@ -46,11 +46,38 @@ class Aligner(Runnable):
 
 class Hisat2(Aligner):
     """
+    Extends Aligner class
     Attributes
     ----------
     
     """ 
     def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
+        """
+        init Hisat2 object
+
+        Parameters
+        ----------
+        *args : tuple
+            Positional arguements
+        index : Str, optional
+            Path to Hisat index. If index is not present it will generate an index using the genome. Index can be supplied via the hisat2.yaml file too. The default is None.
+        genome : Str, optional
+            Path to the reference genome. This will be used to build an index if index is not present The default is None.
+        threads : int, optional
+            Threads to use for hisat2. This will override the global --threads parameter supplied to pyrpipe. The default is None.
+        **kwargs : dict
+            keyword arguments
+
+        Raises
+        ------
+        ValueError
+            Raises ValueError if hista index is not found and genome is not present to generate an index.
+
+        Returns
+        -------
+        None.
+
+        """
         super().__init__(*args,**kwargs)
         self._command='hisat2'
         self._deps=[self._command,'samtools']
@@ -85,31 +112,10 @@ class Hisat2(Aligner):
         
         index_path: string
             Path where the index will be created
-            
-        index_name: string
-            A name for the index
-            
-        args: tuple
-            Path to reference input files
-        threads: int
-            Num threads to use
-            
-        verbose : bool
-            Print stdout and std error
-            
-        quiet : bool 
-            Print nothing
-            
-        logs : bool 
-            Log this command to pyrpipe logs
-            
+        genome: string
+            Path to the reference genome
         objectid : string 
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        
-        kwargs: dict
-            Parameters for the hisat2-build command
-        
-        
             
         :return: Returns the status of hisat2-build
         :rtype: bool
@@ -178,18 +184,13 @@ class Hisat2(Aligner):
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output sam file
-        threads: int
-            Num threads to use
-        overwrite: bool
-            Overwrite output sam if already exist
-        verbose: bool
-            Print stdout and std error
-        logs: bool
-            Log this command to pyrpipe logs
+        out_dir: string
+            Directory to save the results. Default value is sra_object.directory
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to hisat2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
+        
+        :return: Returns the sorted bam file path after converting sam to bam and sorting it
+        :rtype: string
         """
         #check out dir
         if not out_dir:
@@ -228,6 +229,15 @@ class Hisat2(Aligner):
      
     
     def check_index(self):
+        """
+        Check self.index exists
+
+        Returns
+        -------
+        bool
+            True if index exists.
+
+        """
         if hasattr(self,'index'):
             return(pu.check_hisatindex(self.index))
         else:
@@ -236,11 +246,37 @@ class Hisat2(Aligner):
 
 class Star(Aligner):
     """This class represents STAR program.
-    
+    Extends the Aligner class
     Attributes
     ----------
     """ 
     def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
+        """
+        init Star object
+
+        Parameters
+        ----------
+        *args : tuple
+            Positional arguements
+        index : Str, optional
+            Path to Star index. If index is not present it will generate an index using the genome. Index can be supplied via the star.yaml file too. The default is None.
+        genome : Str, optional
+            Path to the reference genome. This will be used to build an index if index is not present. The default is None.
+        threads : int, optional
+            Threads to use for STAR. This will override the global --threads parameter supplied to pyrpipe. The default is None.
+        **kwargs : dict
+            keyword arguments
+
+        Raises
+        ------
+        ValueError
+            Raises ValueError if STAR index is not found and genome is not present to generate an index.
+
+        Returns
+        -------
+        None.
+
+        """
         super().__init__(*args,**kwargs)
         self._command='STAR'
         self._deps=[self._command]
@@ -265,29 +301,22 @@ class Star(Aligner):
 
     
     def build_index(self,index_path,genome,objectid="NA"):
-        """Build a star index with given parameters and saves the new index to self.index.
+        """Build a STAR index with given parameters and saves the new index to self.index.
         
         Parameters
         ----------
         
         index_path: string
             Path where the index will be created
-        genome: tuple
-            Path to reference input files
-        overwrite: bool
-            Overwrite if index already exists
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
+        genome: string
+            Path to the reference genome
+        objectid : string 
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
             
-        :return: Returns status of star command
+        :return: Returns the status of STAR-build index
         :rtype: bool
         """
+        
         
         #if index already exists then exit
         if not _force:
@@ -337,41 +366,23 @@ class Star(Aligner):
         return True
             
     def perform_alignment(self,sra_object,out_suffix="_star",out_dir="",objectid="NA"):
-        """Function to perform alignment using star and the provided SRA object.
-        All star output will be written to the sra_object directory by default.
+        """Function to perform STAR alignment using sra_object.
         
         Parameters
         ----------
         
-        sra_object: SRA object
+        sra_object SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
-            Suffix for the output file
-        out_dir: str
-            outout directory default: sra_object.directory
-        threads: int
-            Num threads to use
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
+            Suffix for the output sam file
+        out_dir: string
+            Directory to save the results. Default value is sra_object.directory
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        out_type: str
-            Out type options for star: sam, sorted_bam, unsorted_bam [Default: sorted_bam]
-        optimize: bool
-            If true optimize maping parameters based on read length [Default: True]
-        threads: int
-            Num threads to use. If supplied will override threads supplied during __init__
-        kwargs: dict
-            Options to pass to STAR. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
         
-
-        :return: Return the path to the output dir
+        :return: Returns the path to output bam
         :rtype: string
-        """        
+        """
         
         if not out_dir:
             out_dir=sra_object.directory
@@ -429,22 +440,39 @@ class Star(Aligner):
             
 
 class Bowtie2(Aligner):
-    """This class represents bowtie2 program.
-    
-       Parameters
-       ----------
+    """This Bowtie2 aligner class.
+       Extends Aligner class
        
-       index: string
-            path to a bowtie2 index. This index will be used when bowtie2 is invoked using this object.
-       threads: int
-            Num threads to use
-            
        Attributes
        ----------
     """ 
     def __init__(self,*args,index=None,genome=None,threads=None,**kwargs):
-        """Bowtie2 constructor. Initialize bowtie2 index and other parameters.
-        """       
+        """
+        init Bowtie2 object
+
+        Parameters
+        ----------
+        *args : tuple
+            Positional arguements
+        index : Str, optional
+            Path to Bowtie2 index. If index is not present it will generate an index using the genome. Index can be supplied via the bowtie2.yaml file too. The default is None.
+        genome : Str, optional
+            Path to the reference genome. This will be used to build an index if index is not present The default is None.
+        threads : int, optional
+            Threads to use for Bowtie2. This will override the global --threads parameter supplied to pyrpipe. The default is None.
+        **kwargs : dict
+            keyword arguments
+
+        Raises
+        ------
+        ValueError
+            Raises ValueError if hista index is not found and genome is not present to generate an index.
+
+        Returns
+        -------
+        None.
+
+        """     
         super().__init__(*args,**kwargs)
         self._command='bowtie2'
         self._deps=[self._command]
@@ -477,28 +505,12 @@ class Bowtie2(Aligner):
         
         index_path: string
             Path where the index will be created
-        index_name: string
-            A name for the index
-        args: tuple
-            Path to reference input files
-        threads: int
-            Num threads to use
-        overwrite: bool
-            Overwrite already existing index
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        objectid: str
+        genome: string
+            Path to the reference genome
+        objectid : string 
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to bowtie2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
             
-        
- 
-        :return: Returns the status of bowtie-build
+        :return: Returns the status of bowtie2-build
         :rtype: bool
         """
         
@@ -567,33 +579,20 @@ class Bowtie2(Aligner):
         
     
     def perform_alignment(self,sra_object,out_suffix="_bowtie2",out_dir="",objectid="NA"):
-        """Function to perform alignment using self object and the provided sra_object.
+        """Function to perform alignment using sra_object.
         
         Parameters
         ----------
         
-        sra_object: SRA object
+        sra_object SRA object
             An object of type SRA. The path to fastq files will be obtained from this object.
         out_suffix: string
             Suffix for the output sam file
-        out_dir: str
-            Path to out dir
-        threads: int
-            Num threads to use
-        overwrite: bool
-            Overwrite sam file if exixts
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
+        out_dir: string
+            Directory to save the results. Default value is sra_object.directory
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to bowtie2. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-        
-        :return: Returns the output sam file path
+        :return: Returns the sorted bam file path after converting sam to bam and sorting it
         :rtype: string
         """
         if not out_dir:
