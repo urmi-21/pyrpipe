@@ -59,18 +59,18 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * OS: Linux, Mac
 
 
-## pyrpipe RNA-Seq tools include:
+## API to RNA-Seq tools include:
 
 | Tool                                                                                 | Purpose             |
 |--------------------------------------------------------------------------------------|---------------------|
 | [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)                  | SRA access          |
-| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | QC                  |
-| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | QC                  |
+| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | Trimming            |
+| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | Trimming            |
 | [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)                            | Alignment           |
 | [STAR](https://github.com/alexdobin/STAR)                                            | Alignment           |
 | [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)                     | Alignment           |
-| [Kallisto](https://pachterlab.github.io/kallisto/)                                   | Quant               |
-| [Salmon](https://combine-lab.github.io/salmon/)                                      | Quant               |
+| [Kallisto](https://pachterlab.github.io/kallisto/)                                   | Quantification      |
+| [Salmon](https://combine-lab.github.io/salmon/)                                      | Quantification      |
 | [Stringtie](https://github.com/gpertea/stringtie)                                    | Transcript Assembly |
 | [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)                           | Transcript Assembly |
 | [Samtools](https://github.com/samtools/samtools)                                     | Tools               |
