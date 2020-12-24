@@ -19,24 +19,24 @@ class Runnable:
     """
     def __init__(self,*args,command=None,yaml=None,style='LINUX',deps=None,valid_args=None,**kwargs):
         """
-        
+        The runnable class to import any Unix command to python.
 
         Parameters
         ----------
-        *args : TYPE
-            DESCRIPTION.
-        command : TYPE, optional
-            DESCRIPTION. The default is None.
-        yaml : TYPE, optional
-            DESCRIPTION. The default is None.
-        style : TYPE, optional
-            DESCRIPTION. The default is 'LINUX'.
-        deps : TYPE, optional
-            DESCRIPTION. The default is None.
-        valid_args : TYPE, optional
-            DESCRIPTION. The default is None.
+        *args : tuple
+            The positional arguments for the command. This will be saved as self._args
+        command : String, optional
+            The command name. The default is None.
+        yaml : Str, optional
+            The yaml file name containing command options. This file will be searched under the --param-dir value
+        style : Str, optional
+            The type of options passed --key value (LINUX) or key=value (JAVA). The default is 'LINUX'.
+        deps : Str or List, optional
+            A list of dependencies. These commands will be checked and exception is thrown if dependencies are not found. The default is None.
+        valid_args : Dict or list, optional
+            A dict containing the valid arguments of the command. This will be used to ignore invalid command options. The default is None.
         **kwargs : TYPE
-            DESCRIPTION.
+            Command options passed to the tools. This will be saved as self._kwargs. These will override any commands supplied via the yaml file.
 
         Returns
         -------
@@ -61,15 +61,15 @@ class Runnable:
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        Str
+            Return self.__param_yaml.
 
         """
         return self.__param_yaml
     @_param_yaml.setter
     def _param_yaml(self,value):
         """
-        
+        _param_yaml setter
 
         Parameters
         ----------
@@ -92,15 +92,15 @@ class Runnable:
 
         Returns
         -------
-        TYPE
-            DESCRIPTION.
+        List
+            Return self.__deps.
 
         """
         return self.__deps
     @_deps.setter
     def _deps(self,dep_list):
         """
-        
+        self._deps setter
 
         Parameters
         ----------
@@ -132,11 +132,11 @@ class Runnable:
     @_command.setter
     def _command(self,value):
         """
-        
+        self._command setter
 
         Parameters
         ----------
-        value : TYPE
+        value : Str
             DESCRIPTION.
 
         Raises
@@ -160,18 +160,24 @@ class Runnable:
     
     def resolve_parameter(self,parameter_key,passed_value,default_value,parameter_variable):
         """
-        
+        Resolve a tool parameter by passing as an argument.
+        For example if unix command orfipy take a parameter --procs <num_threads>.
+        This can be converted to a python variable accessible as an attribute of Runnable class.
+        resolve_parameter function will update self._kwargs if parameter_keys exists. Otherwise it will create the parameter_key in self._kwargs
+        To do this call the function as:
+        <Runnable obj>.resolve_parameter("--procs",<passed_value>,<default_value>,'_threads')
+        Now the <Runnable obj>._threads will point to "--procs" value
 
         Parameters
         ----------
-        parameter_key : TYPE
-            DESCRIPTION.
-        passed_value : TYPE
-            DESCRIPTION.
-        default_value : TYPE
-            DESCRIPTION.
-        parameter_variable : TYPE
-            DESCRIPTION.
+        parameter_key : Str
+            The parameter/option name for the Unix command/tool e.g. --threads
+        passed_value : Str
+            The value supplied by user.
+        default_value : Str
+            Default value to use if no value is supplied
+        parameter_variable : Str
+            Name of a variable that will be stored in the Runnable class. e.g. threads
 
         Returns
         -------
@@ -221,10 +227,10 @@ class Runnable:
 
         Parameters
         ----------
-        *args : TYPE
-            DESCRIPTION.
-        **kwargs : TYPE
-            DESCRIPTION.
+        *args : tuple
+            Positional arguments
+        **kwargs : dict
+            the keyword arguments.
 
         Returns
         -------
