@@ -340,7 +340,7 @@ class SRA:
         if not status:
             raise OSError("perform_mapping failed for: "+ self.srr_accession)
         
-        self.annotation=status    
+        self.assembly=status    
         return self
     
     

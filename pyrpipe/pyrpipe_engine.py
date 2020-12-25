@@ -31,7 +31,7 @@ from pyrpipe import PyrpipeLogger
 
 if _logging:
     pyrpipe_logger=PyrpipeLogger(_log_name,logdir=_logs_dir)
-    pu.print_yellow("XXX Logs will be saved to {}".format(pyrpipe_logger.logger_path))
+    pu.print_yellow("Logs will be saved to {}".format(pyrpipe_logger.logger_path))
     
 """
 All functions that interact with shell are defined here. 
