@@ -317,7 +317,7 @@ else:
                 _optsmd5[s]=pu.get_mdf(s)
     
         @atexit.register 
-        def goodbye(): 
+        def goodbye():
             logfile=os.path.join(_logs_dir,_log_name+'.log')
             #if log was created
             if not pu.check_files_exist(logfile):

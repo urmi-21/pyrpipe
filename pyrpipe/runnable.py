@@ -61,6 +61,8 @@ class Runnable:
         self._command=command
         self._deps=deps
         self._param_yaml=yaml
+        #if not self._param_yaml and self._command:
+        #    self._param_yaml=self._command+'.yaml'
         self._args_style=style
         #valid_args can be None or a list, or a dict if subcommands are used
         self._valid_args=valid_args

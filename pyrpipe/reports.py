@@ -197,7 +197,7 @@ def generateHTMLReport(templateFile,cmdLog,envLog,coverage='f'):
             for k, v in newDict.items():
                 newDict[k] = escape(str(v))
             fullHTML=fullHTML+"\n"+template.render(newDict)
-            
+        
     #get start and runtime of last command
     lastDict=json.loads(data[-1])
     lastST=dt.datetime.strptime(lastDict['starttime'],"%y-%m-%d %H:%M:%S")
@@ -464,7 +464,9 @@ def generate_summary(cmdLog,envLog,coverage='a'):
     numPrograms=0
     progNames=[]
     #parse envLog
+    
     sysInfo,progList=parseEnvLog(envLog)    
+    
     
     #get starttime #end time is calculated from log below
     startTime=dt.datetime.strptime(sysInfo['now'],"%y-%m-%d %H:%M:%S")
@@ -483,8 +485,15 @@ def generate_summary(cmdLog,envLog,coverage='a'):
             if int(thisDict['exitcode'])==0: passedCommands+=1
             else: failedCommands+=1
             
-            
-    #get start and runtime of last command
+    #if nothing in logs exit
+    if numCommands<1:
+        pu.print_message('\n=========Summary=========')
+        pu.print_message('No commands were executed via pyrpipe')
+        return
+        
+    
+    
+    #get start and runtime of last command and compute end time
     lastDict=json.loads(data[-1])
     lastST=dt.datetime.strptime(lastDict['starttime'],"%y-%m-%d %H:%M:%S")
     try:
