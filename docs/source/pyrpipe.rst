@@ -11,6 +11,14 @@ Subpackages
 Submodules
 ----------
 
+pyrpipe.arg\_parser module
+--------------------------
+
+.. automodule:: pyrpipe.arg_parser
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pyrpipe.assembly module
 -----------------------
 
@@ -31,6 +39,14 @@ pyrpipe.mapping module
 ----------------------
 
 .. automodule:: pyrpipe.mapping
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyrpipe.param\_loader module
+----------------------------
+
+.. automodule:: pyrpipe.param_loader
    :members:
    :undoc-members:
    :show-inheritance:
@@ -67,6 +83,30 @@ pyrpipe.qc module
    :undoc-members:
    :show-inheritance:
 
+pyrpipe.quant module
+--------------------
+
+.. automodule:: pyrpipe.quant
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyrpipe.reports module
+----------------------
+
+.. automodule:: pyrpipe.reports
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyrpipe.runnable module
+-----------------------
+
+.. automodule:: pyrpipe.runnable
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pyrpipe.sra module
 ------------------
 
@@ -79,6 +119,14 @@ pyrpipe.tools module
 --------------------
 
 .. automodule:: pyrpipe.tools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyrpipe.valid\_args module
+--------------------------
+
+.. automodule:: pyrpipe.valid_args
    :members:
    :undoc-members:
    :show-inheritance:

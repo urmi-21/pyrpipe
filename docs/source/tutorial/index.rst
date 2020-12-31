@@ -13,6 +13,3 @@ The latter topics cover details on how to use pyrpipe framework to integrate any
    runnable
    api
    snakemake
-   pipeline1
-   workflow
-   advanced

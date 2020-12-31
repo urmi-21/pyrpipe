@@ -291,7 +291,7 @@ class Star(Aligner):
         self.resolve_parameter("--genomeDir",index,index,'index')
             
         #check index
-        if not pu.check_starindex(index):
+        if not pu.check_starindex(self.index):
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("STAR index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
                 raise ValueError("Please provide a valid STAR index, or a valid fasta file to generate the index")

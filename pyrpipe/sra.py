@@ -116,6 +116,9 @@ class SRA:
         
         #check if fastq files exist
         if not self.search_fastq(self.directory):
+            #download sra and run fqdump
+            if not self.download_sra():
+                pu.print_boldred('prefetch failed!!! Trying fasterq-dump...')
             #download fastq file
             return self.download_fastq()
         
@@ -181,12 +184,10 @@ class SRA:
         #check if fastq files exists already
         if self.fastq_exists():
             pu.print_green("Fastq files exist already")
-            return True
-        
+            return True        
         #internal_args are created by pyrpipe and will always replace external passed args
         #add the positional args
         if self.sra_exists():
-            #fstrqd_Cmd.append(self.sra_path)
             internal_args=(self.sra_path,)
         else:
             #fstrqd_Cmd.append(self.srr_accession)
@@ -518,7 +519,6 @@ class SRA:
         return 0
     
     
-    #To be removed
     def download_sra(self,**kwargs):
         """This function downloads .sra file from NCBI SRA servers using the prefetch command.
 
@@ -542,6 +542,7 @@ class SRA:
         >>> object.download_sra()
         True
         """     
+        
         #store path to the downloaded sra file
         self.sra_path=os.path.join(self.directory,self.srr_accession+".sra")
         #check if already exists
@@ -555,10 +556,7 @@ class SRA:
             else:
                 self.layout="SINGLE"
             return True
-            
-        
-        #pu.print_info("Downloading "+self.srr_accession+" ...")
-        
+                
         #scan for prefetch arguments
         prefetchArgsList=['-f','-t','-l','-n','-s','-R','-N','-X','-o','-a','--ascp-options','-p','--eliminate-quals','-c','-o','-O','-h','-V','-L','-v','-q']
         
@@ -594,7 +592,7 @@ class SRA:
             pu.print_boldred("Error downloading file. File "+self.sra_path+" does not exist!!!")
             return False
         
-        print ("Downloaded file: "+self.sra_path+" {0} ".format(pu.get_file_size(self.sra_path)))
+        #print ("Downloaded file: "+self.sra_path+" {0} ".format(pu.get_file_size(self.sra_path)))
         #save file .sra file size
         self.sraFileSize=pu.get_file_size(self.sra_path)
         #test if file is paired or single end
@@ -605,105 +603,3 @@ class SRA:
             
         
         return True
-    #to be removed
-    def run_fasterqdump(self,delete_sra=False,**kwargs):
-        """Execute fasterq-dump to convert .sra file to fastq files.
-        The fastq files will be stored in the same directory as the sra file. All fastq files should be consistently named
-        using the extension .fastq
-        
-        Parameters
-        ----------
-        
-        delete_sra: bool
-            delete sra file after completion
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
-        kwargs: dict
-            A dict containing fasterq-dump arguments
-        
-        :return: Return status of the fasterq-dump command. True if successful download and False if failed.
-        :rtype: bool
-
-        Examples
-        --------
-        >>> object.run_fasterqdump()
-        True
-        """
-        #check if fastq files exists already
-        if self.fastq_exists():
-            pu.print_green("Fastq files exist already")
-            return True
-        
-        #first check is sra exists only if not a dry run
-        if not self.sra_exists() and not _dryrun:
-            pu.print_boldred("Error executing fasterq-dump: .sra file not found. Please run download_sra().")
-            return False
-        #else directly run fasterq-dump on accession ?
-        
-        fasterqdumpArgsList=['-f','-t','-s','-N','-X','-a','-p','-c','-o','-O','-h','-V',
-                             '-L','-v','-q','-b','-m','-e','-x','-S','-3','-P','-M',
-                             '-B','--option-file','--strict','--table','--include-technical',
-                             '--skip-technical','--concatenate-reads']
-        
-        
-        
-        #ignore directory and file name arguments if given
-        if '-O' in kwargs:
-            print("Ignoring -O flag."+" directory is: "+self.directory)
-            #delete -O parameter
-            del kwargs['-O']
-        if '-o' in kwargs:
-            print("Ignoring -o flag."+" File name is: "+self.srr_accession)
-            #delete -o parameter
-            del kwargs['-o']
-        
-        
-        #determine threads if not specified
-        if '-e' not in kwargs:
-            kwargs['-e']=_threads
-        #execute command
-        
-        fstrqd_Cmd=['fasterq-dump']
-        fstrqd_Cmd.extend(pu.parse_unix_args(fasterqdumpArgsList,kwargs))
-        
-        #add directory
-        fstrqd_Cmd.extend(['-O',self.directory])
-        #add output filename. output will be <srr_accession>.fastq or <srr_accession>_1.fastq and <srr_accession>_2.fastq
-        fstrqd_Cmd.extend(['-o',self.srr_accession+".fastq"])
-        fstrqd_Cmd.append(self.sra_path)
-        
-        #execute command
-        cmdStatus=pe.execute_command(fstrqd_Cmd,objectid=self.srr_accession)
-        if not cmdStatus:
-            print("fasterqdump failed for:"+self.srr_accession)
-            return False
-        
-        #exit here if dry run
-        if _dryrun: return True
-        
-        #check if fastq files are downloaded 
-        if(self.layout=="SINGLE"):
-            self.fastq_path=os.path.join(self.directory,self.srr_accession+".fastq")
-            
-            if not pu.check_files_exist(self.fastq_path):
-                pu.print_boldred("Error running fasterq-dump file. File "+self.fastq_path+" does not exist!!!")
-                return False
-            
-        else:
-            self.fastq_path=os.path.join(self.directory,self.srr_accession+"_1.fastq")
-            self.fastq2_path=os.path.join(self.directory,self.srr_accession+"_2.fastq")
-            
-            if not pu.check_files_exist(self.fastq_path,self.fastq2_path):
-                pu.print_boldred("Error running fasterq-dump file. File "+self.fastq_path+" does not exist!!!")
-                return False
-            
-        #delete sra file if specified
-        if delete_sra:
-            self.delete_sra()
-            
-        return True
-    

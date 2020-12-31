@@ -1,5 +1,5 @@
 pyrpipe: A python package for RNA-Seq workflows
-==================================
+================================================
 
 :Author: Urminder Singh
 :Date: |today|
@@ -65,7 +65,6 @@ Contents
    :maxdepth: 2
 
    installation.rst
-   usage.rst
    tutorial/index.rst
    cookbook.rst
    api.rst
