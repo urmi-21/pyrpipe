@@ -161,7 +161,25 @@ class BBmap(RNASeqQC):
     """
     def __init__(self,*args,threads=None,memory=None,**kwargs):
         """
+        
+
+        Parameters
+        ----------
+        *args : *tuple
+            arguments to be passed.
+        threads : int, optional
+            Num threads to use. The default is None.
+        memory : float, optional
+            Memory to use, in GB. The default is None.
+        **kwargs : **dict
+            options passed to BBMap.
+
+        Returns
+        -------
+        None.
+
         """
+       
         #run super to inherit parent class properties
         super().__init__(*args,**kwargs)
         self._command='bbduk.sh'
