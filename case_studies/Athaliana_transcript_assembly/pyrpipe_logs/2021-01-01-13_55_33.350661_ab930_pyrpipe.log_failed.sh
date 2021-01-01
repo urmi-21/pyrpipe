@@ -1,2 +1,0 @@
-#!/bin/bash 
-bbduk.sh ktrim=r k=23 mink=11 qtrim='rl' trimq=10 ref=adapters2.fa threads=4 in=athal_out/SRR976159/SRR976159_1_bbduk.fastq in2=athal_out/SRR976159/SRR976159_2_bbduk.fastq out=athal_out/SRR976159/SRR976159_1_bbduk_bbduk.fastq out2=athal_out/SRR976159/SRR976159_2_bbduk_bbduk.fastq -Xmx2g
