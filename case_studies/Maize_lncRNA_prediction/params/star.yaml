@@ -1,0 +1,3 @@
+--outFilterType : BySJout
+--runThreadN": 6
+--outSAMtype: BAM SortedByCoordinate
