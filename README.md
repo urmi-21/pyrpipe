@@ -19,7 +19,7 @@ Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions.
+#### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions.
 
 
 ## What it does
@@ -79,10 +79,13 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 This python codes downloads data from SRA and uses Trim Galore to trim the fastq files. More detailed examples are provided [here](https://github.com/urmi-21/pyrpipe/tree/master/case_studies)
 
 ```
-trimgalore=Trimgalore(threads=8)
-star=Star(index='data/index',threads=4)
+from pyrpipe.sra import SRA
+from pyrpipe.qc import Trimgalore
+from pyrpipe.mapping import Star
+trimgalore=qc.Trimgalore(threads=8)
+star=mapping.Star(index='data/index',threads=4)
 for run in ['SRR976159','SRR978411','SRR971778']:
-    SRA(run).trim(trimgalore).align(star)
+    sra.SRA(run).trim(trimgalore).align(star)
 ```
 
 
