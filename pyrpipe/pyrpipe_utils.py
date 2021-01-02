@@ -129,18 +129,6 @@ def get_timestamp(shorten=False):
     return timestamp
     
 
-#not used
-def get_sra_ftppath(srrid):
-    """Return an ftp address to download sra files
-    """
-    if len(srrid) <6:
-        return None
-    parent_path="anonftp@ftp.ncbi.nlm.nih.gov:/sra/sra-instant/reads/ByRun/sra/"
-    parent_path=parent_path+srrid[0:3]+"/"+srrid[0:6]+"/"+srrid+"/"+srrid+".sra"
-    return parent_path
-    
-
-
 def check_paths_exist(*args):
     """Function to check if a directory exists.
     
