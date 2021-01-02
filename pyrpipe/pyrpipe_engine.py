@@ -91,7 +91,7 @@ def parse_cmd(cmd):
     return cmd
         
 @dryable
-def get_shell_output(cmd,verbose=_verbose):
+def get_shell_output(cmd,verbose=None):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
     getReturnStatus(), getProgramVersion(), find_files()
@@ -107,6 +107,7 @@ def get_shell_output(cmd,verbose=_verbose):
     :return: (returncode, stdout and stderr)
     :rtype: tuple: (int,str,str)
     """
+    if not verbose: verbose=_verbose
     #not logging these commands
     cmd=parse_cmd(cmd)
     log_message=cmd
@@ -169,7 +170,7 @@ def execute_commandRealtime(cmd):
         raise subprocess.CalledProcessError(return_code, cmd)
 
 @dryable
-def execute_command(cmd,verbose=_verbose,logs=_logging,objectid=None,command_name=""):
+def execute_command(cmd,verbose=None,logs=None,objectid=None,command_name=""):
     """Function to execute commands using popen. 
     All commands executed by this function can be logged and saved to pyrpipe logs.
     
@@ -192,6 +193,11 @@ def execute_command(cmd,verbose=_verbose,logs=_logging,objectid=None,command_nam
     :return: Return status.True is returncode is 0
     :rtype: bool
     """
+    
+    #if none then use default
+    if not verbose: verbose=_verbose
+    if not logs: logs=_logging
+        
     
     #get current time
     time_start = time.time()

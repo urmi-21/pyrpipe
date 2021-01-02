@@ -455,7 +455,7 @@ class Runnable:
         return self._valid_args
         pass
         
-    def run(self,*args, subcommand=None, target=None, requires=None, objectid=None, **kwargs):
+    def run(self,*args, subcommand=None, target=None, requires=None, objectid=None, verbose=None,logs=None,**kwargs):
         """
         
 
@@ -579,7 +579,7 @@ class Runnable:
         if not _dryrun: locks=self.create_lock(target_list,' '.join(cmd))
             
         #execute command
-        cmd_status=pe.execute_command(cmd,objectid=objectid)
+        cmd_status=pe.execute_command(cmd,objectid=objectid,verbose=verbose,logs=logs)
         
         # if command finished remove locks
         self.remove_locks(locks)

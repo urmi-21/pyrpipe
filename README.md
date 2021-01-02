@@ -72,8 +72,30 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 | [Samtools](https://github.com/samtools/samtools)                                     | Tools               |
 
 
-
+## Examples
 #### Get started with the basic [tutorial](https://pyrpipe.readthedocs.io/en/latest/?badge=latest).Read the documentation [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest). Several examples are provided [here](https://github.com/urmi-21/pyrpipe/tree/master/case_studies)
+
+### Download, trim and align RNA-Seq data
+This python codes downloads data from SRA and uses Trim Galore to trim the fastq files. More detailed examples are provided [here](https://github.com/urmi-21/pyrpipe/tree/master/case_studies)
+
+```
+trimgalore=Trimgalore(threads=8)
+star=Star(index='data/index',threads=4)
+for run in ['SRR976159','SRR978411','SRR971778']:
+    SRA(run).trim(trimgalore).align(star)
+```
+
+
+### Import a Unix command
+
+This simple example imports and runs the Unix `grep` command. See [this](https://github.com/urmi-21/pyrpipe/blob/imp/case_studies/Integrating%20third-party%20tools.ipynb) for more examples.
+
+```
+>>> from pyrpipe.runnable import Runnable
+>>> grep=Runnable(command='grep')
+>>> grep.run('query1','file1.txt',verbose=True)
+>>> grep.run('query2','file2.txt',verbose=True)
+```
 
 ## Installation
 Please follow these instruction: 
