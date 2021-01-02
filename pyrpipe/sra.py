@@ -119,7 +119,7 @@ class SRA:
             #download sra and run fqdump
             if not self.download_sra():
                 pu.print_boldred('prefetch failed!!! Trying fasterq-dump...')
-            #download fastq file
+            #run fasterqdump either on downloaded SRA file or direclty
             return self.download_fastq()
         
         return True
@@ -250,6 +250,8 @@ class SRA:
             self.fastq_path=fq
             self.fastq2_path=fq2
             self.layout="PAIRED"
+            #remove SRA
+            self.delete_sra()
             return True
         
         #check single end file
@@ -257,6 +259,8 @@ class SRA:
         if pu.check_files_exist(fq):
             self.fastq_path=fq
             self.layout="SINGLE"
+            #remove SRA
+            self.delete_sra()
             return True
         
         return False
