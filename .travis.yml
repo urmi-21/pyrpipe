@@ -64,6 +64,8 @@ install:
   - export PATH=$PATH:$PWD/bbmap/
   #install orfipy
   - pip install orfipy --upgrade
+  #upgrade numpy
+  - pip install numpy --upgrade
   
   
   
