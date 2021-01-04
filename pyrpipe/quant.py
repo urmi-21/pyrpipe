@@ -298,13 +298,13 @@ class Salmon(Quant):
                 raise OSError("Error creating salmon index. Failed to create index directory.")
         
         
-        validArgsIndex=['-v','--version','-h','--help','-t','--transcripts','-k','--kmerLen','-i',
+        validArgsIndex=['-v','-t','--transcripts','-k','--kmerLen','-i',
                              '--index','--gencode','--keepDuplicates','-p','--threads','--perfectHash',
-                             '--type','-s','--sasamp']
+                             '--type','-s','--sasamp','-d','--decoys']
             
         internal_kwargs={"--threads":_threads,"-t":transcriptome,"-i":index_path}
         #read build parameters
-        yamlfile=os.path.join(_params_dir,'index.yaml')
+        yamlfile=os.path.join(_params_dir,'salmon_index.yaml')
         if pu.check_files_exist(yamlfile):
             yaml_params=pl.YAML_loader(yamlfile)
             yaml_kwargs=yaml_params.get_kwargs()
