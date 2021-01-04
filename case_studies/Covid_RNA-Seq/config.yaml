@@ -1,0 +1,3 @@
+DIR: "out"
+THREADS: 25
+transcriptome: "human_data/human_tr_gen_decoy.fasta"

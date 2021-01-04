@@ -1,0 +1,64 @@
+import yaml
+import sys
+import os
+from pyrpipe import sra,quant
+import pandas as pd
+
+
+####Read config#####
+configfile: "config.yaml"
+DIR = config['DIR']
+THREADS=config['THREADS']
+Tr=config['transcriptome']
+
+
+
+#####Read SRR ids######
+with open ("SRRids.txt") as f:
+	SRR=f.read().splitlines()
+
+#create salmon object. If index is not present it will be created
+salmon=quant.Salmon(index="human_data/salmon_index",transcriptome=Tr,threads=15)
+
+rule all:
+	input:
+		#expand("{wd}/{sample}/salmon_out/quant.sf",wd=DIR,sample=SRR)
+		expand("{wd}/results_TPM.tsv",wd=DIR)
+
+rule quant:
+	output:
+		quant_file="{wd}/{sample}/salmon_out/quant.sf"
+	run:
+		outfile=str(output.quant_file)
+		srrid=outfile.split("/")[1]
+		sra.SRA(srrid,directory=DIR).quant(salmon)
+
+rule merge:
+	input:
+		["{wd}/{sample}/salmon_out/quant.sf".format(wd=DIR,sample=s) for s in SRR]
+	output:
+		outfile="{wd}/results_TPM.tsv"
+	run:
+		#read tx names
+		with open(input[0]) as f:
+		    thisdata=f.read().splitlines()
+		thisdata.pop(0)
+		ids=[]
+		for l in thisdata:
+		    ids.append((l.split('\t'))[0].split('|')[0])
+		df=pd.DataFrame({'TranscriptID':ids})
+
+		#read files in memory
+		for qf in input:
+		    name=qf.split('/')[1]
+		    thisdata=pd.read_csv(qf,sep='\t',usecols=[3],skiprows=0)
+		    df[name]=thisdata['TPM']
+
+		
+		#write to file
+		df.to_csv(output.outfile,sep='\t',index=False)
+
+
+
+	
+

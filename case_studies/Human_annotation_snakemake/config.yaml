@@ -1,5 +1,0 @@
-DIR: "out"
-THREADS: 25
-genome: "human_data/Homo_sapiens.GRCh38.dna_sm.primary_assembly.fa"
-gtf: "human_data/Homo_sapiens.GRCh38.99.gtf"
-blasttarget: "human_data/uniprot_sprot.fasta"
