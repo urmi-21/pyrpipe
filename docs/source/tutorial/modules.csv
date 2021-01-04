@@ -1,0 +1,18 @@
+Module,  Class,  Purpose
+assembly    ,Assembly,              Abstract class to represent Assebler type
+assembly    ,Stringtie,             API to Stringtie
+assembly    ,Cufflinks ,            API to Cufflinks
+mapping     ,Aligner    ,           Abstract class for Aligner type
+mapping     ,Star        ,          API to Star
+mapping     ,Bowtie2      ,         API to Bowtie2
+mapping    , Hisat2        ,        API to Hisat2
+qc        ,  RNASeqQC       ,       Abstract class for RNASeqQC type (quality control and trimming)
+qc       ,   Trimgalore      ,      API to Trim Galore
+qc      ,    BBmap            ,     API to bbduk.sh
+quant  ,     Quant             ,    Abstract class for Quantification type
+quant ,      Salmon             ,   API to Salmon
+quant,       Kallisto            ,  API to Kallisto
+sra,         SRA                  , Class to represent RNA-Seq data and API to NCBI SRA-Tools
+tools,Samtools  ,            API to Samtools and other commonly used tools
+
+
