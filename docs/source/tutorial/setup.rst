@@ -34,4 +34,18 @@ To recreate the conda environment in the `environment.yml`, use
 .. code-block:: bash
 
     conda env create -f environment.yml
-	
+
+
+Setting up NCBI SRA-Tools
+------------------------------
+
+After installing sra-tools, please configure prefetch to save the downloads the the **public user-repository**.
+This will ensure that the prefetch command will download the data to the user defined directory.
+To do this
+
+- Type `vdb-config -i` command in terminal to open the NCBI SRA-Tools configuration editor.
+- Under the TOOLS tab, set prefetch downloads option to **public user-repository**
+
+
+
+
