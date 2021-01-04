@@ -21,8 +21,7 @@ Activate the newly created conda environment and install required tools
 .. code-block:: bash
 
     conda activate pyrpipe
-    conda install -c bioconda 
-    conda install -c bioconda pyrpipe star=2.7.7a sra-tools=2.10.9 stringtie=2.1.4 trim-galore=0.6.6 orfipy=0.0.3
+    conda install -c bioconda pyrpipe star=2.7.7a sra-tools=2.10.9 stringtie=2.1.4 trim-galore=0.6.6 orfipy=0.0.3 salmon=1.4.0
     
 To create a yaml file containing information about the conda environment, run the following command
 
