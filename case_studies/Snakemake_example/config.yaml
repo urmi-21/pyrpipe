@@ -1,0 +1,5 @@
+DIR: "results"
+THREADS: 5
+genome: "refdata/Saccharomyces_cerevisiae.R64-1-1.dna.toplevel.fa"
+gtf: "refdata/Saccharomyces_cerevisiae.R64-1-1.49.gff3"
+

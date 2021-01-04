@@ -1,0 +1,39 @@
+import yaml
+import sys
+import os
+from pyrpipe import sra,qc,mapping,assembly
+
+
+####Read config#####
+configfile: "config.yaml"
+DIR = config['DIR']
+THREADS=config['THREADS']
+
+##check required files
+GENOME= config['genome']
+GTF=config['gtf']
+
+#####Read SRR ids######
+with open ("runids.txt") as f:
+	SRR=f.read().splitlines()
+
+
+#Create pyrpipe objects
+#parameters defined in ./params will be automatically loaded, threads will be replaced with the supplied value
+tg=qc.Trimgalore(threads=THREADS)
+star=mapping.Star(threads=THREADS)
+st=assembly.Stringtie(threads=THREADS)
+
+rule all:
+	input:
+		expand("{wd}/{sample}/Aligned.sortedByCoord.out_star_stringtie.gtf",sample=SRR,wd=DIR),
+
+rule process:
+	output:
+		gtf="{wd}/{sample}/Aligned.sortedByCoord.out_star_stringtie.gtf"
+	run:
+		gtffile=str(output.gtf)
+		srrid=gtffile.split("/")[1]
+		sra.SRA(srrid,directory=DIR).trim(tg).align(star).assemble(st)
+
+
