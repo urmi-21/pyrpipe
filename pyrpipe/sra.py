@@ -591,9 +591,16 @@ class SRA:
             return False
         
         
-        #validate path exists
+        #move file if downloaded inside the directory
         if not pu.check_files_exist(self.sra_path):
-            pu.print_boldred("Error downloading file. File "+self.sra_path+" does not exist!!!")
+            #check outdir/SRR/SRR/SRR.sra
+            if pu.check_files_exist(os.path.join(self.directory,self.srr_accession,self.srr_accession+".sra")):
+                pe.move_file(os.path.join(self.directory,self.srr_accession,self.srr_accession+".sra"),self.sra_path)
+                
+           
+        #validate path exists
+        if not pu.check_files_exist(self.sra_path):            
+            pu.print_boldred("Error downloading file. File "+self.sra_path+" does not exist!!!\n Please check you SRA-Tools config")
             return False
         
         #print ("Downloaded file: "+self.sra_path+" {0} ".format(pu.get_file_size(self.sra_path)))

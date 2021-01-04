@@ -345,7 +345,7 @@ def getStdoutFromLog(inFile,filterList,coverage):
 
 
 
-def generateBashScript(logFile,outFile,filterList,coverage='a'):
+def generateBashScript(logFile,outFile,filterList,coverage='a',verbose=True):
     commands=getCommandsFromLog(logFile,filterList,coverage)
     if not outFile.endswith(".sh"):
         outFile=outFile+".sh"
@@ -361,7 +361,8 @@ def generateBashScript(logFile,outFile,filterList,coverage='a'):
         cov='Failed'
     elif coverage=='p':
         cov='Passed'
-    pu.print_notification("{} commands commands written to {}".format(cov,outFile))
+        
+    if verbose: pu.print_notification("{} commands written to {}".format(cov,outFile))
 
 
 def checkEnvLog(logFile):

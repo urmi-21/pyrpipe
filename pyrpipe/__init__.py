@@ -336,9 +336,9 @@ else:
             
             #export shell commands
             out_cmds=logfile+'_commands'
-            reports.generateBashScript(logfile,out_cmds,None)
+            reports.generateBashScript(logfile,out_cmds,None,verbose=False)
             out_cmds=logfile+'_failed'
-            reports.generateBashScript(logfile,out_cmds,None,coverage='i')             
+            reports.generateBashScript(logfile,out_cmds,None,coverage='i',verbose=False)             
             #run reports/multiqc if specified
             if _multiqc: reports.generate_multiqc(directory=os.getcwd(),tempDir='MultiQC_temp',outDir='MultiQC_out')
     
