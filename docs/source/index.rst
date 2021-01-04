@@ -37,16 +37,25 @@ Key Features
 Installation
 #############
 
-To install the latest stable release via conda::
+To install the latest stable release via conda:
+
+.. code-block:: bash
+
 	conda install -c bioconda pyrpipe 
 
-To install the latest stable release via pip::
+To install the latest stable release via pip:
+
+.. code-block:: bash
+
 	pip install pyrpipe --upgrade
 
-Install latest development version ::
+Install latest development version :
+
+.. code-block:: bash
+
 	git clone https://github.com/urmi-21/pyrpipe.git
 	pip install -r pyrpipe/requirements.txt
-	pip install -e path_to/pyrpipe
+	pip install -e pyrpipe
 
 See the :ref:`Installation notes <installation>` for details.
 
