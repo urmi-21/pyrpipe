@@ -1,7 +1,7 @@
 ## Introduction
 
-This basic example demonstrate importing pyrpipe libraries into snakemake.
-This example downloads data from NCBI-SRA, trims read using Trim Galore, align reads to genome using STAR and assemble transcripts with stringtie
+This basic example demonstrates importing pyrpipe libraries into Snakemake.
+The example downloads data from NCBI-SRA, trims reads using Trim Galore, aligns reads to genome using STAR and assembles transcripts with stringtie
 
 ## Download reference data
 
