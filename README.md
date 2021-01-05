@@ -111,11 +111,16 @@ An example of setting up the environment using conda is provided below.
 It is best to [share your conda environment files](https://stackoverflow.com/questions/41274007/anaconda-export-environment-file) with pyrpipe scripts to ensure reproducibility.**
 
 1. Download and install [Conda](https://docs.conda.io/en/latest/miniconda.html)
-2. `conda create -n pyrpipe python=3.7`
+2. `conda create -n pyrpipe python=3.8`
 3. `conda activate pyrpipe`
 4. `conda install -c bioconda pyrpipe star=2.7.7a sra-tools=2.10.9 stringtie=2.1.4 trim-galore=0.6.6`
 
 The above command will install pyrpipe and the required tools inside a conda environment.
+Alternatively, use the conda environment.yaml file provided in this repository and build the conda environment by running
+
+```
+conda env create -f environment.yml
+```
 
 ### Install latest stable version
 

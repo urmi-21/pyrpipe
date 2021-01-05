@@ -32,7 +32,7 @@ tools       				Samtools              			API to Samtools and other commonly used
 
 
 The SRA class
---------------
+^^^^^^^^^^^^^^^^^^
 The SRA class contained in the sra module captures RNA-Seq data.
 It can automatically download RNA-Seq data from the NCBI SRA servers via the prefetch command.
 The SRA constructor can take the SRR accession, path to fastq or sra file as arguments.
@@ -72,7 +72,7 @@ quant()             	This function takes a Quantification type object and perfor
 
 
 The RNASeqQC class
--------------------
+^^^^^^^^^^^^^^^^^^^^
 
 The RNASeqQC is an abstract class defined in the qc module. RNASeqQC class extends the Runnable class and thus has all the attributes as in the Runnable class.
 Classes Trimgalore and BBmap extends RNASeqQC class and share following attributes and functions.
@@ -93,7 +93,7 @@ perform_qc()        Takes a SRA object, performs qc and returns path to resultan
 
 
 The Aligner class
--------------------
+^^^^^^^^^^^^^^^^^^^^^
 The Aligner is an abstract class defined in the mapping module. Aligner class extends the Runnable class and thus has all the attributes as in the Runnable class.
 Classes Star, Hisat2 and Bowtie2 extends the Aligner class and share following attributes and functions.
 
@@ -115,7 +115,7 @@ perform_alignment()		  Takes a sra object, performs alignemnt and returns path t
 ===================         ===========================================
 
 The Assembly class
--------------------
+^^^^^^^^^^^^^^^^^^^^^
 The Assembly is an abstract class defined in the assembly module. Assembly class extends the Runnable class and thus has all the attributes as in the Runnable class.
 Classes Stringtie and Cufflinks extends the Assembly class and share following attributes and functions.
 
@@ -137,7 +137,7 @@ perform_assembly()  		Takes a SRA object, performs transcript assembly and retur
 
 
 The Quant class
--------------------
+^^^^^^^^^^^^^^^^^^
 The Quant is an abstract class defined in the quant module. Quant class extends the Runnable class and thus has all the attributes as in the Runnable class.
 Classes Salmon and Kallisto extends the Quant class and share following attributes and functions.
 

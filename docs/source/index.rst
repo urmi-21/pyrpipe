@@ -76,7 +76,6 @@ Contents
    installation.rst
    tutorial/index.rst
    cookbook.rst
-   api.rst
 ..  faq.rst
 ..  developer.rst
 ..  release.rst
