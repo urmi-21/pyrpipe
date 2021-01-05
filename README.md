@@ -85,8 +85,8 @@ from pyrpipe.qc import Trimgalore
 from pyrpipe.mapping import Star
 trimgalore=qc.Trimgalore(threads=8)
 star=mapping.Star(index='data/index',threads=4)
-for run in ['SRR976159','SRR978411','SRR971778']:
-    sra.SRA(run).trim(trimgalore).align(star)
+for srr in ['SRR976159','SRR978411','SRR971778']:
+    sra.SRA(srr).trim(trimgalore).align(star)
 ```
 
 
