@@ -19,7 +19,7 @@ Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-#### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions.
+### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions. pyrpipe version 0.0.5 is currenly available only from GitHub.
 
 
 ## What it does
@@ -119,7 +119,7 @@ The above command will install pyrpipe and the required tools inside a conda env
 Alternatively, use the conda environment.yaml file provided in this repository and build the conda environment by running
 
 ```
-conda env create -f environment.yml
+conda env create -f environment.yaml
 ```
 
 ### Install latest stable version
