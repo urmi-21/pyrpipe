@@ -19,7 +19,7 @@ Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions. pyrpipe version 0.0.5 is currenly available only from GitHub.
+### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions. All the tutorials and documentation has been updated to reflect v0.0.5. pyrpipe version 0.0.5 is currenly available only from GitHub.
 
 
 ## What it does
