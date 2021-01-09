@@ -107,7 +107,7 @@ def get_shell_output(cmd,verbose=None):
     :return: (returncode, stdout and stderr)
     :rtype: tuple: (int,str,str)
     """
-    if not verbose: verbose=_verbose
+    if verbose==None: verbose=_verbose
     #not logging these commands
     cmd=parse_cmd(cmd)
     log_message=cmd
@@ -195,8 +195,8 @@ def execute_command(cmd,verbose=None,logs=None,objectid=None,command_name=""):
     """
     
     #if none then use default
-    if not verbose: verbose=_verbose
-    if not logs: logs=_logging
+    if verbose==None: verbose=_verbose
+    if logs==None: logs=_logging
         
     
     #get current time
