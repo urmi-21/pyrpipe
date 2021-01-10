@@ -69,25 +69,21 @@ class SRA:
         
         #if fastq are provided
         if fastq and fastq2:
-            if pu.check_files_exist(fastq,fastq2):
-                self.layout="PAIRED"
-                #set dir
-                self.directory=pu.get_file_directory(fastq)
-                return True
-            else:
+            self.layout="PAIRED"
+            self.directory=pu.get_file_directory(fastq)
+            if not pu.check_files_exist(fastq,fastq2) and not _dryrun:
                 pu.print_boldred("ERROR: File not found")
                 raise ValueError("Please check fastq files {} {}".format(fastq,fastq2))
+            return True
                 
         #if only one fastq (single)
         if fastq:
-            if pu.check_files_exist(fastq):
-                self.layout="SINGLE"
-                self.directory=pu.get_file_directory(fastq)
-                return True
-            else:
+            self.layout="SINGLE"
+            self.directory=pu.get_file_directory(fastq)
+            if not pu.check_files_exist(fastq) and not _dryrun:
                 pu.print_boldred("ERROR: File not found")
                 raise ValueError("Please check fastq files {}".format(fastq))
-                return False
+            return True
     
         #init from srr_accession and directory
         return self.init_from_accession(srr_accession,directory)
