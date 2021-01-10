@@ -190,7 +190,7 @@ def check_hisatindex(index):
     return True
 
 def check_kallistoindex(index):
-    """Function to check if salmon index is valid and exists.
+    """Function to check if kallisto index is valid and exists.
     
     Parameters
     ----------

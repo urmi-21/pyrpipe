@@ -66,7 +66,7 @@ class Kallisto(Quant):
             
         #check index
         #kallisto index is a single file
-        if not pu.check_files_exist(index):
+        if not self.check_index():
             if not (pu.check_files_exist(self.transcriptome)):
                 pu.print_boldred("Kallisto index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
                 raise ValueError("Please provide a valid Kallisto index, or a valid fasta file to generate the index")
@@ -244,7 +244,7 @@ class Salmon(Quant):
         self.resolve_parameter("-i",index,index,'index')
                
         #check index
-        if not pu.check_salmonindex(index):
+        if not self.check_index():
             if not (pu.check_files_exist(self.transcriptome)):
                 pu.print_boldred("Salmon index '{}' not found; New index could not be created as transcriptome file '{}' not found.".format(self.index,self.transcriptome))
                 raise ValueError("Please provide a valid Salmon index, or a valid fasta file to generate the index")

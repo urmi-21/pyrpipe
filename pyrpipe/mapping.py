@@ -291,7 +291,7 @@ class Star(Aligner):
         self.resolve_parameter("--genomeDir",index,index,'index')
             
         #check index
-        if not pu.check_starindex(self.index):
+        if not self.check_index():
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("STAR index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
                 raise ValueError("Please provide a valid STAR index, or a valid fasta file to generate the index")
@@ -488,13 +488,13 @@ class Bowtie2(Aligner):
         self.resolve_parameter("-x",index,index,'index')
         
         #if index is passed, update the passed arguments
-        if not pu.check_bowtie2index(index):
+        if not self.check_index():
             if not (pu.check_files_exist(self.genome)):
                 pu.print_boldred("Bowtie2 index '{}' not found; New index could not be created as genome file '{}' not found.".format(self.index,self.genome))
                 raise ValueError("Please provide a valid Bowtie2 index, or a valid fasta file to generate the index")
             else:
                 #call build index to generate index
-                self.build_index(index,self.genome)
+                self.build_index(self.index,self.genome)
             
         
     def build_index(self,index_path,genome,objectid="NA"):
