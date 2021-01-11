@@ -1,0 +1,4 @@
+-l: A
+-i: ../human_reference/salmon_index/human_index_EB_gencode/salmon_index_human_1277215tx_2871_decoys
+--seqBias: True 
+--gcBias: True

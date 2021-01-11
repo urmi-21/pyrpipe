@@ -124,7 +124,7 @@ _args_SALMON=['--help-reads','-i','--index','-l','--libType','-r','--unmatedRead
               '--numBiasSamples','--numAuxModelSamples','--numPreAuxModelSamples','--useVBOpt',
               '--rangeFactorizationBins','--numGibbsSamples','--numBootstraps','--thinningFactor',
               '-q','--perTranscriptPrior','--vbPrior','--writeOrphanLinks','--writeUnmappedNames',
-              '-x','--quasiCoverage']
+              '-x','--quasiCoverage','--validateMappings']
 
 
 _args_SAMTOOLS=None

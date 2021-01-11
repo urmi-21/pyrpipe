@@ -1,0 +1,22 @@
+#The configuration used by the driverGTEx.py file
+#pipeline options
+#pipeline to run either 'align' or 'quant'
+pipeline_type: quant
+#these many samples will be downloaded and submitted to a node for batch processing
+batch_size: 30
+
+#gen3-client options
+gen3_profile: gen3profile
+num_parallel: 4
+
+#slurm options
+#If running download on a different node ssh into it otherwise leave it blank
+#dtn_ssh: ssh user@dtn
+dtn_ssh: 
+#job time
+slurm_job_time: "12:00:00" #in quotes
+email: user@iastate.edu
+#path to conda profile
+conda_profile: /path/to/etc/profile.d/conda.sh
+#conda env to use
+conda_env: pyrpipe
