@@ -56,6 +56,20 @@ Using Mapping objects
     #create a star object
     star=Star(index='path_to_star_index')
     
+    #perform alignment using SRA object
+    bam=star.perform_alignment(sraobject)
+    #or
+    sraobject.align(star)
+    bam=sraobject.bam_path
+    
+    #execute STAR with any arguments and parameters
+    kwargs={'--outFilterType' : 'BySJout',
+            '--runThreadN': '6',
+            '--outSAMtype': 'BAM SortedByCoordinate',
+            '--readFilesIn': 'SRR3098744_1.fastq SRR3098744_2.fastq'
+            }
+    star.run(**kwargs)
+    
     
     
     
