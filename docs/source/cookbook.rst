@@ -6,6 +6,7 @@ Cookbook
 
 Using SRA objects
 ----------------------
+
 .. code-block::
 
     from pyrpipe.sra import SRA #imports the SRA class
@@ -47,3 +48,21 @@ Using SRA objects
     
 Using Mapping objects
 ----------------------
+
+.. code-block::
+
+    from pyrpipe.mapping import Star
+    
+    #create a star object
+    star=Star(index='path_to_star_index')
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
+    
