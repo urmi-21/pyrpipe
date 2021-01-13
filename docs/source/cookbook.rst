@@ -4,7 +4,7 @@ Cookbook
 
 .. contents::
 
-Creating SRA objects
+Using SRA objects
 ----------------------
 .. code-block::
 
@@ -37,3 +37,13 @@ Creating SRA objects
     
     #delete sra
     myob.delete_sra()
+    
+    #download fastq 
+    myob.download_fastq()
+    
+    #trim fastq files
+    myob.trim(qcobject)
+    
+    
+Using Mapping objects
+----------------------
