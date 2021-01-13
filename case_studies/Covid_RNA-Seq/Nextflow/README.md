@@ -20,6 +20,8 @@ To install the reference data and build Salmon index, run [this file](https://gi
 
 `bash prepare_data.sh`
 
+The salmon index must be in `./human_data/salmon_index` or specify path to salmon index in the `run_quant.nf` file.
+
 ### Execute using Nextflow
 
 `nextflow run run_quant.nf`
