@@ -7,7 +7,10 @@ Cookbook
 Using SRA objects
 ----------------------
 
-.. code-block::
+
+
+.. code-block:: python
+    :linenos:
 
     from pyrpipe.sra import SRA #imports the SRA class
     
@@ -49,7 +52,9 @@ Using SRA objects
 Using Mapping objects
 ----------------------
 
-.. code-block::
+
+.. code-block:: python
+    :linenos:
 
     from pyrpipe.mapping import Star
     
