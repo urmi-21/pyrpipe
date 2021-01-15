@@ -31,7 +31,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * report generating features for easy sharing, reproducing, benchmarking and debugging
 
 ## Key Features
-* Import any UNIX command in python
+* Import any UNIX executable command/tool in python
 * Dry-run feature to check dependencies and commands before execution
 * Flexible and robust handling of options and arguments (both Linux and Java style options)
 * Auto load command options from .yaml files

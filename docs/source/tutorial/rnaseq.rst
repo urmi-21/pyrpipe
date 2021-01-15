@@ -5,11 +5,15 @@ Basic RNA-Seq processing
 After setting up the environment, one can import pyrpipe modules in python and start using it.
 In this example we will use the *A. thaliana* Paired-end RNA-Seq run *SRR976159*.
 
+Many other examples are available on `github <https://github.com/urmi-21/pyrpipe/tree/master/case_studies>`_
+
 Required files
 ================
 
 We need to download the reference genome and annotation for *A. thalinia*. This can be done inside python script too.
 For simplicity we just download these using the `wget` command from the terminal.
+
+Code for *A. thalinia* transcript assembly case study is available on `github <https://github.com/urmi-21/pyrpipe/tree/master/case_studies/Athaliana_transcript_assembly>`_
 
 .. code-block:: bash
     :linenos:
@@ -26,6 +30,7 @@ Simple pipeline
 
 RNA-Seq processing is as easy as creating required objects and executing required functions.
 The following python script provides a basic example of using pyrpipe on publicly available RNA-Seq data.
+
 
 
 .. code-block:: python

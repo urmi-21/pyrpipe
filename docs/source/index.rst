@@ -9,7 +9,7 @@ pyrpipe: A python package for RNA-Seq workflows
 Introduction
 *************
 pyrpipe (pronounced as "pyre-pipe") is a python package to easily develop computational pipelines in pure python, in an object-oriented manner. 
-pyrpipe provides an easy-to-use object oriented framework to import any UNIX command or tool in python. 
+pyrpipe provides an easy-to-use object oriented framework to import any UNIX executable command or tool in python. 
 pyrpipe also provides flexible and easy handling of tool options and parameters and can automatically load the tool parameters from .yaml files.
 This framework minimizes the commands user has to write, rather the tools are available as objects and are fully re-usable.
 All commands executed via pyrpipe are automatically logged extensively and could be compiled into reports using  the pyrpipe_diagnostic tool.
@@ -19,11 +19,13 @@ These classes provide high level APIs to many popular RNA-Seq tools for easier a
 These pipelines can be fully customizable and users can easily add/replace the tools using the pyrpipe framework.
 Finally, pyrpipe can be used on local computers or on HPC environments and pyrpipe scripts can be easily integrated into workflow management systems such as Snakemake and Nextflow.
 
+Get started with the tutorial: :ref:`Tutorial Overview` or look at real data `examples <https://github.com/urmi-21/pyrpipe/tree/master/case_studies>`_.
+
 
 Key Features
 #############
 
-- Import any UNIX command in python
+- Import any UNIX executable command/tool in python
 - Dry-runnable pipelines to check dependencies and commands before execution
 - Flexible and robust handling of tool arguments and parameters
 - Auto load parameters from .yaml files

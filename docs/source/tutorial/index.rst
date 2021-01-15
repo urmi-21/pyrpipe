@@ -1,8 +1,19 @@
+.. _Tutorial Overview:
+
 Tutorial
 ========
 
-This tutorial provides introduction to pyrpipe. The first part describes using pyrpipe's RNA-Seq related modules to implement RNA-Seq processing pipelines. 
-The latter topics cover details on how to use pyrpipe framework to integrate any third-party UNIX command/tool in python. 
+This tutorial provides introduction to pyrpipe. 
+New users can start here to get an idea how to use pyrpipe APIs for RNA-Seq or other analysis.
+This tutorial is divided into smaller sections.
+
+First section describes the recommended way of installing pyrpipe and setting up conda environments.
+
+Then, an introduction to basic RNA-Seq API is provided via a simple RNA-Seq processing pipeline example.
+
+After that, there is information on how to extend pipelines using third-party tools and integrate pyrpipe into snakemake for more scalable workflows.
+ 
+The latter topics provide cover details on pyepipe_engine, pyepipe_module and pyrpipe_diagnostic which provide many useful and helpful functionality.
 
 
 .. toctree::

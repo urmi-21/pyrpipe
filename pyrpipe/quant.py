@@ -349,7 +349,7 @@ class Salmon(Quant):
         kwargs: dict
             Options to pass to salmon. This will override the existing options
 
-        :return: Path to salmon out directory
+        :return: Path to salmon out file
         :rtype: string
         """
             

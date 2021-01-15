@@ -335,6 +335,9 @@ class SRA:
         #must have a bam file
         if not self.bam_path:
             raise ValueError("No BAM file associated with "+ self.srr_accession)
+        
+        if not pu.check_files_exist(self.bam_path):
+            raise ValueError("BAM file {} not fount ".format(self.bam_path))
             
         status=assembly_object.perform_assembly(self.bam_path,objectid=self.srr_accession,**kwargs)
         
@@ -358,6 +361,7 @@ class SRA:
         if not status:
             raise OSError("perform_mapping failed for: "+ self.srr_accession)
             
+        self.abundance=status    
         return self
         
     
