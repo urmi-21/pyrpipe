@@ -26,7 +26,7 @@ process rnaseq {
     salmon=quant.Salmon(index="$projectdir/human_data/salmon_index")
     thisid='${srr}'
     print('Processing:',thisid)
-    sra.SRA(thisid).quant(salmon)
+    sra.SRA(thisid).quant(salmon).delete_fastq()
     """
 }
 

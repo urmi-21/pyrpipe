@@ -31,7 +31,7 @@ rule quant:
 	run:
 		outfile=str(output.quant_file)
 		srrid=outfile.split("/")[1]
-		sra.SRA(srrid,directory=DIR).quant(salmon)
+		sra.SRA(srrid,directory=DIR).quant(salmon).delete_fastq()
 
 rule merge:
 	input:
