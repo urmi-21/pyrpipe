@@ -45,7 +45,6 @@ setuptools.setup(
     url="https://github.com/urmi-21/pyrpipe",
     packages=setuptools.find_packages(),
     include_package_data=True,
-    scripts=['scripts/pyrpipe_diagnostic.py'],
     entry_points={
             'console_scripts': [
                     'pyrpipe = pyrpipe.__main__:main',

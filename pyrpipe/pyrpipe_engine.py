@@ -42,7 +42,7 @@ All functions that interact with shell are defined here.
 #a decorator to skip functions in safe mode
 def skippable(func):
     """
-    Skip a function execution
+    Skip a function execution in safemode
     """
     if not _safe:
         return func
@@ -83,7 +83,7 @@ def dryable(func):
 def parse_cmd(cmd):
     """This function converts a list to str.
     If a command is passed as list it is converted to str.
-    For pyrpipe v0.0.5 onwards the get_shell_output function uses shell=True
+    pyrpipe v0.0.5 onwards the get_shell_output function uses shell=True
     """
     if isinstance(cmd,list):
         return " ".join(cmd)
@@ -94,12 +94,15 @@ def parse_cmd(cmd):
 def get_shell_output(cmd,verbose=None):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
-    getReturnStatus(), getProgramVersion(), find_files()
+    get_return_status(), get_program_version()
+    
+    pyrpipe v0.0.5 onwards the get_shell_output function uses shell=True
+    
     
     Parameters
     ----------
     
-    cdm: list
+    cdm: list or string
         command to run
     verbose: bool
         to print messages

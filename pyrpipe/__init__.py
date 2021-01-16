@@ -150,6 +150,9 @@ class PyrpipeLogger():
 
 #read pyrpipe.conf in current dir
 class Conf:
+    """
+    Read and store pyrpipe configuration
+    """
     def __init__( self):
         #init default values to use
         self._dry = False
@@ -251,8 +254,8 @@ Decide what to run based on how pyrpipe was invoked
 
 There are multiple ways to execute a python script containing pyrpipe code
 
-if infile is present implies invoked via pyrpipe command and control will go to the __main__ module
-If infile is absent, it was invoked using python script.py command. In this case all pyrpipe options are read
+if infile is present implies invoked via pyrpipe command, e.g. pyrpipe --in script.py, and control will go to the __main__ module
+If infile is absent, it was invoked using python script.py command, e.g python script.py. In this case all pyrpipe options are read
 and removed from the argv parameters so that passed argv  are available to the script.py
 """
 #if pyrpipe_diagnostic is invoked
@@ -316,6 +319,7 @@ else:
             if pu.check_files_exist(s):
                 _optsmd5[s]=pu.get_mdf(s)
     
+        #this will be executed at then end of script
         @atexit.register 
         def goodbye():
             logfile=os.path.join(_logs_dir,_log_name+'.log')

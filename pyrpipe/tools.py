@@ -22,13 +22,14 @@ class RNASeqTools(Runnable):
     
 
 class Samtools(RNASeqTools):
-    """init function allows to specify commonly tuned parameters like threads, out_dir, memory etc.
-    More specific parameters can be passed when calling the specific functions. There is option to override the parameters specified here in init later.
-    
+    """
+    Class to access samtools
+    args: tuple
+        arguments to samtools
     threads: int
         Number of threads samtools will use
-    max_memory: int
-        Max memory to use in GB
+    kwargs: dict
+        Options to samtools
     
     """
     def __init__(self,*args,threads=None,**kwargs):

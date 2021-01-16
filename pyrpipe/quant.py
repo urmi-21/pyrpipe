@@ -79,20 +79,12 @@ class Kallisto(Quant):
         """Function to  build kallisto index
         
         index_path: str
-            path to the output directory
-        index_name: str
-            index name
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
+            path to the index
+        transcriptome: str
+            Path to transcriptome
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to kallisto. This will override the existing options in self.passed_args_dict (only replace existing arguments and not replace all the arguments).
-            
+                
         :return: Status of kallisto index
         :rtype: bool
         """
@@ -154,23 +146,13 @@ class Kallisto(Quant):
         
         sra_object: SRA
             SRA object contatining paths to fastq files
-        index_path: str
-            path to the output directory
-        index_name: str
-            index name
-        threads: int
-            Number of threads
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
+        out_suffix: str
+            suffix for output file
+        out_dir: str
+            path to output directory
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to kallisto. This will override the existing options
-
+       
         :return: Path to kallisto out directory
         :rtype: string
         """
@@ -334,21 +316,13 @@ class Salmon(Quant):
         """run salmon quant
         sra_object: SRA
             An SRA object with valid fastq files
-        lib_type: str
-            Library type. Default:A
-        threads: int
-            Num threads to use
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
+        out_suffix: str
+            suffix string fout out file
+        out_dir: str
+            path to outdir
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to salmon. This will override the existing options
-
+        
         :return: Path to salmon out file
         :rtype: string
         """

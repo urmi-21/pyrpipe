@@ -41,6 +41,9 @@ class Stringtie(Assembly):
         
         threads: int
             number of threads
+        guide: str
+            Reference annotation gtf/gff to use as guide
+            
         """
     def __init__(self,*args,threads=None,guide=None,**kwargs):
         super().__init__(*args,**kwargs)
@@ -63,24 +66,12 @@ class Stringtie(Assembly):
         
         bam_file: string
             path to the bam file
+        out_dir: string
+            Path to out file
         out_suffix: string
             Suffix for the output gtf file
-        reference_gtf: str
-            Path to the reference gtf used as guide
-        threads: int
-            Number of threads to use
-        overwrite: bool
-            Overwrite if output file already exists.
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to stringtie. 
         :return: Returns the path to output GTF file
         :rtype: string
         """
@@ -143,22 +134,8 @@ class Cufflinks(Assembly):
             output directory
         out_suffix: string
             Suffix for the output gtf file
-        reference_gtf: str
-            Path to reference gtf 
-        threads: int
-            Number of threads to use
-        overwrite: bool
-            Overwrite if output file already exists.
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession.
-        kwargs: dict
-            Options to pass to cufflinks. 
             
         :return: Returns the path to output GTF file
         :rtype: string       

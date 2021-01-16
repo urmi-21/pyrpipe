@@ -71,7 +71,7 @@ class Hisat2(Aligner):
         Raises
         ------
         ValueError
-            Raises ValueError if hista index is not found and genome is not present to generate an index.
+            Raises ValueError if hisat index is not found and genome is not present to generate an index.
 
         Returns
         -------

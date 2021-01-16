@@ -516,6 +516,10 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
     -------
     result : TYPE
         DESCRIPTION.
+    
+    Example
+    --------
+    find_files('path/to/directory','.*\.txt$',recursive=False,verbose=False)
 
     """
     
@@ -544,6 +548,20 @@ def find_files(search_path,search_pattern,recursive=False,verbose=False):
              
 
 def get_mdf(filename):
+    """
+    Compute and return md5checksum 
+
+    Parameters
+    ----------
+    filename : str
+        Path to input file
+
+    Returns
+    -------
+    md5 : str
+        MD5 checksum value
+
+    """
     if not check_files_exist(filename):
         #print_boldred('Error calculating MD5. File {} not found'.format(filename))
         return None

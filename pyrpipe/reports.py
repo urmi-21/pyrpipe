@@ -27,6 +27,22 @@ from pyrpipe import report_templates
 
 
 def parseEnvLog(envLog):
+    """
+    Parse env log file
+
+    Parameters
+    ----------
+    envLog : str
+        Env lof file path.
+
+    Returns
+    -------
+    sysInfo : dict
+        system information .
+    progList : dict
+        programs used.
+
+    """
     #parse the env log
     with open(envLog) as f:
         envdata=f.read().splitlines()
@@ -282,6 +298,24 @@ def writeHtmlToMarkdown(htmlText,outFile):
     
 
 def getCommandsFromLog(inFile,filterList,coverage):
+    """
+    Get commands from a log
+
+    Parameters
+    ----------
+    inFile : str
+        path to pyrpipe log file.
+    filterList : str
+        list of commands to ignore.
+    coverage : char
+        type of commands to report all, passed or failed: a,p, i.
+
+    Returns
+    -------
+    commands : TYPE
+        DESCRIPTION.
+
+    """
     with open(inFile) as f:
         data=f.read().splitlines()
     commands=[]
@@ -346,6 +380,27 @@ def getStdoutFromLog(inFile,filterList,coverage):
 
 
 def generateBashScript(logFile,outFile,filterList,coverage='a',verbose=True):
+    """
+    Write commands to a bash file
+
+    Parameters
+    ----------
+    logFile : str
+        path to input pyrpipe log file
+    outFile : str
+        path to output file.
+    filterList : list
+        list of programs to ignore.
+    coverage : char, optional
+        type of commands passed or failed. The default is 'a'.
+    verbose : boolean, optional
+        print messages. The default is True.
+
+    Returns
+    -------
+    None.
+
+    """
     commands=getCommandsFromLog(logFile,filterList,coverage)
     if not outFile.endswith(".sh"):
         outFile=outFile+".sh"
@@ -366,6 +421,20 @@ def generateBashScript(logFile,outFile,filterList,coverage='a',verbose=True):
 
 
 def checkEnvLog(logFile):
+    """
+    Check log exist and return path to corresponding ENV log
+
+    Parameters
+    ----------
+    logFile : str
+        path to log file.
+
+    Returns
+    -------
+    envLog : TYPE
+        DESCRIPTION.
+
+    """
     #check all logs exist
     logFileDir=pu.get_file_directory(logFile)
     basename=pu.get_file_basename(logFile)
@@ -378,6 +447,29 @@ def checkEnvLog(logFile):
 
 
 def generate_multiqc(directory,tempDir,outDir="",coverage='a',verbose=False,cleanup=False):
+    """
+    Generate reports using multiqc
+
+    Parameters
+    ----------
+    directory : str
+        path to directory containing logs.
+    tempDir : str
+        temp dir.
+    outDir : str, optional
+        output dir. The default is "".
+    coverage : char, optional
+        commands to use in pyrpipe log: fa(i)led (p)assed or (a)ll. The default is 'a'.
+    verbose : bool, optional
+        print messages. The default is False.
+    cleanup : bool, optional
+        remove temp files. The default is False.
+
+    Returns
+    -------
+    None.
+
+    """
     #searg all _pyrpipe.log files under current directory
     files=pu.find_files(directory,".*_pyrpipe\.log$",recursive=True)
     #extract stdout from each file and save to temp

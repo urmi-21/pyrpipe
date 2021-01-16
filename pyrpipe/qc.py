@@ -34,7 +34,10 @@ class Trimgalore(RNASeqQC):
     
     Parameters
     ----------
-        
+        args: tuple
+            arguments passed to trim_galore
+        threads: int
+            Num threads to use
         kwargs:
             trim_galore arguments.
     """
@@ -62,21 +65,11 @@ class Trimgalore(RNASeqQC):
             Path to output directory
         out_suffix: string
             Suffix for the output sam file
-        threads: int
-            Num threads to use
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
         objectid: str
             Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        kwargs: dict
-            Options to pass to trimgalore. This will override the existing options 
-
-            :return: Returns the path of fastq files after QC. tuple has one item for single end files and two for paired.
-            :rtype: tuple
+            
+        :return: Returns the path of fastq files after QC. tuple has one item for single end files and two for paired.
+        :rtype: tuple
         """
         if not out_dir:
             out_dir=sra_object.directory
@@ -203,6 +196,15 @@ class BBmap(RNASeqQC):
     def perform_qc(self,sra_object,out_dir="",out_suffix="_bbduk",objectid="NA"):
         """Run bbduk on fastq files specified by the sra_object
        
+        sra_object: SRA
+            An SRA object whose fastq files will be used
+        out_dir: str
+            Path to output directory
+        out_suffix: string
+            Suffix for the output sam file
+        objectid: str
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
+        
         :return: Returns the path of fastq files after QC. tuple has one item for single end files and 2 for paired.
         :rtype: tuple
             
@@ -267,17 +269,8 @@ class BBmap(RNASeqQC):
             Path to output dir. Default: sra_object.directory
         out_suffix: string
             Suffix for output file name
-        overwrite: bool
-            overwrite existing files
-        verbose: bool
-            Print stdout and std error
-        quiet: bool
-            Print nothing
-        logs: bool
-            Log this command to pyrpipe logs
         objectid: str
-            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.
-        
+            Provide an id to attach with this command e.g. the SRR accession. This is useful for debugging, benchmarking and reports.        
         kwargs: dict
             options passed to bbsplit
 
@@ -361,7 +354,7 @@ class BBmap(RNASeqQC):
             return("",)
     
     
-    
+    #used by perform_cleaning
     def run_bbsplit(self,objectid="NA",**kwargs):
         """wrapper to run bbsplit
         

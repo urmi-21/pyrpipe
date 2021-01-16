@@ -16,12 +16,14 @@ def add_bool(self, node):
 SafeConstructor.add_constructor(u'tag:yaml.org,2002:bool', add_bool)
 
 class YAML_loader():
+    """
+    Load parameters from a yaml file
+    """
     
     
     def __init__(self,file):
         self.__params=None
         self.__kwargs=None
-        self.__args=None
         
         if not pu.check_files_exist(file):
             return
@@ -42,7 +44,7 @@ class YAML_loader():
     
     def parse_params(self):
         """
-        separate params into args and kwargs
+        store params as dict
         """
         #if file is empty
         if not self.__params:
@@ -62,10 +64,9 @@ class YAML_loader():
                 params[k]=str(v)
         
         for k in to_del:
-            del params[k]
-        
+            del params[k]        
         
         self.__kwargs=params
-        #self.__args=tuple(args)
+        
         
                 

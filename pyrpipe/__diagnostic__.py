@@ -16,6 +16,14 @@ from pyrpipe import reports
 
 
 def report():
+    """
+    Entry point for report subcommand
+
+    Returns
+    -------
+    None.
+
+    """
     
     parser = argparse.ArgumentParser(
    
@@ -66,7 +74,14 @@ def report():
     
     
 def shell():
-    print("Generating bash script")
+    """
+    Entry point for shell command
+
+    Returns
+    -------
+    None.
+
+    """
     parser = argparse.ArgumentParser(
    
             description='pyrpipe diagnostic utility\nGenerate shell script.',
@@ -101,7 +116,14 @@ def shell():
     
 
 def benchmark():
-    print("Generating benchmarks")
+    """
+    Entry point for benchmark subcommand
+
+    Returns
+    -------
+    None.
+
+    """
     parser = argparse.ArgumentParser(
    
             description='pyrpipe diagnostic utility\nGenerate benchmark report.',
@@ -147,7 +169,15 @@ def benchmark():
 
     
 def multiqc():
-    print("Generating html report with multiqc")
+    """
+    Entry point for multiqc subcommand
+
+    Returns
+    -------
+    None.
+
+    """
+    
     parser = argparse.ArgumentParser(
    
             description='pyrpipe diagnostic utility\nGenerate report with multiqc.',
