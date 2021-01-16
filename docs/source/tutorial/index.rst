@@ -13,7 +13,7 @@ Section 2 is  an introduction to basic RNA-Seq API is provided via a simple RNA-
 
 Section 3 provides information on how to extend pipelines using third-party tools and integrate pyrpipe into snakemake for more scalable workflows.
  
-Subsequent Sections detail pyrpipe_engine, pyrpipe_module and pyrpipe_diagnostic, each of which provide reproducibility and helpful functionality.
+Subsequent Sections detail pyrpipe_engine, pyrpipe_utils and pyrpipe_diagnostic, each of which provide helpful functionality.
 
 
 .. toctree::
