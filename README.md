@@ -19,7 +19,7 @@ Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-### Note: Due to change in API design, pyrpipe version 0.0.5 and above is not compatible with lower versions. All the tutorials and documentation has been updated to reflect v0.0.5. pyrpipe version 0.0.5 is currenly available only from GitHub.
+### Note: Due to change in API designs, pyrpipe version 0.0.5 and above is not compatible with lower versions. All the tutorials and documentation have been updated to reflect v0.0.5.  pyrpipe version 0.0.5 is currenly available only from GitHub.
 
 
 ## What it does
@@ -40,11 +40,11 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * Automatically verify Integrity of output targets
 * Resume feature to restart pipelines/jobs from where interrupted
 * Create reports, MultiQC reports for bioinformatic pipelines
-* Easily integrated into workflow managers like Snakemake and NextFlow
+* Easily integrated into workflow managers like Snakemake and NextFlow (to schedule jobs, scale jobs, identify paralellel steps in pipelines)
 
 
 
-## What it CAN NOT do by itself
+## What it CAN NOT do by itself 
 * Schedule jobs
 * Scale jobs on HPC/cloud
 * Identify parallel steps in pipelines
@@ -102,7 +102,7 @@ This simple example imports and runs the Unix `grep` command. See [this](https:/
 ```
 
 ## Installation
-Please follow these instruction: 
+Please follow these instructions: 
 
 ### To create a new Conda environment (recommended):
 
