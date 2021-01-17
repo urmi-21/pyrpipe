@@ -68,11 +68,11 @@ rule merge:
 		#gene counts
 		df_gene=df[['GeneID']+names].copy()
 		df_gene = df_gene.groupby(['GeneID'],as_index = False).sum()
-                df_gene['GeneID']=df_gene['GeneID'].str.split('.').str[0]
-                #add gene metadata
-                md=pd.read_csv('Ens_gene_metadata.txt',sep='\t',skiprows=0) 
-                md.rename(columns={ md.columns[0]: "GeneID" }, inplace = True)
-                df_gene=md.merge(df_gene, on=['GeneID'], how='right')
-                #reorder
-                df_gene = df_gene[ ['Gene name'] + [ col for col in df_gene.columns if col != 'Gene name' ] ]
+        df_gene['GeneID']=df_gene['GeneID'].str.split('.').str[0]
+        #add gene metadata
+        md=pd.read_csv('Ens_gene_metadata.txt',sep='\t',skiprows=0) 
+        md.rename(columns={ md.columns[0]: "GeneID" }, inplace = True)
+        df_gene=md.merge(df_gene, on=['GeneID'], how='right')
+        #reorder
+        df_gene = df_gene[ ['Gene name'] + [ col for col in df_gene.columns if col != 'Gene name' ] ]
 		df_gene.to_csv(DIR+'/results_TPM_gene.tsv',sep='\t',index=False)

@@ -121,7 +121,7 @@ class Kallisto(Quant):
         #add positional args
         internal_kwargs['--']=args
         
-        validArgsIndex=['-i','--index','-k','--kmer-size','--make-unique']
+        validArgsIndex=valid_args._args_KALLISTO_INDEX
         
         kallisto_cmd=['kallisto','index']
         kallisto_cmd.extend(pu.parse_unix_args(validArgsIndex,internal_kwargs))
@@ -280,9 +280,8 @@ class Salmon(Quant):
                 raise OSError("Error creating salmon index. Failed to create index directory.")
         
         
-        validArgsIndex=['-v','-t','--transcripts','-k','--kmerLen','-i',
-                             '--index','--gencode','--keepDuplicates','-p','--threads','--perfectHash',
-                             '--type','-s','--sasamp','-d','--decoys']
+        validArgsIndex=valid_args._args_SALMON_INDEX
+        
             
         internal_kwargs={"--threads":_threads,"-t":transcriptome,"-i":index_path}
         #read build parameters

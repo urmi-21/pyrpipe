@@ -141,9 +141,8 @@ class Hisat2(Aligner):
                 raise OSError("Error creating hisat2 index. Failed to create index directory.")
                 
         
-        hisat2Buildvalid_args=['-c','--large-index','-a','-p','--bmax','--bmaxdivn','--dcv','--nodc','-r','-3','-o',
-                                  '-t','--localoffrate','--localftabchars','--snp','--haplotype','--ss','--exon',
-                                  '--seed','-q','-h','--usage','--version']
+        hisat2Buildvalid_args=valid_args._args_HISAT2BUILD
+        
         
         args=(genome,index_path)
         internal_kwargs={"-p":self._threads}
