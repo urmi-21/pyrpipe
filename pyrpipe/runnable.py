@@ -450,10 +450,16 @@ class Runnable:
             Returns the list of valid options for the subcommand.
 
         """
-        if subcommand:
-            return self._valid_args[subcommand]
-        return self._valid_args
-        pass
+        
+        if isinstance(self._valid_args, list): return self._valid_args
+        #if dict
+        if isinstance(self._valid_args, dict):
+            if subcommand:
+                return self._valid_args[subcommand]
+            #default
+            return self._valid_args[0]
+        #no valid format provided
+        return None
         
     def run(self,*args, subcommand=None, target=None, requires=None, objectid=None, verbose=None,logs=None,**kwargs):
         """
@@ -564,7 +570,8 @@ class Runnable:
             #add to command
             cmd.extend(subcommand)
             
-            
+        #get valid args
+        #self.get_valid_parameters(subcommand)
         #parse and add parameters
         if self._args_style=='LINUX':
             cmd.extend(pu.parse_unix_args(self._valid_args,kwargs))      

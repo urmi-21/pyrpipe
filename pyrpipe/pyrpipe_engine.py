@@ -134,7 +134,7 @@ def get_shell_output(cmd,verbose=None,shell=False):
             stderr=''
         return(result.returncode,stdout,stderr)
     except:
-        return(-1,"","Command failed to execute")
+        return(-1,"Command failed to execute","Command failed to execute")
 
 @dryable
 def get_return_status(cmd):
