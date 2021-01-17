@@ -76,6 +76,9 @@ script:
   #- travis_wait 60 coverage run -m pytest tests/
   - rm -rf tests/testout
   - coverage run -m pytest tests/
+  #copy config file
+  - cp tests/test_files/pyrpipe_conf.yaml .
+  - coverage run -m pytest tests/
   - coverage report --show-missing -i
 after_success:
   - coveralls

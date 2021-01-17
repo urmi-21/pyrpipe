@@ -91,12 +91,12 @@ def parse_cmd(cmd):
     return cmd
         
 @dryable
-def get_shell_output(cmd,verbose=None):
+def get_shell_output(cmd,verbose=None,shell=False):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
     get_return_status(), get_program_version()
     
-    pyrpipe v0.0.5 onwards the get_shell_output function uses shell=True
+    pyrpipe v0.0.5 onwards the get_shell_output function allows shell=True
     
     
     Parameters
@@ -114,12 +114,15 @@ def get_shell_output(cmd,verbose=None):
     #not logging these commands
     cmd=parse_cmd(cmd)
     log_message=cmd
+    #command_name=cmd.split()[0]
+    
+    
     starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
     if verbose:
         pu.print_notification("Start:"+starttime_str)
         pu.print_blue("$ "+log_message)
     try:
-        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=shell)
         stdout,stderr = result.communicate()
         if stdout:
             stdout=stdout.decode("utf-8")
