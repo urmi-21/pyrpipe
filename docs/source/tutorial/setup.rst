@@ -34,6 +34,14 @@ To recreate the conda environment in the `environment.yml`, use
 .. code-block:: bash
 
     conda env create -f environment.yml
+    
+We have also provided a utility to install required RNA-Seq tools via a single command:
+
+.. code-block:: bash
+    
+    pyrpipe_diagnostic build-tools
+    
+**Note** Users must verify the versions of the tools installed in the conda environment.
 
 
 Setting up NCBI SRA-Tools
@@ -46,6 +54,11 @@ To do this
 - Type `vdb-config -i` command in terminal to open the NCBI SRA-Tools configuration editor.
 - Under the TOOLS tab, set prefetch downloads option to **public user-repository**
 
+Users can easily test if SRA-Tools has been setup properly by invoking the following command
+
+.. code-block:: bash
+    
+    pyrpipe_diagnostic test
 
 
 

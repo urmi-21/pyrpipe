@@ -87,27 +87,6 @@ def args_to_list(args):
 if __name__ == '__main__':
     main()
 
-def caller(threads,mem,dryrun,safemode,paramdir,logsdir,nologs,verbose,force,infile,unknownargs):
-    #write pyrpipe configuration
-    #everything saved as str
-    conf={}
-    conf['threads']=threads
-    conf['memory']=mem
-    conf['params_dir']=paramdir
-    conf['dry']=dryrun
-    conf['force']=force
-    conf['safe']=safemode
-    conf['logs_dir']=logsdir
-    conf['logs']= not nologs
-    conf['verbose']=verbose
-    
-    #with open('pyrpipe.conf', 'w') as outfile:
-    #    json.dump(conf, outfile,indent=4)
-    #execute
-    cmd=['python',infile]+unknownargs
-    print('MAININFILE',infile,unknownargs)
-    print('CMD',' '.join(cmd))
-    os.system(' '.join(cmd))
-    
+
     
     

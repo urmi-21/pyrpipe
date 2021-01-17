@@ -15,6 +15,8 @@ usage="""
 pyrpipe [<pyrpipe options>] --in <script.py> [<script options>]
 OR
 python <script.py> [<pyrpipe options>] [<script options>]
+
+use pyrpipe_diagnostic command for reports, and tests and installation of RNA-Seq tools
 """)
 
 
@@ -27,10 +29,7 @@ parser.add_argument("--safe-mode", help="Disable file deletions through pyrpipe_
 parser.add_argument("--no-logs", help="Disable pyrpipe logs\nDefault: False",default=False,dest='nologs', action='store_true')
 parser.add_argument("--param-dir", help="Directory containing parameter yaml files\nDefault: ./params",dest='paramdir',default='params')
 parser.add_argument("--logs-dir", help="Directory for saving log files\nDefault: ./pyrpipe_logs",dest='logsdir',default='pyrpipe_logs')
-
 parser.add_argument("--multiqc", help="Autorun MultiQC after execution\nDefault: False",default=False,dest='multiqc', action='store_true')
-parser.add_argument("--build-tools", help="Install the tools required by pyrpipe via  bioconda.",dest='build_conda',default=False,action='store_true')
-parser.add_argument("--test-sratools", help="Test if NCBI SRA-Tools is woking.",dest='test_sra',default=False,action='store_true')
 
 parser.add_argument("--version", help="Print version information and exit",default=False,dest='versioninfo', action='store_true')
 

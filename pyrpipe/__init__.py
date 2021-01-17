@@ -29,6 +29,21 @@ from pyrpipe import reports
 import uuid
 
 
+####################DEFAULTS#####################
+_dryrun=False
+_safe=False
+_threads='2'
+_mem='2'
+_params_dir='./params'
+_logs_dir='./pyrpipe_logs'
+_timestamp=str(datetime.now()).replace(" ","-").replace(":","_")
+_uuid=uuid.uuid4().hex[:5]
+_log_name=_timestamp+"_"+_uuid+"_pyrpipe"
+_logging=False
+_verbose=True
+_force=False
+_multiqc=False
+#########################################
 
 ###logger
 class LogFormatter():
@@ -260,7 +275,7 @@ and removed from the argv parameters so that passed argv  are available to the s
 """
 #if pyrpipe_diagnostic is invoked
 if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic':
-    #will go to __diagnostic__.main
+    #will go to __diagnostic__.main, this behaviour is specified in the setup
     pass
 elif sys.argv[0].split('/')[-1]=='pyrpipe':
     #will go to __main__.main

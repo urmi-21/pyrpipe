@@ -11,7 +11,7 @@ import os
 import argparse
 from pyrpipe import pyrpipe_utils as pu
 from pyrpipe import reports
-
+from pyrpipe import test_sratools,buildtools
 
 
 
@@ -228,10 +228,16 @@ def multiqc():
     else:
         reports.generate_multiqc(logFile,tempDir,outDir=outDir,coverage=args.c,verbose=args.v,cleanup=args.r)
 
-
+def testsra():
+    test_sratools.runtest()
+    
+def installtools():
+    buildtools.build_tools()
+    
+    
 def main():
     ##Start parsing
-    subcommands=['report','shell','benchmark','multiqc','all']
+    subcommands=['report','shell','benchmark','multiqc','test','build-tools']
     parser = argparse.ArgumentParser(
                 
                 description='pyrpipe diagnostic utility',
@@ -242,9 +248,11 @@ def main():
                         shell      Generate all commands to shell (bash) script
                         benchmark Generate bemchmarks
                         multiqc Generate HTML report using multiqc
+                        test Test if NCBI-SRA-Tools is working with pyrpipe
+                        build-tools Install the tools required by pyrpipe via  bioconda. pyrpipe must be installed under conda environment.
                         
                         ''')
-    parser.add_argument('command', help='Subcommand to run [report,bash,benchmark,all]')
+    parser.add_argument('command', help='Subcommand to run report, shell,benchmark,multiqc,test')
     
     
     #parse first and last argument as subcommand and logfile 
@@ -262,4 +270,9 @@ def main():
         benchmark()
     elif args.command == 'multiqc':
         multiqc()
+    elif args.command == 'test':
+        testsra()
+    elif args.command == 'build-tools':
+        installtools()
+        
     

@@ -382,7 +382,6 @@ def parse_unix_args(valid_args_list,passed_args):
         Unknown argument Attr2 XX. ignoring...
         ['-O', './test', 'IN1', 'IN2']
     """
-        
     popen_args=[]
     """
     Define some special arguments.

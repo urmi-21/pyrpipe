@@ -46,7 +46,8 @@ def skippable(func):
     """
     if not _safe:
         return func
-    return True
+    
+    return lambda x: True
 
 #decorator function for dry runs
 def dryable(func):
@@ -91,7 +92,7 @@ def parse_cmd(cmd):
     return cmd
         
 @dryable
-def get_shell_output(cmd,verbose=None,shell=False):
+def get_shell_output(cmd,verbose=None):
     """Function to run a shell command and return returncode, stdout and stderr
     Currently (pyrpipe v 0.0.4) this function is called in 
     get_return_status(), get_program_version()
@@ -114,7 +115,10 @@ def get_shell_output(cmd,verbose=None,shell=False):
     #not logging these commands
     cmd=parse_cmd(cmd)
     log_message=cmd
-    #command_name=cmd.split()[0]
+    command_name=cmd.split()[0]
+    if _safe and command_name in ['rm']:
+        pu.print_warning('SAFE MODE: Skipping command {}'.format(cmd))
+        return True
     
     
     starttime_str=time.strftime("%y-%m-%d %H:%M:%S", time.localtime(time.time()))
@@ -122,7 +126,7 @@ def get_shell_output(cmd,verbose=None,shell=False):
         pu.print_notification("Start:"+starttime_str)
         pu.print_blue("$ "+log_message)
     try:
-        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=shell)
+        result = subprocess.Popen(cmd,stdout=subprocess.PIPE,stderr=subprocess.STDOUT,shell=True)
         stdout,stderr = result.communicate()
         if stdout:
             stdout=stdout.decode("utf-8")
@@ -213,6 +217,10 @@ def execute_command(cmd,verbose=None,logs=None,objectid=None,command_name=""):
         command_name=cmd[0]
     log_message=" ".join(cmd)
     
+    ###safe mode
+    if _safe and command_name in ['rm']:
+        pu.print_warning('SAFE MODE: Skipping command {}'.format(cmd))
+        return True
     
     
     pu.print_notification("Start:"+starttime_str)
@@ -423,8 +431,8 @@ def delete_file(file_path):
         Path to the file to be deleted
     Returns
     -------
-    TYPE
-        DESCRIPTION.
+    bool
+        True if file deleted.
 
     """
     #if none
@@ -433,7 +441,10 @@ def delete_file(file_path):
     
     #if pu.check_files_exist(file_path):
     rm_cmd=['rm',file_path]
-    rv= get_return_status(rm_cmd)
+    
+    #rv= get_return_status(rm_cmd)
+    rv=execute_command(rm_cmd)
+    
     return rv
     
     #if file doesn't exist return true

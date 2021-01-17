@@ -403,6 +403,7 @@ class SRA:
         #each qc_object has a function run() to execute their method
         qcStatus=qc_object.perform_qc(self,objectid=self.srr_accession,**kwargs)
         
+        
         #if job failed
         if not qcStatus[0]:
             #print ("Error performing QC for "+self.srr_accession)
@@ -439,16 +440,18 @@ class SRA:
         """Delte the fastq files from the disk.
         The files are referenced by self.fastq_path or self.fastq_path and self.fastq2_path
         """
-            
+        
         if self.layout=='PAIRED':
             if pe.delete_files(self.fastq_path,self.fastq2_path):
                 del self.fastq_path
                 del self.fastq2_path
                 return True
         else:
+            
             if pe.delete_file(self.fastq_path):
                 del self.fastq_path
                 return True
+        
         return False
         
         
@@ -614,3 +617,12 @@ class SRA:
             
         
         return True
+    
+    
+    #def destroy(self):
+        """
+        Delete everything for this object from memory and disk
+        """
+      #  pass
+    
+        
