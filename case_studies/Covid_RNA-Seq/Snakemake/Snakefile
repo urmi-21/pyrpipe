@@ -37,7 +37,7 @@ rule merge:
 	input:
 		["{wd}/{sample}/salmon_out/quant.sf".format(wd=DIR,sample=s) for s in SRR]
 	output:
-		outfile="{wd}/results_TPM_tx.tsv"
+		outfile="{wd}/results_TPM_gene.tsv"
 	run:
 		#read tx names
 		with open(input[0]) as f:
@@ -61,11 +61,18 @@ rule merge:
 			thisdata=pd.read_csv(qf,sep='\t',usecols=[3],skiprows=0)
 			df[name]=thisdata['TPM']
 
-		#transcript counts
+                #transcript counts
 		df_tx=df[['TranscriptID']+names].copy()
 		#write to file
 		df_tx.to_csv(output.outfile,sep='\t',index=False)
 		#gene counts
 		df_gene=df[['GeneID']+names].copy()
 		df_gene = df_gene.groupby(['GeneID'],as_index = False).sum()
+                df_gene['GeneID']=df_gene['GeneID'].str.split('.').str[0]
+                #add gene metadata
+                md=pd.read_csv('Ens_gene_metadata.txt',sep='\t',skiprows=0) 
+                md.rename(columns={ md.columns[0]: "GeneID" }, inplace = True)
+                df_gene=md.merge(df_gene, on=['GeneID'], how='right')
+                #reorder
+                df_gene = df_gene[ ['Gene name'] + [ col for col in df_gene.columns if col != 'Gene name' ] ]
 		df_gene.to_csv(DIR+'/results_TPM_gene.tsv',sep='\t',index=False)
