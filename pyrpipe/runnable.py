@@ -454,10 +454,9 @@ class Runnable:
         if isinstance(self._valid_args, list): return self._valid_args
         #if dict
         if isinstance(self._valid_args, dict):
-            if subcommand:
+            if subcommand and subcommand in self._valid_args:
                 return self._valid_args[subcommand]
-            #default
-            return self._valid_args[0]
+            
         #no valid format provided
         return None
         
@@ -564,19 +563,21 @@ class Runnable:
             cmd=[self._command]
         
         #if subcommand supplied
+        #get valid args
+        valid_args_subcommand=self.get_valid_parameters(subcommand)
+        
         if subcommand:
             if isinstance(subcommand, str):
                 subcommand=[subcommand]
             #add to command
             cmd.extend(subcommand)
             
-        #get valid args
-        #self.get_valid_parameters(subcommand)
+        
         #parse and add parameters
         if self._args_style=='LINUX':
-            cmd.extend(pu.parse_unix_args(self._valid_args,kwargs))      
+            cmd.extend(pu.parse_unix_args(valid_args_subcommand,kwargs))      
         elif self._args_style=='JAVA':
-            cmd.extend(pu.parse_java_args(self._valid_args,kwargs))
+            cmd.extend(pu.parse_java_args(valid_args_subcommand,kwargs))
         else: 
             pu.print_boldred("Unknown args style: {}".format(self._args_style))
             raise ValueError("Unknown args style")
