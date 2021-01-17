@@ -321,7 +321,7 @@ A table describing functions implements in `pyrpipe_utils` is provided in the tu
     pu.mkdir('path/to/dir')
     
     #Search .txt files in a directly
-    pu.pu.find_files('path/to/directory','.*\.txt$',recursive=False,verbose=False)
+    pu.find_files('path/to/directory','.*\.txt$',recursive=False,verbose=False)
 
 
 
