@@ -84,10 +84,10 @@ More detailed examples are provided [here](https://github.com/urmi-21/pyrpipe/tr
 from pyrpipe.sra import SRA
 from pyrpipe.qc import Trimgalore
 from pyrpipe.mapping import Star
-trimgalore=qc.Trimgalore(threads=8)
-star=mapping.Star(index='data/index',threads=4)
+trimgalore = Trimgalore(threads=8)
+star = Star(index='data/index',threads=4)
 for srr in ['SRR976159','SRR978411','SRR971778']:
-    sra.SRA(srr).trim(trimgalore).align(star)
+    SRA(srr).trim(trimgalore).align(star)
 ```
 
 
