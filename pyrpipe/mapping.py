@@ -602,7 +602,7 @@ class Bowtie2(Aligner):
                 
         #create path to output sam file
         outSamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+".sam")
-        outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
+        #outBamFile=os.path.join(out_dir,sra_object.srr_accession+out_suffix+"_sorted.bam")
                     
         
         #find layout and fq file paths
@@ -613,19 +613,19 @@ class Bowtie2(Aligner):
         
         
         
-        status=self.run(None,objectid=sra_object.srr_accession,target=outBamFile,**internal_kwargs)
+        status=self.run(None,objectid=sra_object.srr_accession,target=outSamFile,**internal_kwargs)
         
         
         if status:
             if not pu.check_files_exist(outSamFile) and not _dryrun:
                 return ""
-            #convert to bam before returning
+            #convert to bam before returning; returns outBamFile
             return tools.Samtools().sam_sorted_bam(outSamFile)
-            #return outSamFile
+            
         
         return ""
-        
-        return ""
+    
+    
     
     def check_index(self):
         """Function to check bowtie index.

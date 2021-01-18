@@ -184,7 +184,7 @@ _args_SALMON['quantmerge']=_args_SALMON_QUANTMERGE
 #samtools version 1.9
 _args_SAMTOOLS_SORT=['-l','-m','-n','-t','-o','-T','-O','-@','--input-fmt-option','--output-fmt','--output-fmt-option','--reference','--threads']
 _args_SAMTOOLS_VIEW=['-b','-C','-1','-u','-h','-H','-c','-o','-U','-t','-L','-r','-R','-q','-l','-m','-f','-F','-G','-s','-M','-x','-B','-?','-S','O','T','@',
-                    '--input-fmt-option','--output-fmt','--output-fmt-option','--reference','--threads']
+                    '--input-fmt-option','--output-fmt','--output-fmt-option','--reference','--threads','-@']
 _args_SAMTOOLS_MERGE=['-n','-t','-r','-u','-f','-1','-l','-R','-h','-c','-p','-s','-b','-O','-@','--input-fmt-option',
                       '--output-fmt','--output-fmt-option','--reference','--threads']
 _args_SAMTOOLS={}

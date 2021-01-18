@@ -19,7 +19,8 @@ Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
-### Note: Due to change in API designs, pyrpipe version 0.0.5 and above is not compatible with lower versions. All the tutorials and documentation have been updated to reflect v0.0.5.  pyrpipe version 0.0.5 is currenly available only from GitHub.
+**NOTE:** Due to change in API designs, pyrpipe version 0.0.5 and above is not compatible with lower versions. 
+All the tutorials and documentation have been updated to reflect v0.0.5.
 
 
 ## What it does
@@ -30,7 +31,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 * comprehensive logging features to log all the commands, output and their return status
 * report generating features for easy sharing, reproducing, benchmarking and debugging
 
-## Key Features
+## Key Features (version 0.0.5)
 * Import any UNIX executable command/tool in python
 * Dry-run feature to check dependencies and commands before execution
 * Flexible and robust handling of options and arguments (both Linux and Java style options)

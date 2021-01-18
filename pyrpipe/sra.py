@@ -336,7 +336,7 @@ class SRA:
         if not self.bam_path:
             raise ValueError("No BAM file associated with "+ self.srr_accession)
         
-        if not pu.check_files_exist(self.bam_path):
+        if not _dryrun and not pu.check_files_exist(self.bam_path):
             raise ValueError("BAM file {} not fount ".format(self.bam_path))
             
         status=assembly_object.perform_assembly(self.bam_path,objectid=self.srr_accession,**kwargs)
@@ -355,6 +355,7 @@ class SRA:
         #check a valid mapping_object
         if not (hasattr(quant_object,'_category') and quant_object._category=='Quantification'):
             raise ValueError("Error: No valid assembly object provided for "+self.srr_accession)
+            
             
                    
         status=quant_object.perform_quant(self,objectid=self.srr_accession)
