@@ -73,7 +73,7 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 
 
 ## Examples
-#### Get started with the basic [tutorial](https://pyrpipe.readthedocs.io/en/latest/?badge=latest).Read the documentation [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest). Several examples are provided [here](https://github.com/urmi-21/pyrpipe/tree/master/case_studies)
+#### Get started with the basic [tutorial](https://pyrpipe.readthedocs.io/en/latest/?badge=latest). Read the documentation [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest). Several examples are provided [here](https://github.com/urmi-21/pyrpipe/tree/master/case_studies)
 
 ### Download, trim and align RNA-Seq data
 Following python code downloads data from SRA, uses Trim Galore to trim the fastq files and STAR to align reads. 
