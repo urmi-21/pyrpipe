@@ -29,6 +29,7 @@ hsOpts={"--dta-cufflinks":"","-p":"8"}
 hs=mapping.Hisat2(index=testVars.testDir+"/hisatindex",genome=testVars.genome,**hsOpts)
 star=mapping.Star(index=os.path.join(testVars.testDir,"starIndex"),genome=testVars.genome)
 stie=assembly.Stringtie()
+cl=assembly.Cufflinks()
 
 
 #sra ob 
@@ -54,3 +55,9 @@ def test_pipeline3():
 def test_pipeline4():    
     st=sraOb.align(star)
     assert st!=None,"pipeline 1 failed"
+
+def test_pipeline5():    
+    st=sraOb.trim(tg).align(bt).assemble(cl).assemble(stie)
+    assert st!=None,"pipeline 1 failed"
+    
+    
