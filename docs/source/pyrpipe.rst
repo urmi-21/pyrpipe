@@ -35,6 +35,14 @@ pyrpipe.benchmark module
    :undoc-members:
    :show-inheritance:
 
+pyrpipe.buildtools module
+-------------------------
+
+.. automodule:: pyrpipe.buildtools
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 pyrpipe.mapping module
 ----------------------
 
@@ -111,6 +119,14 @@ pyrpipe.sra module
 ------------------
 
 .. automodule:: pyrpipe.sra
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+pyrpipe.test\_sratools module
+-----------------------------
+
+.. automodule:: pyrpipe.test_sratools
    :members:
    :undoc-members:
    :show-inheritance:
