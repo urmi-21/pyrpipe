@@ -47,7 +47,8 @@ def skippable(func):
     if not _safe:
         return func
     
-    return lambda x: True
+    return lambda *args,**kwargs: True
+    
 
 #decorator function for dry runs
 def dryable(func):

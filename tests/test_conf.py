@@ -25,7 +25,8 @@ workingDir=testVars.testDir
 #create configuration
 f=open('pyrpipe_conf.yaml','w')
 f.write('dry: true\n')
-f.write('threads: true\n')
+f.write('threads: 1\n')
+f.write('safe: true\n')
 f.close()
 
 
