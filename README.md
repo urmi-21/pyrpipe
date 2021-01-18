@@ -161,11 +161,18 @@ cd tests ; . ./build_test_env.sh
 py.test tests/test_*
 ```
 
-## Setting NCBI SRA Toolkit
-If you face problems with downloading data from SRA, try configuring the SRA Toolkit.
+## Setting NCBI SRA-Tools
+If you face problems with downloading data from SRA, try configuring the SRA-Tools.
 Use  ```vdb-config -i``` to configure SRA Toolkit. Make sure that:
+
 * Under the **TOOLS** tab, prefetch downloads to is set to public user-repository
 * Under the **CACHE** tab, location of public user-repository is not empty
+
+Use the following pyrpipe_diagnostic command to test if SRA-Tools are setup properly
+
+```
+pyrpipe_diagnostic test
+```
 
 ## Funding
 
