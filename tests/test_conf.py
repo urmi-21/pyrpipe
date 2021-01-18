@@ -54,17 +54,17 @@ def test_pipeline1():
     
 def test_pipeline2():    
     st=sraOb.trim(tg).align(hs).assemble(stie).quant(kl)   
-    assert st!=None,"pipeline 1 failed"
+    assert st!=None,"pipeline 2 failed"
 
   
 def test_pipeline3():    
     st=sraOb.trim(tg).align(star).assemble(stie).quant(sl)   
-    assert st!=None,"pipeline 1 failed"
+    assert st!=None,"pipeline 3 failed"
 
     
 def test_pipeline4():    
     st=sraOb.quant(sl).quant(kl).align(star)
-    assert st!=None,"pipeline 1 failed"
+    assert st!=None,"pipeline 4 failed"
 
 def test_remove():
     assert pe.delete_file('pyrpipe_conf.yaml')==True,'removing conf.yaml failed'

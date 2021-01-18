@@ -280,8 +280,7 @@ if sys.argv[0].split('/')[-1]=='pyrpipe_diagnostic':
 elif sys.argv[0].split('/')[-1]=='pyrpipe':
     #will go to __main__.main
     pass
-else:
-    
+else:    
     run_py=False
     _full_command=' '.join(sys.argv)
     #this will execute in command was like python <script.py> [opts]
