@@ -36,6 +36,7 @@ hs=mapping.Hisat2(index=testVars.testDir+"/hisatindex",genome=testVars.genome,**
 star=mapping.Star(index=os.path.join(testVars.testDir,"starIndex"),genome=testVars.genome)
 samOb=tools.Samtools()
 stie=assembly.Stringtie()
+cl=assembly.Cufflinks()
 kl=quant.Kallisto(index=testVars.testDir+"/kallistoIndex/kalIndex",transcriptome=testVars.cdna)
 sl=quant.Salmon(index=testVars.testDir+"/salmonIndex/salIndex",transcriptome=testVars.cdna_big)
 
@@ -63,6 +64,9 @@ def test_pipeline4():
     st=sraOb.quant(sl).quant(kl).align(star)
     assert st!=None,"pipeline 1 failed"
 
+def test_pipeline5():    
+    st=sraOb.quant(sl).quant(kl).align(bt).assemble(cl).assemble(stie)
+    assert st!=None,"pipeline 1 failed"
     
     
     
