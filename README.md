@@ -3,7 +3,7 @@
 [![Documentation Status](https://readthedocs.org/projects/pyrpipe/badge/?version=latest)](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - Python Version](https://img.shields.io/pypi/pyversions/pyrpipe)
 ![PyPI - pyrpipe Version](https://img.shields.io/pypi/v/pyrpipe?style=flat-square)
-[![install with bioconda](https://anaconda.org/bioconda/plncpro/badges/installer/conda.svg)](https://anaconda.org/bioconda/pyrpipe)
+[![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/pyrpipe/README.html)
 ![PyPI - License](https://img.shields.io/pypi/l/pyrpipe)
 
 # pyrpipe: python rna-seq pipeliner
