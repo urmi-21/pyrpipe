@@ -15,7 +15,7 @@ pyrpipe provides an easy-to-use framework for importing any UNIX command in pyth
 pyrpipe comes with specialized classes and functions to easily code RNA-Seq processing workflows.
 Pipelines in pyrpipe can be created and extended by integrating third-party tools, executable scripts, or python libraries in an object oriented manner.
 
-Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.925818v3)
+Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.925818v4)
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
