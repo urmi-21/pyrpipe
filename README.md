@@ -1,7 +1,7 @@
 [![Build Status](https://travis-ci.org/urmi-21/pyrpipe.svg?branch=master)](https://travis-ci.org/urmi-21/pyrpipe)
 [![Coverage Status](https://coveralls.io/repos/github/urmi-21/pyrpipe/badge.svg?branch=master)](https://coveralls.io/github/urmi-21/pyrpipe?branch=master)
 [![Documentation Status](https://readthedocs.org/projects/pyrpipe/badge/?version=latest)](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
-![PyPI - pyrpipe Version](https://img.shields.io/pypi/v/pyrpipe?style=flat-square)
+![PyPI](https://img.shields.io/pypi/v/pyrpipe?style=flat-square)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/pyrpipe/README.html)
 ![PyPI - License](https://img.shields.io/pypi/l/pyrpipe)
 
