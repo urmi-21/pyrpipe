@@ -23,7 +23,7 @@ salmon=quant.Salmon(index="human_data/salmon_index",transcriptome=Tr,threads=15)
 rule all:
 	input:
 		#expand("{wd}/{sample}/salmon_out/quant.sf",wd=DIR,sample=SRR)
-		expand("{wd}/results_TPM_tx.tsv",wd=DIR)
+		expand("{wd}/results_TPM_gene.tsv",wd=DIR)
 
 rule quant:
 	output:
