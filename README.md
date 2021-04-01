@@ -62,15 +62,15 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 |--------------------------------------------------------------------------------------|---------------------|
 | [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.10.9 )                  | SRA access          |
 | [Trimgalore](https://github.com/FelixKrueger/TrimGalore) (v. 0.6.0)                            | Trimming            |
-| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | Trimming            |
-| [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)                            | Alignment           |
-| [STAR](https://github.com/alexdobin/STAR)                                            | Alignment           |
-| [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml)                     | Alignment           |
-| [Kallisto](https://pachterlab.github.io/kallisto/)                                   | Quantification      |
-| [Salmon](https://combine-lab.github.io/salmon/)                                      | Quantification      |
-| [Stringtie](https://github.com/gpertea/stringtie)                                    | Transcript Assembly |
-| [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/)                           | Transcript Assembly |
-| [Samtools](https://github.com/samtools/samtools)                                     | Tools               |
+| [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) (v. 38.76) | Trimming            |
+| [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml) (v. 2.2.1)                            | Alignment           |
+| [STAR](https://github.com/alexdobin/STAR) (v. 2.7.7a)                                           | Alignment           |
+| [Bowtie2](http://bowtie-bio.sourceforge.net/bowtie2/index.shtml) (v. 2.3.5.1)                     | Alignment           |
+| [Kallisto](https://pachterlab.github.io/kallisto/) (v. 0.46.2)                                  | Quantification      |
+| [Salmon](https://combine-lab.github.io/salmon/) (v. 0.14.1)                                     | Quantification      |
+| [Stringtie](https://github.com/gpertea/stringtie) (v. 2.1.4)                                   | Transcript Assembly |
+| [Cufflinks](http://cole-trapnell-lab.github.io/cufflinks/) (v. 2.2.1)                           | Transcript Assembly |
+| [Samtools](https://github.com/samtools/samtools) (v. 1.9)                                    | Tools               |
 
 
 ## Examples
