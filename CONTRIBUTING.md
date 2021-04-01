@@ -13,9 +13,9 @@ Here, information is provided for contributers who would like to contribute to p
 
 ## Contribution scope
 We are happy to to discuss and include any contributions that:
-1. Provides significant improvements in the pyrpipe code or design
-2. Improves or updates existing APIs to RNA-Seq tools
-3. Adds new API to pyrpipe in a way that fits with existing API design
+1. Provides significant improvements in the pyrpipe code or design.
+2. Improves or updates existing APIs to RNA-Seq tools.
+3. Adds new APIs to access bioinformatics tools in a way that fits with existing API design and ecosystem.
 4. Fixes any bugs or any known issue. We really appreciate that you please report the bug in [issues](https://github.com/urmi-21/pyrpipe/issues) before suggesting a fix.
 5. Improves the existing documentation.
 
