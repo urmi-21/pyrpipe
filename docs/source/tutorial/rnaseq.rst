@@ -70,7 +70,7 @@ The above code defines a simple pipeline (in a single line: Line 18) that:
 
 1. Imports the required pyrpipe modules
 
-3. Lines 3 to 7 defines the variables for reference files, output directory, and star index
+3. Lines 3 to 7 defines the variables for reference files, *output directory*, and star index. The *output directory* will be used to store the downloaded RNA-Seq data and will be the default directory for all the results.
 
 10. Creates a Star object. It takes index and genome as parameters. It will automatically verify the index and if an index is not found, it will use the genome to build one and save it to the index path provided.
 
