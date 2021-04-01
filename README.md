@@ -60,8 +60,8 @@ Allows fast and easy development of bioinformatics pipelines in python by provid
 
 | Tool                                                                                 | Purpose             |
 |--------------------------------------------------------------------------------------|---------------------|
-| [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.9.6 or higher)                  | SRA access          |
-| [Trimgalore](https://github.com/FelixKrueger/TrimGalore)                             | Trimming            |
+| [SRA Tools](https://github.com/ncbi/sra-tools) (v. 2.10.9 )                  | SRA access          |
+| [Trimgalore](https://github.com/FelixKrueger/TrimGalore) (v. 0.6.0)                            | Trimming            |
 | [BBDuk](https://jgi.doe.gov/data-and-tools/bbtools/bb-tools-user-guide/bbduk-guide/) | Trimming            |
 | [Hisat2](https://ccb.jhu.edu/software/hisat2/index.shtml)                            | Alignment           |
 | [STAR](https://github.com/alexdobin/STAR)                                            | Alignment           |
