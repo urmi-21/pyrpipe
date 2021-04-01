@@ -101,16 +101,16 @@ An example of `pyrpipe_conf.yaml` is shown below with the pyrpipe default values
 
 .. code-block:: yaml
 
-    dry: False
-    threads: None
-    force: False 
-    params_dir: ./params
-    logs: True
-    logs_dir: ./pyrpipe_logs
-    verbose: False
-    memory: None
-    safe: False
-    multiqc: False
+    dry: False          # Only print pyrpipe's commands and not execute anything through pyrpipe_engine module
+    threads: None       # Set the number of threads to use
+    force: False        # Force execution of commands if their target files already exist
+    params_dir: ./params # Directory containing parameters
+    logs: True          # Enable or disable pyrpipe logs
+    logs_dir: ./pyrpipe_logs    # Directory to save logs
+    verbose: False      # Display pyrpipe messages
+    memory: None        # Set memory to use (in GB)
+    safe: False         # Disable file deletion via pyrpipe commands
+    multiqc: False      # Automatically run multiqc after analysis
 
 
 
