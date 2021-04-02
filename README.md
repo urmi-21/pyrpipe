@@ -120,7 +120,7 @@ The above command will install pyrpipe and the required tools inside a conda env
 Alternatively, use the conda environment.yaml file provided in this repository and build the conda environment by running
 
 ```
-conda env create -f environment.yaml
+conda env create -f pyrpipe_environment.yaml
 ```
 
 ### Install latest stable version
