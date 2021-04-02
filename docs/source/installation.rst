@@ -3,6 +3,9 @@ Installation
 ======================
 .. _installation:
 
+
+**Note:** See :ref:`conda_setup` in tutorial, to learn how to install pyrpipe and required tools in an conda environment.
+
 pyrpipe is available through bioconda could be installed via::
 
 	conda install -c bioconda pyrpipe

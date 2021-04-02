@@ -1,3 +1,4 @@
+
 Setting up the environment
 ==========================
 
@@ -6,6 +7,7 @@ In this tutorial we will use the conda environment manager to install python, py
 **Note:** Conda must be installed on the system. For help with setting up conda, please see `miniconda <https://docs.conda.io/en/latest/miniconda.html>`_.
 
 
+.. _conda_setup:
 
 Create a new conda environment
 -------------------------------
