@@ -26,6 +26,16 @@ Activate the newly created conda environment and install required tools
     conda install -c bioconda pyrpipe star=2.7.7a sra-tools=2.10.9 stringtie=2.1.4 trim-galore=0.6.6 orfipy=0.0.3 salmon=1.4.0
 
 
+If the above command fails, please try adding conda channels (see commands below) in the right order and then try again.
+
+.. code-block:: bash
+    
+    conda config --add channels defaults
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+
+
+
 Using conda environment in yaml files
 #####################################
 

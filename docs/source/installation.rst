@@ -6,6 +6,15 @@ Installation
 
 **Note:** See :ref:`conda_setup` in tutorial, to learn how to install pyrpipe and required tools in an conda environment.
 
+Before installing pyrpipe, make sure conda channels are added in right order
+
+.. code-block:: bash
+
+    conda config --add channels defaults
+    conda config --add channels bioconda
+    conda config --add channels conda-forge
+
+
 pyrpipe is available through bioconda could be installed via::
 
 	conda install -c bioconda pyrpipe
