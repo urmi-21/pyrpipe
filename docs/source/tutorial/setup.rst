@@ -22,8 +22,21 @@ Activate the newly created conda environment and install required tools
 
     conda activate pyrpipe
     conda install -c bioconda pyrpipe star=2.7.7a sra-tools=2.10.9 stringtie=2.1.4 trim-galore=0.6.6 orfipy=0.0.3 salmon=1.4.0
-    
-To create a yaml file containing information about the conda environment, run the following command
+
+
+Using conda environment in yaml files
+#####################################
+
+We have provided a yaml file containing the conda packages required to reproduce pyrpipe environment. Users can also use this file to create a conda environment and run pyrpipe.
+To create a conda environment, use the `pyrpipe_environment.yaml <https://github.com/urmi-21/pyrpipe/blob/master/pyrpipe_environment.yaml>`_:
+
+.. code-block:: bash
+
+    conda env create -f pyrpipe_environment.yml
+
+
+Users can easily export and share their own conda environment yaml files containing information about the conda environment.
+To export any conda environment as yaml, run the following command
 
 .. code-block:: bash
 
@@ -34,14 +47,17 @@ To recreate the conda environment in the `environment.yml`, use
 .. code-block:: bash
 
     conda env create -f environment.yml
-    
+
+Automated installation of required tools
+########################################
+
 We have also provided a utility to install required RNA-Seq tools via a single command:
 
 .. code-block:: bash
     
     pyrpipe_diagnostic build-tools
     
-**Note** Users must verify the versions of the tools installed in the conda environment.
+**Note:** Users must verify the versions of the tools installed in the conda environment.
 
 
 Setting up NCBI SRA-Tools
