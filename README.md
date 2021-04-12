@@ -175,6 +175,11 @@ Use the following pyrpipe_diagnostic command to test if SRA-Tools are setup prop
 pyrpipe_diagnostic test
 ```
 
+## Contributing
+
+Please see [CONTRIBUTING.md](https://github.com/urmi-21/pyrpipe/blob/master/CONTRIBUTING.md)
+
+
 ## Funding
 
 This work is funded in part by the National Science Foundation award IOS 1546858, "Orphan Genes: An Untapped Genetic Reservoir of Novel Traits".
