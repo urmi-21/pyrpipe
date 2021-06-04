@@ -4,6 +4,7 @@
 ![PyPI](https://img.shields.io/pypi/v/pyrpipe?style=flat-square)
 [![install with bioconda](https://img.shields.io/badge/install%20with-bioconda-brightgreen.svg?style=flat)](http://bioconda.github.io/recipes/pyrpipe/README.html)
 ![PyPI - License](https://img.shields.io/pypi/l/pyrpipe)
+[![publication](https://img.shields.io/badge/publication-NARGAB-blue)](https://academic.oup.com/nargab/article/3/2/lqab049/6290623)
 
 # pyrpipe: python rna-seq pipeliner
 
@@ -15,7 +16,7 @@ pyrpipe provides an easy-to-use framework for importing any UNIX command in pyth
 pyrpipe comes with specialized classes and functions to easily code RNA-Seq processing workflows.
 Pipelines in pyrpipe can be created and extended by integrating third-party tools, executable scripts, or python libraries in an object oriented manner.
 
-Preprint is available [here](https://www.biorxiv.org/content/10.1101/2020.03.04.925818v4)
+Read the paper [here](https://academic.oup.com/nargab/article/3/2/lqab049/6290623)
 
 Read the docs [here](https://pyrpipe.readthedocs.io/en/latest/?badge=latest)
 
